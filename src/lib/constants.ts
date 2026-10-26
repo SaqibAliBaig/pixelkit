@@ -23,9 +23,9 @@ export interface SiteConfig {
 export const SITE: SiteConfig = {
   name: 'PixelKit',
   url: 'https://pixelkit.app',
-  defaultTitle: 'PixelKit — Convert & compress files in your browser',
+  defaultTitle: 'Image Compressor & Converter — Compress JPG, PNG, WebP, PDF | PixelKit',
   defaultDescription:
-    'Convert and compress HEIC, JPG, PNG, WEBP and PDF to exact KB targets. Fast, private, and free — files never leave your device.',
+    'Free online image compressor and converter. Compress and optimize JPG, PNG, WebP, HEIC & PDF to exact KB targets. 100% private in-browser tool with zero server uploads.',
   defaultOgImage: '/og-default.png',
   twitterHandle: '@pixelkitapp',
   author: 'PixelKit Team',
