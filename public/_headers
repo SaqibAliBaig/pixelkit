@@ -1,0 +1,48 @@
+# Security & performance headers for Cloudflare Pages
+
+# Global security headers for all paths
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Cache immutable build assets for 1 year
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache images & icons for 30 days
+/icon-*.png
+  Cache-Control: public, max-age=2592000
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=2592000
+
+/og-default.png
+  Cache-Control: public, max-age=2592000
+
+/favicon.*
+  Cache-Control: public, max-age=2592000
+
+# HTML pages - revalidate to guarantee fresh content
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# RSS & Sitemaps - cache for 1 hour
+/rss.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/xml; charset=utf-8
+
+/sitemap-*.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/xml; charset=utf-8
+
+# Service Worker - no-cache so updates propagate immediately
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate

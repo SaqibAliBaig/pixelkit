@@ -1,0 +1,40 @@
+---
+import Badge from '@components/ui/Badge.astro';
+
+interface Combo {
+  from: string;
+  to: string;
+  sizeKb: number | null;
+}
+
+interface Props {
+  combo: Combo;
+}
+
+const { combo } = Astro.props;
+const fromLabel = combo.from.toUpperCase();
+const toLabel = combo.to.toUpperCase();
+
+const h1 = combo.sizeKb
+  ? `Convert ${fromLabel} to ${toLabel} Under ${combo.sizeKb}KB`
+  : `Convert ${fromLabel} to ${toLabel} in Your Browser`;
+
+const subtitle = combo.sizeKb
+  ? `Hit exactly ${combo.sizeKb}KB in one pass — with the highest possible quality. No upload, no signup, no watermark.`
+  : `One-click ${fromLabel} → ${toLabel} conversion that runs entirely on your device. Nothing is uploaded.`;
+---
+
+<section class="text-center">
+  <Badge variant="muted" class="mx-auto">
+    <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+    100% client-side
+  </Badge>
+
+  <h1 class="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+    {h1}
+  </h1>
+
+  <p class="mx-auto mt-4 max-w-prose text-balance text-base text-muted leading-relaxed sm:text-lg">
+    {subtitle}
+  </p>
+</section>

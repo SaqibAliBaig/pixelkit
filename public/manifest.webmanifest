@@ -1,0 +1,73 @@
+{
+  "name": "PixelKit",
+  "short_name": "PixelKit",
+  "description": "Convert and compress HEIC, PNG, JPG, WEBP and PDF files in your browser. Fast, private, free.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "categories": ["productivity", "utilities", "photo", "graphics"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "HEIC to JPG",
+      "short_name": "HEIC→JPG",
+      "url": "/heic-to-jpg",
+      "description": "Convert iPhone HEIC photos to JPG format"
+    },
+    {
+      "name": "Compress under 50KB",
+      "short_name": "<50KB",
+      "url": "/heic-to-jpg-under-50kb",
+      "description": "Compress any image under 50KB"
+    },
+    {
+      "name": "JPG to PDF under 100KB",
+      "short_name": "PDF<100KB",
+      "url": "/jpg-to-pdf-under-100kb",
+      "description": "Convert photo to PDF under 100KB"
+    },
+    {
+      "name": "Browse All Conversions",
+      "short_name": "All Tools",
+      "url": "/convert",
+      "description": "Search all 1,000+ file conversions"
+    }
+  ]
+}

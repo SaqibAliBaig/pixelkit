@@ -1,0 +1,3 @@
+cd pixelkit/public/fonts
+curl -L -o Inter-Variable-Italic.woff2 \
+  "https://github.com/rsms/inter/raw/master/docs/font-files/InterVariable-Italic.woff2"

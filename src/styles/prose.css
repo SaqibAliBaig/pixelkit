@@ -1,0 +1,206 @@
+/* ------------------------------------------------------------------ *
+ * Prose — blog and long-form typography.
+ *
+ * Tailwind's typography plugin (prose prose-neutral dark:prose-invert)
+ * handles the base scale. This file only refines things specific to
+ * PixelKit: tighter code blocks, cleaner quotes, consistent inline link
+ * styling, and tokens that track the site palette.
+ *
+ * Enable in tailwind.config.mjs plugins: [require('@tailwindcss/typography')]
+ * ------------------------------------------------------------------ */
+
+.prose {
+  color: rgb(var(--fg) / 0.85);
+  max-width: 68ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+/* Headings inherit the site font + tokens; the plugin adds margin. */
+.prose :where(h1, h2, h3, h4):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--fg));
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  scroll-margin-top: 5rem;
+}
+
+.prose :where(h2):not(:where([class~='not-prose'] *)) {
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.prose :where(h3):not(:where([class~='not-prose'] *)) {
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  font-size: 1.2rem;
+  line-height: 1.35;
+}
+
+/* Paragraphs. */
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+/* Links — underlined, accent-colored on hover. */
+.prose :where(a):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--fg));
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--muted) / 0.4);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 150ms ease, color 150ms ease;
+}
+
+.prose :where(a):not(:where([class~='not-prose'] *)):hover {
+  color: rgb(var(--accent));
+  text-decoration-color: rgb(var(--accent) / 0.6);
+}
+
+/* Lists. */
+.prose :where(ul, ol):not(:where([class~='not-prose'] *)) {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.5em;
+}
+
+.prose :where(li):not(:where([class~='not-prose'] *)) {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose :where(li > p):not(:where([class~='not-prose'] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose :where(ul > li)::marker {
+  color: rgb(var(--muted));
+}
+
+.prose :where(ol > li)::marker {
+  color: rgb(var(--muted));
+  font-variant-numeric: tabular-nums;
+}
+
+/* Blockquote — accent left rule, muted text. */
+.prose :where(blockquote):not(:where([class~='not-prose'] *)) {
+  margin: 1.75em 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 2px solid rgb(var(--accent));
+  color: rgb(var(--muted));
+  font-style: normal;
+}
+
+.prose :where(blockquote p:first-of-type)::before,
+.prose :where(blockquote p:last-of-type)::after {
+  content: '';
+}
+
+/* Inline code — subtle surface, tighter radius. */
+.prose :where(code):not(:where([class~='not-prose'] *)):not(pre code) {
+  background-color: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.375rem;
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.prose :where(code)::before,
+.prose :where(code)::after {
+  content: '';
+}
+
+/* Code blocks — bordered, dark-friendly, scrollable. */
+.prose :where(pre):not(:where([class~='not-prose'] *)) {
+  background-color: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.65;
+}
+
+.prose :where(pre code):not(:where([class~='not-prose'] *)) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Horizontal rule. */
+.prose :where(hr):not(:where([class~='not-prose'] *)) {
+  border: 0;
+  border-top: 1px solid rgb(var(--border));
+  margin: 2.5em 0;
+}
+
+/* Tables — full width, hairline borders, tabular numerics. */
+.prose :where(table):not(:where([class~='not-prose'] *)) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.75em 0;
+  font-size: 0.925em;
+}
+
+.prose :where(th, td):not(:where([class~='not-prose'] *)) {
+  border-bottom: 1px solid rgb(var(--border));
+  padding: 0.65em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose :where(th):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--fg));
+  font-weight: 600;
+  font-size: 0.95em;
+  letter-spacing: 0.01em;
+}
+
+.prose :where(td):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--fg) / 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Images. */
+.prose :where(img):not(:where([class~='not-prose'] *)) {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(var(--border));
+  margin: 1.75em 0;
+}
+
+.prose :where(figcaption):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--muted));
+  font-size: 0.875em;
+  margin-top: 0.5em;
+  text-align: center;
+}
+
+/* Strong / em inherit font weight carefully. */
+.prose :where(strong):not(:where([class~='not-prose'] *)) {
+  color: rgb(var(--fg));
+  font-weight: 600;
+}
+
+.prose :where(em):not(:where([class~='not-prose'] *)) {
+  font-style: italic;
+}
+
+/* Small resets for the intro / lead paragraph pattern. */
+.prose > :first-child:not(:where([class~='not-prose'] *)) {
+  margin-top: 0;
+}
+
+.prose > :last-child:not(:where([class~='not-prose'] *)) {
+  margin-bottom: 0;
+}
+
+/* Dark mode inherits automatically through CSS variables. No extra
+   .dark overrides are needed — the tokens resolve to the right palette. */

@@ -1,0 +1,46 @@
+{
+  "global": [
+    {
+      "q": "Is PixelKit really free?",
+      "a": "Yes. PixelKit is free to use with no watermarks, no file limits and no account. Everything runs in your browser, so there is no server cost that would justify a paywall."
+    },
+    {
+      "q": "Do my files get uploaded anywhere?",
+      "a": "No. Every conversion happens locally on your device using your browser's canvas and Web Worker APIs. Files never leave your device and nothing is stored after you close the tab."
+    },
+    {
+      "q": "Does it work offline?",
+      "a": "Yes, after the first page load the tool works fully offline because the conversion engine is already cached in your browser. No network round-trip is required."
+    },
+    {
+      "q": "Is there a file size limit?",
+      "a": "There is no server-side limit because there is no server. Very large files may be limited only by your device's available memory — usually several hundred MB on desktop and tens of MB on mobile."
+    },
+    {
+      "q": "Which browsers are supported?",
+      "a": "PixelKit works in all modern browsers: Chrome, Edge, Firefox, Safari, and their mobile equivalents. Web Workers and canvas are required; both are universally available on evergreen browsers."
+    }
+  ],
+  "byKind": {
+    "convert": [
+      {
+        "q": "Will the conversion change how my file looks?",
+        "a": "For lossless targets like PNG the result is pixel-identical. For lossy targets like JPG or WEBP the tool uses the highest quality that still meets any size target you set, so the difference is usually imperceptible."
+      },
+      {
+        "q": "Can I convert multiple files at once?",
+        "a": "Yes. Drop multiple files into the zone, and PixelKit converts them in parallel using a pool of Web Workers. Results appear in a list you can download one by one or all at once."
+      }
+    ],
+    "compress": [
+      {
+        "q": "How does PixelKit hit an exact KB target?",
+        "a": "The tool uses a binary-search loop: it encodes your file at a mid-point quality, checks the size against your target, then narrows the quality range up or down. After about 12 iterations it lands at or just under the target with the best possible quality for that size."
+      },
+      {
+        "q": "What if the file can't get small enough?",
+        "a": "For very aggressive targets the tool will also downscale the image dimensions. If even the smallest possible file is over target, PixelKit tells you the smallest achievable size and lets you download that instead."
+      }
+    ]
+  }
+}

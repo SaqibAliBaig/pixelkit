@@ -1,0 +1,72 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Prose from '@components/ui/Prose.astro';
+import { SITE } from '@lib/constants';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `Privacy Policy — ${SITE.name}`,
+    description: "PixelKit runs entirely in your browser. Files are never uploaded, stored, or logged.",
+    url: new URL('/privacy', SITE.url).href,
+  },
+];
+---
+
+<BaseLayout
+  title={`Privacy — ${SITE.name}`}
+  description="PixelKit runs entirely in your browser. Files are never uploaded, stored, or logged. Here's exactly what we do and don't collect."
+  jsonLd={jsonLd}
+  width="prose"
+>
+  <Prose>
+    <h1>Privacy</h1>
+    <p class="lead">
+      The short version: your files never leave your device. PixelKit does
+      not upload, store, or inspect anything you open in the tool.
+    </p>
+
+    <h2>Files</h2>
+    <p>
+      Every conversion runs locally in your browser using the Canvas API and
+      Web Workers. Files are read from disk, processed in memory, and
+      written back to disk as downloads. Nothing is transmitted over the
+      network during the conversion, and nothing is retained after the tab
+      is closed.
+    </p>
+
+    <h2>Analytics</h2>
+    <p>
+      We use Cloudflare Web Analytics — a privacy-first, cookie-free
+      analytics service. It counts page views and reports aggregate
+      performance metrics (like load time) but does not set cookies,
+      fingerprint visitors, or track you across sites. No personal data is
+      collected, and no data is sold.
+    </p>
+
+    <h2>Logs</h2>
+    <p>
+      Our hosting provider (Cloudflare) keeps standard HTTP access logs for
+      a short retention window, as any web host does. These logs contain IP
+      address, user agent, and requested path — they do not contain any of
+      your converted files, since your files are never sent to the server.
+    </p>
+
+    <h2>Third parties</h2>
+    <p>
+      We do not embed third-party trackers, ad networks, or analytics SDKs.
+      We do not use Facebook Pixel, Google Analytics, or similar services.
+      The only third-party request on the site is the Cloudflare Web
+      Analytics beacon, which is served from Cloudflare's own CDN and is
+      cookie-free.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy? Email <a href="mailto:privacy@pixelkit.app">privacy@pixelkit.app</a>.
+    </p>
+
+    <p><em>Last updated: January 2026</em></p>
+  </Prose>
+</BaseLayout>

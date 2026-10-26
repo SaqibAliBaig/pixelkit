@@ -1,0 +1,15 @@
+---
+interface Props {
+  data: Record<string, unknown>;
+}
+
+const { data } = Astro.props;
+
+// Add @context if missing — callers can pass it in or omit for brevity.
+const payload = '@context' in data ? data : { '@context': 'https://schema.org', ...data };
+
+// Escape `<` so a rogue string in JSON-LD can't break out of the <script> tag.
+const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+---
+
+<script type="application/ld+json" set:html={json} />

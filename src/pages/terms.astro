@@ -1,0 +1,75 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Prose from '@components/ui/Prose.astro';
+import { SITE } from '@lib/constants';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `Terms of Use — ${SITE.name}`,
+    description: "Plain-English terms for using PixelKit. Free, browser-based, no warranty, private.",
+    url: new URL('/terms', SITE.url).href,
+  },
+];
+---
+
+<BaseLayout
+  title={`Terms of use — ${SITE.name}`}
+  description="Plain-English terms for using PixelKit. Short, because there isn't much to it — free, as-is, no warranty, use responsibly."
+  jsonLd={jsonLd}
+  width="prose"
+>
+  <Prose>
+    <h1>Terms of use</h1>
+    <p class="lead">
+      By using PixelKit, you agree to these simple terms. If you don't agree,
+      please don't use the site.
+    </p>
+
+    <h2>What PixelKit is</h2>
+    <p>
+      PixelKit is a free, browser-based file converter and compressor. It is
+      provided as-is, with no warranty of any kind, express or implied. We do
+      our best to make it work reliably, but we can't guarantee any specific
+      result, quality, or compatibility with a particular portal or service.
+    </p>
+
+    <h2>Acceptable use</h2>
+    <p>
+      You may use PixelKit for any lawful purpose. You agree not to:
+    </p>
+    <ul>
+      <li>Use the site to break any law.</li>
+      <li>Attempt to interfere with the site's operation or availability.</li>
+      <li>Republish PixelKit as your own product without attribution.</li>
+    </ul>
+
+    <h2>No liability</h2>
+    <p>
+      PixelKit is provided "as is" and "as available." To the maximum extent
+      permitted by law, we disclaim all warranties and are not liable for any
+      damages arising from your use of the site, including but not limited to
+      data loss, quality degradation, or rejection of a converted file by a
+      third-party service.
+    </p>
+    <p>
+      Because files are processed entirely in your browser, and we never
+      receive them, we cannot recover any file for you. Always keep your
+      original files.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      We may update these terms occasionally. When we do, we'll update the
+      date below. Continued use after changes constitutes acceptance.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions? Email <a href="mailto:hello@pixelkit.app">hello@pixelkit.app</a>.
+    </p>
+
+    <p><em>Last updated: January 2026</em></p>
+  </Prose>
+</BaseLayout>

@@ -1,0 +1,109 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import ToolHero from '@components/seo/ToolHero.astro';
+import ToolIntro from '@components/seo/ToolIntro.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import RelatedCombos from '@components/seo/RelatedCombos.astro';
+import UseCaseGrid from '@components/seo/UseCaseGrid.astro';
+import RelatedBlog from '@components/seo/RelatedBlog.astro';
+import Converter from '../components/converter/Converter.astro';
+import { buildToolJsonLd } from '@lib/seo/jsonld';
+
+interface Combo {
+  from: string;
+  to: string;
+  sizeKb: number | null;
+  fromMime: string;
+  toMime: string;
+}
+
+interface Props {
+  combo: Combo;
+  title: string;
+  description: string;
+  intro: string;
+  faqs: { q: string; a: string }[];
+  related: { label: string; href: string }[];
+  useCaseIds?: string[];
+  relatedBlogSlugs?: string[];
+}
+
+const {
+  combo,
+  title,
+  description,
+  intro,
+  faqs,
+  related,
+  useCaseIds = [],
+  relatedBlogSlugs = [],
+} = Astro.props;
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert' },
+  {
+    label: combo.sizeKb
+      ? `${combo.from.toUpperCase()} to ${combo.to.toUpperCase()} under ${combo.sizeKb}KB`
+      : `${combo.from.toUpperCase()} to ${combo.to.toUpperCase()}`,
+  },
+];
+
+const jsonLd = buildToolJsonLd({
+  combo,
+  title,
+  description,
+  faqs,
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  breadcrumbs: breadcrumbs.map((b) => ({
+    name: b.label,
+    url: b.href ? new URL(b.href, Astro.site).href : undefined,
+  })),
+});
+
+const fromLabel = combo.from.toUpperCase();
+const toLabel = combo.to.toUpperCase();
+const toolKeywords = [
+  `${combo.from} to ${combo.to}`,
+  `convert ${fromLabel} to ${toLabel}`,
+  `${fromLabel} converter`,
+  `${toLabel} converter`,
+  combo.sizeKb ? `compress ${fromLabel} to ${combo.sizeKb}kb` : `compress ${fromLabel}`,
+  combo.sizeKb ? `${fromLabel} under ${combo.sizeKb}kb` : 'online file converter',
+  'client-side converter',
+  'no upload image converter',
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={toolKeywords}
+  jsonLd={jsonLd}
+  width="default"
+>
+  <Breadcrumbs items={breadcrumbs} />
+
+  <ToolHero combo={combo} />
+
+  <div class="mt-8">
+    <Converter
+      from={combo.from}
+      to={combo.to}
+      fromMime={combo.fromMime}
+      toMime={combo.toMime}
+      targetKb={combo.sizeKb}
+    />
+  </div>
+
+  <ToolIntro combo={combo} intro={intro} />
+
+  <FAQSection faqs={faqs} />
+
+  {useCaseIds.length > 0 && <UseCaseGrid ids={useCaseIds} />}
+
+  <RelatedCombos items={related} />
+
+  {relatedBlogSlugs.length > 0 && <RelatedBlog slugs={relatedBlogSlugs} />}
+</BaseLayout>

@@ -1,0 +1,18 @@
+---
+interface Props {
+  size?: 'sm' | 'base' | 'lg';
+  class?: string;
+}
+
+const { size = 'base', class: className = '' } = Astro.props;
+
+const sizes = {
+  sm: 'prose-sm',
+  base: 'prose-base',
+  lg: 'prose-lg',
+} as const;
+---
+
+<div class={['prose prose-neutral dark:prose-invert', sizes[size], className].join(' ')}>
+  <slot />
+</div>

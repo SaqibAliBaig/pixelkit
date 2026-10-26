@@ -1,0 +1,78 @@
+---
+// Renders the toggle button. The no-flash init runs in BaseLayout <head>.
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Toggle theme"
+  title="Toggle theme"
+  class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:text-fg hover:bg-surface transition-colors"
+>
+  <!-- Sun (shown in dark mode) -->
+  <svg
+    id="theme-icon-sun"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="h-[18px] w-[18px] hidden dark:block"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+  </svg>
+
+  <!-- Moon (shown in light mode) -->
+  <svg
+    id="theme-icon-moon"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="h-[18px] w-[18px] block dark:hidden"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
+<script>
+  (() => {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const isDark = root.classList.toggle('dark');
+      try {
+        localStorage.setItem('pk-theme', isDark ? 'dark' : 'light');
+      } catch (_) {}
+      // Update meta theme-color for mobile browser chrome.
+      const metas = document.querySelectorAll('meta[name="theme-color"]');
+      metas.forEach((m) => {
+        const mq = m.getAttribute('media') || '';
+        if (mq.includes('dark')) {
+          m.setAttribute('content', isDark ? '#0A0A0A' : '#0A0A0A');
+        }
+      });
+    });
+
+    // Sync with system preference when user hasn't chosen yet.
+    try {
+      const stored = localStorage.getItem('pk-theme');
+      if (!stored) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        mq.addEventListener?.('change', (e) => {
+          document.documentElement.classList.toggle('dark', e.matches);
+        });
+      }
+    } catch (_) {}
+  })();
+</script>

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "useCases": [
+    {
+      "id": "passport",
+      "title": "Passport & visa portals",
+      "blurb": "Portals like the US DS-160, UK Gov, and Indian Passport Seva reject photos above 200KB or 240KB. PixelKit hits the exact KB in one pass — no guesswork with sliders.",
+      "sizes": [50, 100, 200],
+      "targets": ["jpg"],
+      "icon": "id-card"
+    },
+    {
+      "id": "aadhaar",
+      "title": "Aadhaar & PAN updates",
+      "blurb": "UIDAI portals cap Aadhaar scans at 2 MB and PAN uploads at 100–200 KB. Convert and compress without losing readable text on the scan.",
+      "sizes": [100, 200],
+      "targets": ["jpg", "pdf"],
+      "icon": "file-text"
+    },
+    {
+      "id": "exam-portals",
+      "title": "Exam & job applications",
+      "blurb": "SSC, UPSC, IBPS, NEET and most state portals reject photos and signatures above 20–50 KB. Hit the exact number every time.",
+      "sizes": [20, 50],
+      "targets": ["jpg"],
+      "icon": "clipboard-check"
+    },
+    {
+      "id": "email",
+      "title": "Email attachments",
+      "blurb": "Gmail, Outlook and most corporate mailboxes cap attachments at 10–25 MB. Compress a batch of photos in one pass so they send on the first try.",
+      "sizes": [100, 250, 500],
+      "targets": ["jpg", "webp", "pdf"],
+      "icon": "mail"
+    },
+    {
+      "id": "iphone",
+      "title": "iPhone HEIC photos",
+      "blurb": "iPhone saves photos as HEIC, which Windows and most web portals don't accept. Convert to JPG in your browser with no upload and no app install.",
+      "sizes": [100, 250, 500],
+      "targets": ["jpg", "png"],
+      "icon": "smartphone"
+    },
+    {
+      "id": "web-upload",
+      "title": "Website & CMS uploads",
+      "blurb": "WordPress, Shopify and Webflow all have max upload sizes. Convert to WEBP and target exact KBs to keep pages fast and Core Web Vitals green.",
+      "sizes": [50, 100, 150, 250],
+      "targets": ["webp"],
+      "icon": "globe"
+    }
+  ]
+}

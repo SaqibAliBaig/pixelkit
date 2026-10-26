@@ -1,0 +1,24 @@
+---
+// Static shell. Hidden until the island starts a job.
+---
+
+<div
+  id="pk-progress"
+  class="hidden"
+  role="progressbar"
+  aria-label="Conversion progress"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="0"
+>
+  <div class="flex items-center justify-between text-xs text-muted mb-1.5">
+    <span id="pk-progress-label">Converting…</span>
+    <span id="pk-progress-percent" class="tabular-nums">0%</span>
+  </div>
+  <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface border border-border">
+    <div
+      id="pk-progress-fill"
+      class="h-full w-0 bg-accent transition-[width] duration-200 ease-out"
+    ></div>
+  </div>
+</div>

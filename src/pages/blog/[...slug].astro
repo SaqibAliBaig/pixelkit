@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BlogLayout from '@layouts/BlogLayout.astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getCollection('blog');
+  return posts
+    .filter((p) => !p.data.draft)
+    .map((post) => ({
+      params: { slug: post.slug },
+      props: { post },
+    }));
+};
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+
+const { Content } = await post.render();
+
+// Related combos — the slugs are stored as plain strings on the entry.
+const related = (post.data.relatedCombos ?? [])
+  .map((slug: string) => {
+    // Parse "heic-to-jpg" or "heic-to-jpg-under-50kb" into a label.
+    const m = slug.match(/^([a-z]+)-to-([a-z]+)(?:-under-(\d+)kb)?$/);
+    if (!m) return null;
+    const [, from, to, size] = m;
+    if (!from || !to) return null;
+    const label = size
+      ? `${from.toUpperCase()} to ${to.toUpperCase()} under ${size}KB`
+      : `${from.toUpperCase()} to ${to.toUpperCase()}`;
+    const href = `/${slug}`;
+    return { label, href };
+  })
+  .filter((x): x is { label: string; href: string } => x !== null);
+
+const cover = post.data.cover?.src ?? undefined;
+---
+
+<BlogLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishedAt={post.data.publishedAt}
+  updatedAt={post.data.updatedAt}
+  author={post.data.author}
+  tags={post.data.tags}
+  cover={cover}
+  related={related}
+>
+  <Content />
+</BlogLayout>

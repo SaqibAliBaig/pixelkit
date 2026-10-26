@@ -1,0 +1,73 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  full?: boolean;
+  class?: string;
+  external?: boolean;
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  disabled = false,
+  full = false,
+  class: className = '',
+  external = false,
+  ariaLabel,
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap';
+
+const variants: Record<NonNullable<Props['variant']>, string> = {
+  primary: 'bg-accent text-accent-fg hover:opacity-90 active:opacity-95',
+  secondary:
+    'bg-surface text-fg border border-border hover:bg-surface/70 active:bg-surface/60',
+  ghost: 'text-fg hover:bg-surface active:bg-surface/80',
+  danger: 'bg-danger text-white hover:opacity-90 active:opacity-95',
+};
+
+const sizes: Record<NonNullable<Props['size']>, string> = {
+  sm: 'text-sm px-3 py-1.5 h-8',
+  md: 'text-sm px-4 py-2 h-10',
+  lg: 'text-base px-5 py-2.5 h-12',
+};
+
+const classes = [
+  base,
+  variants[variant],
+  sizes[size],
+  full ? 'w-full' : '',
+  className,
+].join(' ');
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class={classes}
+      aria-label={ariaLabel}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button
+      type={type}
+      class={classes}
+      disabled={disabled}
+      aria-label={ariaLabel}
+    >
+      <slot />
+    </button>
+  )
+}

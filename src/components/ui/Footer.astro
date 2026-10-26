@@ -1,0 +1,85 @@
+---
+import Container from '@components/ui/Container.astro';
+import { SITE, FOOTER_LINKS } from '@lib/constants';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-16 border-t border-border bg-bg">
+  <Container>
+    <div class="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-5">
+      <!-- Brand + blurb -->
+      <div class="sm:col-span-2">
+        <a href="/" class="inline-flex items-center gap-2 font-semibold text-fg">
+          <img
+            src="/favicon.svg"
+            width="24"
+            height="24"
+            alt="PixelKit"
+            class="h-6 w-6 rounded-md shrink-0 object-contain shadow-sm"
+            aria-hidden="true"
+          />
+          <span>{SITE.name}</span>
+        </a>
+        <p class="mt-3 max-w-md text-sm text-muted leading-relaxed">
+          Fast, private file conversion in your browser. Convert and compress
+          HEIC, JPG, PNG, WEBP and PDF to exact sizes — no uploads, no accounts,
+          no watermarks.
+        </p>
+        <p class="mt-4 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted">
+          <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+          100% client-side · your files never leave your device
+        </p>
+      </div>
+
+      <!-- Tool column -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-muted font-semibold">Convert</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          {FOOTER_LINKS.tools.map((l) => (
+            <li>
+              <a href={l.href} class="text-fg/80 hover:text-fg transition-colors">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Target column -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-muted font-semibold">KB Targets</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          {FOOTER_LINKS.targets.map((l) => (
+            <li>
+              <a href={l.href} class="text-fg/80 hover:text-fg transition-colors">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Company column -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-muted font-semibold">Site</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          {FOOTER_LINKS.site.map((l) => (
+            <li>
+              <a href={l.href} class="text-fg/80 hover:text-fg transition-colors">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2 border-t border-border py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© {year} {SITE.name}. All rights reserved.</p>
+      <p>
+        Made with care. No tracking cookies.
+      </p>
+    </div>
+  </Container>
+</footer>

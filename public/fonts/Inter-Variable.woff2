@@ -1,0 +1,3 @@
+cd pixelkit/public/fonts
+curl -L -o Inter-Variable.woff2 \
+  "https://github.com/rsms/inter/raw/master/docs/font-files/InterVariable.woff2"

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '@lib/constants';
+
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort(
+    (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+  );
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Blog' },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: `Blog — ${SITE.name}`,
+    description: 'Practical guides on file formats, portals, compression, and getting your upload accepted on the first try.',
+    url: new URL('/blog', SITE.url).href,
+    blogPost: posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.data.title,
+      description: p.data.description,
+      url: new URL(`/blog/${p.slug}`, SITE.url).href,
+      datePublished: p.data.publishedAt.toISOString(),
+      dateModified: (p.data.updatedAt ?? p.data.publishedAt).toISOString(),
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title={`Blog — ${SITE.name}`}
+  description="Practical guides on file formats, portals, compression, and getting your upload accepted on the first try."
+  jsonLd={jsonLd}
+  width="default"
+>
+  <div class="mx-auto max-w-3xl">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-6">
+      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Blog</h1>
+      <p class="mt-3 text-base text-muted leading-relaxed">
+        Practical guides on file formats, portals, compression, and getting
+        your upload accepted on the first try.
+      </p>
+    </header>
+
+    <ul class="mt-10 space-y-3">
+      {posts.map((post) => (
+        <li>
+          <a
+            href={`/blog/${post.slug}`}
+            class="group block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-fg/20 hover:bg-surface/70"
+          >
+            <p class="text-xs uppercase tracking-wider text-muted">
+              {post.data.publishedAt.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+            <h2 class="mt-2 text-lg font-semibold text-fg group-hover:text-accent transition-colors">
+              {post.data.title}
+            </h2>
+            <p class="mt-2 text-sm text-muted leading-relaxed">
+              {post.data.description}
+            </p>
+            {post.data.tags.length > 0 && (
+              <ul class="mt-3 flex flex-wrap gap-1.5">
+                {post.data.tags.map((t) => (
+                  <li>
+                    <span class="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] text-muted">
+                      {t}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

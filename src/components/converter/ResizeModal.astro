@@ -1,0 +1,288 @@
+---
+// Interactive Resize & Scale Studio Modal for PixelKit.
+// Professional studio layout: Left = Live Visual Preview & Stats, Right = Scrollable Controls Panel.
+// Ensures 100% of controls and footer action buttons are always accessible and scrollable on any screen.
+---
+
+<div
+  id="pk-resize-modal"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="pk-resize-modal-title"
+>
+  <div
+    class="relative w-full max-w-5xl h-[92vh] max-h-[860px] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
+  >
+    <!-- Header (Pinned) -->
+    <header class="flex items-center justify-between border-b border-border bg-surface px-4 py-3 sm:px-6 shrink-0">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent shrink-0">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          <h3 id="pk-resize-modal-title" class="truncate text-base font-semibold text-fg">
+            Resize & Scale Studio
+          </h3>
+          <span
+            id="pk-resize-badge"
+            class="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-bold text-accent border border-accent/30 shrink-0 font-mono"
+          >
+            100%
+          </span>
+        </div>
+        <p id="pk-resize-filename" class="mt-0.5 text-xs text-muted truncate">
+          Adjust output resolution and preview target size before converting
+        </p>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        id="pk-resize-close-btn"
+        type="button"
+        class="rounded-lg p-2 text-muted hover:text-fg hover:bg-bg border border-transparent hover:border-border transition-colors cursor-pointer shrink-0 ml-2"
+        title="Close (Esc)"
+        aria-label="Close"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Studio Split View (Desktop = Side-by-Side, Mobile = Stacked) -->
+    <div class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
+      <!-- Left Column: Big Visual Interactive Preview Stage & Stats -->
+      <div class="flex flex-col md:w-[58%] lg:w-[60%] border-b md:border-b-0 md:border-r border-border bg-black/95 relative shrink-0 md:shrink">
+        <!-- Live Preview Stage -->
+        <div
+          class="relative flex-1 min-h-[220px] sm:min-h-[260px] md:min-h-0 overflow-hidden flex items-center justify-center p-4 sm:p-6 select-none cursor-default"
+          style="background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 20px 20px;"
+        >
+          <!-- Outer Original Bounding Envelope (represents 100% natural resolution) -->
+          <div
+            id="pk-resize-envelope"
+            class="relative inline-flex items-center justify-center max-h-[44vh] md:max-h-[58vh] max-w-full select-none"
+          >
+            <!-- Ghost reference image: provides exact aspect ratio & 100% boundary up to max stage -->
+            <img
+              id="pk-resize-ghost-img"
+              class="block max-h-[44vh] md:max-h-[58vh] max-w-full w-auto h-auto pointer-events-none rounded select-none opacity-20 filter grayscale"
+              alt="100% Canvas Bound Reference"
+            />
+
+            <!-- Faint reference border representing 100% canvas bounds -->
+            <div
+              id="pk-resize-orig-frame"
+              class="absolute inset-0 rounded-xl border-2 border-dashed border-white/30 pointer-events-none flex items-start justify-end p-2 select-none"
+            >
+              <span class="rounded bg-black/75 backdrop-blur px-2 py-0.5 text-[10px] font-mono text-white/70 border border-white/15">
+                100% Canvas Bound
+              </span>
+            </div>
+
+            <!-- Dynamic Scaled Preview Box: visibly shrinks/expands in real time -->
+            <div
+              id="pk-resize-preview-box"
+              class="absolute inset-0 m-auto rounded-lg overflow-hidden shadow-2xl border-2 border-accent transition-colors duration-100 ease-out bg-black/60 flex items-center justify-center will-change-[width,height]"
+              style="width: 100%; height: 100%;"
+            >
+              <img
+                id="pk-resize-img-preview"
+                class="w-full h-full object-contain pointer-events-none rounded select-none"
+                alt="Resize Target Preview"
+              />
+
+              <!-- Attached Live Dimensions Tag -->
+              <div
+                id="pk-resize-live-badge"
+                class="absolute bottom-2 right-2 rounded-lg bg-black/85 backdrop-blur px-2 py-1 text-[11px] font-mono font-bold text-accent border border-accent/40 shadow pointer-events-none"
+              >
+                -- × -- px
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Dimension Stats Banner -->
+        <div class="border-t border-border bg-bg/70 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shrink-0 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span class="text-muted font-medium">Original:</span>
+            <span id="pk-resize-src-dims" class="font-mono text-fg font-semibold">-- × -- px</span>
+            <span class="text-accent font-bold">➔</span>
+            <span class="text-muted font-medium">Target:</span>
+            <span id="pk-resize-target-dims" class="font-mono text-accent font-bold">-- × -- px</span>
+          </div>
+          <div id="pk-resize-savings-tag" class="text-success font-semibold flex items-center gap-1 font-mono text-[11px]">
+            100% natural resolution
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Scrollable Controls Panel -->
+      <div class="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4 bg-surface text-fg text-xs md:w-[42%] lg:w-[40%]">
+        <!-- 1. Scale Percent Buttons & Slider -->
+        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="font-semibold text-fg flex items-center gap-1.5">
+              <span>Scale Resolution</span>
+              <span class="text-muted font-normal text-[11px]">· Proportional</span>
+            </label>
+            <span id="pk-modal-scale-val" class="font-mono font-bold text-accent text-sm">100%</span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-1.5 p-1 rounded-xl border border-border bg-surface text-center font-medium">
+            <button type="button" class="pk-modal-scale-btn py-1.5 rounded-lg border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer transition-all" data-scale="100">100%</button>
+            <button type="button" class="pk-modal-scale-btn py-1.5 rounded-lg border border-transparent hover:border-border text-muted hover:text-fg cursor-pointer transition-all" data-scale="75">75%</button>
+            <button type="button" class="pk-modal-scale-btn py-1.5 rounded-lg border border-transparent hover:border-border text-muted hover:text-fg cursor-pointer transition-all" data-scale="50">50%</button>
+            <button type="button" class="pk-modal-scale-btn py-1.5 rounded-lg border border-transparent hover:border-border text-muted hover:text-fg cursor-pointer transition-all" data-scale="25">25%</button>
+            <button type="button" class="pk-modal-scale-btn py-1.5 rounded-lg border border-transparent hover:border-border text-muted hover:text-fg cursor-pointer transition-all" data-scale="custom">Custom</button>
+          </div>
+
+          <!-- Smooth Scale Slider -->
+          <div class="flex items-center gap-3 pt-1">
+            <span class="text-muted text-[11px] font-mono shrink-0">10%</span>
+            <input
+              id="pk-modal-scale-slider"
+              type="range"
+              min="10"
+              max="100"
+              step="5"
+              value="100"
+              class="flex-1 accent-accent h-1.5 bg-border rounded-lg cursor-pointer"
+            />
+            <span class="text-muted text-[11px] font-mono shrink-0">100%</span>
+          </div>
+        </div>
+
+        <!-- 2. Standard Output Presets -->
+        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2">
+          <label class="block font-semibold text-fg">
+            Standard Output Presets
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="passport" data-w="413" data-h="531">
+              <span class="block font-semibold text-xs">Passport ID</span>
+              <span class="block text-[10px] text-muted font-mono">413 × 531 px</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="square" data-w="600" data-h="600">
+              <span class="block font-semibold text-xs">Square Avatar</span>
+              <span class="block text-[10px] text-muted font-mono">600 × 600 px</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="webhd" data-w="1920" data-h="1080">
+              <span class="block font-semibold text-xs">Web HD</span>
+              <span class="block text-[10px] text-muted font-mono">1920 × 1080 px</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="social" data-w="1080" data-h="1080">
+              <span class="block font-semibold text-xs">Instagram Post</span>
+              <span class="block text-[10px] text-muted font-mono">1080 × 1080 px</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer col-span-2 sm:col-span-1" data-preset="story" data-w="1080" data-h="1920">
+              <span class="block font-semibold text-xs">Mobile / Story</span>
+              <span class="block text-[10px] text-muted font-mono">1080 × 1920 px</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Exact Pixel Dimensions with Aspect Lock -->
+        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-fg">Exact Pixel Dimensions</span>
+            <button
+              id="pk-modal-lock-btn"
+              type="button"
+              class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold text-accent bg-accent/10 border border-accent/30 hover:bg-accent/20 transition-colors cursor-pointer"
+              title="Lock Aspect Ratio"
+            >
+              <span id="pk-modal-lock-icon">🔒</span>
+              <span id="pk-modal-lock-label">Locked</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <label class="block text-[10px] text-muted mb-0.5">Width (px)</label>
+              <input
+                id="pk-modal-dim-w"
+                type="number"
+                min="10"
+                max="16000"
+                placeholder="e.g. 1920"
+                class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
+              />
+            </div>
+            <span class="text-muted font-bold mt-3">×</span>
+            <div class="flex-1">
+              <label class="block text-[10px] text-muted mb-0.5">Height (px)</label>
+              <input
+                id="pk-modal-dim-h"
+                type="number"
+                min="10"
+                max="16000"
+                placeholder="e.g. 1080"
+                class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Fit Strategy & Guardrail -->
+        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
+          <div>
+            <label class="block font-semibold text-fg mb-1">Fit Strategy</label>
+            <div class="flex rounded-lg border border-border bg-surface p-0.5">
+              <button type="button" class="pk-modal-fit-btn flex-1 rounded-md py-1.5 text-[11px] font-medium bg-bg text-fg shadow-sm cursor-pointer" data-fit="contain">Fit Within</button>
+              <button type="button" class="pk-modal-fit-btn flex-1 rounded-md py-1.5 text-[11px] font-medium text-muted hover:text-fg cursor-pointer" data-fit="cover">Crop to Fill</button>
+              <button type="button" class="pk-modal-fit-btn flex-1 rounded-md py-1.5 text-[11px] font-medium text-muted hover:text-fg cursor-pointer" data-fit="fill">Exact Fill</button>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 text-muted hover:text-fg cursor-pointer select-none text-[11px] pt-0.5">
+            <input
+              id="pk-modal-no-upscale"
+              type="checkbox"
+              checked
+              class="rounded border-border accent-accent h-4 w-4"
+            />
+            <span>Do not upscale if original is smaller</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer: Actions (Always Pinned & Visible) -->
+    <footer class="flex items-center justify-between border-t border-border bg-surface px-4 py-3 sm:px-6 shrink-0 z-10">
+      <button
+        id="pk-resize-reset-btn"
+        type="button"
+        class="rounded-lg px-3.5 py-2 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-border transition-colors cursor-pointer"
+      >
+        Reset to 100%
+      </button>
+
+      <div class="flex items-center gap-2">
+        <button
+          id="pk-resize-cancel-btn"
+          type="button"
+          class="rounded-lg px-3.5 py-2 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-transparent hover:border-border transition-colors cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          id="pk-resize-apply-btn"
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-accent-fg hover:opacity-90 shadow transition-opacity cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Apply Resize & Scale</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

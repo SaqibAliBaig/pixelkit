@@ -1,0 +1,51 @@
+---
+interface Item {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  items: Item[];
+  heading?: string;
+}
+
+const { items, heading = 'Related conversions' } = Astro.props;
+---
+
+<section class="mx-auto mt-16 max-w-prose" aria-labelledby="related-heading">
+  <h2
+    id="related-heading"
+    class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+  >
+    {heading}
+  </h2>
+
+  <ul class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+    {items.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class="group flex items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm font-medium text-fg transition-colors hover:border-fg/20 hover:bg-surface/70"
+        >
+          <span>{item.label}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-fg"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>

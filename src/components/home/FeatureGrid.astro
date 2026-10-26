@@ -1,0 +1,59 @@
+---
+const features = [
+  {
+    title: 'Private by design',
+    body: 'Files are processed locally with Web Workers and the Canvas API. Nothing is uploaded, stored, or logged.',
+    icon: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  },
+  {
+    title: 'Exact KB targets',
+    body: 'Binary-search compression hits your target — 50KB, 100KB, 200KB — with the best quality at that size.',
+    icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  },
+  {
+    title: 'No signup, no watermark',
+    body: 'Free forever. No account, no ads blocking the tool, no artificial limits. Just your files, converted.',
+    icon: '<path d="M12 2l3 7h7l-5.5 4.5L18 20l-6-4-6 4 1.5-6.5L2 9h7z"/>',
+  },
+  {
+    title: 'Works offline',
+    body: 'After the first page load, PixelKit keeps working — the tool and its engines are cached locally.',
+    icon: '<path d="M5 12.55a11 11 0 0 1 14 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.94 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+  },
+];
+---
+
+<section class="mt-20" aria-labelledby="features-heading">
+  <div class="mx-auto max-w-4xl">
+    <h2
+      id="features-heading"
+      class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+    >
+      Why PixelKit
+    </h2>
+
+    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+      {features.map((f) => (
+        <div class="rounded-2xl border border-border bg-surface p-5">
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-bg/60 border border-border text-fg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={f.icon}
+            />
+          </div>
+          <h3 class="mt-3 text-sm font-semibold text-fg">{f.title}</h3>
+          <p class="mt-1.5 text-sm text-muted leading-relaxed">{f.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

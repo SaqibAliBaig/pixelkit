@@ -1,0 +1,79 @@
+---
+/**
+ * Root of the tool. Renders the static shell (drop zone, settings, file list,
+ * privacy note) as SSR HTML so LCP is fast and the tool is usable even
+ * before the JS island boots. The island attaches to #pk-converter-root.
+ */
+import DropZone from '@components/converter/DropZone.astro';
+import FileList from '@components/converter/FileList.astro';
+import SettingsPanel from '@components/converter/SettingsPanel.astro';
+import ProgressBar from '@components/converter/ProgressBar.astro';
+import PrivacyNote from '@components/converter/PrivacyNote.astro';
+import CompareModal from '@components/converter/CompareModal.astro';
+import CropModal from '@components/converter/CropModal.astro';
+import ResizeModal from '@components/converter/ResizeModal.astro';
+
+interface Props {
+  from: string;
+  to: string;
+  fromMime: string;
+  toMime: string;
+  targetKb: number | null;
+}
+
+const { from, to, fromMime, toMime, targetKb } = Astro.props;
+
+// Universal accept: all supported image formats + PDF
+const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tiff,.pdf';
+---
+
+<section
+  id="pk-converter-root"
+  class="rounded-2xl border border-border bg-surface p-4 sm:p-6 overflow-hidden max-w-full"
+  data-from={from}
+  data-to={to}
+  data-from-mime={fromMime}
+  data-to-mime={toMime}
+  data-target-kb={targetKb ?? ''}
+  aria-label="File converter"
+>
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] items-start min-w-0">
+    <div class="space-y-4 min-w-0 w-full">
+      <DropZone accept={accept} from={from} to={to} />
+      <ProgressBar />
+      <FileList />
+    </div>
+
+    <aside class="space-y-4 min-w-0 w-full lg:w-[320px]">
+      <SettingsPanel
+        from={from}
+        to={to}
+        targetKb={targetKb}
+      />
+      <PrivacyNote />
+    </aside>
+  </div>
+
+  <!-- Keyboard / a11y status line -->
+  <p
+    id="pk-status"
+    role="status"
+    aria-live="polite"
+    class="mt-4 text-sm text-muted min-h-[1.25rem]"
+  ></p>
+
+  <!-- Interactive Before/After Visual Comparison Modal -->
+  <CompareModal />
+
+  <!-- Interactive Quick-Crop & Framing Modal -->
+  <CropModal />
+
+  <!-- Interactive Resize & Scale Studio Modal -->
+  <ResizeModal />
+</section>
+
+<!-- The island: hydrates on visible, runs vanilla TS, no React overhead. -->
+<script>
+  import { mountConverterApp } from './islands/ConverterApp';
+  mountConverterApp();
+</script>

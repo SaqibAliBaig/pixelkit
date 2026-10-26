@@ -1,0 +1,85 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ToolLayout from '@layouts/ToolLayout.astro';
+import combinations from '@data/combinations.json';
+import { buildMeta } from '@lib/seo/meta';
+import { buildIntro, buildFaqs } from '@lib/seo/copy';
+
+interface Combo {
+  from: string;
+  fromMime: string;
+  to: string;
+  toMime: string;
+  sizeKb: number | null;
+  kind: 'convert' | 'compress';
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const combos = combinations.combos as Combo[];
+  return combos
+    .filter((c) => c.kind === 'convert')
+    .map((combo) => ({
+      params: {
+        from: combo.from,
+        to: combo.to,
+      },
+      props: { combo },
+    }));
+};
+
+const allCombos = combinations.combos as Combo[];
+const { combo } = Astro.props as { combo: Combo };
+
+const meta = buildMeta(combo);
+const intro = buildIntro(combo);
+const faqs = buildFaqs(combo);
+
+// Related combos — same from or same to, but not this one, capped at 6.
+const related = allCombos
+  .filter((c) => c.kind === 'convert')
+  .filter((c) => c.from === combo.from || c.to === combo.to)
+  .filter((c) => !(c.from === combo.from && c.to === combo.to))
+  .slice(0, 6)
+  .map((c) => ({
+    label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()}`,
+    href: `/${c.from}-to-${c.to}`,
+  }));
+
+// Also link to a couple of size-targeted versions of this same combo.
+const sizeTargets = allCombos
+  .filter(
+    (c) =>
+      c.kind === 'compress' &&
+      c.from === combo.from &&
+      c.to === combo.to
+  )
+  .slice(0, 4)
+  .map((c) => ({
+    label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+  }));
+
+const relatedAll = [...sizeTargets, ...related].slice(0, 8);
+
+const relatedBlogSlugs = ['why-portals-reject-200kb-photos', 'iphone-heic-explained'];
+
+const useCaseIds =
+  combo.from === 'heic'
+    ? ['iphone', 'passport']
+    : combo.to === 'pdf'
+    ? ['aadhaar', 'exam-portals']
+    : combo.to === 'webp'
+    ? ['web-upload']
+    : ['email'];
+---
+
+<ToolLayout
+  combo={{ from: combo.from, to: combo.to, sizeKb: null, fromMime: combo.fromMime, toMime: combo.toMime }}
+  title={meta.title}
+  description={meta.description}
+  intro={intro}
+  faqs={faqs}
+  related={relatedAll}
+  useCaseIds={useCaseIds}
+  relatedBlogSlugs={relatedBlogSlugs}
+/>

@@ -1,0 +1,93 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Prose from '@components/ui/Prose.astro';
+import Button from '@components/ui/Button.astro';
+import { SITE } from '@lib/constants';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `About ${SITE.name}`,
+    description: 'PixelKit is a fast, private file converter and compressor running 100% in your browser.',
+    url: new URL('/about', SITE.url).href,
+    mainEntity: {
+      '@type': 'Organization',
+      name: SITE.name,
+      url: SITE.url,
+      logo: `${SITE.url}/icon-512.png`,
+    },
+  },
+];
+---
+
+<BaseLayout
+  title={`About — ${SITE.name}`}
+  description="PixelKit is a fast, private file converter that runs entirely in your browser. Built by a small team who got tired of watching uploads spin."
+  jsonLd={jsonLd}
+  width="prose"
+>
+  <Prose>
+    <h1>About PixelKit</h1>
+    <p class="lead">
+      PixelKit is a file converter and compressor that runs entirely in your
+      browser. No uploads, no accounts, no watermarks. Built by people who
+      got tired of watching spinner animations.
+    </p>
+
+    <h2>Why it exists</h2>
+    <p>
+      Most online file tools upload your file to a server, process it, and
+      send it back. That works, but it means every file you convert (photos,
+      ID scans, medical images, legal documents) passes through a server you
+      don't control. For personal photos that's mildly uncomfortable. For a
+      passport scan or a medical record, it's a real privacy risk.
+    </p>
+    <p>
+      Modern browsers can do everything those servers do. WebAssembly,
+      Web Workers, and the Canvas API are fast enough to convert a 20 MB
+      HEIC photo to a 200 KB JPG in under a second, without ever leaving
+      your device. PixelKit exists to prove that.
+    </p>
+
+    <h2>What it does well</h2>
+    <ul>
+      <li>Convert between HEIC, JPG, PNG, WEBP, AVIF, GIF, BMP, and PDF.</li>
+      <li>Hit an exact KB target (50 KB, 100 KB, 200 KB) with the highest quality that fits.</li>
+      <li>Batch convert many files at once, in parallel, using Web Workers.</li>
+      <li>Work offline after the first page load.</li>
+      <li>Run on desktop and mobile, in every modern browser.</li>
+    </ul>
+
+    <h2>What it doesn't do</h2>
+    <ul>
+      <li>It doesn't upload your files. Ever. That's the whole point.</li>
+      <li>It doesn't collect personal data. See <a href="/privacy">Privacy</a>.</li>
+      <li>It doesn't watermark, sign, or alter your files beyond the conversion itself.</li>
+      <li>It doesn't require an account, an email, or a phone number.</li>
+    </ul>
+
+    <h2>How it's built</h2>
+    <p>
+      The site is a static Astro build, deployed on Cloudflare's CDN. The
+      conversion engine is vanilla TypeScript running in Web Workers. For
+      HEIC decode it uses <code>heic2any</code>, for PNG output it uses
+      <code>UPNG.js</code>, and for PDFs it uses <code>jsPDF</code> — all
+      loaded lazily only on the pages that need them. Everything else is
+      hand-written.
+    </p>
+
+    <h2>Feedback</h2>
+    <p>
+      Found a bug? A conversion that failed? A portal that rejected your
+      file even at the right size? Email{' '}
+      <a href="mailto:hello@pixelkit.app">hello@pixelkit.app</a> and we'll
+      look into it.
+    </p>
+  </Prose>
+
+  <div class="mt-12 flex flex-wrap gap-3 not-prose">
+    <Button href="/convert" variant="primary" size="md">Browse conversions</Button>
+    <Button href="/blog" variant="secondary" size="md">Read the blog</Button>
+  </div>
+</BaseLayout>

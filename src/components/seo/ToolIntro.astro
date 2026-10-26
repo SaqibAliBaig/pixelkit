@@ -1,0 +1,33 @@
+---
+interface Combo {
+  from: string;
+  to: string;
+  sizeKb: number | null;
+}
+
+interface Props {
+  combo: Combo;
+  intro: string;
+}
+
+const { combo, intro } = Astro.props;
+const fromLabel = combo.from.toUpperCase();
+const toLabel = combo.to.toUpperCase();
+---
+
+<section class="mx-auto mt-14 max-w-prose" aria-labelledby="tool-intro-heading">
+  <h2
+    id="tool-intro-heading"
+    class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+  >
+    {combo.sizeKb
+      ? `How ${fromLabel} to ${toLabel} under ${combo.sizeKb}KB works`
+      : `How ${fromLabel} to ${toLabel} conversion works`}
+  </h2>
+
+  <div class="mt-4 space-y-4 text-base text-fg/85 leading-relaxed">
+    {intro.split('\n\n').map((para) => (
+      <p>{para}</p>
+    ))}
+  </div>
+</section>

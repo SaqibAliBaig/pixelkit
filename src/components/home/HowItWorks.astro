@@ -1,0 +1,42 @@
+---
+const steps = [
+  {
+    n: '1',
+    title: 'Drop your file',
+    body: 'Drag any supported file into the box, or click to browse. No account needed — the tool is ready immediately.',
+  },
+  {
+    n: '2',
+    title: 'Pick a target',
+    body: 'Choose the output format and, if you need one, an exact KB target. PixelKit compresses to land at or just under it.',
+  },
+  {
+    n: '3',
+    title: 'Download',
+    body: 'The converted file downloads straight from your browser. Nothing was ever uploaded, so there is no wait.',
+  },
+];
+---
+
+<section class="mt-20" aria-labelledby="how-heading">
+  <div class="mx-auto max-w-4xl">
+    <h2
+      id="how-heading"
+      class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+    >
+      How it works
+    </h2>
+
+    <ol class="mt-5 grid gap-4 sm:grid-cols-3">
+      {steps.map((s) => (
+        <li class="rounded-2xl border border-border bg-surface p-5">
+          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-fg text-sm font-semibold">
+            {s.n}
+          </div>
+          <h3 class="mt-3 text-sm font-semibold text-fg">{s.title}</h3>
+          <p class="mt-1.5 text-sm text-muted leading-relaxed">{s.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

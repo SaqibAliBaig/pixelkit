@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  slugs: string[];
+  heading?: string;
+}
+
+const { slugs, heading = 'From the blog' } = Astro.props;
+
+const posts = (await getCollection('blog')).filter(
+  (p) => slugs.includes(p.slug) && !p.data.draft
+);
+
+// Preserve the order given in `slugs`.
+const ordered = slugs
+  .map((s) => posts.find((p) => p.slug === s))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+---
+
+{
+  ordered.length > 0 && (
+    <section class="mx-auto mt-16 max-w-prose" aria-labelledby="related-blog-heading">
+      <h2
+        id="related-blog-heading"
+        class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+      >
+        {heading}
+      </h2>
+
+      <ul class="mt-4 space-y-3">
+        {ordered.map((post) => (
+          <li>
+            <a
+              href={`/blog/${post.slug}`}
+              class="group block rounded-xl border border-border bg-surface p-4 transition-colors hover:border-fg/20 hover:bg-surface/70"
+            >
+              <p class="text-sm font-medium text-fg group-hover:text-accent transition-colors">
+                {post.data.title}
+              </p>
+              <p class="mt-1 text-xs text-muted leading-relaxed">
+                {post.data.description}
+              </p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

@@ -1,0 +1,137 @@
+---
+import '@styles/fonts.css';
+import '@styles/global.css';
+import '@styles/prose.css';
+import Header from '@components/ui/Header.astro';
+import Footer from '@components/ui/Footer.astro';
+import SEOHead from '@components/ui/SEOHead.astro';
+import JsonLd from '@components/ui/JsonLd.astro';
+import { SITE } from '@lib/constants';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  publishedAt?: Date;
+  updatedAt?: Date;
+  author?: string;
+  keywords?: string[] | string;
+  /** Raw JSON-LD objects to embed. Arrays welcome. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Add 'wide' for pages that want container-full layout */
+  width?: 'prose' | 'default' | 'wide';
+}
+
+const {
+  title = SITE.defaultTitle,
+  description = SITE.defaultDescription,
+  canonical,
+  image = SITE.defaultOgImage,
+  noindex = false,
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  author = SITE.author,
+  keywords,
+  jsonLd = [],
+  width = 'default',
+} = Astro.props;
+
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(image, Astro.site).href;
+
+const mainWidthClass =
+  width === 'prose'
+    ? 'max-w-prose mx-auto'
+    : width === 'wide'
+    ? 'max-w-[1280px] mx-auto'
+    : 'container';
+
+const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+
+    <SEOHead
+      title={title}
+      description={description}
+      canonical={canonicalUrl}
+      image={ogImageUrl}
+      noindex={noindex}
+      type={type}
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      author={author}
+      keywords={keywords}
+    />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
+
+    {import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({
+          token: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN,
+        })}
+      ></script>
+    )}
+
+    <script is:inline>
+      // No-flash theme: read storage or system preference before paint.
+      (function () {
+        try {
+          var stored = localStorage.getItem('pk-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = stored ? stored === 'dark' : prefersDark;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (_) {}
+      })();
+    </script>
+
+    {jsonLdArr.map((obj) => <JsonLd data={obj} />)}
+  </head>
+  <body class="min-h-screen bg-bg text-fg antialiased flex flex-col overflow-x-hidden">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-fg"
+    >
+      Skip to content
+    </a>
+
+    <Header />
+
+    <main id="main" class={['flex-1 py-10 sm:py-16', mainWidthClass].join(' ')}>
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script is:inline>
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function (err) {
+            console.warn('[PixelKit PWA] Service worker registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

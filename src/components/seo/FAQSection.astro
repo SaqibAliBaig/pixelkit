@@ -1,0 +1,53 @@
+---
+interface FAQ {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  faqs: FAQ[];
+  heading?: string;
+}
+
+const { faqs, heading = 'Frequently asked questions' } = Astro.props;
+---
+
+<section class="mx-auto mt-16 max-w-prose" aria-labelledby="faq-heading">
+  <h2
+    id="faq-heading"
+    class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+  >
+    {heading}
+  </h2>
+
+  <div class="mt-6 divide-y divide-border rounded-2xl border border-border bg-surface">
+    {faqs.map((faq, i) => (
+      <details class="group [&_summary::-webkit-details-marker]:hidden">
+        <summary
+          class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium text-fg hover:text-accent"
+        >
+          <span>{faq.q}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="shrink-0 text-muted transition-transform duration-200 group-open:rotate-45"
+            aria-hidden="true"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </summary>
+        <div class="px-5 pb-5 -mt-1 text-sm text-muted leading-relaxed">
+          {faq.a}
+        </div>
+      </details>
+    ))}
+  </div>
+</section>

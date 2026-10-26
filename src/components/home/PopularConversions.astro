@@ -1,0 +1,49 @@
+---
+import Badge from '@components/ui/Badge.astro';
+
+const conversions = [
+  { label: 'HEIC → JPG', href: '/heic-to-jpg', note: 'iPhone photos' },
+  { label: 'HEIC → JPG · 100KB', href: '/heic-to-jpg-under-100kb', note: 'Aadhaar, forms' },
+  { label: 'PNG → JPG', href: '/png-to-jpg', note: 'Smaller files' },
+  { label: 'JPG → PDF', href: '/jpg-to-pdf', note: 'Documents' },
+  { label: 'JPG → PDF · 100KB', href: '/jpg-to-pdf-under-100kb', note: 'Portals' },
+  { label: 'PNG → WEBP', href: '/png-to-webp', note: 'Web images' },
+  { label: 'JPG → WEBP', href: '/jpg-to-webp', note: 'Site speed' },
+  { label: 'HEIC → JPG · 50KB', href: '/heic-to-jpg-under-50kb', note: 'Exam forms' },
+];
+---
+
+<section class="mt-20" aria-labelledby="popular-heading">
+  <div class="mx-auto max-w-4xl">
+    <div class="flex items-end justify-between gap-4">
+      <h2
+        id="popular-heading"
+        class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
+      >
+        Popular conversions
+      </h2>
+      <a
+        href="/convert"
+        class="text-sm text-muted hover:text-fg transition-colors"
+      >
+        All conversions →
+      </a>
+    </div>
+
+    <ul class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {conversions.map((c) => (
+        <li>
+          <a
+            href={c.href}
+            class="group flex flex-col justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-fg/20 hover:bg-surface/70"
+          >
+            <span class="text-sm font-medium text-fg group-hover:text-accent transition-colors">
+              {c.label}
+            </span>
+            <span class="mt-1 text-xs text-muted">{c.note}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

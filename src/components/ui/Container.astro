@@ -1,0 +1,26 @@
+---
+interface Props {
+  as?: 'div' | 'section' | 'main' | 'article' | 'header' | 'footer';
+  width?: 'prose' | 'default' | 'wide' | 'full';
+  class?: string;
+}
+
+const {
+  as: Tag = 'div',
+  width = 'default',
+  class: className = '',
+} = Astro.props;
+
+const widthClass =
+  width === 'prose'
+    ? 'max-w-prose'
+    : width === 'wide'
+    ? 'max-w-[1280px]'
+    : width === 'full'
+    ? 'max-w-none'
+    : 'max-w-[1200px]';
+---
+
+<Tag class={['mx-auto w-full px-4 sm:px-6 lg:px-8', widthClass, className].join(' ')}>
+  <slot />
+</Tag>

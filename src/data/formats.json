@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "formats": [
+    {
+      "ext": "jpg",
+      "mime": "image/jpeg",
+      "kind": "image",
+      "lossy": true,
+      "lossless": false,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".jpg", ".jpeg"],
+      "label": "JPG"
+    },
+    {
+      "ext": "png",
+      "mime": "image/png",
+      "kind": "image",
+      "lossy": false,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "upng",
+      "accept": [".png"],
+      "label": "PNG"
+    },
+    {
+      "ext": "webp",
+      "mime": "image/webp",
+      "kind": "image",
+      "lossy": true,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".webp"],
+      "label": "WEBP"
+    },
+    {
+      "ext": "heic",
+      "mime": "image/heic",
+      "kind": "image",
+      "lossy": true,
+      "lossless": false,
+      "canTargetKB": true,
+      "engine": "heic",
+      "accept": [".heic", ".heif"],
+      "label": "HEIC"
+    },
+    {
+      "ext": "avif",
+      "mime": "image/avif",
+      "kind": "image",
+      "lossy": true,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".avif"],
+      "label": "AVIF"
+    },
+    {
+      "ext": "gif",
+      "mime": "image/gif",
+      "kind": "image",
+      "lossy": false,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".gif"],
+      "label": "GIF"
+    },
+    {
+      "ext": "bmp",
+      "mime": "image/bmp",
+      "kind": "image",
+      "lossy": false,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".bmp"],
+      "label": "BMP"
+    },
+    {
+      "ext": "svg",
+      "mime": "image/svg+xml",
+      "kind": "vector",
+      "lossy": false,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".svg"],
+      "label": "SVG"
+    },
+    {
+      "ext": "tiff",
+      "mime": "image/tiff",
+      "kind": "image",
+      "lossy": false,
+      "lossless": true,
+      "canTargetKB": true,
+      "engine": "canvas",
+      "accept": [".tif", ".tiff"],
+      "label": "TIFF"
+    },
+    {
+      "ext": "pdf",
+      "mime": "application/pdf",
+      "kind": "doc",
+      "lossy": true,
+      "lossless": false,
+      "canTargetKB": true,
+      "engine": "jspdf",
+      "accept": [".pdf"],
+      "label": "PDF"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ToolLayout from '@layouts/ToolLayout.astro';
+import combinations from '@data/combinations.json';
+import { buildMeta } from '@lib/seo/meta';
+import { buildIntro, buildFaqs } from '@lib/seo/copy';
+
+interface Combo {
+  from: string;
+  fromMime: string;
+  to: string;
+  toMime: string;
+  sizeKb: number | null;
+  kind: 'convert' | 'compress';
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const combos = combinations.combos as Combo[];
+  return combos
+    .filter((c) => c.kind === 'compress' && c.sizeKb !== null)
+    .map((combo) => ({
+      params: {
+        from: combo.from,
+        to: combo.to,
+        size: String(combo.sizeKb),
+      },
+      props: { combo },
+    }));
+};
+
+const allCombos = combinations.combos as Combo[];
+const { combo } = Astro.props as { combo: Combo };
+
+const meta = buildMeta(combo);
+const intro = buildIntro(combo);
+const faqs = buildFaqs(combo);
+
+// Related size variants for the same from → to, plus the plain conversion.
+const samePair = allCombos.filter(
+  (c) => c.from === combo.from && c.to === combo.to && c.sizeKb !== combo.sizeKb
+);
+
+const sizeSiblings = samePair
+  .filter((c) => c.kind === 'compress')
+  .slice(0, 4)
+  .map((c) => ({
+    label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+  }));
+
+const plainLink = samePair
+  .filter((c) => c.kind === 'convert')
+  .slice(0, 1)
+  .map((c) => ({
+    label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} (best quality)`,
+    href: `/${c.from}-to-${c.to}`,
+  }));
+
+// Adjacent-target siblings: e.g. for 100KB, show 50KB, 200KB, 250KB.
+const adjacentTargets = allCombos
+  .filter(
+    (c) =>
+      c.kind === 'compress' &&
+      c.from === combo.from &&
+      c.to === combo.to &&
+      c.sizeKb !== combo.sizeKb
+  )
+  .sort(
+    (a, b) =>
+      Math.abs((a.sizeKb ?? 0) - (combo.sizeKb ?? 0)) -
+      Math.abs((b.sizeKb ?? 0) - (combo.sizeKb ?? 0))
+  )
+  .slice(0, 3)
+  .map((c) => ({
+    label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+  }));
+
+const relatedAll = [...plainLink, ...sizeSiblings, ...adjacentTargets].slice(0, 8);
+
+const relatedBlogSlugs = ['why-portals-reject-200kb-photos', 'compress-aadhaar-to-100kb-pdf'];
+
+const useCaseIds =
+  combo.to === 'pdf'
+    ? ['aadhaar', 'exam-portals']
+    : combo.from === 'heic'
+    ? ['iphone', 'passport']
+    : (combo.sizeKb ?? 0) <= 50
+    ? ['exam-portals']
+    : (combo.sizeKb ?? 0) <= 200
+    ? ['passport', 'aadhaar']
+    : ['email'];
+---
+
+<ToolLayout
+  combo={{ from: combo.from, to: combo.to, sizeKb: combo.sizeKb, fromMime: combo.fromMime, toMime: combo.toMime }}
+  title={meta.title}
+  description={meta.description}
+  intro={intro}
+  faqs={faqs}
+  related={relatedAll}
+  useCaseIds={useCaseIds}
+  relatedBlogSlugs={relatedBlogSlugs}
+/>

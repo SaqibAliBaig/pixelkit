@@ -1,0 +1,31 @@
+---
+import Converter from '../converter/Converter.astro';
+
+// Default page — HEIC to JPG at no target, so users on the homepage get a
+// useful tool immediately.
+interface Props {
+  from?: string;
+  to?: string;
+  fromMime?: string;
+  toMime?: string;
+  targetKb?: number | null;
+}
+
+const {
+  from = 'heic',
+  to = 'jpg',
+  fromMime = 'image/heic',
+  toMime = 'image/jpeg',
+  targetKb = null,
+} = Astro.props;
+---
+
+<div class="mx-auto mt-10 max-w-4xl">
+  <Converter
+    from={from}
+    to={to}
+    fromMime={fromMime}
+    toMime={toMime}
+    targetKb={targetKb}
+  />
+</div>

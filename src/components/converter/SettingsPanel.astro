@@ -1,0 +1,699 @@
+---
+interface Props {
+  from: string;
+  to: string;
+  targetKb: number | null;
+}
+
+const { from, to, targetKb } = Astro.props;
+
+// Target Presets Ladder with KB and MB tiers
+const TARGET_PRESETS = [
+  { value: '', kb: null, badge: 'AUTO', label: 'Best quality (no limit)', desc: 'Full fidelity without file size limit', section: 'unlimited' },
+  // Standard KB Limits
+  { value: '20', kb: 20, badge: '20 KB', label: '20 KB', desc: 'Signatures, small stamps & portal uploads', section: 'kb' },
+  { value: '50', kb: 50, badge: '50 KB', label: '50 KB', desc: 'Government, exam & job application portals', section: 'kb' },
+  { value: '100', kb: 100, badge: '100 KB', label: '100 KB', desc: 'Standard web photo & fast loading', section: 'kb' },
+  { value: '200', kb: 200, badge: '200 KB', label: '200 KB', desc: 'Passport, visa & online photo forms', section: 'kb' },
+  { value: '300', kb: 300, badge: '300 KB', label: '300 KB', desc: 'ID cards & crisp profile avatars', section: 'kb' },
+  { value: '500', kb: 500, badge: '500 KB', label: '500 KB', desc: 'High-quality web presentation & social', section: 'kb' },
+  // Megabyte Limits
+  { value: '1024', kb: 1024, badge: '1 MB', label: '1 MB (1,024 KB)', desc: 'Email attachment standard & messaging', section: 'mb' },
+  { value: '2048', kb: 2048, badge: '2 MB', label: '2 MB (2,048 KB)', desc: 'Discord free tier, blogs & CMS limit', section: 'mb' },
+  { value: '5120', kb: 5120, badge: '5 MB', label: '5 MB (5,120 KB)', desc: 'High-res photography & web portfolio', section: 'mb' },
+  { value: '10240', kb: 10240, badge: '10 MB', label: '10 MB (10,240 KB)', desc: 'Print-ready graphics & high-res assets', section: 'mb' },
+  { value: '25600', kb: 25600, badge: '25 MB', label: '25 MB (25,600 KB)', desc: 'Maximum email file attachment limit', section: 'mb' },
+  // Custom
+  { value: 'custom', kb: null, badge: 'CUST', label: 'Custom Size…', desc: 'Enter exact value with KB / MB unit toggle', section: 'custom' },
+];
+
+const activePreset = TARGET_PRESETS.find((p) => p.kb === targetKb) || (targetKb ? TARGET_PRESETS.find(p => p.value === 'custom')! : TARGET_PRESETS[0]!);
+
+function formatInitialTargetBadge(kb: number | null): string {
+  if (!kb) return 'Best quality (no limit)';
+  if (kb >= 1024) {
+    const mb = kb / 1024;
+    return mb % 1 === 0 ? `Max ${mb} MB` : `Max ${mb.toFixed(1)} MB`;
+  }
+  return `Max ${kb} KB`;
+}
+
+const OUTPUT_FORMATS = [
+  { value: 'jpg', label: 'JPG / JPEG', badge: 'JPG', desc: 'Universal web & print photo', mime: 'image/jpeg' },
+  { value: 'png', label: 'PNG', badge: 'PNG', desc: 'Lossless transparency & graphics', mime: 'image/png' },
+  { value: 'webp', label: 'WEBP', badge: 'WEBP', desc: 'Modern efficient web image', mime: 'image/webp' },
+  { value: 'pdf', label: 'PDF Document', badge: 'PDF', desc: 'Printable multi-page document', mime: 'application/pdf' },
+  { value: 'avif', label: 'AVIF', badge: 'AVIF', desc: 'Next-gen maximum compression', mime: 'image/avif' },
+  { value: 'svg', label: 'SVG Vector', badge: 'SVG', desc: 'Scalable vector graphic', mime: 'image/svg+xml' },
+];
+
+const normalizedTo = to.toLowerCase() === 'jpeg' ? 'jpg' : to.toLowerCase();
+const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT_FORMATS[0]!;
+---
+
+<div class="rounded-xl border border-border bg-bg/40 p-4">
+  <h2 class="text-xs uppercase tracking-wider text-muted font-semibold">
+    Conversion Settings
+  </h2>
+
+  <div class="mt-4 space-y-4">
+    <!-- Output format -->
+    <div class="relative" id="pk-output-format-wrapper">
+      <div class="flex items-center justify-between">
+        <label id="pk-output-format-label" class="block text-sm font-medium text-fg">
+          Output format
+        </label>
+      </div>
+
+      <!-- Hidden standard select for form / worker / test compatibility -->
+      <select id="pk-output-format" class="sr-only" tabindex="-1" aria-hidden="true">
+        {OUTPUT_FORMATS.map((fmt) => (
+          <option value={fmt.value} selected={fmt.value === normalizedTo} data-mime={fmt.mime}>
+            {fmt.label}
+          </option>
+        ))}
+      </select>
+
+      <!-- Custom High-End Trigger Button -->
+      <div class="mt-1.5 relative">
+        <button
+          type="button"
+          id="pk-custom-format-trigger"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-labelledby="pk-output-format-label pk-custom-format-trigger"
+          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface/90 px-3 py-2 text-left text-sm text-fg shadow-sm transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span
+              id="pk-selected-format-badge"
+              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
+            >
+              {activeFmt.badge}
+            </span>
+            <div class="min-w-0 flex-1">
+              <span id="pk-selected-format-title" class="block font-semibold text-fg text-sm truncate">
+                {activeFmt.label}
+              </span>
+              <span id="pk-selected-format-desc" class="block text-[11px] text-muted truncate">
+                {activeFmt.desc}
+              </span>
+            </div>
+          </div>
+          <svg
+            id="pk-custom-format-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- Custom Dropdown Popover Menu -->
+        <div
+          id="pk-custom-format-menu"
+          role="listbox"
+          tabindex="-1"
+          class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all"
+        >
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Select Output Format</div>
+          {OUTPUT_FORMATS.map((fmt) => (
+            <button
+              type="button"
+              role="option"
+              data-value={fmt.value}
+              data-badge={fmt.badge}
+              data-title={fmt.label}
+              data-desc={fmt.desc}
+              aria-selected={fmt.value === normalizedTo}
+              class={`pk-custom-format-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                fmt.value === normalizedTo ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {fmt.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {fmt.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {fmt.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-option-check text-accent shrink-0 ml-2 ${fmt.value === normalizedTo ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+      <p class="mt-1.5 text-xs text-muted flex items-center justify-between">
+        <span>Input: <span id="pk-detected-input-badge" class="font-mono uppercase text-fg font-semibold">{from}</span></span>
+        <span class="text-[11px] text-muted">Auto-detects dropped files</span>
+      </p>
+    </div>
+
+    <!-- Merge Multiple Images into Single Multi-Page PDF -->
+    <div
+      id="pk-merge-pdf-container"
+      class={`rounded-xl border border-accent/30 bg-accent/5 p-3 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
+    >
+      <label class="flex items-center justify-between text-sm text-fg cursor-pointer select-none">
+        <span class="flex items-center gap-2 font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          Merge Files into Single PDF
+        </span>
+        <input
+          id="pk-merge-pdf-toggle"
+          type="checkbox"
+          class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+        />
+      </label>
+      <p class="mt-1 text-[11px] text-muted">
+        Combines all images into one multi-page PDF document. Drag cards to reorder page sequence.
+      </p>
+    </div>
+
+    <!-- SVG Rasterization DPI / Scale Multiplier -->
+    <div
+      id="pk-svg-scale-container"
+      class={`rounded-xl border border-border bg-surface/50 p-3 ${from.toLowerCase() === 'svg' || to.toLowerCase() === 'svg' ? '' : 'hidden'}`}
+    >
+      <div class="flex items-center justify-between">
+        <label for="pk-svg-scale" class="block text-sm font-medium text-fg">
+          SVG Scale (DPI Multiplier)
+        </label>
+        <span id="pk-svg-scale-val" class="text-xs text-accent font-semibold">2x · 192 DPI</span>
+      </div>
+      <div class="mt-1.5 relative">
+        <select
+          id="pk-svg-scale"
+          class="block w-full appearance-none rounded-xl border border-border bg-surface px-3 py-2.5 pr-9 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer transition-colors hover:border-accent/40"
+        >
+          <option value="1">1x · 96 DPI (Standard Web)</option>
+          <option value="2" selected>2x · 192 DPI (Retina / Crisp)</option>
+          <option value="3">3x · 300 DPI (High-Res Document)</option>
+          <option value="4">4x · 600 DPI (Ultra Sharp Print)</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+      <p class="mt-1 text-[11px] text-muted">
+        Controls vector resolution and DPI scaling for SVG conversions (1x = 96 DPI, 2x = 192 DPI, 3x = 300 DPI, 4x = 600 DPI).
+      </p>
+    </div>
+
+    <!-- Target size & Quality controls -->
+    <div class="relative" id="pk-target-kb-wrapper">
+      <div class="flex items-center justify-between">
+        <label id="pk-target-size-label" class="block text-sm font-medium text-fg">
+          Compression & Size
+        </label>
+        <span
+          id="pk-target-value"
+          class="text-xs text-muted tabular-nums font-medium"
+        >
+          {formatInitialTargetBadge(targetKb)}
+        </span>
+      </div>
+
+      <!-- Mode selection pills -->
+      <div class="mt-2 flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
+        <button
+          type="button"
+          id="pk-size-mode-max"
+          class="flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+          data-mode="max"
+        >
+          Max Size
+        </button>
+        <button
+          type="button"
+          id="pk-size-mode-exact"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          data-mode="exact"
+        >
+          Exact Size
+        </button>
+        <button
+          type="button"
+          id="pk-size-mode-range"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          data-mode="range"
+        >
+          Range
+        </button>
+        <button
+          type="button"
+          id="pk-size-mode-quality"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          data-mode="quality"
+        >
+          Quality %
+        </button>
+      </div>
+
+      <!-- Hidden standard select for form / worker / test compatibility -->
+      <select id="pk-target-kb" class="sr-only" tabindex="-1" aria-hidden="true">
+        {TARGET_PRESETS.map((p) => (
+          <option value={p.value} selected={p.value === (targetKb ? String(targetKb) : '')}>
+            {p.label}
+          </option>
+        ))}
+      </select>
+
+      <!-- Custom High-End Trigger Button -->
+      <div id="pk-target-preset-container" class="mt-2 relative">
+        <button
+          type="button"
+          id="pk-custom-target-trigger"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-labelledby="pk-target-size-label pk-custom-target-trigger"
+          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface/90 px-3 py-2 text-left text-sm text-fg shadow-sm transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span
+              id="pk-selected-target-badge"
+              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
+            >
+              {activePreset.badge}
+            </span>
+            <div class="min-w-0 flex-1">
+              <span id="pk-selected-target-title" class="block font-semibold text-fg text-sm truncate">
+                {activePreset.label}
+              </span>
+              <span id="pk-selected-target-desc" class="block text-[11px] text-muted truncate">
+                {activePreset.desc}
+              </span>
+            </div>
+          </div>
+          <svg
+            id="pk-custom-target-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-2"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- Custom Dropdown Popover Menu -->
+        <div
+          id="pk-custom-target-menu"
+          role="listbox"
+          tabindex="-1"
+          class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-72 overflow-y-auto"
+        >
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Unlimited</div>
+          {TARGET_PRESETS.filter(p => p.section === 'unlimited').map((preset) => (
+            <button
+              type="button"
+              role="option"
+              data-value={preset.value}
+              data-badge={preset.badge}
+              data-title={preset.label}
+              data-desc={preset.desc}
+              data-section={preset.section}
+              aria-selected={preset.value === (targetKb ? String(targetKb) : '')}
+              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                preset.value === (targetKb ? String(targetKb) : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {preset.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {preset.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {preset.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
+            Portal & Web Limits (KB)
+          </div>
+          {TARGET_PRESETS.filter(p => p.section === 'kb').map((preset) => (
+            <button
+              type="button"
+              role="option"
+              data-value={preset.value}
+              data-badge={preset.badge}
+              data-title={preset.label}
+              data-desc={preset.desc}
+              data-section={preset.section}
+              aria-selected={preset.value === String(targetKb)}
+              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                preset.value === String(targetKb) ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {preset.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {preset.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {preset.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === String(targetKb) ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
+            Megabyte Limits (Discord, Email, CMS)
+          </div>
+          {TARGET_PRESETS.filter(p => p.section === 'mb').map((preset) => (
+            <button
+              type="button"
+              role="option"
+              data-value={preset.value}
+              data-badge={preset.badge}
+              data-title={preset.label}
+              data-desc={preset.desc}
+              data-section={preset.section}
+              aria-selected={preset.value === String(targetKb)}
+              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                preset.value === String(targetKb) ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase font-semibold">
+                  {preset.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {preset.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {preset.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === String(targetKb) ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
+            Custom Target
+          </div>
+          {TARGET_PRESETS.filter(p => p.section === 'custom').map((preset) => (
+            <button
+              type="button"
+              role="option"
+              data-value={preset.value}
+              data-badge={preset.badge}
+              data-title={preset.label}
+              data-desc={preset.desc}
+              data-section={preset.section}
+              aria-selected={preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '')}
+              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {preset.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {preset.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {preset.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '') ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Custom Size Input Field (KB / MB Unit Toggle) -->
+      <div id="pk-custom-kb-container" class="mt-2 hidden">
+        <div class="flex items-center gap-2">
+          <input
+            id="pk-custom-kb-input"
+            type="number"
+            min="1"
+            max="50000"
+            step="1"
+            placeholder="e.g. 50"
+            value={targetKb ? (targetKb >= 1024 && targetKb % 1024 === 0 ? targetKb / 1024 : targetKb) : ''}
+            class="block w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          <div class="flex rounded-xl border border-border bg-surface/80 p-0.5 text-xs shrink-0">
+            <button
+              type="button"
+              id="pk-custom-unit-kb"
+              class="rounded-lg px-2.5 py-1 font-semibold transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+              data-unit="kb"
+            >
+              KB
+            </button>
+            <button
+              type="button"
+              id="pk-custom-unit-mb"
+              class="rounded-lg px-2.5 py-1 font-semibold transition-colors text-muted hover:text-fg cursor-pointer"
+              data-unit="mb"
+            >
+              MB
+            </button>
+          </div>
+        </div>
+        <div id="pk-custom-unit-hint" class="mt-1 text-[11px] text-muted flex items-center justify-between">
+          <span id="pk-custom-hint-text">Enter exact or maximum size.</span>
+          <span id="pk-custom-equiv-tag" class="text-accent font-mono font-medium hidden"></span>
+        </div>
+      </div>
+
+      <!-- Min-Max Range Input Fields with KB / MB Unit Toggle -->
+      <div id="pk-range-kb-container" class="mt-2 hidden space-y-2">
+        <div class="flex items-center justify-between text-xs text-muted">
+          <span>Target Size Bracket</span>
+          <div class="flex rounded-lg border border-border bg-surface/80 p-0.5 text-[11px]">
+            <button
+              type="button"
+              id="pk-range-unit-kb"
+              class="rounded-md px-2 py-0.5 font-medium transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+              data-unit="kb"
+            >
+              KB
+            </button>
+            <button
+              type="button"
+              id="pk-range-unit-mb"
+              class="rounded-md px-2 py-0.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+              data-unit="mb"
+            >
+              MB
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="pk-min-kb-input" class="block text-[11px] text-muted">Min</label>
+            <input
+              id="pk-min-kb-input"
+              type="number"
+              min="0.1"
+              max="50000"
+              step="any"
+              placeholder="20"
+              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            />
+          </div>
+          <div>
+            <label for="pk-max-kb-input" class="block text-[11px] text-muted">Max</label>
+            <input
+              id="pk-max-kb-input"
+              type="number"
+              min="0.1"
+              max="50000"
+              step="any"
+              placeholder="50"
+              value={targetKb ?? ''}
+              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            />
+          </div>
+        </div>
+        <p id="pk-range-hint-text" class="text-[11px] text-muted">Ideal for portal limits (e.g. 20 KB to 50 KB, or 1 MB to 2 MB).</p>
+      </div>
+
+      <!-- Manual Quality Slider Container -->
+      <div id="pk-quality-container" class="mt-2.5 space-y-1.5 hidden">
+        <div class="flex items-center justify-between text-xs">
+          <label for="pk-quality-slider" class="text-muted font-medium">Image Quality</label>
+          <span id="pk-quality-value" class="font-semibold text-accent tabular-nums text-sm">90%</span>
+        </div>
+        <input
+          id="pk-quality-slider"
+          type="range"
+          min="5"
+          max="100"
+          step="1"
+          value="90"
+          class="w-full accent-accent h-1.5 bg-border rounded-lg cursor-pointer"
+        />
+        <div class="flex justify-between text-[10px] text-muted font-medium">
+          <span>Smaller (5%)</span>
+          <span>Balanced (90%)</span>
+          <span>Max Quality (100%)</span>
+        </div>
+      </div>
+    </div>
+    <!-- Advanced -->
+    <details class="group">
+      <summary
+        class="cursor-pointer text-sm text-muted hover:text-fg select-none list-none flex items-center gap-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform group-open:rotate-90"
+          aria-hidden="true"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+        Advanced Options
+      </summary>
+      <div class="mt-3 space-y-2">
+        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+          <input
+            id="pk-preserve-metadata"
+            type="checkbox"
+            checked
+            class="h-4 w-4 rounded border-border accent-accent"
+          />
+          Preserve EXIF metadata (Camera, GPS, date)
+        </label>
+        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+          <input
+            id="pk-strip-transparency"
+            type="checkbox"
+            checked
+            class="h-4 w-4 rounded border-border accent-accent"
+          />
+          Fill transparent backgrounds with white (for JPG)
+        </label>
+        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+          <input
+            id="pk-auto-orient"
+            type="checkbox"
+            checked
+            class="h-4 w-4 rounded border-border accent-accent"
+          />
+          Auto-orient photos (EXIF correction)
+        </label>
+      </div>
+    </details>
+  </div>
+</div>

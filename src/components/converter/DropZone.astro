@@ -1,0 +1,59 @@
+---
+interface Props {
+  accept: string;
+  from: string;
+  to?: string;
+}
+
+const { accept, from, to } = Astro.props;
+const fromUpper = from.toUpperCase();
+const toUpper = to ? to.toUpperCase() : '';
+---
+
+<label
+  id="pk-dropzone"
+  for="pk-file-input"
+  class="group relative flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-border bg-bg/40 px-6 py-9 text-center cursor-pointer transition-all hover:border-accent hover:bg-bg/60 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20"
+  data-dragover="false"
+>
+  <input
+    id="pk-file-input"
+    type="file"
+    accept={accept}
+    multiple
+    class="sr-only"
+    aria-label={`Drop any image or document to convert`}
+  />
+
+  <div
+    class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:scale-105 transition-transform"
+    aria-hidden="true"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="h-6 w-6 text-accent"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="17 8 12 3 7 8"></polyline>
+      <line x1="12" y1="3" x2="12" y2="15"></line>
+    </svg>
+  </div>
+
+  <div class="text-sm">
+    <span class="font-semibold text-fg">Drop any image or document here</span>
+    <span class="text-muted"> or </span>
+    <span class="font-semibold text-accent underline underline-offset-4 group-hover:text-accent/90">
+      browse files
+    </span>
+  </div>
+  <p class="text-xs text-muted max-w-sm">
+    Supports <span class="font-medium text-fg">JPG, PNG, HEIC, WEBP, PDF, SVG, TIFF, AVIF, GIF, BMP</span>
+    {toUpper && <span> · Preset for <span class="font-medium text-fg">{fromUpper}</span> → <span class="text-accent font-semibold">{toUpper}</span></span>}
+  </p>
+</label>
