@@ -1,18 +1,18 @@
 ---
 // Interactive Resize & Scale Studio Modal for PixelKit — Fully responsive for Mobile & Desktop.
 // Desktop: Side-by-side Live Stage & Controls.
-// Mobile: Balanced compact stage on top with full, comfortable controls panel and pinned action footer.
+// Mobile: Full-screen enlarged studio with spacious preview stage, unobstructed image, and untruncated detail stats.
 ---
 
 <div
   id="pk-resize-modal"
-  class="fixed inset-0 z-50 hidden flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-0 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
   role="dialog"
   aria-modal="true"
   aria-labelledby="pk-resize-modal-title"
 >
   <div
-    class="relative w-full max-w-5xl h-[95vh] sm:h-[92vh] max-h-[860px] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
+    class="relative w-full max-w-5xl h-full sm:h-[92vh] max-h-none sm:max-h-[860px] flex flex-col rounded-none sm:rounded-2xl border-0 sm:border border-border bg-surface text-fg shadow-2xl overflow-hidden"
   >
     <!-- Header (Pinned) -->
     <header class="flex items-center justify-between border-b border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0">
@@ -56,24 +56,24 @@
       </button>
     </header>
 
-    <!-- Main Studio Split View (Desktop = Side-by-Side, Mobile = Stacked with compact top stage) -->
+    <!-- Main Studio Split View (Desktop = Side-by-Side, Mobile = Stacked with enlarged top stage) -->
     <div class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
       <!-- Left Column: Visual Interactive Preview Stage & Stats -->
       <div class="flex flex-col md:w-[55%] lg:w-[58%] border-b md:border-b-0 md:border-r border-border bg-black/95 relative shrink-0 md:shrink">
-        <!-- Live Preview Stage -->
+        <!-- Live Preview Stage (Enlarged for clear mobile preview) -->
         <div
-          class="relative h-[135px] sm:h-[180px] md:h-auto md:flex-1 overflow-hidden flex items-center justify-center p-3 sm:p-6 select-none cursor-default"
+          class="relative h-[195px] sm:h-[240px] md:h-auto md:flex-1 overflow-hidden flex items-center justify-center p-3 sm:p-6 select-none cursor-default"
           style="background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 20px 20px;"
         >
           <!-- Outer Original Bounding Envelope (represents 100% natural resolution) -->
           <div
             id="pk-resize-envelope"
-            class="relative inline-flex items-center justify-center max-h-[115px] sm:max-h-[160px] md:max-h-[56vh] max-w-full select-none"
+            class="relative inline-flex items-center justify-center max-h-[175px] sm:max-h-[220px] md:max-h-[56vh] max-w-full select-none"
           >
             <!-- Ghost reference image: provides exact aspect ratio & 100% boundary up to max stage -->
             <img
               id="pk-resize-ghost-img"
-              class="block max-h-[115px] sm:max-h-[160px] md:max-h-[56vh] max-w-full w-auto h-auto pointer-events-none rounded select-none opacity-20 filter grayscale"
+              class="block max-h-[175px] sm:max-h-[220px] md:max-h-[56vh] max-w-full w-auto h-auto pointer-events-none rounded select-none opacity-20 filter grayscale"
               alt="100% Canvas Bound Reference"
             />
 
@@ -87,10 +87,10 @@
               </span>
             </div>
 
-            <!-- Dynamic Scaled Preview Box: visibly shrinks/expands in real time -->
+            <!-- Dynamic Scaled Preview Box: visibly shrinks/expands in real time, NO dark wash blocking image -->
             <div
               id="pk-resize-preview-box"
-              class="absolute inset-0 m-auto rounded-lg overflow-hidden shadow-2xl border-2 border-accent transition-colors duration-100 ease-out bg-black/60 flex items-center justify-center will-change-[width,height]"
+              class="absolute inset-0 m-auto rounded-lg overflow-hidden shadow-2xl border-2 border-accent transition-colors duration-100 ease-out flex items-center justify-center will-change-[width,height]"
               style="width: 100%; height: 100%;"
             >
               <img
@@ -99,34 +99,33 @@
                 alt="Resize Target Preview"
               />
 
-              <!-- Attached Live Dimensions Tag -->
+              <!-- Attached Live Dimensions Tag: HIDDEN so it NEVER blocks the picture -->
               <div
                 id="pk-resize-live-badge"
-                class="absolute bottom-1.5 right-1.5 rounded bg-black/85 backdrop-blur px-1.5 py-0.5 text-[10px] font-mono font-bold text-accent border border-accent/40 shadow pointer-events-none"
+                class="hidden"
               >
-                -- × -- px
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Live Dimension Stats Banner -->
-        <div class="border-t border-border bg-bg/70 px-3.5 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between gap-2 shrink-0 text-xs overflow-hidden">
-          <div class="flex items-center gap-1.5 sm:gap-2 truncate">
+        <!-- Live Dimension Stats Banner (Structured to NEVER truncate dimensions or hide details) -->
+        <div class="border-t border-border bg-bg/90 px-4 py-2 sm:px-4 sm:py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 shrink-0 text-xs">
+          <div class="flex items-center gap-1.5 sm:gap-2 text-xs flex-wrap">
             <span class="text-muted font-medium text-[11px] sm:text-xs">Original:</span>
-            <span id="pk-resize-src-dims" class="font-mono text-fg font-semibold text-[11px] sm:text-xs truncate">-- × -- px</span>
+            <span id="pk-resize-src-dims" class="font-mono text-fg font-semibold text-[11px] sm:text-xs whitespace-nowrap">-- × -- px</span>
             <span class="text-accent font-bold text-xs">➔</span>
             <span class="text-muted font-medium text-[11px] sm:text-xs">Target:</span>
-            <span id="pk-resize-target-dims" class="font-mono text-accent font-bold text-[11px] sm:text-xs truncate">-- × -- px</span>
+            <span id="pk-resize-target-dims" class="font-mono text-accent font-bold text-[11px] sm:text-xs whitespace-nowrap">-- × -- px</span>
           </div>
-          <div id="pk-resize-savings-tag" class="text-success font-semibold flex items-center gap-1 font-mono text-[10px] sm:text-[11px] shrink-0">
-            100% natural
+          <div id="pk-resize-savings-tag" class="text-success font-semibold flex items-center gap-1 font-mono text-[11px] sm:text-xs shrink-0">
+            100% natural resolution
           </div>
         </div>
       </div>
 
       <!-- Right Column: Scrollable Controls Panel -->
-      <div class="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-4 bg-surface text-fg text-xs md:w-[45%] lg:w-[42%]">
+      <div class="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-3.5 sm:space-y-4 bg-surface text-fg text-xs md:w-[45%] lg:w-[42%]">
         <!-- 1. Scale Percent Buttons & Slider -->
         <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
           <div class="flex items-center justify-between">
@@ -256,8 +255,8 @@
       </div>
     </div>
 
-    <!-- Footer: Actions (Responsive stacked for mobile, side-by-side for desktop) -->
-    <footer class="border-t border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0 z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
+    <!-- Footer: Actions (Enlarged and touch-friendly for mobile) -->
+    <footer class="border-t border-border bg-surface px-4 py-2.5 sm:px-6 sm:py-3 shrink-0 z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
       <div class="grid grid-cols-2 sm:flex items-center gap-2">
         <button
           id="pk-resize-reset-btn"
@@ -278,7 +277,7 @@
       <button
         id="pk-resize-apply-btn"
         type="button"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-fg hover:opacity-90 shadow transition-opacity cursor-pointer"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-5 py-2.5 text-xs font-semibold text-accent-fg hover:opacity-90 shadow transition-opacity cursor-pointer"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>

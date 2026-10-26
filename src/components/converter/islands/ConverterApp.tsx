@@ -993,8 +993,8 @@ export function mountConverterApp(): void {
           if (job.flipH) notes.push('Flip');
           if (job.grayscale ?? state.grayscale) notes.push('B&W');
 
-          const noteStr = notes.length ? ` · ${notes.join(' + ')}` : '';
-          liveDimsEl.textContent = `${pred.srcMP} MP ➔ ${pred.predMP} MP (${pred.w}×${pred.h} px${noteStr})`;
+          const noteStr = notes.length ? ` · ${notes.join(' · ')}` : '';
+          liveDimsEl.textContent = `Target: ${pred.w} × ${pred.h} px${noteStr}`;
           liveDimsEl.classList.remove('hidden');
         } else {
           liveDimsEl.classList.add('hidden');
@@ -2551,10 +2551,9 @@ export function mountConverterApp(): void {
       cropModalFilename.textContent = `${targetJob.file.name}${resizeDesc} · Drag box to frame`;
     }
     if (cropOrigDims) {
-      const origStr = targetJob.originalWidth && targetJob.originalHeight
+      cropOrigDims.textContent = targetJob.originalWidth && targetJob.originalHeight
         ? `${targetJob.originalWidth} × ${targetJob.originalHeight} px`
         : 'Detecting…';
-      cropOrigDims.textContent = `${origStr}${resizeDesc ? ` (${resizeDesc.trim().replace(/^·\s*/, '')})` : ''}`;
     }
 
     // Default ratio from job or fallback to state.cropAspect or 'original'
@@ -2570,15 +2569,7 @@ export function mountConverterApp(): void {
         targetJob.originalWidth = realW;
         targetJob.originalHeight = realH;
         if (cropOrigDims) {
-          const dims = targetJob.dimensions || state.dimensions;
-          const scale = dims?.scalePercent ?? state.scalePercent;
-          let rDesc = '';
-          if (scale && scale !== 100) {
-            rDesc = ` (Scaled ${scale}%)`;
-          } else if (dims?.mode === 'custom' && dims.width && dims.height) {
-            rDesc = ` (Resized ${dims.width}×${dims.height} px)`;
-          }
-          cropOrigDims.textContent = `${realW} × ${realH} px${rDesc}`;
+          cropOrigDims.textContent = `${realW} × ${realH} px`;
         }
       }
       if (targetJob.customCropBox) {
@@ -2867,8 +2858,8 @@ export function mountConverterApp(): void {
     cropModalRatioBtns.forEach((btn) => {
       const isSel = btn.dataset.ratio === cropBoxState.ratioName;
       btn.className = isSel
-        ? 'pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer'
-        : 'pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer';
+        ? 'pk-modal-ratio-btn h-8 px-3 rounded-lg font-semibold border border-accent/40 bg-accent/10 text-accent cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors'
+        : 'pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors';
     });
   }
 
@@ -2876,18 +2867,18 @@ export function mountConverterApp(): void {
     const a = cropBoxState.anchor;
     if (cropModalAnchorTop) {
       cropModalAnchorTop.className = a === 'top'
-        ? 'px-2 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer'
-        : 'px-2 py-1 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium cursor-pointer';
+        ? 'h-7 px-2.5 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs cursor-pointer flex items-center justify-center transition-colors'
+        : 'h-7 px-2.5 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium text-xs cursor-pointer flex items-center justify-center transition-colors';
     }
     if (cropModalAnchorCenter) {
       cropModalAnchorCenter.className = a === 'center'
-        ? 'px-2 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer'
-        : 'px-2 py-1 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium cursor-pointer';
+        ? 'h-7 px-2.5 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs cursor-pointer flex items-center justify-center transition-colors'
+        : 'h-7 px-2.5 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium text-xs cursor-pointer flex items-center justify-center transition-colors';
     }
     if (cropModalAnchorBottom) {
       cropModalAnchorBottom.className = a === 'bottom'
-        ? 'px-2 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer'
-        : 'px-2 py-1 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium cursor-pointer';
+        ? 'h-7 px-2.5 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs cursor-pointer flex items-center justify-center transition-colors'
+        : 'h-7 px-2.5 rounded-md border border-border bg-surface text-muted hover:text-fg font-medium text-xs cursor-pointer flex items-center justify-center transition-colors';
     }
   }
 
@@ -3094,12 +3085,9 @@ export function mountConverterApp(): void {
     const targetW = resizeStudioState.width || srcW;
     const targetH = resizeStudioState.height || srcH;
 
-    const srcMP = Number(((srcW * srcH) / 1_000_000).toFixed(1));
-    const targetMP = Number(((targetW * targetH) / 1_000_000).toFixed(1));
-
     const isCropped = !!(activeResizeJob?.croppedPreviewUrl || activeResizeJob?.customCropBox);
-    if (resizeSrcDims) resizeSrcDims.textContent = `${srcW} × ${srcH} px (${srcMP} MP)${isCropped ? ' (Cropped)' : ''}`;
-    if (resizeTargetDims) resizeTargetDims.textContent = `${targetW} × ${targetH} px (${targetMP} MP)`;
+    if (resizeSrcDims) resizeSrcDims.textContent = `${srcW} × ${srcH} px${isCropped ? ' (Cropped)' : ''}`;
+    if (resizeTargetDims) resizeTargetDims.textContent = `${targetW} × ${targetH} px`;
     if (resizeLiveBadge) resizeLiveBadge.textContent = `${targetW} × ${targetH} px`;
 
     // Dynamic Visual Scaling of the Preview Box

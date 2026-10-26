@@ -4,13 +4,13 @@
 
 <div
   id="pk-crop-modal"
-  class="fixed inset-0 z-50 hidden flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-0 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
   role="dialog"
   aria-modal="true"
   aria-labelledby="pk-crop-modal-title"
 >
   <div
-    class="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] max-h-[860px] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
+    class="relative w-full max-w-4xl h-full sm:h-[90vh] max-h-none sm:max-h-[860px] flex flex-col rounded-none sm:rounded-2xl border-0 sm:border border-border bg-surface text-fg shadow-2xl overflow-hidden"
   >
     <!-- Modal Header -->
     <header class="flex items-center justify-between border-b border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0">
@@ -54,25 +54,25 @@
 
     <!-- Toolbar: Aspect Ratio Selector & Anchor Shortcuts -->
     <div class="border-b border-border bg-bg/50 px-3.5 py-2 sm:px-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 shrink-0 text-xs">
-      <!-- Ratio presets (Horizontal smooth scrolling on mobile) -->
-      <div class="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-full scrollbar-none">
+      <!-- Ratio presets: clean uniform-height chips, single-line labels, smooth horizontal scroll -->
+      <div class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full scrollbar-none whitespace-nowrap">
         <span class="text-muted font-medium mr-1 shrink-0 text-[11px] sm:text-xs">Ratio:</span>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer shrink-0 text-xs transition-colors" data-ratio="original">Original</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="1:1">1:1 Square</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="3.5:4.5">3.5 × 4.5 ID</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="4:3">4:3 Standard</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="16:9">16:9 Landscape</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="9:16">9:16 Story</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="3:2">3:2 Classic</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-semibold border border-accent/40 bg-accent/10 text-accent cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="original">Original</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="1:1">1:1 Square</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="3.5:4.5">3.5:4.5 ID</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="4:3">4:3 Standard</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="16:9">16:9 Wide</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="9:16">9:16 Story</button>
+        <button type="button" class="pk-modal-ratio-btn h-8 px-3 rounded-lg font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs whitespace-nowrap flex items-center justify-center transition-colors" data-ratio="3:2">3:2 Classic</button>
       </div>
 
-      <!-- Quick Anchor Jump Buttons -->
-      <div class="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pt-0.5 sm:pt-0 border-t sm:border-t-0 border-border/40">
-        <span class="text-muted font-medium mr-1 text-[11px] sm:text-xs">Anchor:</span>
+      <!-- Quick Anchor Jump Buttons: clean segmented buttons -->
+      <div class="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-border/40">
+        <span class="text-muted font-medium mr-1 text-[11px] sm:text-xs shrink-0">Anchor:</span>
         <div class="flex items-center gap-1">
-          <button type="button" id="pk-modal-anchor-top" class="px-2.5 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors" title="Align to Top (Face / Header)">▲ Top</button>
-          <button type="button" id="pk-modal-anchor-center" class="px-2.5 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs transition-colors" title="Align to Center">● Center</button>
-          <button type="button" id="pk-modal-anchor-bottom" class="px-2.5 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors" title="Align to Bottom">▼ Bottom</button>
+          <button type="button" id="pk-modal-anchor-top" class="h-7 px-2.5 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors flex items-center justify-center" title="Align to Top (Face / Header)">▲ Top</button>
+          <button type="button" id="pk-modal-anchor-center" class="h-7 px-2.5 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs transition-colors flex items-center justify-center" title="Align to Center">● Center</button>
+          <button type="button" id="pk-modal-anchor-bottom" class="h-7 px-2.5 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors flex items-center justify-center" title="Align to Bottom">▼ Bottom</button>
         </div>
       </div>
     </div>
@@ -121,28 +121,27 @@
           <div class="pk-crop-handle absolute -bottom-2 -left-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nesw-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="sw" title="Drag corner to resize"></div>
           <div class="pk-crop-handle absolute -bottom-2 -right-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nwse-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="se" title="Drag corner to resize"></div>
 
-          <!-- Live Dimensions Tag attached to crop box -->
+          <!-- Live Dimensions Tag: Hidden so it doesn't block the picture (dimensions are visible in the footer) -->
           <div
             id="pk-crop-live-size-tag"
-            class="absolute bottom-2 right-2 rounded bg-black/85 backdrop-blur px-1.5 py-0.5 text-[10px] font-mono font-bold text-accent border border-accent/40 pointer-events-none shadow"
+            class="hidden"
           >
-            1000 × 1000 px
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal Footer: Stats & Actions (Responsive stacked for mobile, side-by-side for desktop) -->
-    <footer class="border-t border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4">
-      <div class="text-xs text-muted flex items-center justify-between sm:justify-start gap-2 overflow-hidden">
-        <div class="flex items-center gap-1.5 truncate">
-          <span class="font-medium text-muted shrink-0 text-[11px] sm:text-xs">Original:</span>
-          <span id="pk-crop-orig-dims" class="font-mono text-fg font-semibold text-[11px] sm:text-xs truncate">-- × -- px</span>
+    <!-- Modal Footer: Stats & Actions (Clean layout: values are NEVER truncated) -->
+    <footer class="border-t border-border bg-surface px-4 py-2.5 sm:px-6 sm:py-3 shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4">
+      <div class="flex items-center justify-between sm:justify-start gap-2 text-xs w-full sm:w-auto">
+        <div class="flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-medium text-muted shrink-0 text-xs">Original:</span>
+          <span id="pk-crop-orig-dims" class="font-mono text-fg font-semibold text-xs whitespace-nowrap">-- × -- px</span>
         </div>
-        <span class="text-accent font-bold shrink-0 text-xs">➔</span>
-        <div class="flex items-center gap-1.5 truncate">
-          <span class="font-medium text-muted shrink-0 text-[11px] sm:text-xs">Crop:</span>
-          <span id="pk-crop-target-dims" class="font-mono text-accent font-bold text-[11px] sm:text-xs truncate">-- × -- px</span>
+        <span class="text-accent font-bold text-xs shrink-0">➔</span>
+        <div class="flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-medium text-muted shrink-0 text-xs">Crop:</span>
+          <span id="pk-crop-target-dims" class="font-mono text-accent font-bold text-xs whitespace-nowrap">-- × -- px</span>
         </div>
       </div>
 
