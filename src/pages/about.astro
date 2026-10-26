@@ -1,8 +1,13 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Prose from '@components/ui/Prose.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Button from '@components/ui/Button.astro';
 import { SITE } from '@lib/constants';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'About' },
+];
 
 const jsonLd = [
   {
@@ -25,69 +30,175 @@ const jsonLd = [
   title={`About — ${SITE.name}`}
   description="PixelKit is a fast, private file converter that runs entirely in your browser. Built by a small team who got tired of watching uploads spin."
   jsonLd={jsonLd}
-  width="prose"
+  width="default"
 >
-  <Prose>
-    <h1>About PixelKit</h1>
-    <p class="lead">
-      PixelKit is a file converter and compressor that runs entirely in your
-      browser. No uploads, no accounts, no watermarks. Built by people who
-      got tired of watching spinner animations.
-    </p>
+  <div class="mx-auto max-w-3xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
 
-    <h2>Why it exists</h2>
-    <p>
-      Most online file tools upload your file to a server, process it, and
-      send it back. That works, but it means every file you convert (photos,
-      ID scans, medical images, legal documents) passes through a server you
-      don't control. For personal photos that's mildly uncomfortable. For a
-      passport scan or a medical record, it's a real privacy risk.
-    </p>
-    <p>
-      Modern browsers can do everything those servers do. WebAssembly,
-      Web Workers, and the Canvas API are fast enough to convert a 20 MB
-      HEIC photo to a 200 KB JPG in under a second, without ever leaving
-      your device. PixelKit exists to prove that.
-    </p>
+    <!-- Page Header -->
+    <header class="mt-5 sm:mt-8">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-[11px] text-muted font-medium mb-3">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+        <span>100% Client-Side · Private &amp; Free</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-fg">
+        About PixelKit
+      </h1>
+      <p class="mt-2.5 sm:mt-3 text-xs sm:text-base text-muted leading-relaxed">
+        PixelKit is a file converter and compressor that runs entirely in your browser. No uploads, no accounts, no watermarks. Built by people who got tired of watching spinner animations.
+      </p>
+    </header>
 
-    <h2>What it does well</h2>
-    <ul>
-      <li>Convert between HEIC, JPG, PNG, WEBP, AVIF, GIF, BMP, and PDF.</li>
-      <li>Hit an exact KB target (50 KB, 100 KB, 200 KB) with the highest quality that fits.</li>
-      <li>Batch convert many files at once, in parallel, using Web Workers.</li>
-      <li>Work offline after the first page load.</li>
-      <li>Run on desktop and mobile, in every modern browser.</li>
-    </ul>
+    <div class="mt-6 sm:mt-10 space-y-4 sm:space-y-6">
+      <!-- Why it exists -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">Why it exists</h2>
+        </div>
+        <div class="space-y-3 text-xs sm:text-sm text-muted leading-relaxed">
+          <p>
+            Most online file tools upload your file to a server, process it, and send it back. That works, but it means every file you convert (photos, ID scans, medical images, legal documents) passes through a server you don't control. For personal photos that's mildly uncomfortable. For a passport scan or a medical record, it's a real privacy risk.
+          </p>
+          <p>
+            Modern browsers can do everything those servers do. WebAssembly, Web Workers, and the Canvas API are fast enough to convert a 20 MB HEIC photo to a 200 KB JPG in under a second, without ever leaving your device. PixelKit exists to prove that.
+          </p>
+        </div>
+      </section>
 
-    <h2>What it doesn't do</h2>
-    <ul>
-      <li>It doesn't upload your files. Ever. That's the whole point.</li>
-      <li>It doesn't collect personal data. See <a href="/privacy">Privacy</a>.</li>
-      <li>It doesn't watermark, sign, or alter your files beyond the conversion itself.</li>
-      <li>It doesn't require an account, an email, or a phone number.</li>
-    </ul>
+      <!-- What it does well -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-3.5">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">What it does well</h2>
+        </div>
+        <ul class="space-y-2.5 text-xs sm:text-sm text-muted">
+          <li class="flex items-start gap-2.5">
+            <svg class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Convert between <strong>HEIC, JPG, PNG, WEBP, AVIF, GIF, BMP</strong>, and <strong>PDF</strong>.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Hit an exact KB target (50 KB, 100 KB, 200 KB) with the highest quality that fits.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Batch convert many files at once, in parallel, using multi-core Web Workers.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Work offline seamlessly after the initial page load.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <svg class="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Optimized for both mobile and desktop screens in every modern browser.</span>
+          </li>
+        </ul>
+      </section>
 
-    <h2>How it's built</h2>
-    <p>
-      The site is a static Astro build, deployed on Cloudflare's CDN. The
-      conversion engine is vanilla TypeScript running in Web Workers. For
-      HEIC decode it uses <code>heic2any</code>, for PNG output it uses
-      <code>UPNG.js</code>, and for PDFs it uses <code>jsPDF</code> — all
-      loaded lazily only on the pages that need them. Everything else is
-      hand-written.
-    </p>
+      <!-- What it doesn't do -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-3.5">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">What it doesn't do</h2>
+        </div>
+        <ul class="space-y-2.5 text-xs sm:text-sm text-muted">
+          <li class="flex items-start gap-2.5">
+            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-500/15 text-[10px] font-bold text-rose-500 mt-0.5">✕</span>
+            <span><strong>Never uploads your files</strong>. They stay strictly inside your device memory.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-500/15 text-[10px] font-bold text-rose-500 mt-0.5">✕</span>
+            <span><strong>Zero personal data collection</strong>. See our <a href="/privacy" class="text-accent underline underline-offset-2">Privacy Policy</a>.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-500/15 text-[10px] font-bold text-rose-500 mt-0.5">✕</span>
+            <span><strong>No watermarks or branding</strong> added to your converted outputs.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-500/15 text-[10px] font-bold text-rose-500 mt-0.5">✕</span>
+            <span><strong>No accounts or signups</strong>. No email, credit card, or personal information required.</span>
+          </li>
+        </ul>
+      </section>
 
-    <h2>Feedback</h2>
-    <p>
-      Found a bug? A conversion that failed? A portal that rejected your
-      file even at the right size? Email{' '}
-      <a href="mailto:hello@pixelkit.app">hello@pixelkit.app</a> and we'll
-      look into it.
-    </p>
-  </Prose>
+      <!-- How it's built -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">How it's built</h2>
+        </div>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          The site is a static Astro build deployed on Cloudflare's CDN. The conversion engine is vanilla TypeScript executing in isolated Web Workers. Heavy libraries are loaded lazily only when needed:
+        </p>
+        <div class="mt-3.5 flex flex-wrap gap-1.5 sm:gap-2">
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">Astro</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">Web Workers</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">Canvas API</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">heic2any</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">UPNG.js</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">jsPDF</span>
+          <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">Cloudflare CDN</span>
+        </div>
+      </section>
 
-  <div class="mt-12 flex flex-wrap gap-3 not-prose">
-    <Button href="/convert" variant="primary" size="md">Browse conversions</Button>
-    <Button href="/blog" variant="secondary" size="md">Read the blog</Button>
+      <!-- Feedback -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-500">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">Feedback &amp; Inquiries</h2>
+        </div>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          Found a bug? A conversion that failed? A portal that rejected your file even at the right size? Reach out and we'll investigate:
+        </p>
+        <div class="mt-3">
+          <a
+            href="mailto:hello@pixelkit.app"
+            class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+          >
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+            </svg>
+            <span>hello@pixelkit.app</span>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-2.5 sm:gap-3 pb-8">
+      <Button href="/convert" variant="primary" size="md" class="w-full sm:w-auto text-center justify-center">Browse conversions</Button>
+      <Button href="/blog" variant="secondary" size="md" class="w-full sm:w-auto text-center justify-center">Read the blog</Button>
+    </div>
   </div>
-</BaseLayout>
+</BaseLayout>
