@@ -111,6 +111,8 @@ export function buildSoftwareApplicationJsonLd(input: {
       'Client-side file conversion',
       'Zero server upload privacy',
       'Exact target file size compression',
+      'Aspect ratio image crop and framing studio',
+      'Resolution scaling and custom pixel dimension resize',
       'Batch conversion in browser',
       'Offline PWA support',
     ],

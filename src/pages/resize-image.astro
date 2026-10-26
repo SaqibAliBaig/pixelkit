@@ -1,0 +1,120 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import { buildSoftwareApplicationJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Resize Image' },
+];
+
+const faqs = [
+  {
+    q: 'How do I resize an image to an exact width and height in pixels?',
+    a: 'Drop your image into PixelKit, click "Scale & Resize" on the file card, and enter your target width and height in pixels (e.g. 1920 × 1080 for Full HD, or 413 × 531 for Passport ID). PixelKit re-renders the image locally using the Canvas API.',
+  },
+  {
+    q: 'How can I scale an image resolution by percentage (e.g., 50% or 75%)?',
+    a: 'In the Resize Studio, click the percentage buttons (100%, 75%, 50%, 25%) or adjust the slider. The aspect ratio is locked automatically to maintain proportional scaling without distortion.',
+  },
+  {
+    q: 'What is the standard passport size photo in pixels?',
+    a: 'For online portals, the standard passport photo dimension is 413 × 531 pixels (3.5 × 4.5 cm at 300 DPI) or 600 × 600 pixels (2 × 2 inches for US Visa). PixelKit has pre-configured 1-click presets for both.',
+  },
+  {
+    q: 'Will resizing my image degrade its quality or blur it?',
+    a: 'PixelKit uses bicubic image interpolation in browser memory. By default, the "Do not upscale" option is enabled to prevent pixelation if the original image is smaller than the target dimension.',
+  },
+  {
+    q: 'Are my images uploaded to any server when resizing?',
+    a: 'No. PixelKit executes 100% inside your browser using client-side Web Workers and HTML5 Canvas. Your files never touch external servers or cloud storage.',
+  },
+];
+
+const pageTitle = `Resize Image Online — Scale Resolution & Dimensions in Pixels | ${SITE.name}`;
+const pageDesc = 'Free online image resizer. Scale image resolution by percentage or enter exact width and height in pixels. Built-in presets for Passport, Square Avatar, and Full HD.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Image Resizer',
+    description: pageDesc,
+    url: new URL('/resize-image', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Resolution Scaling · Pixel Presets · 100% Private</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl text-fg">
+        Resize Image Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Scale image resolution by percentage or set exact width &amp; height in pixels. Fast, private bicubic resampling running entirely in your browser.
+      </p>
+    </header>
+
+    <!-- Tool Preview -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview />
+    </div>
+
+    <!-- Preset Dimension Guide Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common Dimension &amp; Resolution Presets
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Standard aspect ratios and pixel sizes built into PixelKit's Resize Studio:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Passport &amp; ID Photos</div>
+          <div class="font-mono text-accent text-xs mt-1">413 × 531 px · 35 × 45 mm</div>
+          <p class="text-muted mt-1.5 text-xs">Standard requirement for official passport, visa, and exam portal forms.</p>
+        </div>
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Square Avatar &amp; Profile</div>
+          <div class="font-mono text-accent text-xs mt-1">600 × 600 px · 1:1 Ratio</div>
+          <p class="text-muted mt-1.5 text-xs">Optimized for social profile photos, Discord, WhatsApp, and forum icons.</p>
+        </div>
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Full Web HD</div>
+          <div class="font-mono text-accent text-xs mt-1">1920 × 1080 px · 16:9 Ratio</div>
+          <p class="text-muted mt-1.5 text-xs">Standard widescreen format for website headers, desktop wallpapers, and banners.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQs -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>

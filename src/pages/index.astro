@@ -7,9 +7,17 @@ import PopularConversions from '@components/home/PopularConversions.astro';
 import FeatureGrid from '@components/home/FeatureGrid.astro';
 import HowItWorks from '@components/home/HowItWorks.astro';
 import { SITE } from '@lib/constants';
-import { buildWebSiteJsonLd, buildOrganizationJsonLd } from '@lib/seo/jsonld';
+import { buildWebSiteJsonLd, buildOrganizationJsonLd, buildSoftwareApplicationJsonLd } from '@lib/seo/jsonld';
 
-const jsonLd = [buildWebSiteJsonLd(), buildOrganizationJsonLd()];
+const jsonLd = [
+  buildWebSiteJsonLd(),
+  buildOrganizationJsonLd(),
+  buildSoftwareApplicationJsonLd({
+    name: SITE.name,
+    description: SITE.defaultDescription,
+    url: SITE.url,
+  }),
+];
 ---
 
 <BaseLayout

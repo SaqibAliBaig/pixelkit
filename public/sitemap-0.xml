@@ -6,6 +6,21 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://pixelkit.app/compress-image</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://pixelkit.app/resize-image</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://pixelkit.app/crop-image</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://pixelkit.app/convert</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -13,6 +28,21 @@
   <url>
     <loc>https://pixelkit.app/blog</loc>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixelkit.app/blog/how-to-resize-image-to-passport-size</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixelkit.app/blog/how-to-crop-image-to-exact-aspect-ratio</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixelkit.app/blog/why-portals-reject-200kb-photos</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
