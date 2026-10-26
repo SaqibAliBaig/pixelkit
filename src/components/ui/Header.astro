@@ -1,6 +1,8 @@
 ---
 import Container from '@components/ui/Container.astro';
 import ThemeToggle from '@components/ui/ThemeToggle.astro';
+import { Image } from 'astro:assets';
+import logo from '../../assets/logo.png';
 import { SITE, NAV } from '@lib/constants';
 
 const current = Astro.url.pathname;
@@ -17,13 +19,13 @@ const isActive = (href: string) =>
         class="flex items-center gap-2 rounded-md font-semibold text-fg hover:opacity-90"
         aria-label={`${SITE.name} home`}
       >
-        <img
-          src="/favicon.svg"
-          width="28"
-          height="28"
-          alt="PixelKit"
+        <Image
+          src={logo}
+          width={28}
+          height={28}
+          alt={SITE.name}
+          loading="eager"
           class="h-7 w-7 rounded-lg shrink-0 object-contain shadow-sm"
-          aria-hidden="true"
         />
         <span class="text-[15px] tracking-tight">{SITE.name}</span>
       </a>

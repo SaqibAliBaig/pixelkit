@@ -17,6 +17,7 @@ export interface SiteConfig {
   defaultOgImage: string;
   twitterHandle: string;
   author: string;
+  contactEmail: string;
   keywords: string[];
 }
 
@@ -29,6 +30,7 @@ export const SITE: SiteConfig = {
   defaultOgImage: '/og-default.png',
   twitterHandle: '@pixelkitapp',
   author: 'PixelKit Team',
+  contactEmail: 'saqibbaig110@gmail.com',
   keywords: [
     'file converter',
     'image compressor',
