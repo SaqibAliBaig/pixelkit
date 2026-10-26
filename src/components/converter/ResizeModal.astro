@@ -129,10 +129,10 @@
         <!-- 1. Scale Percent Buttons & Slider -->
         <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
           <div class="flex items-center justify-between">
-            <label class="font-semibold text-fg flex items-center gap-1.5">
+            <span class="font-semibold text-fg flex items-center gap-1.5">
               <span>Scale Resolution</span>
               <span class="text-muted font-normal text-[11px]">· Proportional</span>
-            </label>
+            </span>
             <span id="pk-modal-scale-val" class="font-mono font-bold text-accent text-sm">100%</span>
           </div>
 
@@ -162,9 +162,9 @@
 
         <!-- 2. Standard Output Presets -->
         <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2">
-          <label class="block font-semibold text-fg">
+          <span class="block font-semibold text-fg">
             Standard Output Presets
-          </label>
+          </span>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="passport" data-w="413" data-h="531">
               <span class="block font-semibold text-xs truncate">Passport ID</span>
@@ -206,7 +206,7 @@
 
           <div class="flex items-center gap-2">
             <div class="flex-1">
-              <label class="block text-[10px] text-muted mb-0.5">Width (px)</label>
+              <label for="pk-modal-dim-w" class="block text-[10px] text-muted mb-0.5">Width (px)</label>
               <input
                 id="pk-modal-dim-w"
                 type="number"
@@ -218,7 +218,7 @@
             </div>
             <span class="text-muted font-bold mt-3">×</span>
             <div class="flex-1">
-              <label class="block text-[10px] text-muted mb-0.5">Height (px)</label>
+              <label for="pk-modal-dim-h" class="block text-[10px] text-muted mb-0.5">Height (px)</label>
               <input
                 id="pk-modal-dim-h"
                 type="number"
@@ -234,7 +234,7 @@
         <!-- 4. Fit Strategy & Guardrail -->
         <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
           <div>
-            <label class="block font-semibold text-fg mb-1">Fit Strategy</label>
+            <span class="block font-semibold text-fg mb-1">Fit Strategy</span>
             <div class="flex rounded-lg border border-border bg-surface p-0.5">
               <button type="button" class="pk-modal-fit-btn flex-1 rounded-md py-1.5 text-[11px] font-medium bg-bg text-fg shadow-sm cursor-pointer" data-fit="contain">Fit Within</button>
               <button type="button" class="pk-modal-fit-btn flex-1 rounded-md py-1.5 text-[11px] font-medium text-muted hover:text-fg cursor-pointer" data-fit="cover">Crop to Fill</button>
@@ -242,7 +242,7 @@
             </div>
           </div>
 
-          <label class="flex items-center gap-2 text-muted hover:text-fg cursor-pointer select-none text-[11px] pt-0.5">
+          <label for="pk-modal-no-upscale" class="flex items-center gap-2 text-muted hover:text-fg cursor-pointer select-none text-[11px] pt-0.5">
             <input
               id="pk-modal-no-upscale"
               type="checkbox"

@@ -60,9 +60,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
     <!-- Output format -->
     <div class="relative" id="pk-output-format-wrapper">
       <div class="flex items-center justify-between">
-        <label id="pk-output-format-label" class="block text-sm font-medium text-fg">
+        <span id="pk-output-format-label" class="block text-sm font-medium text-fg">
           Output format
-        </label>
+        </span>
       </div>
 
       <!-- Hidden standard select for form / worker / test compatibility -->
@@ -180,7 +180,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       id="pk-merge-pdf-container"
       class={`rounded-xl border border-accent/30 bg-accent/5 p-3 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
     >
-      <label class="flex items-center justify-between text-sm text-fg cursor-pointer select-none">
+      <label for="pk-merge-pdf-toggle" class="flex items-center justify-between text-sm text-fg cursor-pointer select-none">
         <span class="flex items-center gap-2 font-medium">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -236,9 +236,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
     <!-- Target size & Quality controls -->
     <div class="relative" id="pk-target-kb-wrapper">
       <div class="flex items-center justify-between">
-        <label id="pk-target-size-label" class="block text-sm font-medium text-fg">
+        <span id="pk-target-size-label" class="block text-sm font-medium text-fg">
           Compression & Size
-        </label>
+        </span>
         <span
           id="pk-target-value"
           class="text-xs text-muted tabular-nums font-medium"
@@ -645,7 +645,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
     </div>
 
     <!-- Advanced -->
-    <details class="group">
+    <details open class="group">
       <summary
         class="cursor-pointer text-sm text-muted hover:text-fg select-none list-none flex items-center gap-1"
       >
@@ -667,32 +667,32 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         Advanced Options
       </summary>
       <div class="mt-3 space-y-2">
-        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+        <label for="pk-preserve-metadata" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
           <input
             id="pk-preserve-metadata"
             type="checkbox"
             checked
             class="h-4 w-4 rounded border-border accent-accent"
           />
-          Preserve EXIF metadata (Camera, GPS, date)
+          <span>Preserve EXIF metadata (Camera, GPS, date)</span>
         </label>
-        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+        <label for="pk-strip-transparency" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
           <input
             id="pk-strip-transparency"
             type="checkbox"
             checked
             class="h-4 w-4 rounded border-border accent-accent"
           />
-          Fill transparent backgrounds with white (for JPG)
+          <span>Fill transparent backgrounds with white (for JPG)</span>
         </label>
-        <label class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+        <label for="pk-auto-orient" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
           <input
             id="pk-auto-orient"
             type="checkbox"
             checked
             class="h-4 w-4 rounded border-border accent-accent"
           />
-          Auto-orient photos (EXIF correction)
+          <span>Auto-orient photos (EXIF correction)</span>
         </label>
       </div>
     </details>

@@ -7,14 +7,14 @@
  *   - Network-first navigation with offline cache fallback
  */
 
-const CACHE_NAME = 'pixelkit-cache-v1';
+const CACHE_NAME = 'pixelkit-cache-v2';
 const CORE_ASSETS = [
   '/',
   '/convert',
   '/manifest.webmanifest',
   '/favicon.svg',
   '/apple-touch-icon.png',
-  '/fonts/Inter-Variable.woff2',
+  '/fonts/Inter-Variable.woff2?v=4.0',
 ];
 
 self.addEventListener('install', (event) => {

@@ -81,7 +81,7 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Inter-Variable.woff2?v=4.0" as="font" type="font/woff2" crossorigin />
 
     {import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN && (
       <script
@@ -95,6 +95,13 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
     )}
 
     <script is:inline>
+      // Clear legacy stale service worker cache if present
+      try {
+        if ('caches' in window) {
+          caches.delete('pixelkit-cache-v1');
+        }
+      } catch (_) {}
+
       // No-flash theme: read storage or system preference before paint.
       (function () {
         try {
