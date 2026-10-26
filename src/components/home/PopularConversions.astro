@@ -1,46 +1,69 @@
 ---
-import Badge from '@components/ui/Badge.astro';
+// Popular Conversions Grid — Mobile-first 2-column layout and clean desktop cards
 
 const conversions = [
-  { label: 'HEIC → JPG', href: '/heic-to-jpg', note: 'iPhone photos' },
-  { label: 'HEIC → JPG · 100KB', href: '/heic-to-jpg-under-100kb', note: 'Aadhaar, forms' },
-  { label: 'PNG → JPG', href: '/png-to-jpg', note: 'Smaller files' },
-  { label: 'JPG → PDF', href: '/jpg-to-pdf', note: 'Documents' },
-  { label: 'JPG → PDF · 100KB', href: '/jpg-to-pdf-under-100kb', note: 'Portals' },
-  { label: 'PNG → WEBP', href: '/png-to-webp', note: 'Web images' },
-  { label: 'JPG → WEBP', href: '/jpg-to-webp', note: 'Site speed' },
-  { label: 'HEIC → JPG · 50KB', href: '/heic-to-jpg-under-50kb', note: 'Exam forms' },
+  { from: 'HEIC', to: 'JPG', label: 'HEIC → JPG', href: '/heic-to-jpg', note: 'iPhone photos', badge: null },
+  { from: 'HEIC', to: 'JPG', label: 'HEIC → JPG', href: '/heic-to-jpg-under-100kb', note: 'Aadhaar, forms', badge: '100 KB' },
+  { from: 'PNG', to: 'JPG', label: 'PNG → JPG', href: '/png-to-jpg', note: 'Smaller files', badge: null },
+  { from: 'JPG', to: 'PDF', label: 'JPG → PDF', href: '/jpg-to-pdf', note: 'Documents', badge: null },
+  { from: 'JPG', to: 'PDF', label: 'JPG → PDF', href: '/jpg-to-pdf-under-100kb', note: 'Portal uploads', badge: '100 KB' },
+  { from: 'PNG', to: 'WEBP', label: 'PNG → WEBP', href: '/png-to-webp', note: 'Web images', badge: null },
+  { from: 'JPG', to: 'WEBP', label: 'JPG → WEBP', href: '/jpg-to-webp', note: 'Fast loading', badge: null },
+  { from: 'HEIC', to: 'JPG', label: 'HEIC → JPG', href: '/heic-to-jpg-under-50kb', note: 'Exam portals', badge: '50 KB' },
 ];
 ---
 
-<section class="mt-20" aria-labelledby="popular-heading">
+<section class="mt-12 sm:mt-20 px-2 sm:px-0" aria-labelledby="popular-heading">
   <div class="mx-auto max-w-4xl">
-    <div class="flex items-end justify-between gap-4">
-      <h2
-        id="popular-heading"
-        class="text-xl font-semibold tracking-tight text-fg sm:text-2xl"
-      >
-        Popular conversions
-      </h2>
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <h2
+          id="popular-heading"
+          class="text-lg sm:text-2xl font-bold tracking-tight text-fg"
+        >
+          Popular conversions
+        </h2>
+        <p class="text-[11px] sm:text-xs text-muted mt-0.5">
+          One-click presets for web, government forms & social media
+        </p>
+      </div>
+
       <a
         href="/convert"
-        class="text-sm text-muted hover:text-fg transition-colors"
+        class="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-accent hover:opacity-80 transition-opacity shrink-0"
       >
-        All conversions →
+        <span>All</span>
+        <span class="hidden sm:inline">conversions</span>
+        <span>→</span>
       </a>
     </div>
 
-    <ul class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- 2-column grid on mobile, 4-column on desktop -->
+    <ul class="mt-4 sm:mt-5 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
       {conversions.map((c) => (
         <li>
           <a
             href={c.href}
-            class="group flex flex-col justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-fg/20 hover:bg-surface/70"
+            class="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-3 sm:p-4 hover:border-accent/40 hover:bg-surface active:scale-[0.98] transition-all h-full shadow-xs hover:shadow-sm"
           >
-            <span class="text-sm font-medium text-fg group-hover:text-accent transition-colors">
-              {c.label}
-            </span>
-            <span class="mt-1 text-xs text-muted">{c.note}</span>
+            <div>
+              <div class="flex items-center justify-between gap-1">
+                <span class="text-xs sm:text-sm font-semibold text-fg group-hover:text-accent transition-colors">
+                  {c.label}
+                </span>
+                {c.badge && (
+                  <span class="rounded font-mono text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 bg-accent/10 text-accent border border-accent/25 shrink-0">
+                    {c.badge}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div class="mt-2.5 flex items-center justify-between text-[11px] sm:text-xs text-muted">
+              <span class="truncate">{c.note}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-muted/60 group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 ml-1">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
           </a>
         </li>
       ))}
