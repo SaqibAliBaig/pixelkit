@@ -643,6 +643,47 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         </div>
       </div>
     </div>
+
+    <!-- Quick Dimensions & Crop Studio Tools -->
+    <div class="rounded-xl border border-border bg-surface/50 p-3 space-y-2">
+      <div class="flex items-center justify-between">
+        <label class="block text-xs font-semibold text-fg">
+          Dimensions & Framing
+        </label>
+        <span class="text-[10px] text-muted font-medium">Batch / Studio</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          id="pk-open-resize-studio-btn"
+          class="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface hover:border-accent/40 px-2 py-2 text-xs font-semibold text-fg transition-all cursor-pointer shadow-sm hover:shadow"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          <span>Scale & Resize</span>
+        </button>
+
+        <button
+          type="button"
+          id="pk-open-crop-studio-btn"
+          class="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface hover:border-accent/40 px-2 py-2 text-xs font-semibold text-fg transition-all cursor-pointer shadow-sm hover:shadow"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+            <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
+            <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
+          </svg>
+          <span>Crop Studio</span>
+        </button>
+      </div>
+      <p class="text-[10px] text-muted leading-relaxed">
+        Scale resolution or crop aspect ratio for queued files.
+      </p>
+    </div>
+
     <!-- Advanced -->
     <details class="group">
       <summary

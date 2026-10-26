@@ -2,18 +2,18 @@
 import Badge from '@components/ui/Badge.astro';
 ---
 
-<section class="text-center">
-  <Badge variant="muted" class="mx-auto">
-    <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
-    No uploads · No accounts · Free
+<section class="text-center px-2">
+  <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+    <span class="inline-block h-1.5 w-1.5 rounded-full bg-success animate-pulse"></span>
+    <span>No uploads · No accounts · 100% Free</span>
   </Badge>
 
-  <h1 class="mt-4 text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+  <h1 class="mt-3.5 sm:mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-fg">
     Convert &amp; compress files.<br />
-    <span class="text-muted">Right in your browser.</span>
+    <span class="bg-gradient-to-r from-fg via-muted to-muted/70 bg-clip-text text-transparent">Right in your browser.</span>
   </h1>
 
-  <p class="mx-auto mt-5 max-w-prose text-balance text-base text-muted leading-relaxed sm:text-lg">
+  <p class="mx-auto mt-3 sm:mt-5 max-w-prose text-balance text-sm sm:text-base text-muted leading-relaxed">
     HEIC → JPG. PNG → PDF. Any image to an exact KB target. PixelKit runs
     entirely on your device, so files never leave your browser.
   </p>

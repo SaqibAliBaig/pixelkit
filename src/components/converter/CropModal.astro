@@ -1,26 +1,28 @@
 ---
-// Interactive Quick-Crop & Framing Modal dialog
+// Interactive Quick-Crop & Framing Modal dialog — Fully optimized for Mobile & Desktop
 ---
 
 <div
   id="pk-crop-modal"
-  class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
   role="dialog"
   aria-modal="true"
   aria-labelledby="pk-crop-modal-title"
 >
   <div
-    class="relative w-full max-w-4xl h-[90vh] max-h-[850px] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
+    class="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] max-h-[860px] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
   >
     <!-- Modal Header -->
-    <header class="flex items-center justify-between border-b border-border bg-surface px-4 py-3 sm:px-6 shrink-0">
-      <div class="min-w-0 flex-1">
+    <header class="flex items-center justify-between border-b border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0">
+      <div class="min-w-0 flex-1 pr-2">
         <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent shrink-0">
-            <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
-            <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
-          </svg>
-          <h3 id="pk-crop-modal-title" class="truncate text-base font-semibold text-fg">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
+              <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
+            </svg>
+          </div>
+          <h3 id="pk-crop-modal-title" class="truncate text-sm sm:text-base font-semibold text-fg">
             Interactive Crop & Framing
           </h3>
           <span
@@ -30,20 +32,20 @@
             ORIGINAL
           </span>
         </div>
-        <p id="pk-crop-modal-filename" class="text-xs text-muted truncate mt-0.5">
+        <p id="pk-crop-modal-filename" class="text-[11px] sm:text-xs text-muted truncate mt-0.5">
           Select ratio or drag framing box to adjust composition.
         </p>
       </div>
 
-      <!-- Close Button -->
+      <!-- Close Button with comfortable touch target -->
       <button
         id="pk-crop-modal-close-btn"
         type="button"
-        class="rounded-lg p-2 text-muted hover:text-fg hover:bg-bg border border-transparent hover:border-border transition-colors cursor-pointer shrink-0 ml-2"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:text-fg hover:bg-bg border border-border/60 transition-colors cursor-pointer shrink-0"
         title="Close (Esc)"
         aria-label="Close"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
@@ -51,37 +53,40 @@
     </header>
 
     <!-- Toolbar: Aspect Ratio Selector & Anchor Shortcuts -->
-    <div class="border-b border-border bg-bg/50 px-4 py-2 sm:px-6 flex flex-wrap items-center justify-between gap-2 shrink-0 text-xs">
-      <!-- Ratio presets -->
-      <div class="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-full">
-        <span class="text-muted font-medium mr-1 shrink-0">Ratio:</span>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer shrink-0" data-ratio="original">Original</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="1:1">1:1 Square</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="3.5:4.5">3.5 × 4.5 ID</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="4:3">4:3 Standard</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="16:9">16:9 Landscape</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="9:16">9:16 Story</button>
-        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0" data-ratio="3:2">3:2 Classic</button>
+    <div class="border-b border-border bg-bg/50 px-3.5 py-2 sm:px-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 shrink-0 text-xs">
+      <!-- Ratio presets (Horizontal smooth scrolling on mobile) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto py-0.5 max-w-full scrollbar-none">
+        <span class="text-muted font-medium mr-1 shrink-0 text-[11px] sm:text-xs">Ratio:</span>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-accent/40 bg-accent/10 text-accent font-semibold cursor-pointer shrink-0 text-xs transition-colors" data-ratio="original">Original</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="1:1">1:1 Square</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="3.5:4.5">3.5 × 4.5 ID</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="4:3">4:3 Standard</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="16:9">16:9 Landscape</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="9:16">9:16 Story</button>
+        <button type="button" class="pk-modal-ratio-btn px-2.5 py-1 rounded-md font-medium border border-border bg-surface text-fg hover:border-accent/40 cursor-pointer shrink-0 text-xs transition-colors" data-ratio="3:2">3:2 Classic</button>
       </div>
 
       <!-- Quick Anchor Jump Buttons -->
-      <div class="flex items-center gap-1 shrink-0">
-        <span class="text-muted font-medium mr-1">Anchor:</span>
-        <button type="button" id="pk-modal-anchor-top" class="px-2 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium" title="Align to Top (Face / Header)">▲ Top</button>
-        <button type="button" id="pk-modal-anchor-center" class="px-2 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold" title="Align to Center">● Center</button>
-        <button type="button" id="pk-modal-anchor-bottom" class="px-2 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium" title="Align to Bottom">▼ Bottom</button>
+      <div class="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pt-0.5 sm:pt-0 border-t sm:border-t-0 border-border/40">
+        <span class="text-muted font-medium mr-1 text-[11px] sm:text-xs">Anchor:</span>
+        <div class="flex items-center gap-1">
+          <button type="button" id="pk-modal-anchor-top" class="px-2.5 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors" title="Align to Top (Face / Header)">▲ Top</button>
+          <button type="button" id="pk-modal-anchor-center" class="px-2.5 py-1 rounded-md border border-accent/40 bg-accent/10 text-accent font-semibold text-xs transition-colors" title="Align to Center">● Center</button>
+          <button type="button" id="pk-modal-anchor-bottom" class="px-2.5 py-1 rounded-md border border-border bg-surface hover:bg-surface/80 text-muted hover:text-fg font-medium text-xs transition-colors" title="Align to Bottom">▼ Bottom</button>
+        </div>
       </div>
     </div>
 
+    <!-- Viewport Stage -->
     <div
       id="pk-crop-viewport"
-      class="relative flex-1 bg-black/95 overflow-hidden flex items-center justify-center p-4 select-none touch-none cursor-crosshair"
+      class="relative flex-1 bg-black/95 overflow-hidden flex items-center justify-center p-2 sm:p-4 select-none touch-none cursor-crosshair min-h-0"
     >
-      <div id="pk-crop-container" class="relative inline-flex items-center justify-center max-h-[62vh] max-w-full">
+      <div id="pk-crop-container" class="relative inline-flex items-center justify-center max-h-[64vh] max-w-full">
         <!-- Base Source Image -->
         <img
           id="pk-crop-img-source"
-          class="block max-h-[62vh] max-w-full w-auto h-auto pointer-events-none rounded select-none"
+          class="block max-h-[64vh] max-w-full w-auto h-auto pointer-events-none rounded select-none object-contain"
           alt="Crop Target"
         />
 
@@ -105,21 +110,21 @@
             <div class="border-r border-b border-white/60"></div>
             <div class="border-r border-b border-white/60"></div>
             <div class="border-b border-white/60"></div>
-            <div class="border-r border-white/60"></div>
-            <div class="border-r border-white/60"></div>
+            <div class="border-r border-b border-white/60"></div>
+            <div class="border-r border-b border-white/60"></div>
             <div></div>
           </div>
 
-          <!-- Drag handles (4 corners) -->
-          <div class="pk-crop-handle absolute -top-1.5 -left-1.5 h-3.5 w-3.5 bg-accent border-2 border-white rounded-full shadow cursor-nwse-resize touch-none" data-handle="nw"></div>
-          <div class="pk-crop-handle absolute -top-1.5 -right-1.5 h-3.5 w-3.5 bg-accent border-2 border-white rounded-full shadow cursor-nesw-resize touch-none" data-handle="ne"></div>
-          <div class="pk-crop-handle absolute -bottom-1.5 -left-1.5 h-3.5 w-3.5 bg-accent border-2 border-white rounded-full shadow cursor-nesw-resize touch-none" data-handle="sw"></div>
-          <div class="pk-crop-handle absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5 bg-accent border-2 border-white rounded-full shadow cursor-nwse-resize touch-none" data-handle="se"></div>
+          <!-- Drag handles (4 corners with extended 42px touch hit targets for fingers) -->
+          <div class="pk-crop-handle absolute -top-2 -left-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nwse-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="nw" title="Drag corner to resize"></div>
+          <div class="pk-crop-handle absolute -top-2 -right-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nesw-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="ne" title="Drag corner to resize"></div>
+          <div class="pk-crop-handle absolute -bottom-2 -left-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nesw-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="sw" title="Drag corner to resize"></div>
+          <div class="pk-crop-handle absolute -bottom-2 -right-2 h-4 w-4 bg-accent border-2 border-white rounded-full shadow-lg cursor-nwse-resize touch-none after:content-[''] after:absolute after:-inset-3.5 after:rounded-full" data-handle="se" title="Drag corner to resize"></div>
 
           <!-- Live Dimensions Tag attached to crop box -->
           <div
             id="pk-crop-live-size-tag"
-            class="absolute bottom-2 right-2 rounded bg-black/80 backdrop-blur px-1.5 py-0.5 text-[10px] font-mono font-bold text-accent border border-accent/40 pointer-events-none"
+            class="absolute bottom-2 right-2 rounded bg-black/85 backdrop-blur px-1.5 py-0.5 text-[10px] font-mono font-bold text-accent border border-accent/40 pointer-events-none shadow"
           >
             1000 × 1000 px
           </div>
@@ -127,40 +132,44 @@
       </div>
     </div>
 
-    <!-- Modal Footer: Stats & Actions -->
-    <footer class="flex items-center justify-between border-t border-border bg-surface px-4 py-3 sm:px-6 shrink-0">
-      <div class="text-xs text-muted flex items-center gap-2">
-        <span class="font-medium">Original:</span>
-        <span id="pk-crop-orig-dims" class="font-mono text-fg font-semibold">-- × -- px</span>
-        <span class="text-accent font-bold">➔</span>
-        <span class="font-medium">Crop:</span>
-        <span id="pk-crop-target-dims" class="font-mono text-accent font-bold">-- × -- px</span>
+    <!-- Modal Footer: Stats & Actions (Responsive stacked for mobile, side-by-side for desktop) -->
+    <footer class="border-t border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4">
+      <div class="text-xs text-muted flex items-center justify-between sm:justify-start gap-2 overflow-hidden">
+        <div class="flex items-center gap-1.5 truncate">
+          <span class="font-medium text-muted shrink-0 text-[11px] sm:text-xs">Original:</span>
+          <span id="pk-crop-orig-dims" class="font-mono text-fg font-semibold text-[11px] sm:text-xs truncate">-- × -- px</span>
+        </div>
+        <span class="text-accent font-bold shrink-0 text-xs">➔</span>
+        <div class="flex items-center gap-1.5 truncate">
+          <span class="font-medium text-muted shrink-0 text-[11px] sm:text-xs">Crop:</span>
+          <span id="pk-crop-target-dims" class="font-mono text-accent font-bold text-[11px] sm:text-xs truncate">-- × -- px</span>
+        </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="grid grid-cols-3 sm:flex items-center gap-2">
         <button
           id="pk-crop-reset-btn"
           type="button"
-          class="rounded-xl px-3 py-1.5 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-border transition-colors cursor-pointer"
+          class="rounded-xl px-2.5 py-2 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-border transition-colors cursor-pointer text-center"
         >
           Reset
         </button>
         <button
           id="pk-crop-cancel-btn"
           type="button"
-          class="rounded-xl px-3 py-1.5 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-border transition-colors cursor-pointer"
+          class="rounded-xl px-2.5 py-2 text-xs font-medium text-muted hover:text-fg hover:bg-bg border border-border transition-colors cursor-pointer text-center"
         >
           Cancel
         </button>
         <button
           id="pk-crop-apply-btn"
           type="button"
-          class="rounded-xl bg-accent px-4 py-1.5 text-xs font-semibold text-accent-fg shadow hover:bg-accent/90 transition-all cursor-pointer flex items-center gap-1.5"
+          class="rounded-xl bg-accent px-3.5 py-2 text-xs font-semibold text-accent-fg shadow hover:bg-accent/90 transition-all cursor-pointer flex items-center justify-center gap-1.5 col-span-1 sm:col-auto"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          <span>Apply Framing</span>
+          <span>Apply</span>
         </button>
       </div>
     </footer>

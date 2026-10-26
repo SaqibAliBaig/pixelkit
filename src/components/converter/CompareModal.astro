@@ -1,75 +1,47 @@
 ---
 // Modal dialog for visual before/after comparison with interactive split slider and zoom.
+// Fully responsive for Mobile & Desktop.
 ---
 
 <div
   id="pk-compare-modal"
-  class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
+  class="fixed inset-0 z-50 hidden flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm transition-opacity"
   role="dialog"
   aria-modal="true"
   aria-labelledby="pk-compare-title"
 >
   <div
-    class="relative w-full max-w-5xl h-[90vh] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
+    class="relative w-full max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col rounded-2xl border border-border bg-surface text-fg shadow-2xl overflow-hidden"
   >
     <!-- Modal Header -->
-    <header class="flex items-center justify-between border-b border-border bg-surface px-4 py-3 sm:px-6">
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <h3 id="pk-compare-title" class="truncate text-base font-semibold text-fg">
+    <header class="border-b border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0">
+      <!-- Row 1: Title, saved badge, and close button -->
+      <div class="flex items-center justify-between gap-2 min-w-0">
+        <div class="flex items-center gap-2 min-w-0 flex-1 pr-1">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+          <h3 id="pk-compare-title" class="truncate text-sm sm:text-base font-semibold text-fg">
             Visual Comparison
           </h3>
           <span
             id="pk-compare-saved-badge"
-            class="hidden rounded-full bg-success/15 px-2 py-0.5 text-xs font-bold text-success border border-success/30 shrink-0"
+            class="hidden rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-bold text-success border border-success/30 shrink-0 font-mono"
           >
             -0% saved
           </span>
-        </div>
-        <div id="pk-compare-meta" class="mt-0.5 text-xs text-muted flex flex-wrap items-center gap-2">
-          <!-- Stats injected dynamically -->
-        </div>
-      </div>
-
-      <!-- Zoom & View Controls -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-2">
-        <div class="flex items-center rounded-lg border border-border bg-bg/50 p-0.5 text-xs">
-          <button
-            id="pk-zoom-out-btn"
-            type="button"
-            class="px-2 py-1 rounded hover:bg-surface text-muted hover:text-fg font-bold"
-            title="Zoom Out"
-            aria-label="Zoom Out"
-          >
-            −
-          </button>
-          <span id="pk-zoom-level" class="px-2 py-1 font-mono text-[11px] tabular-nums font-medium text-fg">
-            100%
-          </span>
-          <button
-            id="pk-zoom-in-btn"
-            type="button"
-            class="px-2 py-1 rounded hover:bg-surface text-muted hover:text-fg font-bold"
-            title="Zoom In"
-            aria-label="Zoom In"
-          >
-            +
-          </button>
-          <button
-            id="pk-zoom-fit-btn"
-            type="button"
-            class="px-2 py-1 rounded hover:bg-surface text-xs text-accent font-medium ml-0.5"
-            title="Reset to Fit"
-          >
-            Fit
-          </button>
         </div>
 
         <!-- Close modal button -->
         <button
           id="pk-compare-close-btn"
           type="button"
-          class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:text-fg hover:bg-bg/60 border border-border"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:text-fg hover:bg-bg/60 border border-border/60 transition-colors cursor-pointer shrink-0"
+          title="Close (Esc)"
           aria-label="Close Comparison"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,19 +50,59 @@
           </svg>
         </button>
       </div>
+
+      <!-- Row 2: Before / After Stats + Zoom Controls -->
+      <div class="mt-2 pt-1 border-t border-border/40 flex items-center justify-between gap-2 flex-wrap">
+        <div id="pk-compare-meta" class="text-[11px] sm:text-xs text-muted flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
+          <!-- Stats injected dynamically -->
+        </div>
+
+        <!-- Zoom & View Controls -->
+        <div class="flex items-center rounded-lg border border-border bg-bg/50 p-0.5 text-xs shrink-0">
+          <button
+            id="pk-zoom-out-btn"
+            type="button"
+            class="h-6 w-6 inline-flex items-center justify-center rounded hover:bg-surface text-muted hover:text-fg font-bold"
+            title="Zoom Out"
+            aria-label="Zoom Out"
+          >
+            −
+          </button>
+          <span id="pk-zoom-level" class="px-1.5 font-mono text-[11px] tabular-nums font-medium text-fg">
+            100%
+          </span>
+          <button
+            id="pk-zoom-in-btn"
+            type="button"
+            class="h-6 w-6 inline-flex items-center justify-center rounded hover:bg-surface text-muted hover:text-fg font-bold"
+            title="Zoom In"
+            aria-label="Zoom In"
+          >
+            +
+          </button>
+          <button
+            id="pk-zoom-fit-btn"
+            type="button"
+            class="px-2 py-0.5 rounded hover:bg-surface text-xs text-accent font-medium ml-0.5"
+            title="Reset to Fit"
+          >
+            Fit
+          </button>
+        </div>
+      </div>
     </header>
 
     <!-- Main Viewport / Split-view Stage -->
     <div
       id="pk-compare-viewport"
-      class="relative flex-1 overflow-hidden bg-bg/90 select-none touch-none flex items-center justify-center cursor-grab active:cursor-grabbing"
+      class="relative flex-1 overflow-hidden bg-bg/90 select-none touch-none flex items-center justify-center cursor-grab active:cursor-grabbing min-h-0"
     >
       <div
         id="pk-compare-stage"
         class="relative w-full h-full flex items-center justify-center origin-center will-change-transform"
       >
         <!-- Converted image (Base/Under layer: right side) -->
-        <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none select-none">
+        <div class="absolute inset-0 flex items-center justify-center p-3 sm:p-6 pointer-events-none select-none">
           <img
             id="pk-compare-img-result"
             src=""
@@ -102,7 +114,7 @@
         <!-- Original image (Clipped Top layer: left side) -->
         <div
           id="pk-compare-clip-container"
-          class="absolute inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none select-none will-change-[clip-path]"
+          class="absolute inset-0 flex items-center justify-center p-3 sm:p-6 pointer-events-none select-none will-change-[clip-path]"
           style="clip-path: inset(0 50% 0 0); -webkit-clip-path: inset(0 50% 0 0);"
         >
           <img
@@ -119,8 +131,8 @@
           class="absolute top-0 bottom-0 w-0.5 bg-accent/90 shadow-[0_0_10px_rgba(0,0,0,0.6)] cursor-ew-resize z-20 flex items-center justify-center touch-none select-none will-change-[left]"
           style="left: 50%;"
         >
-          <!-- Wide invisible grab zone for effortless dragging -->
-          <div class="absolute inset-y-0 -left-6 -right-6 cursor-ew-resize"></div>
+          <!-- Wide invisible grab zone for effortless touch dragging on mobile -->
+          <div class="absolute inset-y-0 -left-6 -right-6 cursor-ew-resize touch-none"></div>
 
           <div
             class="relative h-9 w-9 rounded-full bg-accent text-accent-fg shadow-2xl flex items-center justify-center text-xs font-bold border-2 border-surface select-none hover:scale-110 active:scale-95 transition-transform"
@@ -131,35 +143,35 @@
           </div>
         </div>
 
-        <!-- Floating Badges -->
-        <div class="absolute top-3 left-3 z-10 pointer-events-auto flex items-center gap-1.5">
+        <!-- Floating Badges (Responsive compact size) -->
+        <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 pointer-events-auto flex items-center gap-1.5">
           <span
             id="pk-compare-orig-tag"
-            class="rounded-lg bg-surface/90 backdrop-blur border border-border px-2.5 py-1 text-xs font-semibold text-fg shadow-md select-none"
+            class="rounded-lg bg-surface/90 backdrop-blur border border-border px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-semibold text-fg shadow-md select-none"
           >
             Original (Before)
           </span>
-          <div id="pk-compare-toggle-container" class="hidden flex items-center bg-surface/90 backdrop-blur border border-border rounded-lg p-0.5 shadow-md text-xs font-semibold">
+          <div id="pk-compare-toggle-container" class="hidden flex items-center bg-surface/90 backdrop-blur border border-border rounded-lg p-0.5 shadow-md text-[11px] sm:text-xs font-semibold">
             <button
               id="pk-compare-view-orig-btn"
               type="button"
-              class="px-2.5 py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer"
+              class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer"
             >
               Original (Before)
             </button>
             <button
               id="pk-compare-view-adj-btn"
               type="button"
-              class="px-2.5 py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer"
+              class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer"
             >
               Adjusted / Framed
             </button>
           </div>
         </div>
-        <div class="absolute top-3 right-3 z-10 pointer-events-none">
+        <div class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 pointer-events-none">
           <span
             id="pk-compare-res-tag"
-            class="rounded-lg bg-surface/90 backdrop-blur border border-border px-2.5 py-1 text-xs font-semibold text-accent shadow-md"
+            class="rounded-lg bg-surface/90 backdrop-blur border border-border px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-semibold text-accent shadow-md"
           >
             Converted (After)
           </span>
@@ -167,25 +179,26 @@
       </div>
     </div>
 
-    <!-- Modal Footer -->
-    <footer class="flex items-center justify-between border-t border-border bg-surface px-4 py-3 sm:px-6 text-xs text-muted">
-      <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Modal Footer (Clean responsive layout: full width button on mobile) -->
+    <footer class="border-t border-border bg-surface px-3.5 py-2.5 sm:px-6 sm:py-3 shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 text-xs text-muted">
+      <div class="flex items-center justify-center sm:justify-start gap-1.5 text-center sm:text-left overflow-hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-accent">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="16" x2="12" y2="12"></line>
           <line x1="12" y1="8" x2="12.01" y2="8"></line>
         </svg>
-        <span id="pk-compare-tip" class="hidden sm:inline">Drag the split handle left/right to inspect details. Scroll wheel to zoom in/out.</span>
-        <span class="sm:hidden">Drag handle to compare.</span>
+        <span id="pk-compare-tip" class="text-[11px] sm:text-xs truncate">
+          Drag handle to inspect details · Pinch or scroll to zoom
+        </span>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center justify-end w-full sm:w-auto">
         <button
           id="pk-compare-dl-btn"
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-fg hover:opacity-90 shadow-sm transition-opacity cursor-pointer"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-xs font-semibold text-accent-fg hover:opacity-90 shadow transition-all cursor-pointer shrink-0"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>

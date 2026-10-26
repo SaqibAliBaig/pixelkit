@@ -214,12 +214,12 @@
   </template>
 </div>
 
-<div class="mt-4 flex flex-wrap items-center gap-3" id="pk-actions">
+<div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" id="pk-actions">
   <button
     id="pk-convert-btn"
     type="button"
     disabled
-    class="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-accent-fg disabled:opacity-50 disabled:pointer-events-none hover:opacity-95 shadow-md shadow-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all cursor-pointer"
+    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 sm:py-2.5 text-sm font-semibold text-accent-fg disabled:opacity-50 disabled:pointer-events-none hover:opacity-95 shadow-md shadow-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all cursor-pointer"
   >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
       <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -231,17 +231,16 @@
     id="pk-clear-btn"
     type="button"
     disabled
-    class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-fg disabled:opacity-50 disabled:pointer-events-none hover:bg-surface/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all cursor-pointer"
+    class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 sm:py-2.5 text-sm font-medium text-fg disabled:opacity-50 disabled:pointer-events-none hover:bg-surface/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all cursor-pointer"
   >
     Clear
   </button>
-
 
   <button
     id="pk-download-all-btn"
     type="button"
     disabled
-    class="hidden inline-flex items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent disabled:opacity-50 disabled:pointer-events-none hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all cursor-pointer shadow-sm"
+    class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 sm:py-2.5 text-sm font-semibold text-accent disabled:opacity-50 disabled:pointer-events-none hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all cursor-pointer shadow-sm"
   >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

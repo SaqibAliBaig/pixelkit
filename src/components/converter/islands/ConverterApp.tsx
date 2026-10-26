@@ -2332,8 +2332,8 @@ export function mountConverterApp(): void {
 
     if (compareTip) {
       compareTip.textContent = isDone
-        ? 'Drag the split handle left/right to inspect details. Scroll wheel to zoom in/out.'
-        : 'Adjusted composition preview. Scroll wheel to zoom, click & drag to pan.';
+        ? 'Drag split handle to compare · Scroll or pinch to zoom'
+        : 'High-fidelity preview · Scroll or pinch to zoom';
     }
 
     if (compareSavedBadge) {
@@ -2486,13 +2486,19 @@ export function mountConverterApp(): void {
   compareViewport?.addEventListener('pointerdown', (e) => {
     if (!compareViewport) return;
     cachedCompareRect = compareViewport.getBoundingClientRect();
-    const currentPercent = parseFloat(compareHandle?.style.left || '50') / 100;
-    const handleX = cachedCompareRect.left + (cachedCompareRect.width * currentPercent);
+    const isComparing = activeCompareJob && activeCompareJob.status === 'done' && compareHandle && !compareHandle.classList.contains('hidden');
 
-    if (Math.abs(e.clientX - handleX) < 32 || zoomLevel === 1.0) {
-      isDraggingSplit = true;
-      handleSplitMove(e.clientX);
-    } else if (zoomLevel > 1.0) {
+    if (isComparing) {
+      const currentPercent = parseFloat(compareHandle?.style.left || '50') / 100;
+      const handleX = cachedCompareRect.left + (cachedCompareRect.width * currentPercent);
+      if (Math.abs(e.clientX - handleX) < 48 || zoomLevel === 1.0) {
+        isDraggingSplit = true;
+        handleSplitMove(e.clientX);
+        return;
+      }
+    }
+
+    if (zoomLevel > 1.0) {
       isPanning = true;
       startPanX = e.clientX - panX;
       startPanY = e.clientY - panY;
