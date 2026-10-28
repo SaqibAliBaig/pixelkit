@@ -4,7 +4,7 @@ description: "The real reasons passport, visa and exam portals reject photos at 
 publishedAt: 2026-01-15
 author: "PixelKit"
 tags: ["portals", "compression", "passport"]
-relatedCombos: ["heic-to-jpg-under-200kb", "jpg-to-jpg-under-200kb"]
+relatedCombos: ["compress-image-to-200kb", "heic-to-jpg-under-200kb", "passport-photo-resizer"]
 draft: false
 ---
 
@@ -32,7 +32,7 @@ The fix: convert HEIC → JPG first, then hit the KB target. PixelKit's [HEIC to
 
 A 12-megapixel iPhone photo is around 4032×3024 pixels. Most passport portals cap at 1200×1200 or smaller. Some portals will resize for you (badly); others reject outright.
 
-If your portal specifies a max dimension, resize **and** compress in one step. PixelKit's compression engine downscales first, then hits the KB target, so you get a photo that satisfies both rules.
+If your portal specifies a max dimension, resize **and** compress in one step. PixelKit's [Passport Photo Resizer & Compressor](/passport-photo-resizer) crops, scales dimensions, and hits your KB target together so you get a photo that satisfies every rule.
 
 ## Why manual compression rarely hits the target
 
@@ -42,7 +42,7 @@ PixelKit does the guessing for you: it uses a **binary search** over the quality
 
 ## The 30-second workflow
 
-1. Open [PixelKit's HEIC to JPG under 200KB tool](/heic-to-jpg-under-200kb) (or the matching page for your portal's limit).
+1. Open [Compress Image to 200KB](/compress-image-to-200kb) (or [HEIC to JPG under 200KB](/heic-to-jpg-under-200kb) for iPhone HEIC files).
 2. Drop your photo in. It never leaves your device.
 3. Download the result. That's it.
 

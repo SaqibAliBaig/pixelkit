@@ -1,0 +1,265 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+interface FormatCompressSpec {
+  ext: string;
+  label: string;
+  mime: string;
+  defaultKb: number | null;
+  headline: string;
+  titleTag: string;
+  metaDesc: string;
+  summary: string;
+  mechanicsTitle: string;
+  mechanicsBody: string;
+  faqs: { q: string; a: string }[];
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const specs: FormatCompressSpec[] = [
+    {
+      ext: 'jpg',
+      label: 'JPG / JPEG',
+      mime: 'image/jpeg',
+      defaultKb: 100,
+      headline: 'Compress JPG Online',
+      titleTag: 'Compress JPG Online — Reduce JPEG File Size in KB Free',
+      metaDesc:
+        'Free online JPG compressor. Shrink JPEG photos by up to 85% or hit exact 50KB, 100KB, and 200KB limits without losing sharpness. Crop & resize privately in your browser.',
+      summary:
+        'Shrink JPEG camera photos and scanned IDs by up to 85%—or dial in an exact KB ceiling like 50KB, 100KB, or 200KB—using client-side binary-search compression.',
+      mechanicsTitle: 'How PixelKit Optimizes JPG Without Blocky Artifacts',
+      mechanicsBody:
+        'Instead of forcing you to guess a quality percentage, PixelKit executes a multi-step binary search across DCT quantization levels inside Web Workers. You can preserve or strip EXIF camera metadata, auto-correct phone orientation, and crop or scale pixel dimensions in the same pass.',
+      faqs: [
+        {
+          q: 'How do I compress a JPG file to under 50KB or 100KB?',
+          a: 'Drop your JPG or JPEG photo above and pick 50 KB or 100 KB in the Compression & Size dropdown (100 KB is pre-selected). PixelKit automatically iterates quality until your JPEG lands right under the cap.',
+        },
+        {
+          q: 'Can I keep EXIF camera and date metadata when compressing JPG?',
+          a: 'Yes. "Preserve EXIF metadata" is available in Advanced Options, or uncheck it to strip GPS coordinates and camera serial data before sharing online.',
+        },
+        {
+          q: 'Can I also crop or resize my JPG before compressing?',
+          a: 'Yes. Click "Crop Studio" or "Scale & Resize" on any dropped JPEG card to adjust aspect ratios or pixel dimensions before downloading.',
+        },
+      ],
+    },
+    {
+      ext: 'png',
+      label: 'PNG',
+      mime: 'image/png',
+      defaultKb: null,
+      headline: 'Compress PNG Online',
+      titleTag: 'Compress PNG Online — Shrink Transparent PNGs Without Upload',
+      metaDesc:
+        'Free online PNG compressor. Reduce PNG screenshot, logo, and transparent graphic file sizes in your browser using UPNG quantization—zero server uploads or watermarks.',
+      summary:
+        'Reduce bloated PNG screenshots, UI assets, and transparent logos directly in your browser using smart palette quantization and lossless deflate compression.',
+      mechanicsTitle: 'Smart PNG Palette Quantization + Transparency Preservation',
+      mechanicsBody:
+        'Raw 32-bit RGBA PNG screenshots often weigh several megabytes. PixelKit uses UPNG compression in Web Workers to quantize redundant color channels while keeping alpha-channel transparency crisp—or lets you switch output to WebP/JPG when you need extreme KB reductions.',
+      faqs: [
+        {
+          q: 'Does compressing a PNG preserve transparent backgrounds?',
+          a: 'Yes. Keeping PNG (or switching to WebP) preserves full alpha-channel transparency so logos, icons, and UI cutouts stay crisp on any background.',
+        },
+        {
+          q: 'Why is my PNG still larger than a JPG?',
+          a: 'PNG is designed for crisp graphics and transparency rather than camera noise. For photographs that must fit under 50KB or 100KB, switch Output Format to JPG or WebP in one click.',
+        },
+        {
+          q: 'Are confidential PNG screenshots uploaded anywhere?',
+          a: 'No. Everything runs 100% locally inside your browser via Web Workers—safe for internal dashboards, invoices, and NDA design mockups.',
+        },
+      ],
+    },
+    {
+      ext: 'webp',
+      label: 'WebP',
+      mime: 'image/webp',
+      defaultKb: 100,
+      headline: 'Compress WebP Online',
+      titleTag: 'Compress WebP Online — Optimize WebP Images for Core Web Vitals',
+      metaDesc:
+        'Free in-browser WebP compressor. Shrink WebP images to exact KB budgets (50KB, 100KB, 200KB), resize dimensions, and crop aspect ratios with zero server uploads.',
+      summary:
+        'Optimize WebP assets to strict kilobyte budgets for faster Largest Contentful Paint (LCP), Shopify/WordPress themes, and modern web publishing.',
+      mechanicsTitle: 'Built for PageSpeed & Core Web Vitals Budgets',
+      mechanicsBody:
+        'WebP already beats legacy JPEG and PNG by 25–45%, and pairing it with PixelKit’s exact-KB binary search + Scale & Resize Studio ensures every hero banner and product card stays safely below your performance budget.',
+      faqs: [
+        {
+          q: 'What KB target is best for WebP website images?',
+          a: 'Aim for under 50KB–100KB for product cards and thumbnails, and under 200KB for Full HD (1920×1080) hero banners to keep mobile LCP in the green.',
+        },
+        {
+          q: 'Can I batch-compress dozens of WebP images at once?',
+          a: 'Yes. Drop an entire folder of images, compress them in parallel across CPU Web Workers, and export them all in a single ZIP archive.',
+        },
+        {
+          q: 'Can I convert JPG or PNG to compressed WebP here too?',
+          a: 'Yes—PixelKit auto-detects any input format you drop and encodes optimized WebP output immediately.',
+        },
+      ],
+    },
+    {
+      ext: 'pdf',
+      label: 'PDF',
+      mime: 'application/pdf',
+      defaultKb: 200,
+      headline: 'Compress PDF Online',
+      titleTag: 'Compress PDF Online — Reduce PDF Size to 100KB or 200KB Privately',
+      metaDesc:
+        'Free client-side PDF compressor. Shrink scanned PDFs and ID documents to under 100KB, 200KB, or 500KB right in your browser without uploading sensitive files.',
+      summary:
+        'Shrink heavy scanned PDFs, Aadhaar/PAN cards, certificates, and multi-page forms to strict 100KB, 200KB, or 500KB upload limits without your documents ever leaving your device.',
+      mechanicsTitle: '100% On-Device PDF Compression for Sensitive Documents',
+      mechanicsBody:
+        'Most PDF compressors upload your tax returns, passports, and bank statements to cloud servers. PixelKit decodes pages locally via PDF.js, optimizes embedded page imagery with binary-search compression, and rebuilds a compact PDF via jsPDF entirely in browser memory.',
+      faqs: [
+        {
+          q: 'How do I compress a PDF to under 100KB or 200KB for government portals?',
+          a: 'Drop your PDF (or phone photos of your document) above, select 100 KB or 200 KB in Compression & Size, and download a compliant PDF ready for portal upload.',
+        },
+        {
+          q: 'Can I merge front and back ID scans into one compressed PDF?',
+          a: 'Yes. Drop both images, check "Merge Files into Single PDF", drag to order page 1 and page 2, and export one combined PDF under your target KB limit.',
+        },
+        {
+          q: 'Is it safe to compress confidential legal or KYC PDFs here?',
+          a: 'Yes—100%. Zero bytes are transmitted over the network; you can even disconnect from Wi-Fi after loading the page and compress offline.',
+        },
+      ],
+    },
+  ];
+
+  return specs.map((spec) => ({
+    params: { format: spec.ext },
+    props: { spec },
+  }));
+};
+
+const { spec } = Astro.props as { spec: FormatCompressSpec };
+const allFormats = [
+  { ext: 'jpg', label: 'Compress JPG' },
+  { ext: 'png', label: 'Compress PNG' },
+  { ext: 'webp', label: 'Compress WebP' },
+  { ext: 'pdf', label: 'Compress PDF' },
+];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image' },
+  { label: spec.headline },
+];
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `${spec.headline} — PixelKit`,
+    description: spec.metaDesc,
+    url: new URL(`/compress-${spec.ext}`, SITE.url).href,
+  }),
+  buildFaqJsonLd(spec.faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={`${spec.titleTag} | ${SITE.name}`}
+  description={spec.metaDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>{spec.label} Optimizer · Crop &amp; Resize Built In · Zero Uploads</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl text-fg">
+        {spec.headline}
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        {spec.summary}
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from={spec.ext}
+        to={spec.ext}
+        fromMime={spec.mime}
+        toMime={spec.mime}
+        targetKb={spec.defaultKb}
+      />
+    </div>
+
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        {spec.mechanicsTitle}
+      </h2>
+      <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed max-w-3xl">
+        {spec.mechanicsBody}
+      </p>
+
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">More compressors:</span>
+        {allFormats
+          .filter((f) => f.ext !== spec.ext)
+          .map((f) => (
+            <a
+              href={`/compress-${f.ext}`}
+              class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+            >
+              {f.label}
+            </a>
+          ))}
+        <a
+          href="/compress-image-to-50kb"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Under 50KB
+        </a>
+        <a
+          href="/compress-image-to-100kb"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Under 100KB
+        </a>
+        <a
+          href="/compress-image-to-200kb"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Under 200KB
+        </a>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={spec.faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

@@ -4,7 +4,7 @@ description: "Aadhaar and PAN portals reject PDFs over 100KB or 200KB. Here's th
 publishedAt: 2026-01-20
 author: "PixelKit"
 tags: ["aadhaar", "pdf", "compression"]
-relatedCombos: ["jpg-to-pdf-under-100kb", "png-to-pdf-under-100kb"]
+relatedCombos: ["jpg-to-pdf-under-100kb", "png-to-pdf-under-100kb", "compress-pdf", "compress-image-to-100kb"]
 draft: false
 ---
 
@@ -50,7 +50,7 @@ The pipeline above usually keeps a 12-digit Aadhaar number and the address block
 
 ## What if the portal rejects PDF and asks for JPG?
 
-Some portals flip between "PDF required" and "JPG required" depending on the form step. If yours asks for JPG, use [JPG to JPG under 100KB](/jpg-to-jpg-under-100kb) — same compression engine, JPG output.
+Some portals flip between "PDF required" and "JPG required" depending on the form step. If yours asks for JPG, use [Compress Image to 100KB](/compress-image-to-100kb) — same compression engine, JPG output.
 
 ## One thing to double-check before you submit
 

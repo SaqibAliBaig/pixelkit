@@ -2,7 +2,6 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
-// NOTE: replace with your real production URL before launch.
 const SITE = 'https://pixelkit.app';
 
 export default defineConfig({
@@ -32,31 +31,45 @@ export default defineConfig({
       filter: (page) => !page.includes('/404'),
       serialize(item) {
         const url = item.url.replace(/\/$/, '');
+
         // Homepage
         if (url === SITE) {
           item.priority = 1.0;
-          item.changefreq = 'daily';
+          item.changefreq = 'weekly';
         }
-        // Conversion directory
-        else if (url === `${SITE}/convert`) {
-          item.priority = 0.9;
-          item.changefreq = 'daily';
-        }
-        // High-volume popular tool combinations
+        // Core pillar hubs (Compress, Convert, Resize, Crop, Passport Workflow)
         else if (
+          url === `${SITE}/compress-image` ||
+          url === `${SITE}/convert` ||
+          url === `${SITE}/resize-image` ||
+          url === `${SITE}/crop-image` ||
+          url === `${SITE}/passport-photo-resizer`
+        ) {
+          item.priority = 0.95;
+          item.changefreq = 'weekly';
+        }
+        // High-volume standalone compressors & flagship conversions
+        else if (
+          url.includes('/compress-image-to-') ||
+          url.endsWith('/compress-jpg') ||
+          url.endsWith('/compress-png') ||
+          url.endsWith('/compress-webp') ||
+          url.endsWith('/compress-pdf') ||
           url.endsWith('/heic-to-jpg') ||
           url.endsWith('/png-to-jpg') ||
           url.endsWith('/jpg-to-pdf') ||
+          url.endsWith('/pdf-to-jpg') ||
+          url.endsWith('/svg-to-png') ||
           url.endsWith('/jpg-to-webp') ||
           url.endsWith('/png-to-webp')
         ) {
           item.priority = 0.9;
           item.changefreq = 'weekly';
         }
-        // Blog pages
+        // Blog hub & articles
         else if (url === `${SITE}/blog`) {
-          item.priority = 0.8;
-          item.changefreq = 'daily';
+          item.priority = 0.85;
+          item.changefreq = 'weekly';
         } else if (url.includes('/blog/')) {
           item.priority = 0.8;
           item.changefreq = 'monthly';
@@ -70,13 +83,12 @@ export default defineConfig({
           item.priority = 0.5;
           item.changefreq = 'monthly';
         }
-        // All other tool and size-targeted pages
+        // Curated conversion & KB-targeted pages
         else {
           item.priority = 0.75;
-          item.changefreq = 'weekly';
+          item.changefreq = 'monthly';
         }
 
-        item.lastmod = new Date();
         return item;
       },
     }),

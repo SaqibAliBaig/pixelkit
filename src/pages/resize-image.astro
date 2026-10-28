@@ -81,7 +81,7 @@ const jsonLd = [
 
     <!-- Tool Preview -->
     <div class="mt-6 sm:mt-8">
-      <ToolPreview />
+      <ToolPreview from="jpg" to="jpg" fromMime="image/jpeg" toMime="image/jpeg" />
     </div>
 
     <!-- Preset Dimension Guide Grid -->
@@ -94,11 +94,11 @@ const jsonLd = [
       </p>
 
       <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
-        <div class="rounded-xl border border-border bg-bg/50 p-4">
-          <div class="font-bold text-fg">Passport &amp; ID Photos</div>
+        <a href="/passport-photo-resizer" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+          <div class="font-bold text-fg">Passport &amp; ID Photos →</div>
           <div class="font-mono text-accent text-xs mt-1">413 × 531 px · 35 × 45 mm</div>
-          <p class="text-muted mt-1.5 text-xs">Standard requirement for official passport, visa, and exam portal forms.</p>
-        </div>
+          <p class="text-muted mt-1.5 text-xs">Crop, resize to 413×531 or 600×600 px, and compress under 50KB/100KB in one step.</p>
+        </a>
         <div class="rounded-xl border border-border bg-bg/50 p-4">
           <div class="font-bold text-fg">Square Avatar &amp; Profile</div>
           <div class="font-mono text-accent text-xs mt-1">600 × 600 px · 1:1 Ratio</div>

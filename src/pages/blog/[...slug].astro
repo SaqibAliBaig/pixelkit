@@ -21,10 +21,21 @@ const { post } = Astro.props;
 
 const { Content } = await post.render();
 
-// Related combos — the slugs are stored as plain strings on the entry.
+// Related combos — supports "{from}-to-{to}", "{from}-to-{to}-under-{size}kb",
+// "compress-image-to-{size}kb", "compress-{format}", and "passport-photo-resizer".
 const related = (post.data.relatedCombos ?? [])
   .map((slug: string) => {
-    // Parse "heic-to-jpg" or "heic-to-jpg-under-50kb" into a label.
+    if (slug === 'passport-photo-resizer') {
+      return { label: 'Passport Photo Resizer & Compressor', href: `/${slug}` };
+    }
+    const kbOnly = slug.match(/^compress-image-to-(\d+)kb$/);
+    if (kbOnly?.[1]) {
+      return { label: `Compress Image to ${kbOnly[1]}KB`, href: `/${slug}` };
+    }
+    const fmtOnly = slug.match(/^compress-([a-z]+)$/);
+    if (fmtOnly?.[1]) {
+      return { label: `Compress ${fmtOnly[1].toUpperCase()} Online`, href: `/${slug}` };
+    }
     const m = slug.match(/^([a-z]+)-to-([a-z]+)(?:-under-(\d+)kb)?$/);
     if (!m) return null;
     const [, from, to, size] = m;

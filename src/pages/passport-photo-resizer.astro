@@ -1,0 +1,131 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Resize Image', href: '/resize-image' },
+  { label: 'Passport Photo Resizer & Compressor' },
+];
+
+const faqs = [
+  {
+    q: 'How do I crop, resize, and compress a passport photo in one step?',
+    a: 'Drop your photo (JPG, PNG, or iPhone HEIC) above. Click "Crop Studio" to frame a 3:4 or 1:1 ratio, click "Scale & Resize" to apply the 413 × 531 px (35 × 45 mm) or 600 × 600 px (2 × 2 inch) preset, and keep the target size at 50 KB or 100 KB before clicking Convert & Download.',
+  },
+  {
+    q: 'What are the standard passport photo dimensions in pixels?',
+    a: 'For 35 × 45 mm passports (India, UK, EU, Schengen, Australia), the standard 300 DPI digital size is 413 × 531 pixels. For US Passports and DS-160 Visas (2 × 2 inches), the standard is 600 × 600 pixels.',
+  },
+  {
+    q: 'Can I convert an iPhone HEIC selfie directly into a 50KB passport JPG?',
+    a: 'Yes. PixelKit decodes HEIC locally in your browser, lets you crop and resize to exact passport dimensions, and outputs a standard JPG under 50KB or 100KB accepted by all government portals.',
+  },
+  {
+    q: 'Is my face scan or passport photo uploaded to any server?',
+    a: 'No—never. Biometric face photos are sensitive personal data. PixelKit runs 100% inside your browser using HTML5 Canvas and Web Workers, with zero server uploads.',
+  },
+];
+
+const pageTitle = `Passport Photo Resizer & Compressor Online — 413×531 px, 2×2" & Under 50KB | ${SITE.name}`;
+const pageDesc =
+  'Free private passport & visa photo maker. Crop aspect ratio, resize to 413×531 px (35×45mm) or 600×600 px (2×2"), and compress under 50KB or 100KB JPG in one browser step.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Passport Photo Cropper, Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/passport-photo-resizer', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Crop + Scale + Exact KB in One Pass · 100% On-Device Privacy</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl text-fg">
+        Passport &amp; Visa Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Stop jumping between separate crop, resize, and compression websites. Frame your portrait, set exact pixel dimensions (413×531 px or 600×600 px), and hit 50KB or 100KB JPG limits in one private browser workflow.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={100}
+      />
+    </div>
+
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Digital Photo Specifications
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        All three checks—format, pixel dimensions, and KB cap—handled together:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">35 × 45 mm Standard Passport</div>
+          <div class="font-mono text-accent text-xs mt-1">413 × 531 px · 20–100 KB JPG</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Used by Passport Seva, UK, EU/Schengen, Canada, Australia, and university exam portals.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">2 × 2 Inch US Visa &amp; Passport</div>
+          <div class="font-mono text-accent text-xs mt-1">600 × 600 px · 1:1 · Under 240 KB</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Square framing required for US DS-160 non-immigrant visas, Green Card DV Lottery, and OCI applications.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Exam &amp; Recruitment Portals</div>
+          <div class="font-mono text-accent text-xs mt-1">350 × 450 px · 20–50 KB JPG</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Strict size brackets for UPSC, SSC, IBPS, state civil services, and digital signature uploads.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

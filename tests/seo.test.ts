@@ -66,6 +66,14 @@ describe('combinations data', () => {
       expect(c.sizeKb).toBeNull();
     }
   });
+
+  it('avoids doorway bloat and unsupported output formats', () => {
+    expect(combos.length).toBeLessThan(200);
+    const supportedOutputs = new Set(['jpg', 'png', 'webp', 'avif', 'pdf', 'svg']);
+    for (const c of combos) {
+      expect(supportedOutputs.has(c.to)).toBe(true);
+    }
+  });
 });
 
 describe('meta uniqueness', () => {
@@ -185,7 +193,7 @@ describe('JSON-LD builders', () => {
     expect(me.length).toBe(2);
   });
 
-  it('SoftwareApplication has a free offer', () => {
+  it('SoftwareApplication has a free offer and no fake aggregateRating', () => {
     const ld = buildSoftwareApplicationJsonLd({
       name: 'X',
       description: 'Y',
@@ -194,6 +202,7 @@ describe('JSON-LD builders', () => {
     const offers = ld.offers as Record<string, unknown>;
     expect(offers['@type']).toBe('Offer');
     expect(offers.price).toBe('0');
+    expect(ld.aggregateRating).toBeUndefined();
   });
 
   it('buildToolJsonLd composes 4 JSON-LD objects including HowTo', () => {

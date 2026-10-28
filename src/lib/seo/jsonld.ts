@@ -31,7 +31,8 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
       height: '512',
     },
     sameAs: ['https://twitter.com/pixelkitapp'],
-    description: 'Private, in-browser file converter and compression platform without server uploads.',
+    description:
+      'Free, 100% client-side online image compressor, image converter, photo resizer, and aspect-ratio cropper running privately in your browser without server uploads.',
   };
 }
 
@@ -99,13 +100,6 @@ export function buildSoftwareApplicationJsonLd(input: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      ratingCount: '1420',
-      bestRating: '5',
-      worstRating: '1',
     },
     featureList: [
       'Client-side file conversion',

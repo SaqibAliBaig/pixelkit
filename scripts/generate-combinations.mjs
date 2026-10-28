@@ -3,15 +3,16 @@
  * generate-combinations.mjs
  * ------------------------------------------------------------------
  * Reads src/data/formats.json and produces src/data/combinations.json —
- * the matrix of {from, to, size} tuples consumed by Astro's dynamic
- * routes to generate the 500+ programmatic SEO pages.
+ * the curated matrix of high-search-intent {from, to, size} tuples consumed
+ * by Astro's dynamic routes.
  *
- * Rules:
- *   - Only lossy / raster targets can hit a KB target.
- *   - PDF is allowed as a target but sizes are limited (25–500 KB).
- *   - Skip identity combos (jpg → jpg).
- *   - Deduplicate, sort deterministically, write stable output so git
- *     diffs stay clean.
+ * SEO Anti-Doorway Rules:
+ *   - Only supported encoder outputs (canOutput: true) are generated as targets.
+ *   - Plain conversions cover real-world image, vector (SVG), and document (PDF) workflows.
+ *   - Size-targeted (-under-{size}kb) pages are strictly restricted to high-demand
+ *     source formats (JPG, PNG, HEIC, WEBP) paired with KB-targetable outputs
+ *     (JPG, WEBP, PDF) across real portal limits (20, 50, 100, 200, 500 KB).
+ *   - Skip identity combos (jpg → jpg); standalone compression lives at /compress-*.
  *
  * Usage:   node scripts/generate-combinations.mjs
  * Exit:    0 on success, 1 on validation failure.
@@ -27,17 +28,13 @@ const FORMATS_PATH = resolve(ROOT, 'src/data/formats.json');
 const OUT_PATH = resolve(ROOT, 'src/data/combinations.json');
 
 const KIB = 1024;
-const MIN_KB = 10;
-const MAX_KB = 2048;
 
-// Size ladder — every target that a combo can ask for.
-// Chosen to match real-world portal limits (passport, aadhaar, exam portals).
-const SIZE_LADDER = [
-  10, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 500, 1000,
-];
+// Curated real-world portal & web upload size limits (avoids near-duplicate doorway bloat).
+const SIZE_LADDER = [20, 50, 100, 200, 500];
+const PDF_SIZE_LADDER = [50, 100, 200, 500];
 
-// PDF caps: PDFs aren't photos — huge PDF targets don't make sense.
-const PDF_SIZE_LADDER = [25, 50, 100, 150, 200, 250, 300, 500];
+// Only high-volume input formats merit dedicated -under-{size}kb landing pages.
+const KB_SOURCE_ALLOWLIST = new Set(['jpg', 'png', 'heic', 'webp']);
 
 const MIME = {
   jpg: 'image/jpeg',
@@ -103,7 +100,8 @@ async function main() {
       mime: f.mime || MIME[ext],
       lossy: Boolean(f.lossy),
       lossless: Boolean(f.lossless),
-      canTargetKB: Boolean(f.canTargetKB ?? (f.lossy || ext === 'pdf')),
+      canOutput: Boolean(f.canOutput),
+      canTargetKB: Boolean(f.canTargetKB),
       kind: f.kind || (ext === 'pdf' ? 'doc' : 'image'),
     });
   }
@@ -113,9 +111,18 @@ async function main() {
 
   for (const from of byExt.values()) {
     for (const to of byExt.values()) {
-      if (from.ext === to.ext) continue;             // skip identity
-      if (from.kind !== 'image') continue;           // only image sources
-      if (!to.canTargetKB) continue;                 // target must hit a size
+      if (from.ext === to.ext) continue;   // skip identity
+      if (!to.canOutput) continue;         // only real worker output formats
+
+      // SVG output is only meaningful for common logo/graphic inputs (PNG, JPG, WEBP)
+      if (to.ext === 'svg' && !['png', 'jpg', 'webp'].includes(from.ext)) {
+        continue;
+      }
+
+      // PDF inputs convert cleanly to raster image formats (JPG, PNG, WEBP, AVIF)
+      if (from.ext === 'pdf' && !['jpg', 'png', 'webp', 'avif'].includes(to.ext)) {
+        continue;
+      }
 
       // ---- plain conversion page:  /{from}-to-{to}
       const plainKey = `${from.ext}>${to.ext}`;
@@ -132,10 +139,11 @@ async function main() {
       }
 
       // ---- size-targeted pages:    /{from}-to-{to}-under-{size}kb
-      const ladder =
-        to.ext === 'pdf'
-          ? PDF_SIZE_LADDER
-          : SIZE_LADDER.filter((k) => k >= MIN_KB && k <= MAX_KB);
+      if (!KB_SOURCE_ALLOWLIST.has(from.ext) || !to.canTargetKB) {
+        continue;
+      }
+
+      const ladder = to.ext === 'pdf' ? PDF_SIZE_LADDER : SIZE_LADDER;
 
       for (const kb of ladder) {
         const key = `${from.ext}>${to.ext}@${kb}`;

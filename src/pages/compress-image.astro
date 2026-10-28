@@ -81,7 +81,7 @@ const jsonLd = [
 
     <!-- Tool Preview -->
     <div class="mt-6 sm:mt-8">
-      <ToolPreview targetKb={100} />
+      <ToolPreview from="jpg" to="jpg" fromMime="image/jpeg" toMime="image/jpeg" targetKb={100} />
     </div>
 
     <!-- Target KB Portal Guide -->
@@ -94,26 +94,35 @@ const jsonLd = [
       </p>
 
       <div class="mt-5 grid grid-cols-1 sm:grid-cols-4 gap-3.5 text-xs sm:text-sm">
-        <a href="/heic-to-jpg-under-50kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-50kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 50 KB</div>
-          <div class="font-mono text-accent text-xs mt-1">Signatures &amp; Stamps</div>
+          <div class="font-mono text-accent text-xs mt-1">Signatures &amp; Exams</div>
           <p class="text-muted mt-1.5 text-xs">Standard limit for digital signatures, thumbprints, and compact application forms.</p>
         </a>
-        <a href="/heic-to-jpg-under-100kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-100kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 100 KB</div>
           <div class="font-mono text-accent text-xs mt-1">ID Scans &amp; Passports</div>
           <p class="text-muted mt-1.5 text-xs">Requirement for Aadhaar, PAN card, driver licenses, and state exam portals.</p>
         </a>
-        <a href="/heic-to-jpg-under-200kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-200kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 200 KB</div>
           <div class="font-mono text-accent text-xs mt-1">Visa &amp; Official Forms</div>
           <p class="text-muted mt-1.5 text-xs">Standard maximum threshold for immigration, embassy, and university submissions.</p>
         </a>
-        <a href="/jpg-to-pdf-under-500kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-500kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 500 KB / 1 MB</div>
           <div class="font-mono text-accent text-xs mt-1">Multi-Page &amp; Documents</div>
-          <p class="text-muted mt-1.5 text-xs">Ideal for email attachments, PDF certificates, and job resume portfolios.</p>
+          <p class="text-muted mt-1.5 text-xs">Ideal for email attachments, PDF certificates, and high-res web imagery.</p>
         </a>
+      </div>
+
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Compress by format:</span>
+        <a href="/compress-jpg" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress JPG</a>
+        <a href="/compress-png" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PNG</a>
+        <a href="/compress-webp" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress WebP</a>
+        <a href="/compress-pdf" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PDF</a>
+        <a href="/compress-image-to-20kb" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 20KB</a>
       </div>
     </section>
 
