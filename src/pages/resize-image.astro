@@ -18,8 +18,8 @@ const faqs = [
     a: 'Drop your image into PixelKit, click "Scale & Resize" on the file card, and enter your target width and height in pixels (e.g. 1920 × 1080 for Full HD, or 413 × 531 for Passport ID). PixelKit re-renders the image locally using the Canvas API.',
   },
   {
-    q: 'How can I scale an image resolution by percentage (e.g., 50% or 75%)?',
-    a: 'In the Resize Studio, click the percentage buttons (100%, 75%, 50%, 25%) or adjust the slider. The aspect ratio is locked automatically to maintain proportional scaling without distortion.',
+    q: 'How can I rescale an image resolution by percentage (e.g., 50% or 75%)?',
+    a: 'In the Resize & Rescale Studio, click the percentage buttons (100%, 75%, 50%, 25%) or drag the scale slider. Aspect ratio stays locked automatically for proportional image rescaling without distortion.',
   },
   {
     q: 'What is the standard passport size photo in pixels?',
@@ -35,8 +35,17 @@ const faqs = [
   },
 ];
 
-const pageTitle = `Resize Image Online — Scale Resolution & Dimensions in Pixels | ${SITE.name}`;
-const pageDesc = 'Free online image resizer. Scale image resolution by percentage or enter exact width and height in pixels. Built-in presets for Passport, Square Avatar, and Full HD.';
+const pageTitle = `Image Resizer & Rescale Tool Online — Resize Pixels & Resolution | ${SITE.name}`;
+const pageDesc = 'Free online image resizer and image rescale tool. Rescale photo resolution by percentage or set exact pixel dimensions (Passport 413×531, 600×600, 1920×1080) privately in your browser.';
+const pageKeywords = [
+  'image resizer',
+  'resize image online',
+  'image rescale',
+  'rescale image online',
+  'photo resizer in pixels',
+  'scale image resolution',
+  'passport photo resize',
+];
 
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
@@ -57,6 +66,7 @@ const jsonLd = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
+  keywords={pageKeywords}
   jsonLd={jsonLd}
   width="wide"
 >

@@ -18,8 +18,8 @@ const faqs = [
     a: 'PixelKit uses an iterative binary-search algorithm running locally in Web Workers. It tests compression quantization levels until the output file fits directly under your target limit (e.g. 50 KB, 100 KB, or 200 KB) with maximum visual clarity.',
   },
   {
-    q: 'Can I compress images to under 50KB or 100KB for government application forms?',
-    a: 'Yes. PixelKit has dedicated presets for 50KB, 100KB, 200KB, and 500KB specifically tuned for Aadhaar, PAN, passport, UPSC, and university application portals.',
+    q: 'Can I use PixelKit as an image to KB converter (20KB, 50KB, 100KB)?',
+    a: 'Yes. PixelKit works as an exact image to KB converter with dedicated 1-click presets for 20KB, 50KB, 100KB, 200KB, and 500KB—specifically tuned for Aadhaar, PAN, passport, UPSC, and university application portals.',
   },
   {
     q: 'Which image format compresses to the smallest file size?',
@@ -35,8 +35,18 @@ const faqs = [
   },
 ];
 
-const pageTitle = `Compress Image Online — Reduce File Size in KB without Losing Quality | ${SITE.name}`;
-const pageDesc = 'Free online image compressor. Compress JPG, PNG, WebP, HEIC and PDF to exact KB targets (50KB, 100KB, 200KB). 100% private, client-side tool with zero server uploads.';
+const pageTitle = `Compress Image Online — Image to KB Converter (50KB, 100KB, 200KB) | ${SITE.name}`;
+const pageDesc = 'Free online image compressor & image to KB converter. Shrink JPG, PNG, WebP, HEIC & PDF to exact KB sizes (20KB, 50KB, 100KB, 200KB) without losing quality—zero uploads.';
+const pageKeywords = [
+  'image compressor',
+  'compress image online',
+  'image to kb converter',
+  'photo to kb converter',
+  'reduce image size in kb',
+  'compress image to 50kb',
+  'compress image to 100kb',
+  'compress image to 200kb',
+];
 
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
@@ -57,6 +67,7 @@ const jsonLd = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
+  keywords={pageKeywords}
   jsonLd={jsonLd}
   width="wide"
 >
