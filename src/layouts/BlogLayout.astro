@@ -56,7 +56,7 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={`${title} — ${SITE.name}`}
+  title={title.length > 58 ? title : `${title} — ${SITE.name}`}
   description={description}
   type="article"
   publishedAt={publishedAt}

@@ -28,7 +28,7 @@ const {
 } = Astro.props;
 
 const fullTitle =
-  title === SITE.defaultTitle || title.includes(SITE.name)
+  title === SITE.defaultTitle || title.includes(SITE.name) || title.length > 58
     ? title
     : `${title} — ${SITE.name}`;
 

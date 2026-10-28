@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildMeta } from '../src/lib/seo/meta';
+import { SITE } from '../src/lib/constants';
 import { buildIntro, buildFaqs } from '../src/lib/seo/copy';
 import {
   buildBreadcrumbJsonLd,
@@ -77,6 +78,13 @@ describe('combinations data', () => {
 });
 
 describe('meta uniqueness', () => {
+  it('site default title and description obey Bing & Google length bounds (25–160 chars)', () => {
+    expect(SITE.defaultTitle.length).toBeGreaterThanOrEqual(25);
+    expect(SITE.defaultTitle.length).toBeLessThanOrEqual(70);
+    expect(SITE.defaultDescription.length).toBeGreaterThanOrEqual(50);
+    expect(SITE.defaultDescription.length).toBeLessThanOrEqual(160);
+  });
+
   it('every title is between 30 and 70 chars', () => {
     for (const c of combos) {
       const m = buildMeta(c);

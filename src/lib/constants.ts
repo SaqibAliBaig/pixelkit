@@ -24,9 +24,9 @@ export interface SiteConfig {
 export const SITE: SiteConfig = {
   name: 'PixelKit',
   url: 'https://pixelkit.app',
-  defaultTitle: 'Free Online Image Compressor, Converter, Resizer & Cropper — PixelKit',
+  defaultTitle: 'Image Compressor, Converter, Resizer & Cropper — PixelKit',
   defaultDescription:
-    'Compress, convert, resize, and crop images online in one step. Shrink JPG, PNG, WebP, HEIC, SVG & PDF to exact KB targets (50KB, 100KB, 200KB) or pixel dimensions—100% private in your browser with zero uploads.',
+    'Free online image compressor, converter, resizer and cropper. Shrink JPG, PNG, WebP, HEIC, SVG and PDF to exact KB or pixel sizes in your browser.',
   defaultOgImage: '/og-default.png',
   twitterHandle: '@pixelkitapp',
   author: 'PixelKit Team',
