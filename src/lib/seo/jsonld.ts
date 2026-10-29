@@ -30,7 +30,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
       width: '512',
       height: '512',
     },
-    sameAs: ['https://twitter.com/pixelkitapp'],
+    sameAs: ['https://x.com/SaqibBaig1100', 'https://github.com/SaqibAliBaig/pixelkit'],
     description:
       'Free, 100% client-side online image compressor, image converter, photo resizer, and aspect-ratio cropper running privately in your browser without server uploads.',
   };

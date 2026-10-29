@@ -22,7 +22,10 @@
   Cache-Control: public, max-age=2592000
 
 /og-default.png
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=86400
+
+/og-preview.png
+  Cache-Control: public, max-age=86400
 
 /favicon.*
   Cache-Control: public, max-age=2592000

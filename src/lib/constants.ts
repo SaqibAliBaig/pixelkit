@@ -27,8 +27,8 @@ export const SITE: SiteConfig = {
   defaultTitle: 'Image Compressor, Converter, Resizer & Cropper — PixelKit',
   defaultDescription:
     'Free online image compressor, converter, resizer and cropper. Shrink JPG, PNG, WebP, HEIC, SVG and PDF to exact KB or pixel sizes in your browser.',
-  defaultOgImage: '/og-default.png',
-  twitterHandle: '@pixelkitapp',
+  defaultOgImage: '/og-preview.png',
+  twitterHandle: '@SaqibBaig1100',
   author: 'PixelKit Team',
   contactEmail: 'saqibbaig110@gmail.com',
   keywords: [
