@@ -1,0 +1,98 @@
+---
+interface Props {
+  format?: string;
+  sizeKb?: number | null;
+}
+
+const { format = 'JPG', sizeKb = null } = Astro.props;
+---
+
+<section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8" aria-labelledby="portal-guide-heading">
+  <h2 id="portal-guide-heading" class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+    Official Portal Upload Specifications &amp; Requirements Guide
+  </h2>
+  <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+    Government, visa, and university recruitment portals enforce strict technical constraints to automate biometric validation. Here is how standard portals evaluate uploaded {format} files:
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-left text-xs sm:text-sm">
+      <thead>
+        <tr class="border-b border-border text-muted">
+          <th class="pb-2.5 font-medium">Application Portal / Authority</th>
+          <th class="pb-2.5 font-medium">Format</th>
+          <th class="pb-2.5 font-medium">Dimensions (Pixels &amp; MM)</th>
+          <th class="pb-2.5 font-medium text-accent">File Size Limit</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border/60 text-fg/85">
+        <tr>
+          <td class="py-2.5 font-medium text-fg">Passport Seva (India) &amp; PAN Card</td>
+          <td class="py-2.5">JPG / JPEG</td>
+          <td class="py-2.5">413 × 531 px (35 × 45 mm at 300 DPI)</td>
+          <td class="py-2.5 font-medium text-accent">20 KB to 50 KB</td>
+        </tr>
+        <tr>
+          <td class="py-2.5 font-medium text-fg">US Visa (DS-160) &amp; DV Green Card Lottery</td>
+          <td class="py-2.5">JPEG</td>
+          <td class="py-2.5">600 × 600 px up to 1200 × 1200 px (1:1 Square)</td>
+          <td class="py-2.5 font-medium text-accent">Under 240 KB</td>
+        </tr>
+        <tr>
+          <td class="py-2.5 font-medium text-fg">Schengen Visa (France, Germany, Italy, Spain)</td>
+          <td class="py-2.5">JPG</td>
+          <td class="py-2.5">413 × 531 px (35 × 45 mm)</td>
+          <td class="py-2.5 font-medium text-accent">Under 200 KB</td>
+        </tr>
+        <tr>
+          <td class="py-2.5 font-medium text-fg">UK Passport &amp; Home Office Visa Portal</td>
+          <td class="py-2.5">JPG</td>
+          <td class="py-2.5">Minimum 600 × 750 px (3:4 ratio)</td>
+          <td class="py-2.5 font-medium text-accent">50 KB to 10 MB</td>
+        </tr>
+        <tr>
+          <td class="py-2.5 font-medium text-fg">UPSC, SSC, IBPS, State Civil Services Photos</td>
+          <td class="py-2.5">JPG</td>
+          <td class="py-2.5">350 × 450 px (Portrait)</td>
+          <td class="py-2.5 font-medium text-accent">20 KB to 50 KB</td>
+        </tr>
+        <tr>
+          <td class="py-2.5 font-medium text-fg">Official Digital Signature &amp; Thumbprint</td>
+          <td class="py-2.5">JPG / PNG</td>
+          <td class="py-2.5">140 × 60 px to 240 × 240 px</td>
+          <td class="py-2.5 font-medium text-accent">10 KB to 20 KB</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-8 space-y-4 text-xs sm:text-sm text-fg/80 leading-relaxed border-t border-border/60 pt-6">
+    <h3 class="text-base font-semibold text-fg">
+      Avoiding Automated Portal Rejection: Core Technical Rules
+    </h3>
+    <p>
+      <strong>Aspect Ratio and Margin Preservation:</strong> Automated facial biometric recognition systems expect the subject's face (from the crown of the head to the chin) to occupy between 70% and 80% of total image height. Cropping too closely into the forehead or leaving excessive empty sky above the head triggers automated disqualification. Always use PixelKit's 1:1 or 3:4 aspect ratio presets with balanced margins.
+    </p>
+    <p>
+      <strong>Preventing Loss of Detail in Small Budgets:</strong> When shrinking photos down to strict 20KB or 50KB limits, scaling original dimensions down (e.g. from 4000×3000 to 600×800 pixels) preserves far more perceived sharpness than applying high compression to full-resolution files. Rescaling reduces redundant pixel counts before compression begins, allowing quantization algorithms to retain clean facial contours and high-contrast signature lines.
+    </p>
+    <p>
+      <strong>Uniform Lighting &amp; Neutral Background Alignment:</strong> Biometric review engines measure pixel contrast differences between the subject's hair/ears and the background. Deep cast shadows on the wall behind the subject or uneven side-lighting frequently cause automated gates to reject submissions. If your original capture has minor background gradient variations, PixelKit's integrated canvas processor blends uniform backdrops cleanly before quantization passes.
+    </p>
+    <p>
+      <strong>Digital Signature &amp; Document Stamp Legibility:</strong> For candidate signatures and official stamp scans, low-pass blur filters must be avoided. Signatures rely on sharp edge transitions between blue/black ink strokes and white paper. PixelKit applies specialized high-contrast thresholding routines during binary search compression to keep delicate pen strokes legible even under strict 10KB to 20KB upload ceilings.
+    </p>
+    <p>
+      <strong>Orientation Normalization &amp; EXIF Header Handling:</strong> Smartphone cameras routinely record photos in landscape sensor orientation and append an EXIF rotation tag indicating how the photo should be rotated for display. Many legacy government portal scripts disregard EXIF tags, resulting in photos appearing sideways or upside down on official application forms. PixelKit physically bakes rotation into the raw bitmap data, guaranteeing upright display regardless of portal limitations.
+    </p>
+    <p>
+      <strong>Color Gamut Calibration (sRGB vs Display P3):</strong> Modern Apple iPhone and Android flagships photograph in the wide DCI-P3 color spectrum. However, web form upload validators and passport print systems expect standard sRGB color profiles. PixelKit converts chromatic coordinates to sRGB during client-side canvas processing, preventing washed-out skin tones or uncalibrated color shifts.
+    </p>
+    <p>
+      <strong>Multi-Core Web Worker Thread Concurrency:</strong> PixelKit executes compression in independent worker threads rather than blocking the browser's main UI loop. Even when processing multiple multi-megabyte raw photos simultaneously, your browser remains completely fluid, responsive, and stable without lag.
+    </p>
+    <p>
+      <strong>Zero Server Uploads &amp; Guaranteed Privacy:</strong> Personal ID cards, passports, signatures, and biometric photographs are high-value targets for data scraping and identity theft. PixelKit is built with a zero-knowledge architecture: all decoding, cropping, resizing, and binary-search compression executes 100% inside your local device memory using WebAssembly. Your files are never stored, transmitted, or logged on remote servers.
+    </p>
+  </div>
+</section>

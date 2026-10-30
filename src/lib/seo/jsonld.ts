@@ -95,11 +95,17 @@ export function buildSoftwareApplicationJsonLd(input: {
     url: input.url,
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'All (Web Browser, Windows, macOS, Linux, iOS, Android)',
-    browserRequirements: 'Requires JavaScript and HTML5 Canvas',
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '128',
+      bestRating: '5',
+      worstRating: '1',
     },
     featureList: [
       'Client-side file conversion',

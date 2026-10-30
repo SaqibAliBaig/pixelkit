@@ -4,6 +4,7 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
 import { SITE } from '@lib/constants';
 import { buildSoftwareApplicationJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
 
@@ -51,7 +52,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Image Resizer',
     description: pageDesc,
-    url: new URL('/resize-image', SITE.url).href,
+    url: new URL('/resize-image/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
   buildBreadcrumbJsonLd(
@@ -104,7 +105,7 @@ const jsonLd = [
       </p>
 
       <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
-        <a href="/passport-photo-resizer" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/passport-photo-resizer/" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Passport &amp; ID Photos →</div>
           <div class="font-mono text-accent text-xs mt-1">413 × 531 px · 35 × 45 mm</div>
           <p class="text-muted mt-1.5 text-xs">Crop, resize to 413×531 or 600×600 px, and compress under 50KB/100KB in one step.</p>
@@ -122,7 +123,62 @@ const jsonLd = [
       </div>
     </section>
 
+    <!-- Comprehensive Image Resizing Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Technical Principles of Clean Image Rescaling
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Rescaling digital imagery involves recalculating pixel values across continuous 2D coordinate matrices. When scaling down, high-frequency spatial detail must be filtered smoothly to prevent moiré patterns and jagged pixel aliasing. When scaling up, interpolation algorithms estimate intermediary values to avoid harsh boxy pixelation.
+        </p>
+        <p>
+          PixelKit utilizes multi-step bicubic convolution directly within device RAM. By examining the 16 nearest neighboring pixels for each target sample, bicubic interpolation generates substantially smoother gradients and cleaner tonal gradations than basic nearest-neighbor or bilinear approaches.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Aspect Ratio Locking</h3>
+            <p class="text-xs text-muted mt-1">
+              Always leave the aspect ratio link icon toggled on unless intentionally stretching graphic assets. Modifying width and height independently distorts human facial anatomy and graphic geometry.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">DPI &amp; Physical Dimensions</h3>
+            <p class="text-xs text-muted mt-1">
+              Physical print size depends on pixel density. A 413×531 px image prints at exactly 35×45 mm when reproduced at 300 DPI, making it the universal standard for biometric identification photos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Articles & Tools -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface/50 p-5 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-semibold tracking-tight text-fg">
+        Related Sizing &amp; Rescaling Guides
+      </h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3 text-sm">
+        <a href="/blog/how-to-resize-image-to-passport-size/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Tutorial Guide</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">How to Resize Images to Passport Size</h3>
+          <p class="text-xs text-muted mt-1.5">Exact pixel dimensions, DPI guidelines, and file weight caps for global passport portals.</p>
+        </a>
+        <a href="/passport-photo-resizer/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Specialized Workflow</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Passport Photo Resizer</h3>
+          <p class="text-xs text-muted mt-1.5">Pre-configured 35×45 mm &amp; 2×2 inch templates with automated 20–100KB compression.</p>
+        </a>
+        <a href="/crop-image/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Companion Studio</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Crop Image Studio</h3>
+          <p class="text-xs text-muted mt-1.5">Interactive visual framing with 1:1, 4:5, 16:9 aspect ratio presets and rule of thirds grid.</p>
+        </a>
+      </div>
+    </section>
+
     <!-- FAQs -->
+    <PortalRequirementsGuide />
+
     <div class="mt-12 sm:mt-16">
       <FAQSection faqs={faqs} />
     </div>

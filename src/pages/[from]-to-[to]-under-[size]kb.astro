@@ -45,7 +45,7 @@ const sizeSiblings = samePair
   .slice(0, 4)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
-    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb/`,
   }));
 
 const plainLink = samePair
@@ -53,7 +53,7 @@ const plainLink = samePair
   .slice(0, 1)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} (best quality)`,
-    href: `/${c.from}-to-${c.to}`,
+    href: `/${c.from}-to-${c.to}/`,
   }));
 
 // Adjacent-target siblings: e.g. for 100KB, show 50KB, 200KB, 250KB.
@@ -73,12 +73,12 @@ const adjacentTargets = allCombos
   .slice(0, 3)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
-    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb/`,
   }));
 
 const relatedAll = [...plainLink, ...sizeSiblings, ...adjacentTargets].slice(0, 8);
 
-const relatedBlogSlugs = ['why-portals-reject-200kb-photos', 'compress-aadhaar-to-100kb-pdf'];
+const relatedBlogSlugs = (combo.sizeKb ?? 0) <= 50 ? ['how-to-resize-image-to-passport-size', 'why-portals-reject-200kb-photos'] : ['compress-aadhaar-to-100kb-pdf', 'why-portals-reject-200kb-photos'];
 
 const useCaseIds =
   combo.to === 'pdf'

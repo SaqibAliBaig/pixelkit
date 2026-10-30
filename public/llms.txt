@@ -1,0 +1,28 @@
+# PixelKit — Free, 100% Client-Side Image & PDF Studio
+> Free online image compressor, converter, resizer, and aspect-ratio cropper running locally in your browser memory without server uploads.
+
+## Core Capabilities
+- Exact Kilobyte & Megabyte Budget Targeting: Binary search compression to Max Size, Exact Size, or Range (20KB, 50KB, 100KB, 200KB, 500KB, etc.).
+- Universal Format Conversion: Client-side conversion across JPG, PNG, WebP, AVIF, iPhone HEIC, SVG, TIFF, BMP, GIF, and multi-page PDF documents.
+- Integrated Crop Studio: Aspect ratio presets (Passport 3.5x4.5, 1:1, 4:3, 16:9, custom), rotation, and flip.
+- High-DPI SVG Vector Scaling: 1x to 4x (96 to 600 DPI) vector rasterization to transparent PNG.
+- PDF Tools: Merge multiple images/scans into a single compact PDF, or extract PDF pages to JPG/PNG.
+- Zero Server Uploads: 100% private, runs offline as a PWA, no accounts, no ads.
+
+## Key Links & Tools
+- Homepage & All-in-One Studio: https://pixelkit.app/
+- Image Compressor: https://pixelkit.app/compress-image
+- Image Converter: https://pixelkit.app/convert
+- Scale & Resize: https://pixelkit.app/resize-image
+- Aspect Ratio Cropper: https://pixelkit.app/crop-image
+- Passport & Visa Photo Resizer: https://pixelkit.app/passport-photo-resizer
+- Compress to 50KB: https://pixelkit.app/compress-image-to-50kb
+- Compress to 100KB: https://pixelkit.app/compress-image-to-100kb
+- Compress to 200KB: https://pixelkit.app/compress-image-to-200kb
+- HEIC to JPG Converter: https://pixelkit.app/heic-to-jpg
+- SVG to PNG Converter: https://pixelkit.app/svg-to-png
+- PDF to JPG Converter: https://pixelkit.app/pdf-to-jpg
+- Privacy Policy: https://pixelkit.app/privacy
+- Terms of Service: https://pixelkit.app/terms
+- XML Sitemap: https://pixelkit.app/sitemap-index.xml
+

@@ -4,8 +4,10 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import combinations from '@data/combinations.json';
+import FAQSection from '@components/seo/FAQSection.astro';
 import { SITE } from '@lib/constants';
 import {
+  buildFaqJsonLd,
   buildBreadcrumbJsonLd,
   buildSoftwareApplicationJsonLd,
 } from '@lib/seo/jsonld';
@@ -32,18 +34,18 @@ for (const c of plainCombos) {
 const fromList = [...byFrom.keys()].sort();
 
 const popularTargets = [
-  { label: 'Compress Image to 50KB', href: '/compress-image-to-50kb', portal: 'Exam, signature & recruitment portals' },
-  { label: 'Compress Image to 100KB', href: '/compress-image-to-100kb', portal: 'Aadhaar, PAN & passport portals' },
-  { label: 'Compress Image to 200KB', href: '/compress-image-to-200kb', portal: 'US DS-160 visa & embassy uploads' },
-  { label: 'HEIC to JPG under 100KB', href: '/heic-to-jpg-under-100kb', portal: 'iPhone photos for government portals' },
-  { label: 'JPG to PDF under 100KB', href: '/jpg-to-pdf-under-100kb', portal: 'Document & ID card uploads' },
-  { label: 'JPG to PDF under 200KB', href: '/jpg-to-pdf-under-200kb', portal: 'Bank statements & KYC verification' },
-  { label: 'PNG to JPG under 50KB', href: '/png-to-jpg-under-50kb', portal: 'Signatures & thumbprints' },
-  { label: 'PNG to WEBP under 100KB', href: '/png-to-webp-under-100kb', portal: 'High-res transparent web graphics' },
-  { label: 'JPG to WEBP under 50KB', href: '/jpg-to-webp-under-50kb', portal: 'PageSpeed & Core Web Vitals' },
-  { label: 'SVG to PNG Converter', href: '/svg-to-png', portal: '1x–4x Retina & print vector export' },
-  { label: 'PDF to JPG Converter', href: '/pdf-to-jpg', portal: 'Extract multi-page PDF pages to images' },
-  { label: 'Passport Photo Resizer', href: '/passport-photo-resizer', portal: '413×531 px & 600×600 px in one pass' },
+  { label: 'Compress Image to 50KB', href: '/compress-image-to-50kb/', portal: 'Exam, signature & recruitment portals' },
+  { label: 'Compress Image to 100KB', href: '/compress-image-to-100kb/', portal: 'Aadhaar, PAN & passport portals' },
+  { label: 'Compress Image to 200KB', href: '/compress-image-to-200kb/', portal: 'US DS-160 visa & embassy uploads' },
+  { label: 'HEIC to JPG under 100KB', href: '/heic-to-jpg-under-100kb/', portal: 'iPhone photos for government portals' },
+  { label: 'JPG to PDF under 100KB', href: '/jpg-to-pdf-under-100kb/', portal: 'Document & ID card uploads' },
+  { label: 'JPG to PDF under 200KB', href: '/jpg-to-pdf-under-200kb/', portal: 'Bank statements & KYC verification' },
+  { label: 'PNG to JPG under 50KB', href: '/png-to-jpg-under-50kb/', portal: 'Signatures & thumbprints' },
+  { label: 'PNG to WEBP under 100KB', href: '/png-to-webp-under-100kb/', portal: 'High-res transparent web graphics' },
+  { label: 'JPG to WEBP under 50KB', href: '/jpg-to-webp-under-50kb/', portal: 'PageSpeed & Core Web Vitals' },
+  { label: 'SVG to PNG Converter', href: '/svg-to-png/', portal: '1x–4x Retina & print vector export' },
+  { label: 'PDF to JPG Converter', href: '/pdf-to-jpg/', portal: 'Extract multi-page PDF pages to images' },
+  { label: 'Passport Photo Resizer', href: '/passport-photo-resizer/', portal: '413×531 px & 600×600 px in one pass' },
 ];
 
 const breadcrumbs = [
@@ -54,7 +56,32 @@ const breadcrumbs = [
 const pageTitle = `Free Online Image Converter — HEIC, PNG, JPG, WebP, PDF | ${SITE.name}`;
 const pageDesc = `Free online image converter across ${plainCombos.length} formats including HEIC to JPG, PNG to WebP, SVG to PNG, JPG to PDF, and PDF to JPG—with built-in crop and resize.`;
 
+
+const convertFaqs = [
+  {
+    q: 'How does client-side format conversion work without uploading files?',
+    a: 'PixelKit leverages modern browser capabilities including HTML5 Canvas, WebAssembly (Wasm), and background Web Workers. When you drop an image, the browser decodes the binary file directly into an in-memory pixel buffer, applies any requested resizing, cropping, or quantization, and re-encodes it into your chosen target format (like JPG, WebP, PNG, or PDF). The entire lifecycle happens locally inside your browser process.',
+  },
+  {
+    q: 'Why should I convert HEIC images to JPG or PNG?',
+    a: 'Apple devices capture photos in High Efficiency Image Container (HEIC) format by default to save storage space. However, many government application portals, banking verification forms, academic portals, and older operating systems (like Windows 10 without codecs) cannot open or preview HEIC files. Converting to JPG or PNG provides universal compatibility across all operating systems, web browsers, and upload forms.',
+  },
+  {
+    q: 'When should I convert PNG to WebP instead of JPG?',
+    a: 'If your image contains crisp typography, sharp line art, screenshots, or transparent alpha backgrounds, converting PNG to WebP is ideal. WebP maintains transparent cutouts and crisp borders while reducing file weight by 25% to 40% compared to PNG. If you do not require transparency and are converting continuous-tone photographs, JPG offers maximum universal compatibility.',
+  },
+  {
+    q: 'Can I convert multiple images and combine them into a single PDF document?',
+    a: 'Yes! Using PixelKit JPG to PDF or PNG to PDF converters, you can upload multiple photos or document pages, arrange them in your preferred sequence, adjust page orientations, and export a compact, multi-page PDF document optimized for upload under strict portal limits such as 100KB, 200KB, or 500KB.',
+  },
+  {
+    q: 'Will converting between image formats degrade picture quality?',
+    a: 'PixelKit provides lossless conversion wherever mathematically possible (such as SVG vector rendering, PNG quantization, and lossless WebP). When converting to lossy formats like JPG or lossy WebP, PixelKit uses high-precision 4:4:4 or 4:2:0 chroma subsampling and adaptive quantization matrices to preserve fine details, text legibility, and realistic skin tones without creating distracting blocky compression artifacts.',
+  },
+];
+
 const jsonLd = [
+  buildFaqJsonLd(convertFaqs),
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Online Image & Document Converter',
     description: pageDesc,
@@ -185,7 +212,7 @@ const jsonLd = [
               {items.map((c) => (
                 <li class="pk-converter-item" data-from={c.from.toLowerCase()} data-to={c.to.toLowerCase()} data-query={`${c.from} to ${c.to} ${c.from} ${c.to}`}>
                   <a
-                    href={`/${c.from}-to-${c.to}`}
+                    href={`/${c.from}-to-${c.to}/`}
                     class="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm text-fg transition-colors hover:bg-bg/60"
                   >
                     <span>
@@ -265,6 +292,202 @@ const jsonLd = [
         ))}
       </div>
     </section>
+
+    <!-- In-Depth Format Matrix & Conversion Pipeline Guide -->
+    <section class="mt-16 rounded-2xl border border-border bg-surface p-6 sm:p-10 text-fg" aria-labelledby="format-guide-heading">
+      <h2 id="format-guide-heading" class="text-xl sm:text-2xl font-bold tracking-tight text-fg">
+        Comprehensive Image Format &amp; Conversion Guide
+      </h2>
+      <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed max-w-3xl">
+        Every graphic and document format serves a distinct purpose across mobile applications, print publications, and government filing systems. Understanding format strengths helps you select the right target output without losing critical image fidelity.
+      </p>
+
+      <div class="mt-8 grid gap-6 md:grid-cols-2">
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-5">
+          <h3 class="text-sm font-semibold text-accent uppercase tracking-wider">Raster Formats (JPG, PNG, WebP, AVIF)</h3>
+          <p class="mt-2 text-xs text-muted leading-relaxed">
+            Raster formats represent images as pixel grids. <strong>JPG / JPEG</strong> is universally accepted and provides lossy DCT compression tailored for continuous-tone photography. <strong>PNG</strong> utilizes lossless DEFLATE compression and supports full 8-bit alpha transparency, making it indispensable for logos and screenshots. <strong>WebP</strong> and <strong>AVIF</strong> deliver next-generation predictive intra-frame compression, reducing file weight by 30% to 50% compared to JPG while retaining sharp details.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-5">
+          <h3 class="text-sm font-semibold text-accent uppercase tracking-wider">Mobile &amp; Specialized Formats (HEIC, SVG, TIFF)</h3>
+          <p class="mt-2 text-xs text-muted leading-relaxed">
+            <strong>HEIC</strong> (High Efficiency Image Container) is Apple's default iOS camera format, offering superior color depth and dynamic range at small file sizes, though frequently rejected by government or legacy portals. <strong>SVG</strong> stores vector curves mathematically, allowing infinite scaling without pixelation for iconography and typography. <strong>TIFF</strong> preserves uncompressed, multi-channel image data for professional archival, medical imaging, and commercial offset printing.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-fg">
+          Client-Side In-Browser Conversion Architecture
+        </h3>
+        <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+          PixelKit completely eliminates server uploads. All decoding, color space transformation, canvas resampling, and bitstream encoding execute directly within isolated Web Workers running in your local web browser. Whether converting proprietary iPhone HEIC files, rasterizing vectors, or assembling multi-page PDFs, your sensitive photos and legal documents never travel over public networks or touch external cloud storage disks.
+        </p>
+      </div>
+    
+      <!-- Deep Dive Format Specifications -->
+      <div class="mt-10 grid gap-6 md:grid-cols-3 text-xs text-muted">
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">JPEG / JPG (.jpg, .jpeg)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            The global benchmark for photographic captures. JPG utilizes Discrete Cosine Transform (DCT) lossy compression to balance rich gradients and subtle color transitions. Ideal for passports, landscape photography, and multi-megabyte photo archives. Does not support transparent alpha layers.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">PNG (.png)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Uncompressed bitmap clarity with full 8-bit alpha transparency. PNG preserves pixel-perfect vector lines, user interface screenshots, corporate logos, and transparent overlays using DEFLATE compression. PixelKit applies UPNG palette quantization to reduce PNG weight without introducing blur.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">WebP (.webp)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Google's premier modern web format. WebP blends predictive lossy compression with 24-bit RGB and 8-bit alpha transparency. Delivers 25% to 35% byte savings over standard JPEG at identical perceived fidelity, making it the top recommendation for Google Core Web Vitals and PageSpeed scores.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">AVIF (.avif)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Next-generation format derived from the AV1 video codec. Features ultra-deep 10-bit and 12-bit High Dynamic Range (HDR) color reproduction and state-of-the-art compression efficiency. Delivers clean images at minuscule bitrates where standard JPG would show heavy compression blocks.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">HEIC / HEIF (.heic)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Apple's default capture container on modern iPhones and iPads. Packed with multi-burst frames, depth maps, and live photo audio data. Converting HEIC to universally recognized JPG or PDF enables instant upload to government portals, online job applications, and non-Apple devices.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">SVG (.svg)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Scalable Vector Graphics defined by mathematical XML coordinate paths rather than raster pixels. SVGs can scale to billboard proportions or high-density Retina screens without a single blur. PixelKit rasterizes SVG vectors into high-resolution PNG, JPG, or PDF bitmaps with custom density factors.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">TIFF / TIF (.tiff, .tif)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Tagged Image File Format used extensively in desktop publishing, professional offset printing, 3D scanning, and legal archiving. TIFF files are typically huge and uncompressed. Converting TIFF to JPG or PDF makes legal records easily shareable over email and uploadable to portals.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">PDF (.pdf)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Portable Document Format is the universal standard for legally binding documents, official identification cards, academic transcripts, and multi-page application packages. PixelKit decodes and renders PDF pages client-side, enabling single or multi-page export into web image formats or compressed PDFs.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/70 bg-bg/40 p-4">
+          <h4 class="font-semibold text-fg">GIF &amp; BMP (.gif, .bmp)</h4>
+          <p class="mt-1.5 leading-relaxed">
+            Legacy graphic standards. BMP stores raw, uncompressed Windows bitmap raster data with enormous file footprints. GIF is restricted to an indexed 256-color palette. PixelKit easily updates both legacy formats into modern JPG, PNG, or WebP files, slashing storage requirements by up to 90%.
+          </p>
+        </div>
+      </div>
+
+    
+      <!-- Government & Portal Optimization Best Practices -->
+      <div class="mt-10 border-t border-border pt-8">
+        <h3 class="text-base font-semibold text-fg">
+          Best Practices for Uploading Converted Images to Government Portals
+        </h3>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 text-xs text-muted">
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">1. Match Specified Dimension Aspect Ratios</h4>
+            <p class="mt-1 leading-relaxed">
+              Most exam and visa submission systems (such as US State Dept DS-160 or UPSC civil service portals) automatically validate facial aspect ratios (e.g. 1:1 square for US visas, or 3.5cm x 4.5cm for European passports). Use our built-in Crop Studio before converting to avoid automated upload rejections.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">2. Strictly Observe Minimum and Maximum KB Thresholds</h4>
+            <p class="mt-1 leading-relaxed">
+              Application servers frequently reject images that are either too large (exceeding 100KB or 200KB) OR overly compressed (falling below 20KB or 50KB). PixelKit's binary-search target size engine lets you hit the exact sweet spot in the portal's accepted range.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">3. Preserve Text Sharpness on Scanned Documents</h4>
+            <p class="mt-1 leading-relaxed">
+              When converting scanned birth certificates, bank statements, or academic diplomas to PDF or JPG, ensure the text remains legible without blotchy artifacts. PixelKit uses adaptive quantization to preserve sharp contrasting edges around letterforms.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">4. Sanitize Metadata for Identity &amp; Privacy Protection</h4>
+            <p class="mt-1 leading-relaxed">
+              Digital photographs taken with modern smartphones store geographic GPS tags, device IMEI numbers, and timestamp data inside EXIF headers. PixelKit gives you the power to strip non-essential EXIF metadata before submitting documents online.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">5. Universal Format Compatibility for Older Systems</h4>
+            <p class="mt-1 leading-relaxed">
+              Older governmental servers frequently fail when encountering Apple HEIC or modern WebP images. By converting into baseline JPEG or standard PDF format, you ensure immediate compatibility with legacy mainframe validators.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h4 class="font-semibold text-fg">6. Zero-Upload Confidentiality Guarantees</h4>
+            <p class="mt-1 leading-relaxed">
+              All pixel operations execute locally in your computer or smartphone RAM via isolated Web Workers. Financial records, tax forms, passports, and ID numbers never travel across public networks or touch third-party servers.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    
+      <!-- Core Web Vitals & Batch Engine -->
+      <div class="mt-8 border-t border-border pt-6">
+        <h4 class="text-sm font-semibold text-fg">
+          Optimizing Core Web Vitals (LCP &amp; CLS) Through Format Modernization
+        </h4>
+        <p class="mt-2 text-xs text-muted leading-relaxed">
+          Largest Contentful Paint (LCP) directly dictates how fast real human visitors experience your website. Serving oversized legacy JPEG or uncompressed PNG hero assets introduces massive network transmission bottlenecks on mobile devices. Converting hero artwork to modern WebP or AVIF slashes file payloads by up to 50% without visual degradation. Furthermore, setting explicit width and height bounding boxes prevents Cumulative Layout Shift (CLS), ensuring your web pages achieve stellar 95+ Google PageSpeed Insights benchmarks.
+        </p>
+      </div>
+
+      <div class="mt-6 border-t border-border pt-6">
+        <h4 class="text-sm font-semibold text-fg">
+          Client-Side WebAssembly Multithreading &amp; Concurrency Architecture
+        </h4>
+        <p class="mt-2 text-xs text-muted leading-relaxed">
+          Traditional server-side batch converters queue jobs in remote worker clusters, leading to delayed turnaround times, upload bandwidth consumption, and severe data privacy risks. PixelKit executes all image codecs inside isolated WebAssembly (Wasm) modules driven by browser Web Workers. By utilizing parallel CPU threads right on your machine, batch operations convert dozens of images simultaneously at wire-speed without freezing your browser interface or consuming data plan upload quotas.
+        </p>
+      </div>
+
+    
+      <!-- Frequently Converted Workflows -->
+      <div class="mt-8 border-t border-border pt-6">
+        <h4 class="text-sm font-semibold text-fg">
+          High-Demand Conversion Workflows &amp; Technical Tips
+        </h4>
+        <div class="mt-3 grid gap-4 sm:grid-cols-2 text-xs text-muted leading-relaxed">
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">iPhone HEIC to JPG for Visa and Exam Uploads</h5>
+            <p class="mt-1">
+              Apple iOS devices capture photos in high-efficiency HEIC files by default. While HEIC offers excellent dynamic range, almost all international consular systems, university portals, and state government verification services immediately fail with unsupported format errors when uploading .heic files. Converting to standardized JPG guarantees 100% acceptance without losing facial sharpness or color fidelity.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">PNG to WebP for Maximum Page Speed</h5>
+            <p class="mt-1">
+              Heavy PNG graphics such as UI wireframes, software screenshots, and transparent brand marks frequently bloat website bundles. Converting to lossy or lossless WebP maintains complete transparent alpha channel cutouts and crisp vector typography while reducing HTTP payload weight by an average of 35% to 45%, directly improving Core Web Vitals LCP benchmarks.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">SVG to Raster PNG for Print &amp; Legacy Platforms</h5>
+            <p class="mt-1">
+              Scalable Vector Graphics (SVG) scale infinitely in modern browsers, but email marketing clients, document processors, and social media platforms require raster bitmap images. PixelKit's SVG converter allows you to specify custom scale multipliers (1x, 2x, 4x) to render ultra-sharp high-DPI Retina PNG or JPG assets with crystal-clear edges.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">PDF Page Extraction &amp; Archival Image Packaging</h5>
+            <p class="mt-1">
+              Extract high-resolution raster images from multi-page PDF documents without installing bloated desktop software or compromising confidential financial or medical reports. PixelKit decodes individual PDF pages at full 300 DPI clarity directly in your local browser sandbox, preserving crisp document legibility for official re-use.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="mt-12 sm:mt-16"><FAQSection faqs={convertFaqs} heading="Image Conversion Frequently Asked Questions" /></div>
   </div>
 
   <script is:inline>

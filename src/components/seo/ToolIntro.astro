@@ -13,6 +13,103 @@ interface Props {
 const { combo, intro } = Astro.props;
 const fromLabel = combo.from.toUpperCase();
 const toLabel = combo.to.toUpperCase();
+
+interface FormatSpec {
+  name: string;
+  mime: string;
+  compression: string;
+  transparency: string;
+  idealUse: string;
+}
+
+const SPECS: Record<string, FormatSpec> = {
+  jpg: {
+    name: 'Joint Photographic Experts Group (JPEG)',
+    mime: 'image/jpeg',
+    compression: 'Discrete Cosine Transform (Lossy)',
+    transparency: 'No (Auto white background fill)',
+    idealUse: 'Photographs, government portal forms, passport applications, universal web sharing',
+  },
+  png: {
+    name: 'Portable Network Graphics',
+    mime: 'image/png',
+    compression: 'DEFLATE lossless byte-stream',
+    transparency: 'Yes (Full 8-bit alpha channel)',
+    idealUse: 'Logos, screenshots, graphics with transparent backgrounds, digital signatures',
+  },
+  webp: {
+    name: 'WebP Image Container',
+    mime: 'image/webp',
+    compression: 'VP8 / VP8L predictive coding (Lossy & Lossless)',
+    transparency: 'Yes (Alpha channel supported)',
+    idealUse: 'Modern high-performance web publishing, next-gen mobile assets, green Core Web Vitals',
+  },
+  avif: {
+    name: 'AV1 Image File Format',
+    mime: 'image/avif',
+    compression: 'AV1 intra-frame coding (Next-Gen Lossy/Lossless)',
+    transparency: 'Yes (Alpha channel supported)',
+    idealUse: 'Cutting-edge web imagery requiring maximal byte reduction with high fidelity',
+  },
+  heic: {
+    name: 'High Efficiency Image Container (HEIF)',
+    mime: 'image/heic',
+    compression: 'High Efficiency Video Coding (HEVC / H.265)',
+    transparency: 'Yes (Depth maps and alpha)',
+    idealUse: 'Apple iOS camera capture, mobile device photo storage',
+  },
+  svg: {
+    name: 'Scalable Vector Graphics (XML)',
+    mime: 'image/svg+xml',
+    compression: 'Lossless resolution-independent XML coordinates',
+    transparency: 'Yes (Vector transparency)',
+    idealUse: 'Icons, brand typography, responsive web vector assets, high-DPI print',
+  },
+  pdf: {
+    name: 'Portable Document Format',
+    mime: 'application/pdf',
+    compression: 'PostScript stream / Flate compression',
+    transparency: 'Preserves raster layers',
+    idealUse: 'Formal visa packets, academic certificates, multi-page document submission, KYC',
+  },
+  tiff: {
+    name: 'Tagged Image File Format',
+    mime: 'image/tiff',
+    compression: 'Uncompressed, LZW, or ZIP lossless compression',
+    transparency: 'Yes (Multi-channel alpha)',
+    idealUse: 'High-end scanner archiving, professional publishing, raw photo master copies',
+  },
+  bmp: {
+    name: 'Bitmap Image File',
+    mime: 'image/bmp',
+    compression: 'Uncompressed raster array',
+    transparency: 'Basic bitmask',
+    idealUse: 'Legacy Windows desktop workflows, uncompressed frame processing',
+  },
+  gif: {
+    name: 'Graphics Interchange Format',
+    mime: 'image/gif',
+    compression: 'LZW 8-bit 256-color palette indexing',
+    transparency: 'Yes (1-bit index transparency)',
+    idealUse: 'Simple retro graphics, animated banners, compact low-color icons',
+  },
+};
+
+const srcSpec = SPECS[combo.from.toLowerCase()] || {
+  name: fromLabel,
+  mime: `image/${combo.from}`,
+  compression: 'Standard container',
+  transparency: 'Standard',
+  idealUse: 'General image handling',
+};
+
+const tgtSpec = SPECS[combo.to.toLowerCase()] || {
+  name: toLabel,
+  mime: `image/${combo.to}`,
+  compression: 'Standard container',
+  transparency: 'Standard',
+  idealUse: 'General image handling',
+};
 ---
 
 <section class="mx-auto mt-14 max-w-prose" aria-labelledby="tool-intro-heading">
@@ -29,5 +126,139 @@ const toLabel = combo.to.toUpperCase();
     {intro.split('\n\n').map((para) => (
       <p>{para}</p>
     ))}
+  </div>
+
+  <!-- Technical Container Comparison Matrix -->
+  <div class="mt-10 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+    <h3 class="text-base font-semibold text-fg">
+      Technical Architecture: {fromLabel} vs {toLabel}
+    </h3>
+    <p class="mt-1 text-xs text-muted">
+      Architectural differences between the source format and destination encoding container:
+    </p>
+
+    <div class="mt-4 overflow-x-auto">
+      <table class="w-full text-left text-xs sm:text-sm">
+        <thead>
+          <tr class="border-b border-border text-muted">
+            <th class="pb-2.5 font-medium">Specification</th>
+            <th class="pb-2.5 font-medium text-fg">{fromLabel} (Input)</th>
+            <th class="pb-2.5 font-medium text-accent">{toLabel} (Output)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border/60 text-fg/85">
+          <tr>
+            <td class="py-2.5 font-medium text-muted">Standard Name</td>
+            <td class="py-2.5">{srcSpec.name}</td>
+            <td class="py-2.5 font-medium text-fg">{tgtSpec.name}</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 font-medium text-muted">MIME Type</td>
+            <td class="py-2.5 font-mono text-xs">{srcSpec.mime}</td>
+            <td class="py-2.5 font-mono text-xs text-accent">{tgtSpec.mime}</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 font-medium text-muted">Compression Type</td>
+            <td class="py-2.5">{srcSpec.compression}</td>
+            <td class="py-2.5">{tgtSpec.compression}</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 font-medium text-muted">Alpha Transparency</td>
+            <td class="py-2.5">{srcSpec.transparency}</td>
+            <td class="py-2.5">{tgtSpec.transparency}</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 font-medium text-muted">Optimal Application</td>
+            <td class="py-2.5">{srcSpec.idealUse}</td>
+            <td class="py-2.5 font-medium text-fg">{tgtSpec.idealUse}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- In-Browser Execution Pipeline -->
+  <div class="mt-10 space-y-4">
+    <h3 class="text-lg font-semibold tracking-tight text-fg">
+      Four-Stage In-Browser Conversion Pipeline
+    </h3>
+    <p class="text-sm text-fg/85 leading-relaxed">
+      Unlike traditional online file converters that transmit your files to cloud servers, PixelKit executes every conversion pass directly inside your browser memory using hardware-accelerated WebAssembly and HTML5 Canvas APIs:
+    </p>
+
+    <ol class="mt-4 space-y-3.5 text-sm text-fg/85">
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface border border-border text-xs font-semibold text-accent">1</span>
+        <div>
+          <strong class="font-semibold text-fg">Client-Side Stream Decoding:</strong>
+          When you select a {fromLabel} file, your device reads the binary byte stream directly into an ArrayBuffer without network transmission. Decoders parse container headers, color profiles, and raw pixel bitmaps locally.
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface border border-border text-xs font-semibold text-accent">2</span>
+        <div>
+          <strong class="font-semibold text-fg">Canvas Pre-Processing &amp; Framing:</strong>
+          If aspect ratio cropping or pixel resizing is requested, PixelKit resamples the image matrix using bicubic interpolation. When converting from transparent formats to formats like JPG, clean solid color backings are blended automatically.
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface border border-border text-xs font-semibold text-accent">3</span>
+        <div>
+          <strong class="font-semibold text-fg">Adaptive Quantization Engine:</strong>
+          {combo.sizeKb
+            ? `To guarantee your file stays safely under ${combo.sizeKb}KB, PixelKit runs a fast binary search over discrete quantization tables in a background Web Worker, pinpointing the optimal quality level that respects your budget.`
+            : `The encoder compiles high-efficiency quantization tables to ensure the output ${toLabel} preserves sharp visual edges, true color tonality, and high signal-to-noise ratio.`}
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface border border-border text-xs font-semibold text-accent">4</span>
+        <div>
+          <strong class="font-semibold text-fg">Instant Blob Download &amp; Zero Residue:</strong>
+          The compiled {toLabel} file is exposed as an ephemeral blob URL for instantaneous saving. Once downloaded or cleared, all pixel buffers are immediately released by browser garbage collection.
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Deep Technical Optimization Guide -->
+  <div class="mt-10 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+    <h3 class="text-base font-semibold text-fg">
+      Deep-Dive: Compression &amp; Format Engineering Principles
+    </h3>
+    <div class="mt-3 space-y-3 text-xs sm:text-sm text-fg/80 leading-relaxed">
+      <p>
+        <strong>Color Profile and Gamut Preservation:</strong> Digital images captured on modern smartphones frequently embed wide color gamuts such as Display P3 or Apple Wide Color. When re-encoding to {toLabel}, PixelKit transforms chromatic coordinate spaces to standard sRGB via WebAssembly color correction matrices. This ensures that skin tones, skies, and vibrant logos display identically across every mobile screen, desktop monitor, and physical printer without color clipping or muddy desaturation.
+      </p>
+      <p>
+        <strong>EXIF Metadata and Orientation Normalization:</strong> Raw camera captures often store orientation flags (EXIF rotation tags 1 through 8) rather than physically rotating the pixel grid. If a viewer ignores this tag, the photo displays sideways or upside down. During conversion, PixelKit extracts the embedded EXIF tag, rotates the bitmap matrix physically into canonical upright orientation, and allows you to strip personal GPS coordinates and camera serial numbers for enhanced security and privacy.
+      </p>
+      <p>
+        <strong>Elimination of Re-Compression Artifacts:</strong> Repeatedly opening, editing, and saving compressed image files introduces generational loss, causing noticeable macroblock ringing and mosquito noise around high-contrast edges. PixelKit performs all cropping, scaling, color filling, and quantization in a single non-destructive memory pipeline, eliminating intermediate re-compression artifacts so your final {toLabel} remains as crisp as possible.
+      </p>
+      <p>
+        <strong>Multi-Threaded Worker Performance:</strong> Encoding complex formats like WebP, AVIF, or large PDF documents requires intensive mathematical operations including discrete cosine transforms, discrete wavelet transforms, and Huffman coding passes. PixelKit delegates these compute-heavy loops to isolated background Web Worker threads. This architectural decoupling ensures the main browser thread remains 100% responsive at a smooth 60 frames per second, preventing UI stutter or frozen browser tabs even when batch converting high-resolution photo archives.
+      </p>
+      <p>
+        <strong>Offline Progressivity &amp; Native Device Reliability:</strong> Once loaded into your web browser, PixelKit caches all core WebAssembly binaries and conversion scripts in a Service Worker cache. This means you can continue converting, cropping, and compressing {fromLabel} into {toLabel} on airplanes, remote travel destinations, or in enterprise facilities with zero active internet connectivity.
+      </p>
+    </div>
+  </div>
+
+  <!-- Best Practices for Strict Portal Submissions -->
+  <div class="mt-10 rounded-2xl border border-border bg-surface/50 p-5 sm:p-6">
+    <h3 class="text-base font-semibold text-fg">
+      Practical Tips for Portal &amp; Form Submissions
+    </h3>
+    <div class="mt-3 space-y-2.5 text-xs sm:text-sm text-fg/80 leading-relaxed">
+      <p>
+        <strong>Check Dimension vs KB Constraints:</strong> Many official government portals (such as passport renewals, exam admit cards, and visa systems) impose both an aspect ratio limit (like 3.5×4.5 cm or 413×531 px) and a strict file size ceiling (like under 50KB or 100KB). Use the Crop Studio and Resize tools before downloading to hit both criteria in a single pass.
+      </p>
+      <p>
+        <strong>Preserve Text &amp; Signature Clarity:</strong> For digital signatures and scanned documents, prioritize dimension scaling over severe lossy compression. High-contrast bicubic scaling preserves sharp strokes even at very small byte budgets.
+      </p>
+      <p>
+        <strong>100% Confidentiality:</strong> Since PixelKit never uploads your images or documents to remote servers, you can safely process sensitive passports, ID scans, banking records, and medical files without risking personal data leakage.
+      </p>
+    </div>
   </div>
 </section>

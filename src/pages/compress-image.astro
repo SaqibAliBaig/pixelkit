@@ -4,6 +4,7 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
 import { SITE } from '@lib/constants';
 import { buildSoftwareApplicationJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
 
@@ -52,7 +53,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Image Compressor',
     description: pageDesc,
-    url: new URL('/compress-image', SITE.url).href,
+    url: new URL('/compress-image/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
   buildBreadcrumbJsonLd(
@@ -105,22 +106,22 @@ const jsonLd = [
       </p>
 
       <div class="mt-5 grid grid-cols-1 sm:grid-cols-4 gap-3.5 text-xs sm:text-sm">
-        <a href="/compress-image-to-50kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-50kb/" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 50 KB</div>
           <div class="font-mono text-accent text-xs mt-1">Signatures &amp; Exams</div>
           <p class="text-muted mt-1.5 text-xs">Standard limit for digital signatures, thumbprints, and compact application forms.</p>
         </a>
-        <a href="/compress-image-to-100kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-100kb/" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 100 KB</div>
           <div class="font-mono text-accent text-xs mt-1">ID Scans &amp; Passports</div>
           <p class="text-muted mt-1.5 text-xs">Requirement for Aadhaar, PAN card, driver licenses, and state exam portals.</p>
         </a>
-        <a href="/compress-image-to-200kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-200kb/" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 200 KB</div>
           <div class="font-mono text-accent text-xs mt-1">Visa &amp; Official Forms</div>
           <p class="text-muted mt-1.5 text-xs">Standard maximum threshold for immigration, embassy, and university submissions.</p>
         </a>
-        <a href="/compress-image-to-500kb" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
+        <a href="/compress-image-to-500kb/" class="block rounded-xl border border-border bg-bg/50 p-4 hover:border-accent transition-colors">
           <div class="font-bold text-fg">Under 500 KB / 1 MB</div>
           <div class="font-mono text-accent text-xs mt-1">Multi-Page &amp; Documents</div>
           <p class="text-muted mt-1.5 text-xs">Ideal for email attachments, PDF certificates, and high-res web imagery.</p>
@@ -129,15 +130,70 @@ const jsonLd = [
 
       <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
         <span class="text-muted font-medium mr-1">Compress by format:</span>
-        <a href="/compress-jpg" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress JPG</a>
-        <a href="/compress-png" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PNG</a>
-        <a href="/compress-webp" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress WebP</a>
-        <a href="/compress-pdf" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PDF</a>
-        <a href="/compress-image-to-20kb" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 20KB</a>
+        <a href="/compress-jpg/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress JPG</a>
+        <a href="/compress-png/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PNG</a>
+        <a href="/compress-webp/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress WebP</a>
+        <a href="/compress-pdf/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress PDF</a>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 20KB</a>
+      </div>
+    </section>
+
+    <!-- Comprehensive Technical Guide on Image Compression -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Understanding Client-Side Image Compression Mechanics
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Compressing digital images requires balancing visual fidelity against file weight. In uncompressed form, a standard 12-megapixel smartphone photograph represents approximately 36 megabytes of raw RGB pixel data. Compression algorithms dramatically reduce this byte weight through two primary approaches: lossless redundancy reduction and psycho-visually optimized lossy quantization.
+        </p>
+        <p>
+          Lossy formats such as JPG, WebP, and AVIF discard high-frequency spatial frequencies that the human visual system is least sensitive to, especially across chrominance channels. PixelKit's binary search compression engine iterates quantization matrix scaling factors in multi-threaded Web Workers, determining the highest possible visual clarity that guarantees the final output file does not exceed your designated kilobyte target.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Chroma Subsampling Optimization</h3>
+            <p class="text-xs text-muted mt-1">
+              By using 4:2:0 chroma subsampling for photographic content, color bandwidth is halved with zero perceived sharpness loss, allowing aggressive byte reductions for passport and exam portal submissions.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Target Convergence Without Guesswork</h3>
+            <p class="text-xs text-muted mt-1">
+              Instead of manually dragging a percentage quality slider and repeatedly checking file size in your file explorer, PixelKit automatically converges to your exact budget in less than half a second.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Articles & Companion Tools -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface/50 p-5 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-semibold tracking-tight text-fg">
+        Helpful Compression Guides &amp; Tools
+      </h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3 text-sm">
+        <a href="/blog/why-portals-reject-200kb-photos/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Troubleshooting</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Why Portals Reject Photos &amp; How to Fix It</h3>
+          <p class="text-xs text-muted mt-1.5">Detailed guide to passing automated upload gates for visas, government forms, and passports.</p>
+        </a>
+        <a href="/blog/compress-aadhaar-to-100kb-pdf/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Step-by-Step</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Compress Aadhaar &amp; Scans to 100KB PDF</h3>
+          <p class="text-xs text-muted mt-1.5">How to combine multiple ID scans into a single compact PDF document under strict limits.</p>
+        </a>
+        <a href="/passport-photo-resizer/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Dedicated Tool</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Passport Photo Resizer</h3>
+          <p class="text-xs text-muted mt-1.5">Pre-configured 35×45 mm &amp; 2×2 inch templates with automated 20–100KB compression.</p>
+        </a>
       </div>
     </section>
 
     <!-- FAQs -->
+    <PortalRequirementsGuide />
+
     <div class="mt-12 sm:mt-16">
       <FAQSection faqs={faqs} />
     </div>

@@ -7,7 +7,7 @@ const SITE = 'https://pixelkit.app';
 export default defineConfig({
   site: SITE,
   output: 'static',
-  trailingSlash: 'never',
+  trailingSlash: 'always',
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
@@ -30,6 +30,9 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes('/404'),
       serialize(item) {
+        if (!item.url.endsWith('/') && !item.url.includes('.')) {
+          item.url = `${item.url}/`;
+        }
         const url = item.url.replace(/\/$/, '');
 
         // Homepage

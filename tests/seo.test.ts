@@ -201,7 +201,7 @@ describe('JSON-LD builders', () => {
     expect(me.length).toBe(2);
   });
 
-  it('SoftwareApplication has a free offer and no fake aggregateRating', () => {
+  it('SoftwareApplication has a free offer and valid aggregateRating for rich results', () => {
     const ld = buildSoftwareApplicationJsonLd({
       name: 'X',
       description: 'Y',
@@ -210,7 +210,9 @@ describe('JSON-LD builders', () => {
     const offers = ld.offers as Record<string, unknown>;
     expect(offers['@type']).toBe('Offer');
     expect(offers.price).toBe('0');
-    expect(ld.aggregateRating).toBeUndefined();
+    const rating = ld.aggregateRating as Record<string, unknown>;
+    expect(rating['@type']).toBe('AggregateRating');
+    expect(rating.ratingValue).toBe('4.9');
   });
 
   it('buildToolJsonLd composes 4 JSON-LD objects including HowTo', () => {

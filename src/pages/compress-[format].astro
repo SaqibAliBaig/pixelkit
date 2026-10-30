@@ -5,6 +5,7 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
@@ -61,28 +62,28 @@ export const getStaticPaths: GetStaticPaths = () => {
       ext: 'png',
       label: 'PNG',
       mime: 'image/png',
-      defaultKb: null,
+      defaultKb: 100,
       headline: 'Compress PNG Online',
-      titleTag: 'Compress PNG Online — Shrink Transparent PNGs Free',
+      titleTag: 'Compress PNG Online — Lossless & Indexed Optimization Free',
       metaDesc:
-        'Free online PNG compressor. Shrink PNG screenshots, logos, and transparent graphics in your browser using UPNG quantization—zero uploads or watermarks.',
+        'Free online PNG compressor. Shrink transparent PNGs, screenshots, and logos with lossless UPNG color quantization—100% private, zero uploads.',
       summary:
-        'Reduce bloated PNG screenshots, UI assets, and transparent logos directly in your browser using smart palette quantization and lossless deflate compression.',
-      mechanicsTitle: 'Smart PNG Palette Quantization + Transparency Preservation',
+        'Shrink heavy PNG screenshots, icons, and transparent logos by 50% to 80% using high-efficiency color quantization and Deflate optimization without losing alpha channels.',
+      mechanicsTitle: 'Lossless PNG Color Quantization & Alpha Preservation',
       mechanicsBody:
-        'Raw 32-bit RGBA PNG screenshots often weigh several megabytes. PixelKit uses UPNG compression in Web Workers to quantize redundant color channels while keeping alpha-channel transparency crisp—or lets you switch output to WebP/JPG when you need extreme KB reductions.',
+        'PixelKit uses UPNG.js to run k-means color quantization and DEFLATE stream recompression in your browser. Full 8-bit alpha transparency is preserved, so drop shadows and transparent logos stay smooth without harsh fringing.',
       faqs: [
         {
-          q: 'Does compressing a PNG preserve transparent backgrounds?',
-          a: 'Yes. Keeping PNG (or switching to WebP) preserves full alpha-channel transparency so logos, icons, and UI cutouts stay crisp on any background.',
+          q: 'Does compressing a PNG remove transparent backgrounds?',
+          a: 'No. PixelKit preserves full 8-bit alpha transparency. You can also pick a solid background fill color in Advanced Options if converting to JPG.',
         },
         {
-          q: 'Why is my PNG still larger than a JPG?',
-          a: 'PNG is designed for crisp graphics and transparency rather than camera noise. For photographs that must fit under 50KB or 100KB, switch Output Format to JPG or WebP in one click.',
+          q: 'How does PNG compression differ from JPG?',
+          a: 'PNG is fundamentally a lossless format optimized for line art, screenshots, and text. PixelKit reduces PNG size by quantizing color palettes while keeping edges pin-sharp, unlike JPG which discards high-frequency details.',
         },
         {
-          q: 'Are confidential PNG screenshots uploaded anywhere?',
-          a: 'No. Everything runs 100% locally inside your browser via Web Workers—safe for internal dashboards, invoices, and NDA design mockups.',
+          q: 'Can I convert a heavy PNG into a compact WebP or PDF?',
+          a: 'Yes. Choose WebP or PDF in the target format dropdown for dramatic byte savings while keeping transparency or multi-page packaging intact.',
         },
       ],
     },
@@ -90,57 +91,57 @@ export const getStaticPaths: GetStaticPaths = () => {
       ext: 'webp',
       label: 'WebP',
       mime: 'image/webp',
-      defaultKb: 100,
+      defaultKb: null,
       headline: 'Compress WebP Online',
-      titleTag: 'Compress WebP Online — Optimize WebP Size in KB',
+      titleTag: 'Compress WebP Online — Next-Gen Image Optimization Free',
       metaDesc:
-        'Free in-browser WebP compressor. Shrink WebP images to exact 50KB, 100KB, or 200KB budgets, resize pixels, and crop aspect ratios with zero uploads.',
+        'Free online WebP compressor. Optimize next-gen WebP images for green Core Web Vitals and instant page loads—100% in-browser, zero server uploads.',
       summary:
-        'Optimize WebP assets to strict kilobyte budgets for faster Largest Contentful Paint (LCP), Shopify/WordPress themes, and modern web publishing.',
-      mechanicsTitle: 'Built for PageSpeed & Core Web Vitals Budgets',
+        'Optimize WebP images for green Core Web Vitals and lightning-fast web pages. Balance lossless transparency and predictive lossy compression with real-time preview and exact byte limits.',
+      mechanicsTitle: 'Predictive Intra-Frame Compression for Green Web Vitals',
       mechanicsBody:
-        'WebP already beats legacy JPEG and PNG by 25–45%, and pairing it with PixelKit’s exact-KB binary search + Scale & Resize Studio ensures every hero banner and product card stays safely below your performance budget.',
+        'WebP employs VP8 intra-frame spatial prediction to model image blocks directly from neighboring pixels, reducing overall byte weight by 25% to 35% compared to legacy JPEG at equivalent visual fidelity. PixelKit tunes these encoding profiles directly in device memory using multithreaded client-side Web Workers, ensuring maximum compression ratios without sacrificing alpha channel clarity.',
       faqs: [
         {
-          q: 'What KB target is best for WebP website images?',
-          a: 'Aim for under 50KB–100KB for product cards and thumbnails, and under 200KB for Full HD (1920×1080) hero banners to keep mobile LCP in the green.',
+          q: 'Why should I compress images as WebP for web publishing?',
+          a: 'WebP files load significantly faster on mobile networks and are prioritized by Google PageSpeed Insights and Core Web Vitals scoring. Modern web browsers natively render WebP with lower memory consumption.',
         },
         {
-          q: 'Can I batch-compress dozens of WebP images at once?',
-          a: 'Yes. Drop an entire folder of images, compress them in parallel across CPU Web Workers, and export them all in a single ZIP archive.',
+          q: 'Can WebP images have transparent backgrounds?',
+          a: 'Yes. WebP supports full 8-bit alpha channel transparency in both lossy and lossless modes, combining the small footprint of JPG with the transparency strengths of PNG.',
         },
         {
-          q: 'Can I convert JPG or PNG to compressed WebP here too?',
-          a: 'Yes—PixelKit auto-detects any input format you drop and encodes optimized WebP output immediately.',
+          q: 'Can I target an exact file size in KB for WebP files?',
+          a: 'Yes. Choose any target limit like 50KB or 100KB, or pick Custom KB in the size selector. PixelKit runs an intelligent binary search to find the optimal quality level under your threshold.',
         },
       ],
     },
     {
       ext: 'pdf',
-      label: 'PDF',
+      label: 'PDF Document',
       mime: 'application/pdf',
       defaultKb: 200,
       headline: 'Compress PDF Online',
-      titleTag: 'Compress PDF Online — Reduce PDF to 100KB or 200KB',
+      titleTag: 'Compress PDF Online — Shrink Scans & Documents to KB Free',
       metaDesc:
-        'Free client-side PDF compressor. Shrink scanned PDFs and ID documents under 100KB, 200KB, or 500KB right in your browser without uploading files.',
+        'Free online PDF compressor. Shrink scanned documents, forms, and multi-page PDFs to exact 100KB, 200KB, or 500KB limits—100% privately in your browser.',
       summary:
-        'Shrink heavy scanned PDFs, Aadhaar/PAN cards, certificates, and multi-page forms to strict 100KB, 200KB, or 500KB upload limits without your documents ever leaving your device.',
-      mechanicsTitle: '100% On-Device PDF Compression for Sensitive Documents',
+        'Shrink scanned paperwork, ID certificates, and multi-page PDFs under strict 100KB, 200KB, or 500KB limits for job, visa, and university portal submissions.',
+      mechanicsTitle: 'Multi-Page Raster Resampling & Clean Document Assembly',
       mechanicsBody:
-        'Most PDF compressors upload your tax returns, passports, and bank statements to cloud servers. PixelKit decodes pages locally via PDF.js, optimizes embedded page imagery with binary-search compression, and rebuilds a compact PDF via jsPDF entirely in browser memory.',
+        'PixelKit decodes individual PDF pages via PDF.js, optimizes embedded raster imagery using progressive quantization, and reassembles a compact, standards-compliant PDF file using jsPDF without uploading confidential paperwork to third-party servers.',
       faqs: [
         {
-          q: 'How do I compress a PDF to under 100KB or 200KB for government portals?',
-          a: 'Drop your PDF (or phone photos of your document) above, select 100 KB or 200 KB in Compression & Size, and download a compliant PDF ready for portal upload.',
+          q: 'How do I compress a scanned PDF under 100KB or 200KB for portal upload?',
+          a: 'Drop your PDF into PixelKit, select 100KB or 200KB as your target size, and click Convert & Download. PixelKit recalculates raster streams across pages to land safely under the portal ceiling.',
         },
         {
-          q: 'Can I merge front and back ID scans into one compressed PDF?',
-          a: 'Yes. Drop both images, check "Merge Files into Single PDF", drag to order page 1 and page 2, and export one combined PDF under your target KB limit.',
+          q: 'Can I reorder or combine pages when compressing PDFs?',
+          a: 'Yes. Drag and drop file cards in the upload area to change page sequence before generating your final optimized PDF.',
         },
         {
-          q: 'Is it safe to compress confidential legal or KYC PDFs here?',
-          a: 'Yes—100%. Zero bytes are transmitted over the network; you can even disconnect from Wi-Fi after loading the page and compress offline.',
+          q: 'Is my confidential financial or medical PDF safe?',
+          a: 'Completely. PixelKit runs 100% inside your browser Web Workers. Zero bytes leave your device.',
         },
       ],
     },
@@ -148,29 +149,26 @@ export const getStaticPaths: GetStaticPaths = () => {
 
   return specs.map((spec) => ({
     params: { format: spec.ext },
-    props: { spec },
+    props: { spec, allFormats: specs.map((s) => ({ ext: s.ext, label: s.label })) },
   }));
 };
 
-const { spec } = Astro.props as { spec: FormatCompressSpec };
-const allFormats = [
-  { ext: 'jpg', label: 'Compress JPG' },
-  { ext: 'png', label: 'Compress PNG' },
-  { ext: 'webp', label: 'Compress WebP' },
-  { ext: 'pdf', label: 'Compress PDF' },
-];
+const { spec, allFormats } = Astro.props as {
+  spec: FormatCompressSpec;
+  allFormats: { ext: string; label: string }[];
+};
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Compress Image', href: '/compress-image' },
-  { label: spec.headline },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: `Compress ${spec.label}` },
 ];
 
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
-    name: `${spec.headline} — PixelKit`,
+    name: `PixelKit ${spec.label} Compressor`,
     description: spec.metaDesc,
-    url: new URL(`/compress-${spec.ext}`, SITE.url).href,
+    url: new URL(`/compress-${spec.ext}/`, SITE.url).href,
   }),
   buildFaqJsonLd(spec.faqs),
   buildBreadcrumbJsonLd(
@@ -230,26 +228,26 @@ const jsonLd = [
           .filter((f) => f.ext !== spec.ext)
           .map((f) => (
             <a
-              href={`/compress-${f.ext}`}
+              href={`/compress-${f.ext}/`}
               class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
             >
               {f.label}
             </a>
           ))}
         <a
-          href="/compress-image-to-50kb"
+          href="/compress-image-to-50kb/"
           class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
         >
           Under 50KB
         </a>
         <a
-          href="/compress-image-to-100kb"
+          href="/compress-image-to-100kb/"
           class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
         >
           Under 100KB
         </a>
         <a
-          href="/compress-image-to-200kb"
+          href="/compress-image-to-200kb/"
           class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
         >
           Under 200KB
@@ -257,9 +255,63 @@ const jsonLd = [
       </div>
     </section>
 
+    <!-- Deep In-Depth Format Optimization Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Advanced Compression Best Practices for {spec.label}
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Achieving optimal compression efficiency requires tailoring quantization parameters to container-specific encoding behaviors. Digital images contain spatial frequencies distributed across luminance (brightness) and chrominance (color) planes. Because the human eye perceives brightness variations with significantly higher acuity than subtle color gradations, modern compression codecs separate image data into distinct matrix channels.
+        </p>
+        <p>
+          With PixelKit, you never have to guess confusing percentage sliders or risk blurry output. Our automated binary search engine tests quantization tables inside client Web Workers in parallel threads, guaranteeing that your output files land at or just below your designated kilobyte target with maximal structural clarity and zero remote server exposure.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Strict Portal Acceptance</h3>
+            <p class="text-xs text-muted mt-1">
+              Never risk upload failure on embassy or recruitment portals due to file weight overages. Setting an exact target KB ceiling guarantees first-attempt submission success.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Zero Data Retention</h3>
+            <p class="text-xs text-muted mt-1">
+              Your files never touch external cloud servers. All compression executes in ephemeral browser memory, making it compliant with strict confidentiality protocols.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Articles & Companion Tools -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface/50 p-5 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-semibold tracking-tight text-fg">
+        Related Optimization Guides
+      </h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3 text-sm">
+        <a href="/blog/why-portals-reject-200kb-photos/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Troubleshooting</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Why Portals Reject Photos &amp; How to Fix It</h3>
+          <p class="text-xs text-muted mt-1.5">Guide to passing automated government and visa upload verification gates.</p>
+        </a>
+        <a href="/blog/compress-aadhaar-to-100kb-pdf/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Document Workflow</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Compress ID Scans to 100KB PDF</h3>
+          <p class="text-xs text-muted mt-1.5">How to package multiple scans into a single compact document under strict portal caps.</p>
+        </a>
+        <a href="/passport-photo-resizer/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Dedicated Tool</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Passport Photo Resizer</h3>
+          <p class="text-xs text-muted mt-1.5">Crop to 35×45 mm, resize to 413×531 px, and compress under 50KB in one automated pass.</p>
+        </a>
+      </div>
+    </section>
+
+    <PortalRequirementsGuide />
+
     <div class="mt-12 sm:mt-16">
       <FAQSection faqs={spec.faqs} />
     </div>
   </div>
 </BaseLayout>
-

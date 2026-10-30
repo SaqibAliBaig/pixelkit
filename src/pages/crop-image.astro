@@ -4,6 +4,7 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
 import { SITE } from '@lib/constants';
 import { buildSoftwareApplicationJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
 
@@ -42,7 +43,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Image Cropper',
     description: pageDesc,
-    url: new URL('/crop-image', SITE.url).href,
+    url: new URL('/crop-image/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
   buildBreadcrumbJsonLd(
@@ -117,7 +118,62 @@ const jsonLd = [
       </div>
     </section>
 
+    <!-- Comprehensive In-Depth Cropping Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Mastering Image Cropping for Web &amp; Documents
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Cropping is more than cutting unwanted edges from a photo—it fundamentally alters visual composition, directs viewer focus, and aligns imagery with strict platform specifications. Whether adapting a horizontal DSLR capture for vertical mobile feeds or preparing official biometric documents, choosing the right aspect ratio ensures your visuals look professional without unexpected auto-cropping or distortion.
+        </p>
+        <p>
+          When you use PixelKit's in-browser Crop Studio, your original pixels are manipulated entirely in local device memory via high-performance HTML5 Canvas APIs. You can activate the 3×3 Rule of Thirds grid overlay to align focal points along harmonic visual intersections, lock specific aspect ratios to prevent accidental stretching, or drag freeform crop handles for pixel-level framing precision.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Compositional Integrity</h3>
+            <p class="text-xs text-muted mt-1">
+              Position key subjects at horizontal and vertical grid intersections. Keep sufficient headroom in portraits to avoid feeling cramped on small mobile viewports.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Target Resolution Retention</h3>
+            <p class="text-xs text-muted mt-1">
+              Cropping discards peripheral pixels. If your target destination demands minimum dimensions (e.g., 600×600 px for passport portals), start from high-resolution source captures.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Articles & Companion Tools -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface/50 p-5 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-semibold tracking-tight text-fg">
+        Related Cropping &amp; Resizing Resources
+      </h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3 text-sm">
+        <a href="/blog/how-to-crop-image-to-exact-aspect-ratio/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Tutorial Guide</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">How to Crop Images to Exact Aspect Ratios</h3>
+          <p class="text-xs text-muted mt-1.5">Complete walkthrough on 1:1, 4:5, and 16:9 framing for social media and official uploads.</p>
+        </a>
+        <a href="/passport-photo-resizer/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Dedicated Tool</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Passport Photo Resizer</h3>
+          <p class="text-xs text-muted mt-1.5">Crop to 35×45 mm or 2×2 inch and compress under 50KB/100KB in one automated pass.</p>
+        </a>
+        <a href="/resize-image/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent transition-colors">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider">Companion Tool</span>
+          <h3 class="font-medium text-fg group-hover:text-accent mt-1">Resize Image Studio</h3>
+          <p class="text-xs text-muted mt-1.5">Resample pixel dimensions with high-fidelity bicubic scaling and locked aspect ratios.</p>
+        </a>
+      </div>
+    </section>
+
     <!-- FAQs -->
+    <PortalRequirementsGuide />
+
     <div class="mt-12 sm:mt-16">
       <FAQSection faqs={faqs} />
     </div>

@@ -34,15 +34,19 @@ const meta = buildMeta(combo);
 const intro = buildIntro(combo);
 const faqs = buildFaqs(combo);
 
-// Related combos — same from or same to, but not this one, capped at 6.
-const related = allCombos
-  .filter((c) => c.kind === 'convert')
-  .filter((c) => c.from === combo.from || c.to === combo.to)
-  .filter((c) => !(c.from === combo.from && c.to === combo.to))
+// Prioritize combos sharing the SAME source format (e.g., other TIFF or SVG conversions)
+const sameSource = allCombos
+  .filter((c) => c.kind === 'convert' && c.from === combo.from && c.to !== combo.to);
+
+// Then combos sharing the SAME target format (e.g., other conversions to JPG or PNG)
+const sameTarget = allCombos
+  .filter((c) => c.kind === 'convert' && c.to === combo.to && c.from !== combo.from);
+
+const related = [...sameSource, ...sameTarget]
   .slice(0, 6)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()}`,
-    href: `/${c.from}-to-${c.to}`,
+    href: `/${c.from}-to-${c.to}/`,
   }));
 
 // Also link to a couple of size-targeted versions of this same combo.
@@ -56,12 +60,12 @@ const sizeTargets = allCombos
   .slice(0, 4)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
-    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb`,
+    href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb/`,
   }));
 
 const relatedAll = [...sizeTargets, ...related].slice(0, 8);
 
-const relatedBlogSlugs = ['why-portals-reject-200kb-photos', 'iphone-heic-explained'];
+const relatedBlogSlugs = combo.from === 'heic' || combo.to === 'heic' ? ['iphone-heic-explained', 'why-portals-reject-200kb-photos'] : combo.to === 'pdf' || combo.from === 'pdf' ? ['compress-aadhaar-to-100kb-pdf', 'why-portals-reject-200kb-photos'] : ['how-to-crop-image-to-exact-aspect-ratio', 'how-to-resize-image-to-passport-size'];
 
 const useCaseIds =
   combo.from === 'heic'
