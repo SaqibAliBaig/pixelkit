@@ -93,7 +93,7 @@ export async function pdfToImageBitmap(
     canvas = new OffscreenCanvas(w, h);
   }
 
-  const context = canvas.getContext('2d');
+  const context = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
   if (!context) throw new Error('Failed to get 2D context for PDF rendering');
 
   // Fill with solid white background

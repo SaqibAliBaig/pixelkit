@@ -33,6 +33,7 @@ if (typeof (Uint8Array.prototype as unknown as Record<string, unknown>).toHex !=
 
 import type {
   ConvertRequest,
+  MergePdfRequest,
   WorkerMessage,
   DimensionOptions,
   TargetSizeMode,
@@ -42,6 +43,7 @@ import type {
   CustomCropBox,
 } from '@lib/worker/types';
 import { ASPECT_RATIOS } from '@lib/worker/adjustments';
+import { PORTAL_PRESETS, type PortalPreset } from '@lib/portal-presets';
 import { formatBytes } from '@lib/utils/filesize';
 import { downloadBlob } from '@lib/utils/download';
 import { mimeForExtension } from '@lib/engines';
@@ -60,9 +62,16 @@ interface FileJob {
   result?: Blob;
   resultName?: string;
   error?: string;
+  to?: string;
+  toMime?: string;
   targetKb: number | null;
+  targetSizeMode?: SizeControlMode;
+  quality?: number;
+  minKb?: number | null;
+  maxKb?: number | null;
   targetOptions?: TargetSizeOptions;
   dimensions?: DimensionOptions;
+  scalePercent?: number;
   cropAspect?: CropAspectPreset;
   cropAnchor?: CropAnchor;
   customCropBox?: CustomCropBox;
@@ -76,6 +85,8 @@ interface FileJob {
   originalHeight?: number;
   resultWidth?: number;
   resultHeight?: number;
+  thumbUrl?: string;
+  resultThumbUrl?: string;
   previewUrl?: string;
   resultPreviewUrl?: string;
   croppedPreviewUrl?: string;
@@ -114,11 +125,14 @@ interface State {
   svgScale: number;
   autoOrient: boolean;
   stripTransparency: boolean;
+  portalPreset: string | null;
 }
 
 // ---------- constants ----------
 
-const MAX_WORKERS = Math.max(1, Math.min(2, ((navigator.hardwareConcurrency || 4) >= 4 ? 2 : 1)));
+const hardwareCores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || 4) : 4;
+// Scale up to 4 parallel workers on quad-core/multi-core machines for 2x-4x batch conversion speed
+const MAX_WORKERS = Math.max(2, Math.min(4, Math.floor(hardwareCores / 2) || 2));
 
 // ---------- bootstrap ----------
 
@@ -152,6 +166,7 @@ export function mountConverterApp(): void {
     svgScale: 2,
     autoOrient: true,
     stripTransparency: true,
+    portalPreset: null,
   };
 
   // Elements
@@ -159,8 +174,11 @@ export function mountConverterApp(): void {
   const dropzone = document.getElementById('pk-dropzone');
   const fileList = document.getElementById('pk-file-list');
   const emptyState = document.getElementById('pk-empty-state');
+  const filesHeader = document.getElementById('pk-files-header');
+  const filesCount = document.getElementById('pk-files-count');
   const template = document.getElementById('pk-file-item-template') as HTMLTemplateElement | null;
   const convertBtn = document.getElementById('pk-convert-btn') as HTMLButtonElement | null;
+  const deselectPhotoBtn = document.getElementById('pk-deselect-photo-btn') as HTMLButtonElement | null;
   const clearBtn = document.getElementById('pk-clear-btn') as HTMLButtonElement | null;
   const downloadAllBtn = document.getElementById('pk-download-all-btn') as HTMLButtonElement | null;
   const statusEl = document.getElementById('pk-status');
@@ -218,9 +236,74 @@ export function mountConverterApp(): void {
   const customUnitKbBtn = document.getElementById('pk-custom-unit-kb') as HTMLButtonElement | null;
   const customUnitMbBtn = document.getElementById('pk-custom-unit-mb') as HTMLButtonElement | null;
   const customEquivTag = document.getElementById('pk-custom-equiv-tag');
+
+  // Top Mode Segmented Bar Elements
+  const modeTabs = document.querySelectorAll<HTMLElement>('.pk-mode-tab');
+  const dropzonePrompt = document.getElementById('pk-dropzone-prompt');
+  const stageFormat = document.getElementById('pk-stage-format');
+  const stageCompress = document.getElementById('pk-stage-compress');
+  const stageCrop = document.getElementById('pk-stage-crop');
+  const stageResize = document.getElementById('pk-stage-resize');
+  const stagesList = document.getElementById('pk-stages-list');
+  const stageAdvanced = document.getElementById('pk-stage-advanced');
+  const toggleMoreToolsWrapper = document.getElementById('pk-more-tools-toggle-wrapper');
+  const toggleMoreToolsBtn = document.getElementById('pk-toggle-more-tools-btn') as HTMLButtonElement | null;
+  const moreToolsLabel = document.getElementById('pk-more-tools-btn-label');
+  const moreToolsAction = document.getElementById('pk-more-tools-action-text');
+  const moreToolsChevron = document.getElementById('pk-more-tools-chevron');
+  const moreToolsBadge = document.getElementById('pk-more-tools-active-badge');
+  const settingsModeBadge = document.getElementById('pk-settings-mode-badge');
+
+  // Active Photo Target Bar Elements
+  const activePhotoBar = document.getElementById('pk-active-photo-bar');
+  const activePhotoCounter = document.getElementById('pk-active-photo-counter');
+  const activePhotoName = document.getElementById('pk-active-photo-name');
+  const targetPrevBtn = document.getElementById('pk-target-prev-btn') as HTMLButtonElement | null;
+  const targetNextBtn = document.getElementById('pk-target-next-btn') as HTMLButtonElement | null;
+  const applyToAllBtn = document.getElementById('pk-apply-to-all-btn') as HTMLButtonElement | null;
+
+  // Multi-Photo Steppers in Crop & Resize Modals
+  const cropStepper = document.getElementById('pk-crop-modal-stepper');
+  const cropCounter = document.getElementById('pk-crop-modal-counter');
+  const cropPrevBtn = document.getElementById('pk-crop-modal-prev-btn') as HTMLButtonElement | null;
+  const cropNextBtn = document.getElementById('pk-crop-modal-next-btn') as HTMLButtonElement | null;
+
+  const resizeStepper = document.getElementById('pk-resize-modal-stepper');
+  const resizeCounter = document.getElementById('pk-resize-modal-counter');
+  const resizePrevBtn = document.getElementById('pk-resize-modal-prev-btn') as HTMLButtonElement | null;
+  const resizeNextBtn = document.getElementById('pk-resize-modal-next-btn') as HTMLButtonElement | null;
+
+  let selectedJobId: string | null = null;
+  let isMoreToolsOpen = false;
+  const initialToolMode = root.dataset.initialTool || 'all';
+  let currentToolMode = initialToolMode;
+
+  // Tab Mode Elements & Portal Presets
+  const tabCustom = document.getElementById('pk-tab-custom') as HTMLButtonElement | null;
+  const tabPortal = document.getElementById('pk-tab-portal') as HTMLButtonElement | null;
+  const panelCustom = document.getElementById('pk-panel-custom');
+  const panelPortal = document.getElementById('pk-panel-portal');
+  const portalActiveDot = document.getElementById('pk-portal-active-dot');
+  const customActiveBanner = document.getElementById('pk-custom-active-preset-banner');
+  const bannerFlag = document.getElementById('pk-banner-flag');
+  const bannerName = document.getElementById('pk-banner-name');
+  const bannerDetails = document.getElementById('pk-banner-details');
+  const bannerReset = document.getElementById('pk-banner-reset') as HTMLButtonElement | null;
+  const btnSwitchToPortal = document.getElementById('pk-btn-switch-to-portal') as HTMLButtonElement | null;
+  const btnBackToCustom = document.getElementById('pk-btn-back-to-custom') as HTMLButtonElement | null;
+  const portalPanelReset = document.getElementById('pk-portal-panel-reset') as HTMLButtonElement | null;
+  const portalPresetCards = document.querySelectorAll<HTMLButtonElement>('.pk-portal-preset-card');
+  const portalSearchInput = document.getElementById('pk-portal-search') as HTMLInputElement | null;
+  const portalCatFilters = document.querySelectorAll<HTMLButtonElement>('.pk-cat-filter');
+  const portalNoMatches = document.getElementById('pk-portal-no-matches');
+  let activePortalCat = 'all';
+  const portalAppliedSummary = document.getElementById('pk-portal-applied-summary');
+
   const rangeUnitKbBtn = document.getElementById('pk-range-unit-kb') as HTMLButtonElement | null;
   const rangeUnitMbBtn = document.getElementById('pk-range-unit-mb') as HTMLButtonElement | null;
   let customUnit: 'kb' | 'mb' = state.targetKb && state.targetKb >= 1024 && state.targetKb % 1024 === 0 ? 'mb' : 'kb';
+  let savedMaxTargetValue: string = initialTarget ? String(initialTarget) : '';
+  let savedExactTargetValue: string = initialTarget ? String(initialTarget) : '100';
   let rangeUnit: 'kb' | 'mb' = 'kb';
 
   // Adjustments & Dimensions Elements
@@ -377,6 +460,455 @@ export function mountConverterApp(): void {
   const activeFileList = fileList;
   const activeTemplate = template;
 
+  
+  function filterPortalCards(): void {
+    const query = (portalSearchInput?.value || '').trim().toLowerCase();
+    let visibleCount = 0;
+
+    portalPresetCards.forEach((card) => {
+      const cat = card.dataset.cat || '';
+      const searchData = card.dataset.search || '';
+      const matchesCat = activePortalCat === 'all' || cat === activePortalCat;
+      const matchesQuery = !query || searchData.includes(query);
+
+      const show = matchesCat && matchesQuery;
+      card.classList.toggle('hidden', !show);
+      if (show) visibleCount++;
+    });
+
+    if (portalNoMatches) {
+      portalNoMatches.classList.toggle('hidden', visibleCount > 0);
+    }
+  }
+
+  function switchSettingsTab(mode: 'custom' | 'portal'): void {
+    if (mode === 'portal') {
+      panelCustom?.classList.add('hidden');
+      panelPortal?.classList.remove('hidden');
+      tabCustom?.classList.remove('bg-surface', 'text-fg', 'shadow-xs', 'border', 'border-border/40');
+      tabCustom?.classList.add('text-muted');
+      tabCustom?.setAttribute('aria-selected', 'false');
+      tabPortal?.classList.add('bg-surface', 'text-fg', 'shadow-xs', 'border', 'border-border/40');
+      tabPortal?.classList.remove('text-muted');
+      tabPortal?.setAttribute('aria-selected', 'true');
+    } else {
+      panelPortal?.classList.add('hidden');
+      panelCustom?.classList.remove('hidden');
+      tabPortal?.classList.remove('bg-surface', 'text-fg', 'shadow-xs', 'border', 'border-border/40');
+      tabPortal?.classList.add('text-muted');
+      tabPortal?.setAttribute('aria-selected', 'false');
+      tabCustom?.classList.add('bg-surface', 'text-fg', 'shadow-xs', 'border', 'border-border/40');
+      tabCustom?.classList.remove('text-muted');
+      tabCustom?.setAttribute('aria-selected', 'true');
+    }
+  }
+
+  function updateMoreToolsToggle(): void {
+    if (!toggleMoreToolsBtn || !moreToolsAction || !moreToolsChevron) return;
+    if (currentToolMode === 'all') {
+      toggleMoreToolsWrapper?.classList.add('hidden');
+      return;
+    }
+
+    toggleMoreToolsWrapper?.classList.remove('hidden');
+
+    let activeSecondaryCount = 0;
+    if (currentToolMode !== 'convert') {
+      if (state.to !== (root?.dataset.to || 'jpg')) activeSecondaryCount++;
+    }
+    if (currentToolMode !== 'compress') {
+      if (state.targetKb) activeSecondaryCount++;
+    }
+    if (currentToolMode !== 'crop') {
+      if (state.cropAspect && state.cropAspect !== 'original') activeSecondaryCount++;
+    }
+    if (currentToolMode !== 'resize') {
+      if ((state.scalePercent && state.scalePercent !== 100) || (state.dimensions && state.dimensions.mode !== 'original')) {
+        activeSecondaryCount++;
+      }
+    }
+
+    if (moreToolsBadge) {
+      if (activeSecondaryCount > 0) {
+        moreToolsBadge.textContent = `${activeSecondaryCount} active`;
+        moreToolsBadge.classList.remove('hidden');
+      } else {
+        moreToolsBadge.classList.add('hidden');
+      }
+    }
+
+    if (isMoreToolsOpen) {
+      moreToolsAction.textContent = 'Hide';
+      moreToolsChevron.classList.add('rotate-180');
+      toggleMoreToolsBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      moreToolsAction.textContent = 'Show';
+      moreToolsChevron.classList.remove('rotate-180');
+      toggleMoreToolsBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function setToolMode(mode: string, scroll = false): void {
+    currentToolMode = mode;
+
+    // Toggle stage number badges: hide when an individual tool is selected, show only in All-in-One
+    const stageNums = document.querySelectorAll('.pk-stage-num');
+    stageNums.forEach((el) => {
+      el.classList.toggle('hidden', mode !== 'all');
+    });
+
+    // Toggle discovery card at the end of custom panel: only show on Home ("all" mode)
+    const discoveryCard = document.getElementById('pk-card-portal-discovery');
+    if (discoveryCard) {
+      discoveryCard.classList.toggle('hidden', mode !== 'all');
+    }
+
+    modeTabs.forEach((tab) => {
+      const isSelected = tab.dataset.mode === mode;
+      if (isSelected) {
+        tab.className =
+          'pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-semibold bg-surface text-fg shadow-xs border border-border/50';
+      } else {
+        tab.className =
+          'pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium text-muted hover:text-fg';
+      }
+    });
+
+    if (settingsModeBadge) {
+      settingsModeBadge.textContent = mode === 'all' ? 'All-in-One' : mode.toUpperCase();
+    }
+
+    if (mode === 'passport') {
+      switchSettingsTab('portal');
+      if (dropzonePrompt) dropzonePrompt.textContent = 'Drop photo for passport or visa portal';
+      updateButtons();
+      return;
+    }
+
+    switchSettingsTab('custom');
+
+    if (!stagesList) {
+      updateButtons();
+      return;
+    }
+
+    if (mode === 'all') {
+      // Home page: Display all tools in 1-2-3-4 order with NO highlight
+      if (stageFormat) stagesList.appendChild(stageFormat);
+      if (stageCompress) stagesList.appendChild(stageCompress);
+      if (stageCrop) stagesList.appendChild(stageCrop);
+      if (stageResize) stagesList.appendChild(stageResize);
+      if (toggleMoreToolsWrapper) {
+        stagesList.appendChild(toggleMoreToolsWrapper);
+        toggleMoreToolsWrapper.classList.add('hidden');
+      }
+      if (stageAdvanced) stagesList.appendChild(stageAdvanced);
+
+      [stageFormat, stageCompress, stageCrop, stageResize].forEach((stage) => {
+        stage?.classList.remove('hidden');
+        stage?.classList.remove('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+        stage?.classList.add('border-border', 'bg-surface/40');
+      });
+
+      if (dropzonePrompt) dropzonePrompt.textContent = 'Drop any image or document here';
+      updateStageDots();
+      updateButtons();
+      return;
+    }
+
+    // Dedicated single-tool pages or tabs
+    let primary: HTMLElement | null = null;
+    let secondary: (HTMLElement | null)[] = [];
+    let moreLabel = 'Additional Editing & Compression Tools';
+    let dropPrompt = 'Drop any image or document here';
+
+    if (mode === 'convert') {
+      primary = stageFormat;
+      secondary = [stageCompress, stageCrop, stageResize];
+      moreLabel = 'Add Compression, Crop, or Resize (Optional)';
+      dropPrompt = 'Drop any photo or document to convert';
+    } else if (mode === 'compress') {
+      primary = stageCompress;
+      secondary = [stageFormat, stageCrop, stageResize];
+      moreLabel = 'Add Format, Crop, or Resize (Optional)';
+      dropPrompt = 'Drop any photo to compress file size';
+    } else if (mode === 'crop') {
+      primary = stageCrop;
+      secondary = [stageResize, stageFormat, stageCompress];
+      moreLabel = 'Add Resize, Format, or Compression (Optional)';
+      dropPrompt = 'Drop any photo to crop & frame';
+    } else if (mode === 'resize') {
+      primary = stageResize;
+      secondary = [stageCrop, stageFormat, stageCompress];
+      moreLabel = 'Add Crop, Format, or Compression (Optional)';
+      dropPrompt = 'Drop any photo to resize resolution';
+    }
+
+    if (primary) {
+      stagesList.appendChild(primary);
+      primary.classList.remove('hidden');
+      primary.classList.remove('border-border', 'bg-surface/40');
+      primary.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+    }
+
+    if (toggleMoreToolsWrapper) {
+      stagesList.appendChild(toggleMoreToolsWrapper);
+      toggleMoreToolsWrapper.classList.remove('hidden');
+    }
+
+    if (moreToolsLabel) moreToolsLabel.textContent = moreLabel;
+
+    secondary.forEach((stage) => {
+      if (!stage) return;
+      stagesList.appendChild(stage);
+      stage.classList.remove('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+      stage.classList.add('border-border', 'bg-surface/40');
+      stage.classList.toggle('hidden', !isMoreToolsOpen);
+    });
+
+    if (stageAdvanced) {
+      stagesList.appendChild(stageAdvanced);
+    }
+
+    if (dropzonePrompt) dropzonePrompt.textContent = dropPrompt;
+
+    if (scroll && primary) {
+      primary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    updateMoreToolsToggle();
+    updateStageDots();
+    updateButtons();
+  }
+
+  function syncPortalPresetUi(id: string): void {
+    const preset = PORTAL_PRESETS.find((p) => p.id === id) || PORTAL_PRESETS[0]!;
+    const isNone = preset.id === 'none';
+
+    // 1. Update full-width preset cards styling and check badge
+    portalPresetCards.forEach((card) => {
+      const cardId = card.dataset.id || 'none';
+      const isSelected = cardId === preset.id;
+      card.setAttribute('aria-selected', String(isSelected));
+      if (isSelected) {
+        card.className =
+          'pk-portal-preset-card group relative w-full rounded-xl border border-accent bg-accent/10 p-2.5 text-left transition-all cursor-pointer shadow-xs';
+      } else {
+        card.className =
+          'pk-portal-preset-card group relative w-full rounded-xl border border-border bg-surface p-2.5 text-left transition-all cursor-pointer hover:border-accent/60 hover:bg-surface/90 shadow-2xs';
+      }
+      const check = card.querySelector('.pk-portal-card-check');
+      if (check) {
+        check.classList.toggle('hidden', !isSelected);
+      }
+    });
+
+    // 2. Active Dot on Tab
+    if (portalActiveDot) {
+      portalActiveDot.classList.toggle('hidden', isNone);
+    }
+
+    // 3. Custom Mode Active Banner
+    if (customActiveBanner) {
+      customActiveBanner.classList.toggle('hidden', isNone);
+    }
+    if (bannerFlag) bannerFlag.textContent = preset.countryCode || preset.flag;
+    if (bannerName) bannerName.textContent = `${preset.name} Active`;
+    if (bannerDetails) bannerDetails.textContent = `${preset.dimLabel} · Max ${preset.targetKb} KB JPG`;
+
+    // 4. Panel Reset Buttons
+    if (portalPanelReset) {
+      portalPanelReset.classList.toggle('hidden', isNone);
+    }
+
+    // 5. Applied summary inside portal tab
+    if (portalAppliedSummary) {
+      if (!isNone && preset.portalSummary) {
+        portalAppliedSummary.textContent = `✓ ${preset.dimLabel} (${preset.cropAspect} crop) · Max ${preset.targetKb} KB JPG applied`;
+        portalAppliedSummary.classList.remove('hidden');
+      } else {
+        portalAppliedSummary.classList.add('hidden');
+      }
+    }
+  }
+
+  async function applyPortalPreset(id: string): Promise<void> {
+    const preset = PORTAL_PRESETS.find((p) => p.id === id);
+    if (!preset || preset.id === 'none') {
+      state.portalPreset = null;
+      savedMaxTargetValue = '';
+      savedExactTargetValue = '100';
+      state.targetKb = null;
+      if (targetSelect) {
+        targetSelect.value = '';
+      }
+      syncCustomTargetUi('');
+      setSizeMode('max');
+
+      // 1. Output Format -> Reset to default format
+      const defaultTo = root?.dataset.to || 'jpg';
+      state.to = defaultTo;
+      state.toMime = root?.dataset.toMime || mimeForExtension(defaultTo) || 'image/jpeg';
+      if (outputSelect) {
+        outputSelect.value = defaultTo;
+      }
+      syncCustomFormatUi(defaultTo);
+
+      // 2. Crop Aspect & Anchor -> Reset to Original
+      state.cropAspect = 'original';
+      state.cropAnchor = 'center';
+      if (cropAspectSelect) {
+        cropAspectSelect.value = 'original';
+      }
+      syncCustomCropUi('original');
+
+      // 3. Dimensions & Scale -> Reset to 100% Original
+      state.dimensions = { mode: 'original', noUpscale: true };
+      state.scalePercent = 100;
+      scaleBtns.forEach((btn) => {
+        const isSelected = btn.dataset.scale === '100';
+        btn.className = isSelected
+          ? 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm'
+          : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
+      });
+      if (resizeHint) resizeHint.textContent = '100% (Original)';
+      customDimsContainer?.classList.add('hidden');
+      if (dimWidthInput) dimWidthInput.value = '';
+      if (dimHeightInput) dimHeightInput.value = '';
+
+      // 4. Reset crop and scale values on all loaded pics as well
+      state.jobs.forEach((j) => {
+        j.cropAspect = 'original';
+        j.cropAnchor = 'center';
+        j.customCropBox = undefined;
+        j.croppedWidth = undefined;
+        j.croppedHeight = undefined;
+        j.dimensions = { mode: 'original', noUpscale: true };
+        j.scalePercent = 100;
+        j.targetKb = null;
+        j.to = undefined;
+        j.toMime = undefined;
+        if (j.adjustedPreviewUrl) {
+          URL.revokeObjectURL(j.adjustedPreviewUrl);
+          j.adjustedPreviewUrl = undefined;
+        }
+        if (j.croppedPreviewUrl) {
+          URL.revokeObjectURL(j.croppedPreviewUrl);
+          j.croppedPreviewUrl = undefined;
+        }
+        j.adjustedWidth = undefined;
+        j.adjustedHeight = undefined;
+        if (j.status === 'done') {
+          j.status = 'queued';
+          j.result = undefined;
+          if (j.resultPreviewUrl) {
+            URL.revokeObjectURL(j.resultPreviewUrl);
+            j.resultPreviewUrl = undefined;
+          }
+          if (j.resultThumbUrl) {
+            if (j.resultThumbUrl !== j.resultPreviewUrl) URL.revokeObjectURL(j.resultThumbUrl);
+            j.resultThumbUrl = undefined;
+          }
+        }
+      });
+
+      // 5. Update UI
+      syncPortalPresetUi('none');
+      if (selectedJobId) {
+        const activeJob = state.jobs.find((j) => j.id === selectedJobId) || null;
+        syncSidebarToSelectedJob(activeJob);
+      }
+    renderFiles();
+      updateLiveDimensionsAndCardPreviews();
+      updateStageDots();
+      updateButtons();
+      setStatus('Reset portal preset. Returned all photos and settings to default.');
+      return;
+    }
+
+    state.portalPreset = preset.id;
+    savedMaxTargetValue = String(preset.targetKb);
+    savedExactTargetValue = String(preset.targetKb);
+
+    // 1. Output Format -> JPG
+    state.to = 'jpg';
+    state.toMime = 'image/jpeg';
+    if (outputSelect) {
+      outputSelect.value = 'jpg';
+    }
+    syncCustomFormatUi('jpg');
+
+    // 2. Target KB & Mode -> Max Size preset.targetKb
+    state.targetKb = preset.targetKb;
+    state.targetSizeMode = 'max';
+    state.maxKb = preset.targetKb;
+    if (targetSelect) {
+      targetSelect.value = String(preset.targetKb);
+    }
+    syncCustomTargetUi(String(preset.targetKb));
+    setSizeMode('max');
+
+    // 3. Crop Aspect & Anchor -> preset.cropAspect, preset.cropAnchor
+    state.cropAspect = preset.cropAspect;
+    state.cropAnchor = preset.cropAnchor;
+    if (cropAspectSelect) {
+      cropAspectSelect.value = preset.cropAspect;
+    }
+    syncCustomCropUi(preset.cropAspect);
+
+    // 4. Dimensions -> Exact pixel bounding dimensions with cover fit
+    state.scalePercent = null;
+    state.dimensions = {
+      mode: 'custom',
+      width: preset.width ?? undefined,
+      height: preset.height ?? undefined,
+      fit: 'cover',
+      lockAspectRatio: false,
+    };
+    scaleBtns.forEach((btn) => {
+      const isSelected = btn.dataset.scale === 'custom';
+      btn.className = isSelected
+        ? 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm'
+        : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
+    });
+    if (resizeHint) resizeHint.textContent = `${preset.width}×${preset.height} px`;
+
+    // 5. Apply to all loaded jobs
+    state.jobs.forEach((j) => {
+      j.cropAspect = preset.cropAspect;
+      j.cropAnchor = preset.cropAnchor;
+      j.customCropBox = undefined;
+      j.croppedWidth = undefined;
+      j.croppedHeight = undefined;
+      j.scalePercent = undefined;
+      j.dimensions = {
+        mode: 'custom',
+        width: preset.width ?? undefined,
+        height: preset.height ?? undefined,
+        fit: 'cover',
+        lockAspectRatio: false,
+      };
+      j.targetKb = preset.targetKb;
+      j.to = 'jpg';
+      j.toMime = 'image/jpeg';
+      if (j.status === 'done') {
+        j.status = 'queued';
+        j.result = undefined;
+      }
+    });
+
+    syncPortalPresetUi(preset.id);
+    if (selectedJobId) {
+      const activeJob = state.jobs.find((j) => j.id === selectedJobId) || null;
+      syncSidebarToSelectedJob(activeJob);
+    }
+    renderFiles();
+    updateLiveDimensionsAndCardPreviews();
+    updateStageDots();
+    updateButtons();
+    setStatus(`Applied ${preset.flag} ${preset.name}: ${preset.dimLabel}, Max ${preset.targetKb} KB JPG`);
+  }
+
   function syncCustomFormatUi(toVal: string): void {
     const norm = toVal.toLowerCase() === 'jpeg' ? 'jpg' : toVal.toLowerCase();
     customFormatOptions.forEach((opt) => {
@@ -489,6 +1021,62 @@ export function mountConverterApp(): void {
         check.classList.toggle('hidden', !isSelected);
       }
     });
+  }
+
+  async function generateFastThumbnail(file: File | Blob, maxDim = 200): Promise<string | null> {
+    const ext = 'name' in file ? (file.name.split('.').pop()?.toLowerCase() || '') : (file.type.split('/')[1] || 'jpg');
+    if (!['jpg', 'jpeg', 'png', 'webp', 'bmp', 'avif'].includes(ext) && !file.type.startsWith('image/')) {
+      return null;
+    }
+    try {
+      let bmp: ImageBitmap | null = null;
+      try {
+        bmp = await createImageBitmap(file, { resizeWidth: maxDim, resizeQuality: 'low' });
+      } catch {
+        try {
+          bmp = await createImageBitmap(file);
+        } catch {
+          return null;
+        }
+      }
+      if (!bmp) return null;
+
+      let targetW = bmp.width;
+      let targetH = bmp.height;
+      if (Math.max(targetW, targetH) > maxDim) {
+        const scale = maxDim / Math.max(targetW, targetH);
+        targetW = Math.max(1, Math.round(targetW * scale));
+        targetH = Math.max(1, Math.round(targetH * scale));
+      }
+
+      let blob: Blob | null = null;
+      if (typeof OffscreenCanvas !== 'undefined') {
+        const oc = new OffscreenCanvas(targetW, targetH);
+        const ctx = oc.getContext('2d');
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'low';
+          ctx.drawImage(bmp, 0, 0, targetW, targetH);
+          blob = await oc.convertToBlob({ type: 'image/jpeg', quality: 0.75 });
+        }
+      } else {
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'low';
+          ctx.drawImage(bmp, 0, 0, targetW, targetH);
+          blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.75));
+        }
+      }
+
+      bmp.close?.();
+      return blob ? URL.createObjectURL(blob) : null;
+    } catch {
+      return null;
+    }
   }
 
   async function renderImageTransformCanvas(
@@ -635,8 +1223,8 @@ export function mountConverterApp(): void {
         sourceBmp = img;
       }
 
-      // Cap preview canvas dimensions to max 1600px for instant rendering and low memory footprint
-      const MAX_PREVIEW_PX = 1600;
+      // Cap preview canvas dimensions to max 800px for instant rendering and low memory footprint
+      const MAX_PREVIEW_PX = 800;
       let previewW = finalW;
       let previewH = finalH;
       let pScale = 1.0;
@@ -694,7 +1282,7 @@ export function mountConverterApp(): void {
 
         ctx.restore();
 
-        const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', 0.85));
+        const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', 0.80));
         if ('close' in sourceBmp && typeof (sourceBmp as ImageBitmap).close === 'function') {
           (sourceBmp as ImageBitmap).close();
         }
@@ -914,8 +1502,9 @@ export function mountConverterApp(): void {
 
       // Update Card Thumbnail Live Framing
       if (img) {
-        if (job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl) {
-          const targetSrc = (job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl)!;
+        const hasCustomBitmap = Boolean(job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl);
+        if (hasCustomBitmap) {
+          const targetSrc = (job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl)!;
           if (img.getAttribute('data-src') !== targetSrc) {
             img.setAttribute('data-src', targetSrc);
             img.src = targetSrc;
@@ -925,6 +1514,11 @@ export function mountConverterApp(): void {
           img.style.aspectRatio = 'auto';
           img.style.objectFit = 'cover';
         } else {
+          const currentSrc = job.thumbUrl || job.previewUrl;
+          if (currentSrc && img.getAttribute('data-src') !== currentSrc) {
+            img.setAttribute('data-src', currentSrc);
+            img.src = currentSrc;
+          }
           const deg = job.rotate ?? 0;
           const sx = job.flipH ? -1 : 1;
           const isGray = job.grayscale ?? state.grayscale;
@@ -993,6 +1587,14 @@ export function mountConverterApp(): void {
           if (job.flipH) notes.push('Flip');
           if (job.grayscale ?? state.grayscale) notes.push('B&W');
 
+          const defaultTo = (root?.dataset.to || 'jpg').toUpperCase();
+          const jobTo = (job.to || state.to).toUpperCase();
+          if (job.to && job.to.toUpperCase() !== defaultTo) {
+            notes.unshift(`➔ ${jobTo}`);
+          }
+          if (job.targetKb) {
+            notes.push(`Max ${formatSizeLabel(job.targetKb)}`);
+          }
           const noteStr = notes.length ? ` · ${notes.join(' · ')}` : '';
           liveDimsEl.textContent = `Target: ${pred.w} × ${pred.h} px${noteStr}`;
           liveDimsEl.classList.remove('hidden');
@@ -1019,6 +1621,10 @@ export function mountConverterApp(): void {
       };
       cropAnchorLabel.textContent = map[anchor];
     }
+    if (selectedJobId && !state.jobs.some((j) => j.id === selectedJobId)) {
+      selectedJobId = null;
+    }
+    updateActivePhotoBar();
     updateLiveDimensionsAndCardPreviews();
   }
 
@@ -1065,9 +1671,9 @@ export function mountConverterApp(): void {
       const job = state.jobs.find((j) => j.id === msg.id);
       if (job) {
         const isMergePdf = state.mergePdf && state.to === 'pdf' && state.jobs.length > 1;
-        job.status = 'done';
+        job.status = isMergePdf ? 'working' : 'done';
         job.result = msg.blob;
-        job.resultName = isMergePdf ? job.file.name.replace(/\.[^.]+$/, '.jpg') : msg.filename;
+        job.resultName = isMergePdf ? job.file.name.replace(/\.[^.]+$/, '.pdf') : msg.filename;
         job.resultSize = msg.resultSize;
         job.originalWidth = msg.originalWidth ?? job.originalWidth;
         job.originalHeight = msg.originalHeight ?? job.originalHeight;
@@ -1081,6 +1687,12 @@ export function mountConverterApp(): void {
 
         if (msg.blob && (isMergePdf || !msg.filename.endsWith('.pdf'))) {
           job.resultPreviewUrl = URL.createObjectURL(msg.blob);
+          generateFastThumbnail(new File([msg.blob], msg.filename, { type: msg.blob.type })).then((thumb) => {
+            if (thumb) {
+              job.resultThumbUrl = thumb;
+              updateSingleCardNode(job);
+            }
+          });
         }
         if (!job.result) {
           job.status = 'error';
@@ -1118,7 +1730,7 @@ export function mountConverterApp(): void {
       w.postMessage(req);
     }
     if (queue.length === 0 && pending === 0) {
-      if (state.mergePdf && state.to === 'pdf' && state.jobs.some((j) => j.status === 'done' && j.result)) {
+      if (state.mergePdf && state.to === 'pdf' && state.jobs.some((j) => (j.status === 'done' || j.status === 'working') && j.result)) {
         mergeCompletedPdfJobs();
       } else {
         state.converting = false;
@@ -1129,7 +1741,7 @@ export function mountConverterApp(): void {
   }
 
   async function mergeCompletedPdfJobs(): Promise<void> {
-    const validJobs = state.jobs.filter((j) => j.status === 'done' && j.result);
+    const validJobs = state.jobs.filter((j) => (j.status === 'done' || j.status === 'working') && j.result);
     if (!validJobs.length) {
       state.converting = false;
       updateButtons();
@@ -1137,53 +1749,68 @@ export function mountConverterApp(): void {
     }
     setStatus(`Merging ${validJobs.length} pages into a single PDF document…`);
 
-    try {
-      const { mergeImagesToPdf } = await import('@lib/worker/pdf');
-      const pages = validJobs.map((j) => ({
-        jpegBlob: j.result!,
-        widthPx: j.resultWidth || 800,
-        heightPx: j.resultHeight || 1000,
-      }));
+    const mergeId = `pk-merged-${Date.now()}`;
+    const pages = validJobs.map((j) => ({
+      blob: j.result!,
+      width: j.resultWidth || 800,
+      height: j.resultHeight || 1000,
+    }));
 
-      const mergedBlob = await mergeImagesToPdf(pages, 'PixelKit Merged Document');
-      const mergedName = `PixelKit-merged-${Date.now()}.pdf`;
+    const worker = idle.pop() || createWorker();
 
-      const totalOrig = validJobs.reduce((acc, j) => acc + j.originalSize, 0);
+    const onMergeMessage = async (e: MessageEvent<WorkerMessage>) => {
+      const msg = e.data;
+      if (msg.id !== mergeId) return;
+      worker.removeEventListener('message', onMergeMessage);
+      idle.push(worker);
 
-      // Preserve first page's visual image preview for the card thumbnail
-      const firstPreview = validJobs[0]?.resultPreviewUrl || validJobs[0]?.previewUrl;
+      if (msg.type === 'result') {
+        const mergedBlob = msg.blob;
+        const mergedName = msg.filename;
+        const totalOrig = validJobs.reduce((acc, j) => acc + (j.originalSize || j.file.size), 0);
+        const firstPreview = validJobs[0]?.resultPreviewUrl || validJobs[0]?.previewUrl;
 
-      for (const j of state.jobs) {
-        if (j.previewUrl && j.previewUrl !== firstPreview) URL.revokeObjectURL(j.previewUrl);
-        if (j.resultPreviewUrl && j.resultPreviewUrl !== firstPreview) URL.revokeObjectURL(j.resultPreviewUrl);
+        for (const j of state.jobs) {
+          if (j.previewUrl && j.previewUrl !== firstPreview) URL.revokeObjectURL(j.previewUrl);
+          if (j.resultPreviewUrl && j.resultPreviewUrl !== firstPreview) URL.revokeObjectURL(j.resultPreviewUrl);
+        }
+
+        state.jobs = [
+          {
+            id: mergeId,
+            file: new File([mergedBlob], mergedName, { type: 'application/pdf' }),
+            status: 'done',
+            result: mergedBlob,
+            resultName: mergedName,
+            previewUrl: firstPreview,
+            originalSize: totalOrig,
+            resultSize: mergedBlob.size,
+            targetKb: state.targetKb,
+            pdfTotalPages: pages.length,
+          },
+        ];
+
+        downloadBlob(mergedBlob, mergedName);
+        setStatus(`Successfully merged ${pages.length} pages into ${mergedName}`);
+      } else if (msg.type === 'error') {
+        console.error('[PixelKit Merge PDF Error]', msg.message);
+        setStatus('Error merging PDF pages: ' + msg.message);
       }
 
-      state.jobs = [
-        {
-          id: `pk-merged-${Date.now()}`,
-          file: new File([mergedBlob], mergedName, { type: 'application/pdf' }),
-          status: 'done',
-          result: mergedBlob,
-          resultName: mergedName,
-          previewUrl: firstPreview,
-          originalSize: totalOrig,
-          resultSize: mergedBlob.size,
-          targetKb: state.targetKb,
-          pdfTotalPages: pages.length,
-        },
-      ];
-
-      downloadBlob(mergedBlob, mergedName);
-      setStatus(`Successfully merged ${pages.length} pages into ${mergedName}`);
-    } catch (err) {
-      console.error('[PixelKit Merge PDF Error]', err);
-      setStatus('Error merging PDF pages.');
-    } finally {
       state.converting = false;
-      renderFiles();
+    renderFiles();
       updateButtons();
       updateProgress();
-    }
+    };
+
+    worker.addEventListener('message', onMergeMessage);
+    const req: MergePdfRequest = {
+      type: 'merge-pdf',
+      id: mergeId,
+      pages,
+      title: 'PixelKit Merged Document',
+    };
+    worker.postMessage(req);
   }
 
   // ---------- input handlers (Universal Any-to-Any) ----------
@@ -1248,6 +1875,12 @@ export function mountConverterApp(): void {
                 pageJob.dimensions = { ...state.dimensions };
               }
 
+              generateFastThumbnail(item.blob).then((thumb) => {
+                if (thumb) {
+                  pageJob.thumbUrl = thumb;
+                  updateSingleCardNode(pageJob);
+                }
+              });
               state.jobs.push(pageJob);
             }
             continue;
@@ -1273,6 +1906,16 @@ export function mountConverterApp(): void {
         try {
           previewUrl = URL.createObjectURL(file);
           job.previewUrl = previewUrl;
+          if (ext === 'svg') {
+            job.thumbUrl = previewUrl;
+          } else {
+            generateFastThumbnail(file).then((thumb) => {
+              if (thumb) {
+                job.thumbUrl = thumb;
+                updateSingleCardNode(job);
+              }
+            });
+          }
 
           // Read natural resolution fast from file header (<0.1ms) without allocating full uncompressed pixel bitmaps
           readImageDimensionsFast(file)
@@ -1317,13 +1960,22 @@ export function mountConverterApp(): void {
 
     updateFormatUi();
     if (extractedPdfCount > 0) {
-      setStatus(`Extracted and lined up ${extractedPdfCount} image${extractedPdfCount === 1 ? '' : 's'} from PDF.`);
+      setStatus(`Extracted and lined up ${extractedPdfCount} image${extractedPdfCount === 1 ? '' : 's'} from PDF (${state.jobs.length} total in queue).`);
     } else {
-      setStatus(`Added ${arr.length} file${arr.length === 1 ? '' : 's'}.`);
+      setStatus(`Added ${arr.length} file${arr.length === 1 ? '' : 's'} (${state.jobs.length} total in queue). No size cap limit.`);
     }
     renderFiles();
     updateLiveDimensionsAndCardPreviews();
     updateButtons();
+
+    if (arr.length === 1 && state.jobs.length >= 1) {
+      const latestJob = state.jobs[state.jobs.length - 1];
+      if (currentToolMode === 'crop') {
+        setTimeout(() => openCropModal(latestJob), 80);
+      } else if (currentToolMode === 'resize') {
+        setTimeout(() => openResizeModal(latestJob), 80);
+      }
+    }
   }
 
   activeFileInput.addEventListener('change', () => {
@@ -1331,32 +1983,95 @@ export function mountConverterApp(): void {
     activeFileInput.value = '';
   });
 
-  // Drag & drop
-  ;(['dragenter', 'dragover'] as const).forEach((ev) => {
-    activeDropzone.addEventListener(ev, (e) => {
+  // Robust Drag & Drop support across dropzone, file list, converter root, and whole window
+  const converterRoot = document.getElementById('pk-converter-root') || activeDropzone;
+  let dragCounter = 0;
+  let lastDropTimestamp = 0;
+
+  // Dropzone click & keyboard activation
+  activeDropzone.addEventListener('click', (e) => {
+    if (Date.now() - lastDropTimestamp < 500) {
       e.preventDefault();
-      activeDropzone.dataset.dragover = 'true';
-      activeDropzone.classList.add('border-accent', 'bg-bg/70');
-    });
+      e.stopPropagation();
+      return;
+    }
+    if ((e.target as HTMLElement).closest('input')) return;
+    activeFileInput.click();
   });
-  ;(['dragleave', 'drop'] as const).forEach((ev) => {
-    activeDropzone.addEventListener(ev, (e) => {
+  activeDropzone.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      activeFileInput.click();
+    }
+  });
+
+  const onDragEnter = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter++;
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    activeDropzone.dataset.dragover = 'true';
+    activeDropzone.classList.add('border-accent', 'bg-bg/70');
+  };
+
+  const onDragOver = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    activeDropzone.dataset.dragover = 'true';
+    activeDropzone.classList.add('border-accent', 'bg-bg/70');
+  };
+
+  const onDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
       activeDropzone.dataset.dragover = 'false';
       activeDropzone.classList.remove('border-accent', 'bg-bg/70');
-    });
-  });
-  activeDropzone.addEventListener('drop', async (e) => {
+    }
+  };
+
+  const onDrop = async (e: DragEvent) => {
     e.preventDefault();
-    const dt = (e as DragEvent).dataTransfer;
+    e.stopPropagation();
+    lastDropTimestamp = Date.now();
+    dragCounter = 0;
+    activeDropzone.dataset.dragover = 'false';
+    activeDropzone.classList.remove('border-accent', 'bg-bg/70');
+
+    const dt = e.dataTransfer;
     if (!dt) return;
 
-    if (dt.files?.length) {
-      addFiles(dt.files);
+    // 1. Files from standard dt.files
+    const droppedFiles: File[] = [];
+    if (dt.files && dt.files.length > 0) {
+      for (let i = 0; i < dt.files.length; i++) {
+        const file = dt.files[i];
+        if (file && (file.size > 0 || file.name)) {
+          droppedFiles.push(file);
+        }
+      }
+    }
+
+    // 2. Fallback to dt.items if dt.files was empty (e.g. Chrome/Windows desktop drag)
+    if (droppedFiles.length === 0 && dt.items && dt.items.length > 0) {
+      for (let i = 0; i < dt.items.length; i++) {
+        const item = dt.items[i];
+        if (item && item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) droppedFiles.push(file);
+        }
+      }
+    }
+
+    if (droppedFiles.length > 0) {
+      await addFiles(droppedFiles);
       return;
     }
 
-    // URL Dragging from another tab or web page
+    // 3. Fallback: URL Dragging from another tab or web page
     const uri = dt.getData('text/uri-list') || dt.getData('text/plain') || dt.getData('URL');
     if (uri && (uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('data:image/'))) {
       try {
@@ -1366,12 +2081,36 @@ export function mountConverterApp(): void {
         const urlParts = uri.split('?')[0]?.split('/') || [];
         const rawName = urlParts[urlParts.length - 1] || 'dragged-image.png';
         const file = new File([blob], rawName, { type: blob.type || 'image/png' });
-        addFiles([file]);
+        await addFiles([file]);
       } catch (err) {
         console.warn('[PixelKit URL drag]', err);
         setStatus('Could not load dragged image URL (CORS or network restriction).');
       }
     }
+  };
+
+  // Bind drag events to dropzone, file list, and converter root
+  [activeDropzone, converterRoot, activeFileList].forEach((el) => {
+    if (el) {
+      el.addEventListener('dragenter', (e) => onDragEnter(e as DragEvent));
+      el.addEventListener('dragover', (e) => onDragOver(e as DragEvent));
+      el.addEventListener('dragleave', (e) => onDragLeave(e as DragEvent));
+      el.addEventListener('drop', (e) => onDrop(e as DragEvent));
+    }
+  });
+
+  // Global window listeners: prevent browser navigation on dragover & catch drops anywhere on window
+  window.addEventListener('dragenter', (e) => e.preventDefault());
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+  });
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+  });
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    onDrop(e);
   });
 
   // Clipboard Paste (Ctrl+V / Cmd+V)
@@ -1442,6 +2181,85 @@ export function mountConverterApp(): void {
       customTargetChevron.classList.remove('rotate-180');
     }
   }
+
+  
+  // Top Mode Segmented Bar Listeners
+  modeTabs.forEach((tab) => {
+    tab.addEventListener('click', (e) => {
+      const m = tab.dataset.mode;
+      if (!m) return;
+      if (state.jobs.length > 0) {
+        // If files are already loaded in memory, prevent navigation so files aren't lost
+        e.preventDefault();
+        setToolMode(m, true);
+      }
+      // If no files are queued, let the browser follow href to /compress-image/, /convert/, etc.!
+    });
+  });
+
+  // Tab Mode Switching
+  tabCustom?.addEventListener('click', () => {
+    switchSettingsTab('custom');
+    if (currentToolMode === 'passport') {
+      setToolMode('all', false);
+    }
+  });
+  tabPortal?.addEventListener('click', () => setToolMode('passport', false));
+  btnSwitchToPortal?.addEventListener('click', () => setToolMode('passport', false));
+  btnBackToCustom?.addEventListener('click', () => setToolMode('all', false));
+
+  toggleMoreToolsBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    isMoreToolsOpen = !isMoreToolsOpen;
+    setToolMode(currentToolMode, false);
+  });
+
+  // Filter and Category Event Listeners
+  portalSearchInput?.addEventListener('input', () => {
+    filterPortalCards();
+  });
+
+  portalCatFilters.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activePortalCat = btn.dataset.cat || 'all';
+      portalCatFilters.forEach((b) => {
+        const isSelected = b === btn;
+        if (isSelected) {
+          b.className =
+            'pk-cat-filter active rounded-md border border-accent bg-accent/15 px-2 py-0.5 font-semibold text-accent cursor-pointer transition-colors';
+        } else {
+          b.className =
+            'pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors';
+        }
+      });
+      filterPortalCards();
+    });
+  });
+
+  // Select Portal Preset Card
+  portalPresetCards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = card.dataset.id;
+      if (id) {
+        if (state.portalPreset === id) {
+          applyPortalPreset('none');
+        } else {
+          applyPortalPreset(id);
+        }
+      }
+    });
+  });
+
+  // Reset to manual controls
+  bannerReset?.addEventListener('click', (e) => {
+    e.preventDefault();
+    applyPortalPreset('none');
+  });
+  portalPanelReset?.addEventListener('click', (e) => {
+    e.preventDefault();
+    applyPortalPreset('none');
+  });
 
   // Toggle Output Format dropdown menu
   customFormatTrigger?.addEventListener('click', (e) => {
@@ -1525,6 +2343,30 @@ export function mountConverterApp(): void {
     opt.addEventListener('click', (e) => {
       e.stopPropagation();
       const val = opt.dataset.value ?? '';
+      if (selectedJobId) {
+        const targetJob = state.jobs.find((j) => j.id === selectedJobId);
+        if (targetJob) {
+          if (val === 'custom') {
+            targetJob.targetKb = null;
+            customKbContainer?.classList.remove('hidden');
+          } else {
+            customKbContainer?.classList.add('hidden');
+            targetJob.targetKb = val ? Number(val) : null;
+            targetJob.targetSizeMode = state.targetSizeMode === 'exact' ? 'exact' : 'max';
+            targetJob.maxKb = targetJob.targetKb;
+          }
+          if (targetJob.status === 'done') targetJob.status = 'queued';
+          syncCustomTargetUi(val);
+          updateTargetLabel();
+    renderFiles();
+          updateLiveDimensionsAndCardPreviews();
+          updateStageDots();
+          closeAllCustomDropdowns();
+          customTargetTrigger?.focus();
+          setStatus(val ? `Target size for ${targetJob.file.name}: ${formatSizeLabel(Number(val))}` : `Quality for ${targetJob.file.name}: Best quality (no limit)`);
+          return;
+        }
+      }
       if (targetSelect) {
         targetSelect.value = val;
         targetSelect.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1555,16 +2397,58 @@ export function mountConverterApp(): void {
   // 1. Output Format Selection
   outputSelect?.addEventListener('change', () => {
     const val = outputSelect.value;
+    if (selectedJobId) {
+      const targetJob = state.jobs.find((j) => j.id === selectedJobId);
+      if (targetJob) {
+        targetJob.to = val;
+        targetJob.toMime = mimeForExtension(val) || `image/${val}`;
+        if (targetJob.status === 'done') targetJob.status = 'queued';
+        syncCustomFormatUi(val);
+    renderFiles();
+        updateLiveDimensionsAndCardPreviews();
+        updateStageDots();
+        setStatus(`Format for ${targetJob.file.name}: ${val.toUpperCase()}`);
+        return;
+      }
+    }
     state.to = val;
     state.toMime = mimeForExtension(val) || `image/${val}`;
+    for (const j of state.jobs) {
+      if (!j.to) {
+        if (j.status === 'done') {
+          j.status = 'queued';
+          j.result = undefined;
+          if (j.resultPreviewUrl) {
+            URL.revokeObjectURL(j.resultPreviewUrl);
+            j.resultPreviewUrl = undefined;
+          }
+          if (j.resultThumbUrl) {
+            if (j.resultThumbUrl !== j.resultPreviewUrl) URL.revokeObjectURL(j.resultThumbUrl);
+            j.resultThumbUrl = undefined;
+          }
+        }
+      }
+    }
     updateFormatUi();
+    renderFiles();
     updateButtons();
+    updateStageDots();
     setStatus(`Target output set to ${val.toUpperCase()}`);
   });
 
   // 1b. Merge Multiple Files into Single PDF
   mergePdfToggle?.addEventListener('change', () => {
     state.mergePdf = mergePdfToggle.checked;
+    for (const j of state.jobs) {
+      if (j.status === 'done') {
+        j.status = 'queued';
+        j.result = undefined;
+        if (j.resultPreviewUrl) {
+          URL.revokeObjectURL(j.resultPreviewUrl);
+          j.resultPreviewUrl = undefined;
+        }
+      }
+    }
     renderFiles();
     updateButtons();
     setStatus(
@@ -1619,20 +2503,13 @@ export function mountConverterApp(): void {
       targetPresetContainer?.classList.remove('hidden');
 
       if (targetSelect) {
-        // If currently on "Best quality (no limit)", select default 100 KB
-        if (!targetSelect.value) {
-          targetSelect.value = '100';
-          state.targetKb = 100;
-        } else if (targetSelect.value === 'custom') {
-          updateCustomTargetFromInput();
-        } else {
-          state.targetKb = Number(targetSelect.value);
-        }
-
+        targetSelect.value = savedExactTargetValue || '100';
         if (targetSelect.value === 'custom') {
           customKbContainer?.classList.remove('hidden');
+          updateCustomTargetFromInput();
         } else {
           customKbContainer?.classList.add('hidden');
+          state.targetKb = Number(targetSelect.value);
         }
       }
       syncCustomTargetUi(targetSelect?.value || '100');
@@ -1643,6 +2520,7 @@ export function mountConverterApp(): void {
       targetPresetContainer?.classList.remove('hidden');
 
       if (targetSelect) {
+        targetSelect.value = savedMaxTargetValue;
         if (targetSelect.value === 'custom') {
           customKbContainer?.classList.remove('hidden');
           updateCustomTargetFromInput();
@@ -1706,6 +2584,31 @@ export function mountConverterApp(): void {
 
   targetSelect?.addEventListener('change', () => {
     const v = targetSelect.value;
+    if (selectedJobId) {
+      const targetJob = state.jobs.find((j) => j.id === selectedJobId);
+      if (targetJob) {
+        if (v === 'custom') {
+          customKbContainer?.classList.remove('hidden');
+        } else {
+          customKbContainer?.classList.add('hidden');
+          targetJob.targetKb = v ? Number(v) : null;
+          targetJob.targetSizeMode = state.targetSizeMode === 'exact' ? 'exact' : 'max';
+          targetJob.maxKb = targetJob.targetKb;
+        }
+        if (targetJob.status === 'done') targetJob.status = 'queued';
+        syncCustomTargetUi(v);
+        updateTargetLabel();
+    renderFiles();
+        updateLiveDimensionsAndCardPreviews();
+        updateStageDots();
+        return;
+      }
+    }
+    if (state.targetSizeMode === 'exact') {
+      savedExactTargetValue = v;
+    } else if (state.targetSizeMode === 'max') {
+      savedMaxTargetValue = v;
+    }
     qualityContainer?.classList.add('hidden');
     if (v === 'custom') {
       customKbContainer?.classList.remove('hidden');
@@ -1716,6 +2619,9 @@ export function mountConverterApp(): void {
     }
     syncCustomTargetUi(v);
     updateTargetLabel();
+    renderFiles();
+    updateLiveDimensionsAndCardPreviews();
+    updateStageDots();
   });
 
   customKbInput?.addEventListener('input', updateCustomTargetFromInput);
@@ -1811,35 +2717,62 @@ export function mountConverterApp(): void {
 
   function updateTargetLabel(): void {
     if (!targetValue) return;
-    if (state.targetSizeMode === 'quality') {
-      targetValue.textContent = `Quality ${Math.round(state.quality * 100)}%`;
-    } else if (state.targetSizeMode === 'range') {
+    const activeJob = selectedJobId ? state.jobs.find((j) => j.id === selectedJobId) : null;
+    const currentTargetKb = activeJob ? activeJob.targetKb : state.targetKb;
+    const currentSizeMode = activeJob?.targetSizeMode || state.targetSizeMode;
+    const currentQuality = activeJob?.quality ?? state.quality;
+
+    if (currentSizeMode === 'quality') {
+      targetValue.textContent = `Quality ${Math.round(currentQuality * 100)}%`;
+    } else if (currentSizeMode === 'range') {
       const min = state.minKb ? formatSizeLabel(state.minKb) : '0';
       const max = state.maxKb ? formatSizeLabel(state.maxKb) : 'Any';
       targetValue.textContent = `Range: ${min}–${max}`;
-    } else if (state.targetKb) {
-      const prefix = state.targetSizeMode === 'exact' ? 'Exact ' : 'Max ';
-      targetValue.textContent = `${prefix}${formatSizeLabel(state.targetKb)}`;
+    } else if (currentTargetKb) {
+      const prefix = currentSizeMode === 'exact' ? 'Exact ' : 'Max ';
+      targetValue.textContent = `${prefix}${formatSizeLabel(currentTargetKb)}`;
     } else {
       targetValue.textContent = 'Best quality (no limit)';
     }
+    updateStageDots();
   }
 
   // 5. Aspect Ratio Crop Presets
   cropAspectSelect?.addEventListener('change', async () => {
-    state.cropAspect = (cropAspectSelect.value || 'original') as CropAspectPreset;
-    syncCustomCropUi(state.cropAspect);
-    await Promise.all(
-      state.jobs.map(async (j) => {
-        if (state.cropAspect === 'original') {
-          j.cropAspect = 'original';
-          j.customCropBox = undefined;
+    const aspect = (cropAspectSelect.value || 'original') as CropAspectPreset;
+    syncCustomCropUi(aspect);
+
+    updateStageDots();
+
+    if (selectedJobId) {
+      const targetJob = state.jobs.find((j) => j.id === selectedJobId);
+      if (targetJob) {
+        if (aspect === 'original') {
+          targetJob.cropAspect = 'original';
+          targetJob.customCropBox = undefined;
         } else {
-          j.cropAspect = state.cropAspect;
+          targetJob.cropAspect = aspect;
         }
-        await generateJobCroppedPreview(j);
-      })
-    );
+        if (targetJob.status === 'done') targetJob.status = 'queued';
+    renderFiles();
+        updateLiveDimensionsAndCardPreviews();
+        const label = cropAspectSelect.options[cropAspectSelect.selectedIndex]?.text || aspect;
+        setStatus(`Crop preset for ${targetJob.file.name}: ${label}`);
+        return;
+      }
+    }
+
+    // If no single job selected, apply globally
+    state.cropAspect = aspect;
+    for (const j of state.jobs) {
+      if (state.cropAspect === 'original') {
+        j.cropAspect = 'original';
+        j.customCropBox = undefined;
+      } else {
+        j.cropAspect = state.cropAspect;
+      }
+      if (j.status === 'done') j.status = 'queued';
+    }
     renderFiles();
     updateLiveDimensionsAndCardPreviews();
     const label = cropAspectSelect.options[cropAspectSelect.selectedIndex]?.text || state.cropAspect;
@@ -1848,16 +2781,13 @@ export function mountConverterApp(): void {
 
   // 5b. Crop Focal Anchor (Top/Face, Center, Bottom)
   cropAnchorBtns.forEach((btn) => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', () => {
       const anchor = (btn.dataset.anchor || 'center') as CropAnchor;
       setCropAnchor(anchor);
-      await Promise.all(
-        state.jobs.map(async (j) => {
-          j.cropAnchor = anchor;
-          await generateJobCroppedPreview(j);
-        })
-      );
-      renderFiles();
+      for (const j of state.jobs) {
+        j.cropAnchor = anchor;
+      }
+    renderFiles();
       updateLiveDimensionsAndCardPreviews();
       setStatus(`Crop focal anchor: ${anchor.toUpperCase()}`);
     });
@@ -1891,6 +2821,34 @@ export function mountConverterApp(): void {
         : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
     });
 
+    updateStageDots();
+
+    if (selectedJobId) {
+      const targetJob = state.jobs.find((j) => j.id === selectedJobId);
+      if (targetJob) {
+        if (scale === 'custom') {
+          targetJob.scalePercent = undefined;
+          customDimsContainer?.classList.remove('hidden');
+          if (resizeHint) resizeHint.textContent = 'Custom (px)';
+          updateCustomDimensions();
+          await applyCustomDimensionsToJobs();
+        } else {
+          const pct = Number(scale);
+          targetJob.scalePercent = pct === 100 ? undefined : pct;
+          targetJob.dimensions = pct === 100 ? { mode: 'original' } : { mode: 'custom', scalePercent: pct };
+          customDimsContainer?.classList.add('hidden');
+          if (resizeHint) {
+            resizeHint.textContent = pct === 100 ? '100% (Original)' : `${pct}% Scale`;
+          }
+          if (targetJob.status === 'done') targetJob.status = 'queued';
+        }
+    renderFiles();
+        updateLiveDimensionsAndCardPreviews();
+        return;
+      }
+    }
+
+    // If no single job selected, apply globally
     if (scale === 'custom') {
       state.scalePercent = null;
       customDimsContainer?.classList.remove('hidden');
@@ -1905,14 +2863,12 @@ export function mountConverterApp(): void {
         resizeHint.textContent = pct === 100 ? '100% (Original)' : `${pct}% Scale`;
       }
       state.dimensions = pct === 100 ? { mode: 'original' } : { mode: 'custom', scalePercent: pct };
-      await Promise.all(
-        state.jobs.map(async (j) => {
-          j.dimensions = state.dimensions.mode === 'original' ? { mode: 'original' } : { ...state.dimensions };
-          if (j.status === 'done') j.status = 'queued';
-          await generateJobAdjustedPreview(j);
-        })
-      );
-      renderFiles();
+      for (const j of state.jobs) {
+        j.dimensions = state.dimensions.mode === 'original' ? { mode: 'original' } : { ...state.dimensions };
+        j.scalePercent = pct === 100 ? undefined : pct;
+        if (j.status === 'done') j.status = 'queued';
+      }
+    renderFiles();
       updateLiveDimensionsAndCardPreviews();
     }
   }
@@ -2048,10 +3004,9 @@ export function mountConverterApp(): void {
   });
 
   // 7. Grayscale / Black & White Filter
-  grayscaleCheckbox?.addEventListener('change', async () => {
+  grayscaleCheckbox?.addEventListener('change', () => {
     state.grayscale = grayscaleCheckbox.checked;
     setStatus(state.grayscale ? 'Monochrome / Grayscale filter enabled.' : 'Color output restored.');
-    await Promise.all(state.jobs.map((j) => generateJobAdjustedPreview(j)));
     renderFiles();
     updateLiveDimensionsAndCardPreviews();
   });
@@ -2077,10 +3032,14 @@ export function mountConverterApp(): void {
     job.croppedWidth = undefined;
     job.croppedHeight = undefined;
     job.dimensions = { mode: 'original', noUpscale: true };
+    job.scalePercent = 100;
     job.rotate = 0;
     job.flipH = false;
     job.flipV = false;
     job.grayscale = false;
+    job.targetKb = null;
+    job.to = undefined;
+    job.toMime = undefined;
     if (job.adjustedPreviewUrl) {
       URL.revokeObjectURL(job.adjustedPreviewUrl);
       job.adjustedPreviewUrl = undefined;
@@ -2099,10 +3058,14 @@ export function mountConverterApp(): void {
         job.resultPreviewUrl = undefined;
       }
     }
+    if (selectedJobId === job.id) {
+      syncSidebarToSelectedJob(job);
+    }
     setStatus(`Reset adjustments for ${job.file.name}`);
     renderFiles();
     updateButtons();
     updateLiveDimensionsAndCardPreviews();
+    updateStageDots();
   }
 
   // ---------- Before / After Comparison Modal Controller ----------
@@ -2525,7 +3488,7 @@ export function mountConverterApp(): void {
 
   function openCropModal(job?: FileJob): void {
     if (!cropModal) return;
-    const targetJob = job || state.jobs[0];
+    const targetJob = job || state.jobs.find((j) => j.id === selectedJobId) || state.jobs[0];
     if (!targetJob && !state.jobs.length) {
       setStatus('Please add at least one image to crop.');
       return;
@@ -2549,6 +3512,21 @@ export function mountConverterApp(): void {
 
     if (cropModalFilename) {
       cropModalFilename.textContent = `${targetJob.file.name}${resizeDesc} · Drag box to frame`;
+    }
+
+    if (cropStepper) {
+      if (state.jobs.length > 1) {
+        cropStepper.classList.remove('hidden');
+        cropStepper.classList.add('flex');
+        const currIdx = state.jobs.findIndex((j) => j.id === targetJob.id);
+        const displayIdx = currIdx === -1 ? 0 : currIdx;
+        if (cropCounter) cropCounter.textContent = `${displayIdx + 1} / ${state.jobs.length}`;
+        if (cropPrevBtn) cropPrevBtn.disabled = displayIdx <= 0;
+        if (cropNextBtn) cropNextBtn.disabled = displayIdx >= state.jobs.length - 1;
+      } else {
+        cropStepper.classList.add('hidden');
+        cropStepper.classList.remove('flex');
+      }
     }
     if (cropOrigDims) {
       cropOrigDims.textContent = targetJob.originalWidth && targetJob.originalHeight
@@ -2952,7 +3930,7 @@ export function mountConverterApp(): void {
       }
       await generateJobCroppedPreview(activeCropJob);
       await generateJobAdjustedPreview(activeCropJob);
-      renderFiles();
+    renderFiles();
       updateLiveDimensionsAndCardPreviews();
       closeCropModal();
     }
@@ -2969,7 +3947,7 @@ export function mountConverterApp(): void {
   function openResizeModal(job?: FileJob): void {
     if (!resizeModal) return;
     isGlobalResizeModal = !job;
-    const targetJob = job || state.jobs[0];
+    const targetJob = job || state.jobs.find((j) => j.id === selectedJobId) || state.jobs[0];
     activeResizeJob = targetJob || null;
 
     if (!targetJob && !state.jobs.length) {
@@ -2991,6 +3969,21 @@ export function mountConverterApp(): void {
       resizeFilename.textContent = job
         ? `${job.file.name}${cropBadge}`
         : (targetJob ? `${targetJob.file.name} (Global Settings)${cropBadge}` : 'All files in queue');
+    }
+
+    if (resizeStepper) {
+      if (state.jobs.length > 1) {
+        resizeStepper.classList.remove('hidden');
+        resizeStepper.classList.add('flex');
+        const currIdx = state.jobs.findIndex((j) => j.id === targetJob?.id);
+        const displayIdx = currIdx === -1 ? 0 : currIdx;
+        if (resizeCounter) resizeCounter.textContent = `${displayIdx + 1} / ${state.jobs.length}`;
+        if (resizePrevBtn) resizePrevBtn.disabled = displayIdx <= 0;
+        if (resizeNextBtn) resizeNextBtn.disabled = displayIdx >= state.jobs.length - 1;
+      } else {
+        resizeStepper.classList.add('hidden');
+        resizeStepper.classList.remove('flex');
+      }
     }
 
     // Init state from job or global settings
@@ -3353,15 +4346,148 @@ export function mountConverterApp(): void {
       if (dimWidthInput && resizeStudioState.width) dimWidthInput.value = String(resizeStudioState.width);
       if (dimHeightInput && resizeStudioState.height) dimHeightInput.value = String(resizeStudioState.height);
     }
-
     renderFiles();
     updateLiveDimensionsAndCardPreviews();
     updateButtons();
     closeResizeModal();
   });
 
-  openResizeStudioBtn?.addEventListener('click', () => openResizeModal());
-  openCropStudioBtn?.addEventListener('click', () => openCropModal());
+  openResizeStudioBtn?.addEventListener('click', () => {
+    const targetJob = state.jobs.find((j) => j.id === selectedJobId) || state.jobs[0];
+    openResizeModal(targetJob);
+  });
+  openCropStudioBtn?.addEventListener('click', () => {
+    const targetJob = state.jobs.find((j) => j.id === selectedJobId) || state.jobs[0];
+    openCropModal(targetJob);
+  });
+
+  // Deselect button on active photo bar
+  deselectPhotoBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectJob(null);
+  });
+
+  // Target Photo Bar navigation
+  targetPrevBtn?.addEventListener('click', () => {
+    if (!selectedJobId) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === selectedJobId);
+    if (currIdx > 0 && state.jobs[currIdx - 1]) {
+      selectJob(state.jobs[currIdx - 1]!.id, true);
+    }
+  });
+
+  targetNextBtn?.addEventListener('click', () => {
+    if (!selectedJobId) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === selectedJobId);
+    if (currIdx < state.jobs.length - 1 && state.jobs[currIdx + 1]) {
+      selectJob(state.jobs[currIdx + 1]!.id, true);
+    }
+  });
+
+  applyToAllBtn?.addEventListener('click', async () => {
+    const activeJob = state.jobs.find((j) => j.id === selectedJobId);
+    if (!activeJob) return;
+
+    for (const job of state.jobs) {
+      if (job.id === activeJob.id) continue;
+      job.to = activeJob.to;
+      job.toMime = activeJob.toMime;
+      job.targetKb = activeJob.targetKb;
+      job.targetSizeMode = activeJob.targetSizeMode;
+      job.quality = activeJob.quality;
+      job.minKb = activeJob.minKb;
+      job.maxKb = activeJob.maxKb;
+      job.cropAspect = activeJob.cropAspect;
+      job.cropAnchor = activeJob.cropAnchor;
+      job.customCropBox = activeJob.customCropBox ? { ...activeJob.customCropBox } : undefined;
+      job.dimensions = activeJob.dimensions ? { ...activeJob.dimensions } : undefined;
+      job.scalePercent = activeJob.scalePercent;
+      job.rotate = activeJob.rotate;
+      job.flipH = activeJob.flipH;
+      job.grayscale = activeJob.grayscale;
+      if (job.status === 'done') job.status = 'queued';
+      if (activeJob.customCropBox) {
+        await generateJobCroppedPreview(job);
+      }
+    }
+    renderFiles();
+    updateLiveDimensionsAndCardPreviews();
+    updateStageDots();
+
+    const originalText = applyToAllBtn.innerHTML;
+    applyToAllBtn.innerHTML = '<span>Applied to All Photos ✓</span>';
+    applyToAllBtn.classList.add('text-success');
+    setTimeout(() => {
+      applyToAllBtn.innerHTML = originalText;
+      applyToAllBtn.classList.remove('text-success');
+    }, 1800);
+
+    setStatus(`Applied format, compression, crop & resize from ${activeJob.file.name} to all ${state.jobs.length} photos.`);
+  });
+
+  // Stepper inside Crop Modal
+  cropPrevBtn?.addEventListener('click', () => {
+    if (!activeCropJob) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === activeCropJob!.id);
+    if (currIdx > 0 && state.jobs[currIdx - 1]) {
+      // Save current crop
+      activeCropJob.customCropBox = {
+        x: cropBoxState.x,
+        y: cropBoxState.y,
+        width: cropBoxState.w,
+        height: cropBoxState.h,
+      };
+      activeCropJob.cropAspect = cropBoxState.ratioName;
+      activeCropJob.cropAnchor = cropBoxState.anchor;
+      generateJobCroppedPreview(activeCropJob);
+
+      const nextJob = state.jobs[currIdx - 1]!;
+      selectJob(nextJob.id);
+      openCropModal(nextJob);
+    }
+  });
+
+  cropNextBtn?.addEventListener('click', () => {
+    if (!activeCropJob) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === activeCropJob!.id);
+    if (currIdx < state.jobs.length - 1 && state.jobs[currIdx + 1]) {
+      // Save current crop
+      activeCropJob.customCropBox = {
+        x: cropBoxState.x,
+        y: cropBoxState.y,
+        width: cropBoxState.w,
+        height: cropBoxState.h,
+      };
+      activeCropJob.cropAspect = cropBoxState.ratioName;
+      activeCropJob.cropAnchor = cropBoxState.anchor;
+      generateJobCroppedPreview(activeCropJob);
+
+      const nextJob = state.jobs[currIdx + 1]!;
+      selectJob(nextJob.id);
+      openCropModal(nextJob);
+    }
+  });
+
+  // Stepper inside Resize Modal
+  resizePrevBtn?.addEventListener('click', () => {
+    if (!activeResizeJob) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === activeResizeJob!.id);
+    if (currIdx > 0 && state.jobs[currIdx - 1]) {
+      const nextJob = state.jobs[currIdx - 1]!;
+      selectJob(nextJob.id);
+      openResizeModal(nextJob);
+    }
+  });
+
+  resizeNextBtn?.addEventListener('click', () => {
+    if (!activeResizeJob) return;
+    const currIdx = state.jobs.findIndex((j) => j.id === activeResizeJob!.id);
+    if (currIdx < state.jobs.length - 1 && state.jobs[currIdx + 1]) {
+      const nextJob = state.jobs[currIdx + 1]!;
+      selectJob(nextJob.id);
+      openResizeModal(nextJob);
+    }
+  });
 
   // ---------- actions ----------
 
@@ -3426,15 +4552,17 @@ export function mountConverterApp(): void {
       }
 
       // When merging to a single multi-page PDF, encode each page to JPEG first so jsPDF can embed valid images!
-      const targetMime = isMergePdf ? 'image/jpeg' : state.toMime;
-      const targetExt = isMergePdf ? 'jpg' : state.to;
+      const targetExt = isMergePdf ? 'jpg' : (job.to || state.to);
+      const targetMime = isMergePdf ? 'image/jpeg' : (job.toMime || mimeForExtension(targetExt) || state.toMime);
+      const jobTargetKb = job.targetKb !== undefined ? job.targetKb : (state.targetSizeMode === 'quality' ? null : state.targetKb);
+      const jobSizeMode = job.targetSizeMode || state.targetSizeMode;
 
       // Build target options
       const targetOpts: TargetSizeOptions = {
-        mode: state.targetSizeMode === 'quality' ? 'max' : state.targetSizeMode,
-        targetKb: state.targetSizeMode === 'quality' ? null : state.targetKb,
-        minKb: state.minKb,
-        maxKb: state.maxKb,
+        mode: jobSizeMode === 'quality' ? 'max' : jobSizeMode,
+        targetKb: jobSizeMode === 'quality' ? null : jobTargetKb,
+        minKb: job.minKb ?? state.minKb,
+        maxKb: job.maxKb ?? state.maxKb,
       };
 
       const req: ConvertRequest = {
@@ -3443,7 +4571,7 @@ export function mountConverterApp(): void {
         to: targetExt,
         fromMime: fileMime,
         toMime: targetMime,
-        targetKb: state.targetSizeMode === 'quality' ? null : state.targetKb,
+        targetKb: jobSizeMode === 'quality' ? null : jobTargetKb,
         autoOrient: state.autoOrient,
         preserveMetadata: state.preserveMetadata,
         quality: state.quality,
@@ -3471,21 +4599,29 @@ export function mountConverterApp(): void {
     pump();
   }
 
-  convertBtn?.addEventListener('click', startConversion);
+   convertBtn?.addEventListener('click', startConversion);
+
+
 
   clearBtn?.addEventListener('click', () => {
     if (state.converting) return;
     // Revoke object URLs to avoid memory leaks
     for (const j of state.jobs) {
       if (j.previewUrl) URL.revokeObjectURL(j.previewUrl);
+      if (j.thumbUrl && j.thumbUrl !== j.previewUrl) URL.revokeObjectURL(j.thumbUrl);
       if (j.resultPreviewUrl) URL.revokeObjectURL(j.resultPreviewUrl);
+      if (j.resultThumbUrl && j.resultThumbUrl !== j.resultPreviewUrl) URL.revokeObjectURL(j.resultThumbUrl);
       if (j.adjustedPreviewUrl) URL.revokeObjectURL(j.adjustedPreviewUrl);
       if (j.croppedPreviewUrl && j.croppedPreviewUrl !== j.adjustedPreviewUrl) URL.revokeObjectURL(j.croppedPreviewUrl);
     }
     state.jobs = [];
+    selectedJobId = null;
+    activePhotoBar?.classList.add('hidden');
+    syncSidebarToSelectedJob(null);
     renderFiles();
     updateButtons();
     updateProgress();
+    updateStageDots();
     setStatus('Cleared.');
   });
 
@@ -3541,7 +4677,7 @@ export function mountConverterApp(): void {
     renderScheduled = true;
     requestAnimationFrame(() => {
       renderScheduled = false;
-      renderFiles();
+    renderFiles();
     });
   }
 
@@ -3583,8 +4719,8 @@ export function mountConverterApp(): void {
     // 2. Thumbnail / Display URL
     const isPdfOutput = job.resultName?.endsWith('.pdf') || job.file.type === 'application/pdf';
     const displayUrl = isPdfOutput
-      ? (job.adjustedPreviewUrl || job.croppedPreviewUrl || job.previewUrl)
-      : (job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl || job.previewUrl);
+      ? (job.adjustedPreviewUrl || job.croppedPreviewUrl || job.thumbUrl || job.previewUrl)
+      : (job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl || job.thumbUrl || job.previewUrl);
     if (imgPreview && displayUrl) {
       if (imgPreview.getAttribute('data-src') !== displayUrl) {
         imgPreview.setAttribute('data-src', displayUrl);
@@ -3786,14 +4922,217 @@ export function mountConverterApp(): void {
 
   // ---------- render ----------
 
+  
+  function updateStageDots(): void {
+    const dotFormat = document.getElementById('pk-dot-format');
+    const dotCompress = document.getElementById('pk-dot-compress');
+    const dotCrop = document.getElementById('pk-dot-crop');
+    const dotResize = document.getElementById('pk-dot-resize');
+
+    const DOT_ACTIVE = 'pk-stage-dot inline-block h-2 w-2 rounded-full bg-accent ring-2 ring-accent/25 transition-all shrink-0';
+    const DOT_INACTIVE = 'pk-stage-dot inline-block h-2 w-2 rounded-full border-2 border-border/90 bg-surface transition-all shrink-0';
+
+    const activeJob = selectedJobId ? state.jobs.find((j) => j.id === selectedJobId) : null;
+    const defaultTo = (root?.dataset.to || 'jpg').toLowerCase();
+
+    // 1. Output Format Dot: enabled when a custom format is applied
+    if (dotFormat) {
+      let isFormatActive = false;
+      if (currentToolMode === 'convert') {
+        isFormatActive = true;
+      } else if (activeJob) {
+        isFormatActive = Boolean(activeJob.to && activeJob.to.toLowerCase() !== defaultTo);
+      } else {
+        isFormatActive = Boolean(state.to && state.to.toLowerCase() !== defaultTo);
+      }
+      dotFormat.className = isFormatActive ? DOT_ACTIVE : DOT_INACTIVE;
+    }
+
+    // 2. Compression Dot: enabled when target size limit or custom quality % mode is applied
+    if (dotCompress) {
+      let isCompressActive = false;
+      if (currentToolMode === 'compress') {
+        isCompressActive = true;
+      } else if (activeJob) {
+        isCompressActive =
+          (activeJob.targetKb !== undefined && activeJob.targetKb !== null) ||
+          (activeJob.targetSizeMode === 'quality' && typeof activeJob.quality === 'number' && activeJob.quality < 1.0);
+      } else {
+        isCompressActive =
+          Boolean(state.targetKb) ||
+          (state.targetSizeMode === 'quality' && typeof state.quality === 'number' && state.quality < 1.0);
+      }
+      dotCompress.className = isCompressActive ? DOT_ACTIVE : DOT_INACTIVE;
+    }
+
+    // 3. Crop Dot: enabled when aspect ratio is not original or custom box
+    if (dotCrop) {
+      let isCropActive = false;
+      if (currentToolMode === 'crop') {
+        isCropActive = true;
+      } else if (activeJob) {
+        isCropActive = (Boolean(activeJob.cropAspect) && activeJob.cropAspect !== 'original') || Boolean(activeJob.customCropBox);
+      } else {
+        isCropActive = Boolean(state.cropAspect) && state.cropAspect !== 'original';
+      }
+      dotCrop.className = isCropActive ? DOT_ACTIVE : DOT_INACTIVE;
+    }
+
+    // 4. Resize Dot: enabled when scale is not 100% or custom dimensions
+    if (dotResize) {
+      let isResizeActive = false;
+      if (currentToolMode === 'resize') {
+        isResizeActive = true;
+      } else if (activeJob) {
+        const scale = activeJob.scalePercent;
+        const dims = activeJob.dimensions;
+        isResizeActive = (scale !== undefined && scale !== null && scale !== 100) || (dims?.mode === 'custom');
+      } else {
+        const scale = state.scalePercent;
+        const dims = state.dimensions;
+        isResizeActive = (scale !== undefined && scale !== null && scale !== 100) || (dims?.mode === 'custom');
+      }
+      dotResize.className = isResizeActive ? DOT_ACTIVE : DOT_INACTIVE;
+    }
+  }
+
+  function syncSidebarToSelectedJob(job: FileJob | null): void {
+    const defaultTo = root?.dataset.to || 'jpg';
+    if (job) {
+      // 1. Output Format: sync to this specific job (or default)
+      const jobTo = job.to || defaultTo;
+      if (outputSelect) outputSelect.value = jobTo;
+      syncCustomFormatUi(jobTo);
+
+      // 2. Compression & Target Size: sync to this specific job (or default)
+      const jobKbStr = job.targetKb !== undefined && job.targetKb !== null ? String(job.targetKb) : '';
+      if (targetSelect) targetSelect.value = jobKbStr;
+      syncCustomTargetUi(jobKbStr);
+      updateTargetLabel();
+
+      // 3. Crop UI: sync to this specific job
+      const aspect = job.cropAspect || 'original';
+      if (cropAspectSelect) cropAspectSelect.value = aspect;
+      syncCustomCropUi(aspect);
+
+      // 4. Scale / resize UI: sync to this specific job
+      const scalePct = job.scalePercent ?? (job.dimensions?.scalePercent ?? (job.dimensions?.mode === 'custom' ? 'custom' : 100));
+      const scaleStr = String(scalePct);
+      scaleBtns.forEach((btn) => {
+        const isSelected = btn.dataset.scale === scaleStr;
+        btn.className = isSelected
+          ? 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm'
+          : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
+      });
+      if (resizeHint) {
+        resizeHint.textContent = scaleStr === '100' ? '100% (Original)' : (scaleStr === 'custom' ? 'Custom (px)' : `${scaleStr}% Scale`);
+      }
+    } else {
+      // Return to global batch settings
+      const globalTo = state.to || defaultTo;
+      if (outputSelect) outputSelect.value = globalTo;
+      syncCustomFormatUi(globalTo);
+
+      const globalKbStr = state.targetKb !== null && state.targetKb !== undefined ? String(state.targetKb) : '';
+      if (targetSelect) targetSelect.value = globalKbStr;
+      syncCustomTargetUi(globalKbStr);
+      updateTargetLabel();
+
+      const aspect = state.cropAspect || 'original';
+      if (cropAspectSelect) cropAspectSelect.value = aspect;
+      syncCustomCropUi(aspect);
+
+      const globalScale = state.scalePercent ?? 100;
+      const scaleStr = String(globalScale);
+      scaleBtns.forEach((btn) => {
+        const isSelected = btn.dataset.scale === scaleStr;
+        btn.className = isSelected
+          ? 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm'
+          : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
+      });
+      if (resizeHint) {
+        resizeHint.textContent = globalScale === 100 ? '100% (Original)' : `${globalScale}% Scale`;
+      }
+    }
+    updateStageDots();
+  }
+
+  function selectJob(jobId: string | null, scrollIntoView = false): void {
+    // If clicking the already selected photo, deselect it!
+    if (jobId === selectedJobId) {
+      selectedJobId = null;
+    } else {
+      selectedJobId = jobId;
+    }
+
+    // Update active highlight on all file item cards
+    activeFileList.querySelectorAll<HTMLElement>('.pk-file-item').forEach((n) => {
+      const isSelected = selectedJobId !== null && n.dataset.id === selectedJobId;
+      n.classList.toggle('border-accent', isSelected);
+      n.classList.toggle('ring-1', isSelected);
+      n.classList.toggle('ring-accent/40', isSelected);
+      n.classList.toggle('bg-accent/5', isSelected);
+      n.classList.toggle('border-border', !isSelected);
+      n.classList.toggle('bg-surface/90', !isSelected);
+
+      const selBadge = n.querySelector('.pk-file-selected-badge');
+      if (selBadge) selBadge.classList.toggle('hidden', !isSelected);
+
+      if (isSelected && scrollIntoView) {
+        n.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+
+    const activeJob = selectedJobId ? state.jobs.find((j) => j.id === selectedJobId) || null : null;
+    syncSidebarToSelectedJob(activeJob);
+    updateActivePhotoBar();
+  }
+
+  function updateActivePhotoBar(): void {
+    // If no photo is explicitly selected, hide the active photo bar completely!
+    if (!selectedJobId || state.jobs.length <= 1) {
+      activePhotoBar?.classList.add('hidden');
+      activePhotoBar?.classList.remove('flex');
+      return;
+    }
+
+    const idx = state.jobs.findIndex((j) => j.id === selectedJobId);
+    if (idx === -1) {
+      selectedJobId = null;
+      activePhotoBar?.classList.add('hidden');
+      activePhotoBar?.classList.remove('flex');
+      return;
+    }
+
+    activePhotoBar?.classList.remove('hidden');
+    activePhotoBar?.classList.add('flex');
+
+    const currentJob = state.jobs[idx];
+    if (activePhotoCounter) {
+      activePhotoCounter.textContent = `(${idx + 1} of ${state.jobs.length})`;
+    }
+    if (activePhotoName && currentJob) {
+      activePhotoName.textContent = currentJob.file.name;
+    }
+    if (targetPrevBtn) {
+      targetPrevBtn.disabled = idx <= 0;
+    }
+    if (targetNextBtn) {
+      targetNextBtn.disabled = idx >= state.jobs.length - 1;
+    }
+  }
+
   function renderFiles(): void {
     if (!state.jobs.length) {
       activeFileList.querySelectorAll('.pk-file-item').forEach((n) => n.remove());
       emptyState?.classList.remove('hidden');
+      filesHeader?.classList.add('hidden');
       updateLiveDimensionsAndCardPreviews();
       return;
     }
     emptyState?.classList.add('hidden');
+    filesHeader?.classList.remove('hidden');
+    if (filesCount) filesCount.textContent = `${state.jobs.length} file${state.jobs.length === 1 ? '' : 's'} selected`;
 
     const existingNodes = new Map<string, HTMLElement>();
     activeFileList.querySelectorAll<HTMLElement>('.pk-file-item').forEach((n) => {
@@ -3818,6 +5157,29 @@ export function mountConverterApp(): void {
         isNew = true;
       }
 
+      // Card Selection Click Listener
+      node.onclick = (e) => {
+        if ((e.target as HTMLElement).closest('button, a, input, select')) return;
+        selectJob(job.id);
+      };
+
+      const isSelected = job.id === selectedJobId;
+      node.classList.toggle('border-accent', isSelected);
+      node.classList.toggle('ring-1', isSelected);
+      node.classList.toggle('ring-accent/40', isSelected);
+      node.classList.toggle('bg-accent/5', isSelected);
+      node.classList.toggle('border-border', !isSelected);
+      node.classList.toggle('bg-surface/90', !isSelected);
+
+      const selBadge = node.querySelector('.pk-file-selected-badge');
+      if (selBadge) {
+        selBadge.classList.toggle('hidden', !isSelected);
+        (selBadge as HTMLElement).onclick = (e) => {
+          e.stopPropagation();
+          selectJob(null);
+        };
+      }
+
       const thumbBtn = node.querySelector('.pk-file-thumb-btn') as HTMLElement | null;
       const imgPreview = node.querySelector('.pk-file-img-preview') as HTMLImageElement | null;
       const thumbBadge = node.querySelector('.pk-file-thumb-badge') as HTMLElement | null;
@@ -3833,8 +5195,8 @@ export function mountConverterApp(): void {
       // 1. Real Image Thumbnail / Badge
       const isPdfOutput = job.resultName?.endsWith('.pdf') || job.file.type === 'application/pdf';
       const displayUrl = isPdfOutput
-        ? (job.adjustedPreviewUrl || job.croppedPreviewUrl || job.previewUrl)
-        : (job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl || job.previewUrl);
+        ? (job.adjustedPreviewUrl || job.croppedPreviewUrl || job.thumbUrl || job.previewUrl)
+        : (job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl || job.thumbUrl || job.previewUrl);
       if (imgPreview && displayUrl) {
         if (imgPreview.getAttribute('data-src') !== displayUrl) {
           imgPreview.setAttribute('data-src', displayUrl);
@@ -3887,7 +5249,8 @@ export function mountConverterApp(): void {
           statusBadge.textContent = 'Queued';
           statusBadge.className = 'pk-file-status-badge text-[11px] font-medium px-2 py-0.5 rounded-full bg-surface border border-border text-muted';
         } else if (job.status === 'working') {
-          statusBadge.textContent = 'Converting…';
+          const isMergePdf = state.mergePdf && state.to === 'pdf' && state.jobs.length > 1;
+          statusBadge.textContent = isMergePdf && job.result ? 'Page Ready' : 'Converting…';
           statusBadge.className = 'pk-file-status-badge text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/30 animate-pulse';
         } else if (job.status === 'done') {
           statusBadge.textContent = 'Ready';
@@ -3907,7 +5270,8 @@ export function mountConverterApp(): void {
       }
 
       if (job.status === 'done' && job.result) {
-        const destExt = (job.resultName?.split('.').pop() || state.to).toUpperCase();
+        const isMergePdf = state.mergePdf && state.to === 'pdf' && state.jobs.length > 1;
+        const destExt = isMergePdf ? 'PDF' : (job.resultName?.split('.').pop() || state.to).toUpperCase();
         if (arrow) arrow.classList.remove('hidden');
         if (resultSize) {
           const resDimStr = job.resultWidth && job.resultHeight ? ` (${job.resultWidth}×${job.resultHeight})` : '';
@@ -4153,7 +5517,7 @@ export function mountConverterApp(): void {
               const [moved] = state.jobs.splice(fromIdx, 1);
               if (moved) {
                 state.jobs.splice(toIdx, 0, moved);
-                renderFiles();
+    renderFiles();
               }
             }
           }
@@ -4171,11 +5535,13 @@ export function mountConverterApp(): void {
             e.stopPropagation();
             if (job.status === 'working') return;
             if (job.previewUrl) URL.revokeObjectURL(job.previewUrl);
+            if (job.thumbUrl && job.thumbUrl !== job.previewUrl) URL.revokeObjectURL(job.thumbUrl);
             if (job.resultPreviewUrl) URL.revokeObjectURL(job.resultPreviewUrl);
+            if (job.resultThumbUrl && job.resultThumbUrl !== job.resultPreviewUrl) URL.revokeObjectURL(job.resultThumbUrl);
             if (job.adjustedPreviewUrl) URL.revokeObjectURL(job.adjustedPreviewUrl);
             if (job.croppedPreviewUrl && job.croppedPreviewUrl !== job.adjustedPreviewUrl) URL.revokeObjectURL(job.croppedPreviewUrl);
             state.jobs = state.jobs.filter((j) => j.id !== job.id);
-            renderFiles();
+    renderFiles();
             updateButtons();
             updateProgress();
           });
@@ -4229,8 +5595,7 @@ export function mountConverterApp(): void {
             job.croppedPreviewUrl = undefined;
           }
           updateJobPreviewTransform();
-          await generateJobAdjustedPreview(job);
-          renderFiles();
+    renderFiles();
           updateLiveDimensionsAndCardPreviews();
         });
 
@@ -4255,8 +5620,7 @@ export function mountConverterApp(): void {
             job.croppedPreviewUrl = undefined;
           }
           updateJobPreviewTransform();
-          await generateJobAdjustedPreview(job);
-          renderFiles();
+    renderFiles();
           updateLiveDimensionsAndCardPreviews();
         });
 
@@ -4281,8 +5645,7 @@ export function mountConverterApp(): void {
             job.croppedPreviewUrl = undefined;
           }
           updateJobPreviewTransform();
-          await generateJobAdjustedPreview(job);
-          renderFiles();
+    renderFiles();
           updateLiveDimensionsAndCardPreviews();
         });
 
@@ -4308,8 +5671,7 @@ export function mountConverterApp(): void {
             job.croppedPreviewUrl = undefined;
           }
           updateJobPreviewTransform();
-          await generateJobAdjustedPreview(job);
-          renderFiles();
+    renderFiles();
           updateLiveDimensionsAndCardPreviews();
         });
 
@@ -4452,12 +5814,54 @@ export function mountConverterApp(): void {
     if (convertBtn) {
       convertBtn.disabled = state.converting || pendingJobs === 0;
       const isMerge = state.mergePdf && state.to === 'pdf' && state.jobs.length > 1;
-      const btnText = isMerge ? 'Merge & Convert to Single PDF' : 'Convert & Compress Now';
+      
+      let btnText = 'Convert & Compress Now';
+      if (isMerge) {
+        btnText = 'Merge & Convert to Single PDF';
+      } else if (currentToolMode === 'crop') {
+        btnText = 'Crop & Frame Now';
+      } else if (currentToolMode === 'resize') {
+        btnText = 'Resize Resolution Now';
+      } else if (currentToolMode === 'compress') {
+        btnText = 'Compress Image Now';
+      } else if (currentToolMode === 'convert') {
+        btnText = 'Convert Image Now';
+      } else if (currentToolMode === 'passport') {
+        btnText = 'Apply Portal Specs & Convert';
+      } else {
+        const hasCrop = state.cropAspect && state.cropAspect !== 'original';
+        const hasResize =
+          (state.scalePercent && state.scalePercent !== 100) ||
+          (state.dimensions && state.dimensions.mode !== 'original');
+        const hasCompress = Boolean(state.targetKb);
+
+        if (hasCrop && hasResize && hasCompress) {
+          btnText = 'Crop, Resize & Compress Now';
+        } else if (hasCrop && hasCompress) {
+          btnText = 'Crop & Compress Now';
+        } else if (hasResize && hasCompress) {
+          btnText = 'Resize & Compress Now';
+        } else if (hasCrop && hasResize) {
+          btnText = 'Crop & Resize Now';
+        } else if (hasCompress) {
+          btnText = 'Convert & Compress Now';
+        } else {
+          btnText = 'Convert Image Now';
+        }
+      }
+
       convertBtn.innerHTML = state.converting
         ? '<span class="animate-spin inline-block mr-1.5">⟳</span> Converting…'
         : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> <span>${btnText}</span>`;
     }
     if (clearBtn) clearBtn.disabled = state.converting || state.jobs.length === 0;
+
+
+
+    if (filesHeader && filesCount) {
+      filesHeader.classList.toggle('hidden', state.jobs.length === 0);
+      filesCount.textContent = `${state.jobs.length} file${state.jobs.length === 1 ? '' : 's'} selected`;
+    }
 
     if (downloadAllBtn) {
       downloadAllBtn.classList.toggle('hidden', doneJobs < 2);
@@ -4511,7 +5915,27 @@ export function mountConverterApp(): void {
   // Initial render & format UI setup
   updateFormatUi();
   renderFiles();
+  setToolMode(initialToolMode, false);
   updateButtons();
+  updateStageDots();
+  
+  // Clicking outside deselects the active card
+  document.addEventListener('click', (e) => {
+    if (!selectedJobId) return;
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('.pk-file-item') ||
+      target.closest('#pk-panel-custom') ||
+      target.closest('#pk-active-photo-bar') ||
+      target.closest('#pk-crop-modal') ||
+      target.closest('#pk-resize-modal') ||
+      target.closest('#pk-compare-modal')
+    ) {
+      return;
+    }
+    selectJob(null);
+  });
+
 }
 
 // ---------- helpers ----------

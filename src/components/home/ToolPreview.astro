@@ -9,6 +9,7 @@ interface Props {
   fromMime?: string;
   toMime?: string;
   targetKb?: number | null;
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   fromMime = 'image/heic',
   toMime = 'image/jpeg',
   targetKb = null,
+  initialTool = 'all',
 } = Astro.props;
 ---
 
@@ -27,5 +29,6 @@ const {
     fromMime={fromMime}
     toMime={toMime}
     targetKb={targetKb}
+    initialTool={initialTool}
   />
 </div>

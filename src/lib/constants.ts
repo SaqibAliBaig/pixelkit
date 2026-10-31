@@ -63,6 +63,7 @@ export const NAV: NavItem[] = [
   { label: 'Convert', href: '/convert/' },
   { label: 'Resize', href: '/resize-image/' },
   { label: 'Crop', href: '/crop-image/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
   { label: 'Blog', href: '/blog/' },
   { label: 'About', href: '/about/' },
 ];

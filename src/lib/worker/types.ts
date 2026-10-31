@@ -29,6 +29,9 @@ export type CropAspectPreset =
   | 'original'
   | '1:1'
   | '3.5:4.5'
+  | '2:1'
+  | '5:7'
+  | '3:4'
   | '4:3'
   | '16:9'
   | '9:16'
@@ -60,6 +63,19 @@ export interface TargetSizeOptions {
   targetKb: number | null;
   minKb?: number | null;
   maxKb?: number | null;
+}
+
+export interface MergePdfPage {
+  blob: Blob;
+  width: number;
+  height: number;
+}
+
+export interface MergePdfRequest {
+  type: 'merge-pdf';
+  id: string;
+  pages: MergePdfPage[];
+  title?: string;
 }
 
 export interface ConvertRequest {

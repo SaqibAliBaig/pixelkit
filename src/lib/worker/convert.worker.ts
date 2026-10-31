@@ -14,6 +14,7 @@
 import type {
   ConvertRequest,
   ConvertSuccess,
+  MergePdfRequest,
   WorkerMessage,
 } from './types';
 import { mimeToOutputFormat, buildFilename, mimeForExtension } from '../engines';
@@ -21,23 +22,50 @@ import { detectMimeFromMagicBytes } from '../utils/mime';
 import { compressToTarget, compressWithDownscale } from './compression';
 import { extractExifSegment, insertExifIntoJpeg } from './exif';
 import { applyAdjustments } from './adjustments';
+import { jpegToPdf, mergeImagesToPdf, pdfOverheadBytes } from './pdf';
 
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 
-ctx.addEventListener('message', async (event: MessageEvent<ConvertRequest>) => {
+ctx.addEventListener('message', async (event: MessageEvent<ConvertRequest | MergePdfRequest>) => {
   const req = event.data;
+  if ('type' in req && req.type === 'merge-pdf') {
+    try {
+      const pages = req.pages.map((p) => ({
+        jpegBlob: p.blob,
+        widthPx: p.width,
+        heightPx: p.height,
+      }));
+      const blob = await mergeImagesToPdf(pages, req.title || 'PixelKit Merged Document');
+      const filename = `PixelKit-merged-${Date.now()}.pdf`;
+      const originalSize = req.pages.reduce((acc, p) => acc + p.blob.size, 0);
+      const msg: ConvertSuccess = {
+        type: 'result',
+        id: req.id,
+        blob,
+        filename,
+        originalSize,
+        resultSize: blob.size,
+      };
+      ctx.postMessage(msg);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      ctx.postMessage({ type: 'error', id: req.id, message });
+    }
+    return;
+  }
+  const convertReq = req as ConvertRequest;
   try {
-    const result = await handleConvert(req);
+    const result = await handleConvert(convertReq);
     const filename =
-      req.pdfPageNumber && req.pdfTotalPages && req.pdfTotalPages > 1 && !req.file.name.includes(`_page_${req.pdfPageNumber}`) && !req.file.name.includes(`-page-${req.pdfPageNumber}`)
-        ? buildFilename(req.file.name.replace(/\.pdf$/i, `-page-${req.pdfPageNumber}.pdf`), req.to)
-        : buildFilename(req.file.name, req.to);
+      convertReq.pdfPageNumber && convertReq.pdfTotalPages && convertReq.pdfTotalPages > 1 && !convertReq.file.name.includes(`_page_${convertReq.pdfPageNumber}`) && !convertReq.file.name.includes(`-page-${convertReq.pdfPageNumber}`)
+        ? buildFilename(convertReq.file.name.replace(/\.pdf$/i, `-page-${convertReq.pdfPageNumber}.pdf`), convertReq.to)
+        : buildFilename(convertReq.file.name, convertReq.to);
     const msg: ConvertSuccess = {
       type: 'result',
-      id: req.id,
+      id: convertReq.id,
       blob: result.blob,
       filename,
-      originalSize: req.file.size,
+      originalSize: convertReq.file.size,
       resultSize: result.blob.size,
       originalWidth: result.originalWidth,
       originalHeight: result.originalHeight,
@@ -48,7 +76,7 @@ ctx.addEventListener('message', async (event: MessageEvent<ConvertRequest>) => {
     ctx.postMessage(msg);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    const msg: WorkerMessage = { type: 'error', id: req.id, message };
+    const msg: WorkerMessage = { type: 'error', id: (req as ConvertRequest).id, message };
     ctx.postMessage(msg);
   }
 });
@@ -259,7 +287,10 @@ async function encodeCanvasOutput(
   quality?: number
 ): Promise<Blob> {
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-  const ctx2d = canvas.getContext('2d');
+  const ctx2d = canvas.getContext('2d', {
+    alpha: mime !== 'image/jpeg',
+    willReadFrequently: false,
+  });
   if (!ctx2d) throw new Error('2D context unavailable');
 
   // Strip transparency with clean white background for JPEG if enabled
@@ -295,7 +326,7 @@ async function encodePngOutput(
   targetBytes: number | null
 ): Promise<Blob> {
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-  const ctx2d = canvas.getContext('2d');
+  const ctx2d = canvas.getContext('2d', { willReadFrequently: false });
   if (!ctx2d) throw new Error('2D context unavailable');
   ctx2d.drawImage(bitmap, 0, 0);
 
@@ -321,12 +352,11 @@ async function encodePdfOutput(
   targetBytes: number | null,
   originalName: string
 ): Promise<Blob> {
-  const { jpegToPdf, pdfOverheadBytes } = await import('./pdf');
   const overhead = pdfOverheadBytes();
   const jpegTarget = targetBytes ? Math.max(1024, targetBytes - overhead) : null;
 
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-  const ctx2d = canvas.getContext('2d');
+  const ctx2d = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
   if (!ctx2d) throw new Error('2D context unavailable');
 
   // Fill with solid white background for clean PDF page rendering

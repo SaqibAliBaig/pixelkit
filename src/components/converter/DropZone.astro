@@ -3,16 +3,32 @@ interface Props {
   accept: string;
   from: string;
   to?: string;
+  initialTool?: string;
 }
 
-const { accept, from, to } = Astro.props;
+const { accept, from, to, initialTool = 'all' } = Astro.props;
 const fromUpper = from.toUpperCase();
 const toUpper = to ? to.toUpperCase() : '';
+
+const promptText =
+  initialTool === 'crop'
+    ? 'Drop any photo to crop & frame'
+    : initialTool === 'resize'
+    ? 'Drop any photo to resize resolution'
+    : initialTool === 'passport'
+    ? 'Drop photo for passport or visa portal'
+    : initialTool === 'convert'
+    ? 'Drop any photo or document to convert'
+    : initialTool === 'compress'
+    ? 'Drop any photo to compress file size'
+    : 'Drop any image or document here';
 ---
 
-<label
+<div
   id="pk-dropzone"
-  for="pk-file-input"
+  role="region"
+  tabindex="0"
+  aria-label={`Dropzone: ${promptText}`}
   class="group relative flex flex-col items-center justify-center gap-2.5 rounded-xl sm:rounded-2xl border-2 border-dashed border-border bg-bg/40 px-4 py-7 sm:px-6 sm:py-9 text-center cursor-pointer transition-all hover:border-accent hover:bg-bg/60 active:scale-[0.99] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20"
   data-dragover="false"
 >
@@ -22,7 +38,7 @@ const toUpper = to ? to.toUpperCase() : '';
     accept={accept}
     multiple
     class="sr-only"
-    aria-label={`Drop any image or document to convert`}
+    aria-label="Upload files from your device"
   />
 
   <div
@@ -46,7 +62,7 @@ const toUpper = to ? to.toUpperCase() : '';
   </div>
 
   <div class="text-sm">
-    <span class="font-semibold text-fg">Drop any image or document here</span>
+    <span id="pk-dropzone-prompt" class="font-semibold text-fg">{promptText}</span>
     <span class="text-muted"> or </span>
     <span class="font-semibold text-accent underline underline-offset-4 group-hover:text-accent/90">
       browse files
@@ -54,6 +70,28 @@ const toUpper = to ? to.toUpperCase() : '';
   </div>
   <p class="text-xs text-muted max-w-sm">
     Supports <span class="font-medium text-fg">JPG, PNG, HEIC, WEBP, PDF, SVG, TIFF, AVIF, GIF, BMP</span>
-    {toUpper && <span> · Preset for <span class="font-medium text-fg">{fromUpper}</span> → <span class="text-accent font-semibold">{toUpper}</span></span>}
+    {toUpper && fromUpper !== toUpper && !['crop', 'resize', 'passport'].includes(initialTool) && (
+      <span> · Preset for <span class="font-medium text-fg">{fromUpper}</span> → <span class="text-accent font-semibold">{toUpper}</span></span>
+    )}
   </p>
-</label>
+  <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-0.5 text-[11px] text-muted">
+    <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      No file size limit
+    </span>
+    <span>·</span>
+    <span class="inline-flex items-center gap-1 font-medium text-fg/80">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="8.5" cy="7" r="4"></circle>
+        <line x1="20" y1="8" x2="20" y2="14"></line>
+        <line x1="23" y1="11" x2="17" y2="11"></line>
+      </svg>
+      Add unlimited photos
+    </span>
+    <span>·</span>
+    <span>100% in-browser</span>
+  </div>
+</div>

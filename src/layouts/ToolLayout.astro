@@ -7,6 +7,7 @@ import FAQSection from '@components/seo/FAQSection.astro';
 import RelatedCombos from '@components/seo/RelatedCombos.astro';
 import UseCaseGrid from '@components/seo/UseCaseGrid.astro';
 import RelatedBlog from '@components/seo/RelatedBlog.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
 import Converter from '../components/converter/Converter.astro';
 import { buildToolJsonLd } from '@lib/seo/jsonld';
 
@@ -94,10 +95,13 @@ const toolKeywords = [
       fromMime={combo.fromMime}
       toMime={combo.toMime}
       targetKb={combo.sizeKb}
+      initialTool={combo.sizeKb ? 'compress' : 'convert'}
     />
   </div>
 
   <ToolIntro combo={combo} intro={intro} />
+
+  <PortalRequirementsGuide format={toLabel} sizeKb={combo.sizeKb} />
 
   <FAQSection faqs={faqs} />
 

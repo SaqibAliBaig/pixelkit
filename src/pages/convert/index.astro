@@ -78,6 +78,14 @@ const convertFaqs = [
     q: 'Will converting between image formats degrade picture quality?',
     a: 'PixelKit provides lossless conversion wherever mathematically possible (such as SVG vector rendering, PNG quantization, and lossless WebP). When converting to lossy formats like JPG or lossy WebP, PixelKit uses high-precision 4:4:4 or 4:2:0 chroma subsampling and adaptive quantization matrices to preserve fine details, text legibility, and realistic skin tones without creating distracting blocky compression artifacts.',
   },
+  {
+    q: 'How do the 1-Click Government & Visa Portal Presets work?',
+    a: 'PixelKit includes pre-configured 1-click profiles for US Visa (DS-160 / Diversity Lottery, 600×600 px, 240 KB), Indian Passport, PAN, and Aadhaar (413×531 px, 100 KB), Schengen European Visa (413×531 px, 200 KB), Civil Service / Recruitment Exams like UPSC, SSC, NEET (350×450 px, 50 KB), Official Signature Uploads (280×140 px, 20 KB), and Canada Visa / PR (420×540 px, 240 KB). Selecting any preset automatically synchronizes crop aspect ratio, target pixel dimensions, and binary-search file size limits in a single step.',
+  },
+  {
+    q: 'Can I crop, resize, and convert an image at the same time?',
+    a: 'Yes. PixelKit is an all-in-one image processing suite. You can drop any photo or document, crop to any custom or portal ratio, scale pixel dimensions to official requirements, and convert to JPG, WebP, PNG, or PDF under an exact KB limit in one seamless browser session.',
+  },
 ];
 
 const jsonLd = [
@@ -136,7 +144,7 @@ const jsonLd = [
     </header>
 
     <div class="mt-6 sm:mt-8">
-      <ToolPreview from="heic" to="jpg" fromMime="image/heic" toMime="image/jpeg" />
+      <ToolPreview from="heic" to="jpg" fromMime="image/heic" toMime="image/jpeg" initialTool="convert" />
     </div>
 
     <!-- Instant Live Search & Filter Bar -->
@@ -293,6 +301,80 @@ const jsonLd = [
       </div>
     </section>
 
+    <!-- Government & Visa Portal Presets Overview -->
+    <section class="mt-12 rounded-2xl border border-border bg-surface p-6 sm:p-8" aria-labelledby="portal-presets-heading">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 id="portal-presets-heading" class="text-xl font-semibold tracking-tight text-fg">
+            1-Click Government &amp; Visa Portal Presets
+          </h2>
+          <p class="mt-1 text-sm text-muted">
+            Eliminate rejection errors with pre-configured crop aspect ratios, pixel dimensions, and KB size ceilings built right into the converter.
+          </p>
+        </div>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1 text-xs font-semibold text-accent">
+          Instant 1-Click Setup
+        </span>
+      </div>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 text-xs">
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇺🇸</span>
+            <h3 class="font-semibold text-fg text-sm">US Visa / DS-160 / Diversity Lottery</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Automatically applies 1:1 square crop anchored to head-and-shoulders, resizes to 600×600 px (2×2 inches at 300 DPI), and limits file size to under 240 KB JPEG.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇮🇳</span>
+            <h3 class="font-semibold text-fg text-sm">Indian Passport / PAN / Aadhaar</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Crops to official 3.5:4.5 ratio, scales to 413×531 px (35×45 mm), and performs binary-search compression under 100 KB JPG for passport Seva Kendra and UIDAI forms.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇪🇺</span>
+            <h3 class="font-semibold text-fg text-sm">Schengen / European Visa</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Configures 3.5:4.5 biometric crop framing, resizes to 413×531 px at European consulate standards, and guarantees file weight stays under 200 KB JPG.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🎓</span>
+            <h3 class="font-semibold text-fg text-sm">Civil Service &amp; Exams (UPSC / SSC / NEET)</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Applies 3.5:4.5 portrait crop, resizes directly to 350×450 px, and ensures exact compression under strict 50 KB JPG thresholds enforced by national exam servers.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">✍️</span>
+            <h3 class="font-semibold text-fg text-sm">Official Signature Upload</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Wide 2:1 crop ratio centered on handwriting ink strokes, scaled to 280×140 px, compressed strictly under 20 KB JPG for banking KYC and government applications.
+          </p>
+        </div>
+        <div class="rounded-xl border border-border/80 bg-bg/50 p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇨🇦</span>
+            <h3 class="font-semibold text-fg text-sm">Canada Visa &amp; Permanent Residence (PR)</h3>
+          </div>
+          <p class="mt-2 text-muted leading-relaxed">
+            Crops to 5:7 aspect ratio (50×70 mm biometric spec), resizes to 420×540 px, and tunes compression to land safely under the 240 KB JPG ceiling.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- In-Depth Format Matrix & Conversion Pipeline Guide -->
     <section class="mt-16 rounded-2xl border border-border bg-surface p-6 sm:p-10 text-fg" aria-labelledby="format-guide-heading">
       <h2 id="format-guide-heading" class="text-xl sm:text-2xl font-bold tracking-tight text-fg">
@@ -432,6 +514,19 @@ const jsonLd = [
       </div>
 
     
+      <!-- Unified Pipeline & Batch Engine -->
+      <div class="mt-8 border-t border-border pt-6">
+        <h4 class="text-sm font-semibold text-fg">
+          All-in-One Image Pipeline: Unified Crop, Resize, Format Conversion &amp; Binary Compression
+        </h4>
+        <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+          Traditional image tools force users into frustrating multi-step loops: upload to one website to crop the headshot, download the result, upload to a second website to resize pixel dimensions, download again, and finally upload to a third tool to compress under a 100 KB limit. PixelKit completely eliminates this tedious cycle by executing all four transformations simultaneously in a single client-side pipeline.
+        </p>
+        <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+          When you configure your desired aspect ratio (e.g. 1:1 or 3.5:4.5), specify bounding pixel dimensions (such as 600×600 px or 413×531 px), choose an output format (JPG, WebP, PNG, or PDF), and set a target kilobyte ceiling, PixelKit's WebAssembly canvas engine calculates bicubic resampling, applies focal cropping coordinates, transforms color spaces to sRGB, and runs iterative binary search quantization all in one fluid in-browser operation. You receive a fully compliant, high-fidelity file in under half a second with zero quality loss from repeated intermediate re-encodings.
+        </p>
+      </div>
+
       <!-- Core Web Vitals & Batch Engine -->
       <div class="mt-8 border-t border-border pt-6">
         <h4 class="text-sm font-semibold text-fg">
@@ -449,6 +544,40 @@ const jsonLd = [
         <p class="mt-2 text-xs text-muted leading-relaxed">
           Traditional server-side batch converters queue jobs in remote worker clusters, leading to delayed turnaround times, upload bandwidth consumption, and severe data privacy risks. PixelKit executes all image codecs inside isolated WebAssembly (Wasm) modules driven by browser Web Workers. By utilizing parallel CPU threads right on your machine, batch operations convert dozens of images simultaneously at wire-speed without freezing your browser interface or consuming data plan upload quotas.
         </p>
+      </div>
+
+    
+      <!-- Frequently Converted Workflows -->
+      <div class="mt-8 border-t border-border pt-6">
+        <h4 class="text-sm font-semibold text-fg">
+          High-Demand Conversion Workflows &amp; Technical Tips
+        </h4>
+        <div class="mt-3 grid gap-4 sm:grid-cols-2 text-xs text-muted leading-relaxed">
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">iPhone HEIC to JPG for Visa and Exam Uploads</h5>
+            <p class="mt-1">
+              Apple iOS devices capture photos in high-efficiency HEIC files by default. While HEIC offers excellent dynamic range, almost all international consular systems, university portals, and state government verification services immediately fail with unsupported format errors when uploading .heic files. Converting to standardized JPG guarantees 100% acceptance without losing facial sharpness or color fidelity.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">PNG to WebP for Maximum Page Speed</h5>
+            <p class="mt-1">
+              Heavy PNG graphics such as UI wireframes, software screenshots, and transparent brand marks frequently bloat website bundles. Converting to lossy or lossless WebP maintains complete transparent alpha channel cutouts and crisp vector typography while reducing HTTP payload weight by an average of 35% to 45%, directly improving Core Web Vitals LCP benchmarks.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">SVG to Raster PNG for Print &amp; Legacy Platforms</h5>
+            <p class="mt-1">
+              Scalable Vector Graphics (SVG) scale infinitely in modern browsers, but email marketing clients, document processors, and social media platforms require raster bitmap images. PixelKit's SVG converter allows you to specify custom scale multipliers (1x, 2x, 4x) to render ultra-sharp high-DPI Retina PNG or JPG assets with crystal-clear edges.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
+            <h5 class="font-semibold text-fg">PDF Page Extraction &amp; Archival Image Packaging</h5>
+            <p class="mt-1">
+              Extract high-resolution raster images from multi-page PDF documents without installing bloated desktop software or compromising confidential financial or medical reports. PixelKit decodes individual PDF pages at full 300 DPI clarity directly in your local browser sandbox, preserving crisp document legibility for official re-use.
+            </p>
+          </div>
+        </div>
       </div>
 
     

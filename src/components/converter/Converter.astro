@@ -19,9 +19,10 @@ interface Props {
   fromMime: string;
   toMime: string;
   targetKb: number | null;
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
 }
 
-const { from, to, fromMime, toMime, targetKb } = Astro.props;
+const { from, to, fromMime, toMime, targetKb, initialTool = 'all' } = Astro.props;
 
 // Universal accept: all supported image formats + PDF
 const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tiff,.pdf';
@@ -35,11 +36,82 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
   data-from-mime={fromMime}
   data-to-mime={toMime}
   data-target-kb={targetKb ?? ''}
+  data-initial-tool={initialTool}
   aria-label="File converter"
 >
+  <!-- Top Mode Segmented Switcher: All-in-One · Convert · Compress · Crop · Resize · Passport -->
+  <div class="mb-4 sm:mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5">
+    <div
+      id="pk-top-mode-bar"
+      class="inline-flex items-center gap-1 p-1 rounded-xl bg-surface/60 border border-border text-xs font-semibold overflow-x-auto max-w-full scrollbar-none shadow-2xs"
+      role="tablist"
+      aria-label="Processing Mode"
+    >
+      <a
+        href="/"
+        data-mode="all"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'all' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        All-in-One
+      </a>
+      <a
+        href="/convert/"
+        data-mode="convert"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'convert' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Convert
+      </a>
+      <a
+        href="/compress-image/"
+        data-mode="compress"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'compress' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Compress
+      </a>
+      <a
+        href="/crop-image/"
+        data-mode="crop"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'crop' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Crop
+      </a>
+      <a
+        href="/resize-image/"
+        data-mode="resize"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'resize' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Resize
+      </a>
+      <a
+        href="/passport-photo-resizer/"
+        data-mode="passport"
+        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+          initialTool === 'passport' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Portal Presets
+      </a>
+    </div>
+
+    <div class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+      <span>100% in-browser · Zero uploads</span>
+    </div>
+  </div>
+
   <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] items-start min-w-0">
     <div class="space-y-4 min-w-0 w-full">
-      <DropZone accept={accept} from={from} to={to} />
+      <DropZone accept={accept} from={from} to={to} initialTool={initialTool} />
       <ProgressBar />
       <FileList />
     </div>
@@ -49,6 +121,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
         from={from}
         to={to}
         targetKb={targetKb}
+        initialTool={initialTool}
       />
       <PrivacyNote />
     </aside>

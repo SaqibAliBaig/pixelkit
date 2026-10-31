@@ -41,6 +41,33 @@
         </p>
       </div>
 
+      <!-- Multi-photo Stepper (visible when multiple images are loaded) -->
+      <div id="pk-resize-modal-stepper" class="hidden items-center gap-1.5 px-2 py-1 rounded-lg bg-bg border border-border text-xs shrink-0 mr-2">
+        <button
+          type="button"
+          id="pk-resize-modal-prev-btn"
+          class="p-1 rounded text-muted hover:text-fg hover:bg-surface disabled:opacity-30 cursor-pointer transition-colors"
+          title="Previous photo"
+          aria-label="Previous photo"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <span id="pk-resize-modal-counter" class="font-mono text-[11px] font-bold text-fg px-1">1 / 3</span>
+        <button
+          type="button"
+          id="pk-resize-modal-next-btn"
+          class="p-1 rounded text-muted hover:text-fg hover:bg-surface disabled:opacity-30 cursor-pointer transition-colors"
+          title="Next photo"
+          aria-label="Next photo"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
       <!-- Close Button with comfortable touch target -->
       <button
         id="pk-resize-close-btn"
@@ -174,6 +201,18 @@
               <span class="block font-semibold text-xs truncate">Square Avatar</span>
               <span class="block text-[10px] text-muted font-mono">600 × 600 px</span>
             </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="exam" data-w="350" data-h="450">
+              <span class="block font-semibold text-xs truncate">🎓 Exam / UPSC</span>
+              <span class="block text-[10px] text-muted truncate">350 × 450 px</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="sign" data-w="280" data-h="140">
+              <span class="block font-semibold text-xs truncate">✍️ Signature</span>
+              <span class="block text-[10px] text-muted truncate">280 × 140 px (2:1)</span>
+            </button>
+            <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="canada" data-w="420" data-h="540">
+              <span class="block font-semibold text-xs truncate">🇨🇦 Canada PR</span>
+              <span class="block text-[10px] text-muted truncate">420 × 540 px</span>
+            </button>
             <button type="button" class="pk-modal-dim-preset p-2 rounded-lg border border-border bg-surface text-fg hover:border-accent/40 transition-colors text-left cursor-pointer" data-preset="webhd" data-w="1920" data-h="1080">
               <span class="block font-semibold text-xs truncate">Web HD</span>
               <span class="block text-[10px] text-muted font-mono">1920 × 1080 px</span>
@@ -206,25 +245,27 @@
 
           <div class="flex items-center gap-2">
             <div class="flex-1">
-              <label for="pk-modal-dim-w" class="block text-[10px] text-muted mb-0.5">Width (px)</label>
+              <span class="block text-[10px] text-muted mb-0.5">Width (px)</span>
               <input
                 id="pk-modal-dim-w"
                 type="number"
                 min="10"
                 max="16000"
                 placeholder="e.g. 1920"
+                aria-label="Width in pixels"
                 class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
               />
             </div>
             <span class="text-muted font-bold mt-3">×</span>
             <div class="flex-1">
-              <label for="pk-modal-dim-h" class="block text-[10px] text-muted mb-0.5">Height (px)</label>
+              <span class="block text-[10px] text-muted mb-0.5">Height (px)</span>
               <input
                 id="pk-modal-dim-h"
                 type="number"
                 min="10"
                 max="16000"
                 placeholder="e.g. 1080"
+                aria-label="Height in pixels"
                 class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
               />
             </div>
@@ -242,15 +283,16 @@
             </div>
           </div>
 
-          <label for="pk-modal-no-upscale" class="flex items-center gap-2 text-muted hover:text-fg cursor-pointer select-none text-[11px] pt-0.5">
+          <div class="flex items-center gap-2 text-muted hover:text-fg cursor-pointer select-none text-[11px] pt-0.5" onclick="document.getElementById('pk-modal-no-upscale')?.click()">
             <input
               id="pk-modal-no-upscale"
               type="checkbox"
               checked
+              aria-label="Do not upscale if original is smaller"
               class="rounded border-border accent-accent h-4 w-4 cursor-pointer"
             />
             <span>Do not upscale if original is smaller</span>
-          </label>
+          </div>
         </div>
       </div>
     </div>

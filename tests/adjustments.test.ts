@@ -72,6 +72,39 @@ function createTestBitmap(width: number, height: number): Promise<ImageBitmap> {
     adjusted.close?.();
   });
 
+  it('applies 2:1 official signature crop correctly', async () => {
+    const src = await createTestBitmap(1000, 1000); // 1:1 square source
+    const adjusted = await applyAdjustments(src, { cropAspect: '2:1' });
+
+    // Target ratio 2:1
+    expect(adjusted.width).toBe(1000);
+    expect(adjusted.height).toBe(500);
+    src.close?.();
+    adjusted.close?.();
+  });
+
+  it('applies 5:7 Canada visa crop correctly', async () => {
+    const src = await createTestBitmap(1000, 1000); // 1:1 square source
+    const adjusted = await applyAdjustments(src, { cropAspect: '5:7' });
+
+    // Target ratio 5:7 (~0.714)
+    const ratio = adjusted.width / adjusted.height;
+    expect(Math.abs(ratio - (5 / 7))).toBeLessThan(0.01);
+    src.close?.();
+    adjusted.close?.();
+  });
+
+  it('applies 3:4 portrait crop correctly', async () => {
+    const src = await createTestBitmap(1000, 1000); // 1:1 square source
+    const adjusted = await applyAdjustments(src, { cropAspect: '3:4' });
+
+    // Target ratio 3:4 (0.75)
+    const ratio = adjusted.width / adjusted.height;
+    expect(Math.abs(ratio - (3 / 4))).toBeLessThan(0.01);
+    src.close?.();
+    adjusted.close?.();
+  });
+
   it('applies percentage scaling correctly (50%)', async () => {
     const src = await createTestBitmap(800, 600);
     const adjusted = await applyAdjustments(src, {

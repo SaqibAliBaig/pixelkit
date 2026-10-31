@@ -82,7 +82,7 @@ const jsonLd = [
 
     <!-- Tool Preview -->
     <div class="mt-6 sm:mt-8">
-      <ToolPreview from="jpg" to="jpg" fromMime="image/jpeg" toMime="image/jpeg" />
+      <ToolPreview from="jpg" to="jpg" fromMime="image/jpeg" toMime="image/jpeg" initialTool="crop" />
     </div>
 
     <!-- Aspect Ratio Guide Grid -->
@@ -130,6 +130,9 @@ const jsonLd = [
         <p>
           When you use PixelKit's in-browser Crop Studio, your original pixels are manipulated entirely in local device memory via high-performance HTML5 Canvas APIs. You can activate the 3×3 Rule of Thirds grid overlay to align focal points along harmonic visual intersections, lock specific aspect ratios to prevent accidental stretching, or drag freeform crop handles for pixel-level framing precision.
         </p>
+        <p>
+          Unlike conventional online editors that restrict you to 10 or 20 images per session or impose file size caps of 25MB to 50MB, PixelKit delivers unconstrained freedom. You can queue unlimited photos simultaneously, process raw multi-megapixel captures, and apply tailored crops to individual pictures or bulk-apply aspect ratios across your entire selection. Everything executes locally in parallel through Web Workers, meaning massive 50MB+ photos convert instantaneously without uploading bytes to external servers or risking data breaches.
+        </p>
         <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
           <div class="rounded-xl border border-border bg-bg/50 p-4">
             <h3 class="font-semibold text-fg text-sm">Compositional Integrity</h3>
@@ -141,6 +144,18 @@ const jsonLd = [
             <h3 class="font-semibold text-fg text-sm">Target Resolution Retention</h3>
             <p class="text-xs text-muted mt-1">
               Cropping discards peripheral pixels. If your target destination demands minimum dimensions (e.g., 600×600 px for passport portals), start from high-resolution source captures.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Batch Multi-Photo Workflow</h3>
+            <p class="text-xs text-muted mt-1">
+              Upload as many images as you need with zero file count limits. Crop each photo individually with interactive handles or apply consistent aspect ratios across your entire photo queue.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Zero File Size Restrictions</h3>
+            <p class="text-xs text-muted mt-1">
+              No artificial size caps or paywalls. Process high-res DSLR photographs, full-resolution phone panoramas, and large uncompressed bitmaps directly in your local browser memory.
             </p>
           </div>
         </div>

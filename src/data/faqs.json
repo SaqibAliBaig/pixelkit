@@ -14,7 +14,7 @@
     },
     {
       "q": "Is there a file size limit?",
-      "a": "There is no server-side limit because there is no server. Very large files may be limited only by your device's available memory — usually several hundred MB on desktop and tens of MB on mobile."
+      "a": "No. There is no file size cap limit and no restrictions on how many photos you can add. Everything is processed 100% locally on your device without server limits, upload timeouts, or paywalls."
     },
     {
       "q": "Which browsers are supported?",

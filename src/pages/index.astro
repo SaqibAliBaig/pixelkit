@@ -68,11 +68,107 @@ const jsonLd = [
 >
   <div class="mx-auto max-w-5xl">
     <Hero />
-    <ToolPreview />
+    <ToolPreview initialTool="all" />
     <TrustBar />
     <PopularConversions />
     <FeatureGrid />
     <HowItWorks />
+
+    <!-- 20 Official Government & Consular Presets Showcase -->
+    <section class="mt-16 sm:mt-24 rounded-2xl border border-border bg-surface p-6 sm:p-10 shadow-xs" aria-labelledby="home-portal-presets-heading">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-accent">Consular &amp; Recruitment Verification</span>
+          <h2 id="home-portal-presets-heading" class="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-fg">
+            20 One-Click Government &amp; Visa Portal Presets
+          </h2>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed max-w-2xl">
+            Never fail an automated photo submission check. PixelKit automatically configures head-and-shoulders crop aspect ratios, exact pixel dimensions, and binary-search file size ceilings in a single tap.
+          </p>
+        </div>
+        <a
+          href="/passport-photo-resizer/"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent hover:bg-accent/15 transition-colors shrink-0 self-start sm:self-auto"
+        >
+          Open Passport Resizer →
+        </a>
+      </div>
+
+      <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇺🇸</span>
+            <span class="font-bold text-fg">US Visa &amp; DS-160</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">600×600 px · Max 240 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">1:1 square crop for US Embassy DS-160 and Green Card Lottery.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇮🇳</span>
+            <span class="font-bold text-fg">Indian Passport / Police</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">413×531 px · Max 100 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">35×45 mm spec for Passport Seva Kendra &amp; NRI renewal.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇪🇺</span>
+            <span class="font-bold text-fg">Schengen Europe Visa</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">413×531 px · Max 200 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">Biometric VFS Global &amp; TLScontact standards for EU states.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇬🇧</span>
+            <span class="font-bold text-fg">UK Passport &amp; UKVI</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">413×531 px · Max 200 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">HM Passport Office &amp; UK Visas digital photo guidelines.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇨🇦</span>
+            <span class="font-bold text-fg">Canada Visa &amp; PR</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">420×540 px · Max 240 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">50×70 mm biometric framing for IRCC Express Entry &amp; study.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🇦🇺</span>
+            <span class="font-bold text-fg">Australia ImmiAccount</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">413×531 px · Max 200 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">Department of Home Affairs standard for digital visa lodgement.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🎓</span>
+            <span class="font-bold text-fg">Civil Service Exams</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">350×450 px · Max 50 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">UPSC, SSC CGL/CHSL, NEET, IBPS &amp; state PSC recruitment forms.</p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/60 p-3.5">
+          <div class="flex items-center gap-2">
+            <span class="text-base">✍️</span>
+            <span class="font-bold text-fg">Official Signature / Thumb</span>
+          </div>
+          <div class="mt-1.5 font-mono text-[11px] text-accent font-semibold">280×140 px · Max 20 KB</div>
+          <p class="mt-1 text-muted text-[11px] leading-relaxed">Sharp black/blue ink extraction for banking KYC &amp; applications.</p>
+        </div>
+      </div>
+    </section>
+
     <div class="mt-16 sm:mt-24"><PortalRequirementsGuide />
       <div class="mt-16 sm:mt-24"><FAQSection faqs={homeFaqs} heading="Frequently Asked Questions About PixelKit" /></div>
     </div>

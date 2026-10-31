@@ -56,6 +56,13 @@ const { format = 'JPG', sizeKb = null } = Astro.props;
           <td class="py-2.5">350 × 450 px (Portrait)</td>
           <td class="py-2.5 font-medium text-accent">20 KB to 50 KB</td>
         </tr>
+        
+        <tr>
+          <td class="py-2.5 font-medium text-fg">Canada Visa, PR &amp; Express Entry (IRCC)</td>
+          <td class="py-2.5">JPEG / JPG</td>
+          <td class="py-2.5">420 × 540 px (50 × 70 mm, 5:7 aspect)</td>
+          <td class="py-2.5 font-medium text-accent">Under 240 KB</td>
+        </tr>
         <tr>
           <td class="py-2.5 font-medium text-fg">Official Digital Signature &amp; Thumbprint</td>
           <td class="py-2.5">JPG / PNG</td>
@@ -93,6 +100,38 @@ const { format = 'JPG', sizeKb = null } = Astro.props;
     </p>
     <p>
       <strong>Zero Server Uploads &amp; Guaranteed Privacy:</strong> Personal ID cards, passports, signatures, and biometric photographs are high-value targets for data scraping and identity theft. PixelKit is built with a zero-knowledge architecture: all decoding, cropping, resizing, and binary-search compression executes 100% inside your local device memory using WebAssembly. Your files are never stored, transmitted, or logged on remote servers.
+    </p>
+
+    <h3 class="text-base font-semibold text-fg pt-4">
+      Biometric Passport Photo Technical Verification Standards
+    </h3>
+    <p>
+      <strong>Head Height and Eye Line Centering:</strong> The International Civil Aviation Organization (ICAO Doc 9303) and ISO/IEC 19794-5 dictate that in biometric passport images, the vertical distance between the bottom of the chin and the top of the head (excluding voluminous hair) must measure strictly between 70% and 80% of total image frame height (typically 31 mm to 36 mm on a 45 mm high print). Furthermore, the horizontal center line of the subject's eyes must sit between 50% and 70% of total image height from the bottom edge. PixelKit's 1-click portal presets automatically center the framing coordinates to fulfill these strict geometric ratios on upload.
+    </p>
+    <p>
+      <strong>DPI vs Resolution Translation:</strong> Official guidelines frequently specify dimensions in physical millimeters alongside a minimum DPI requirement (e.g., 35 × 45 mm at 300 DPI). To compute required digital pixels, divide millimeters by 25.4 to convert to inches, then multiply by DPI: (35 / 25.4) × 300 = 413.38 pixels wide, and (45 / 25.4) × 300 = 531.49 pixels high. Uploading files with non-integer subpixel scaling causes border blurring. PixelKit renders exact 413 × 531 integer pixel dimensions directly to ensure pin-sharp biometric validation.
+    </p>
+    <p>
+      <strong>Eliminating JPEG Compression Artifacts (Ringing and Blocking):</strong> When aggressive compression is applied to small file sizes like 20 KB or 50 KB, standard 8×8 Discrete Cosine Transform (DCT) block boundaries become visible around high-frequency edges such as eyelashes, eyebrows, and iris contours. Automated portal gates flag these DCT artifacts as biometric scanning interference. PixelKit's binary search engine utilizes adaptive quantization matrix tuning to preserve smooth facial skin gradients while constraining file sizes exactly below government upload limits.
+    </p>
+    <p>
+      <strong>White Background Uniformity and Shadow Elimination:</strong> Biometric photo gates employ automated edge detection filters that compute luminance gradients across the background perimeter. Any shadow, color tint, wallpaper pattern, or flash reflection behind the ears or neck causes the boundary test to fail. PixelKit's canvas rendering pipeline cleanly isolates facial borders and normalizes background pixels to pure neutral white (#FFFFFF) or light grey (#F2F2F2) as mandated by Schengen, UKVI, and US State Department DS-160 standards.
+    </p>
+
+    <h3 class="text-base font-semibold text-fg pt-4">
+      Universal Document &amp; Signature Optimization Guidelines
+    </h3>
+    <p>
+      <strong>High-Contrast Binarization for Official Signatures:</strong> Digital signature slots on banking, PSC, and university portals require stark differentiation between ink pigments and the paper background. When photograph scans suffer from shadows or ambient room warmth, low-contrast ink lines can be misidentified as blank uploads. PixelKit applies high-frequency adaptive thresholding during processing, amplifying blue and black ballpoint strokes to maximum contrast while ensuring the surrounding boundary clears to pristine white.
+    </p>
+    <p>
+      <strong>Resolution Normalization for Mobile Phone Scans:</strong> Modern smartphone camera sensors capture between 12 and 48 megapixels (4000×3000 to 8000×6000 pixels). Attempting to compress a 48-megapixel image directly down to 100 KB without downsizing dimensions forces extreme DCT quantization, destroying document readability. By combining PixelKit's integrated dimension resizer with its kilobyte compression ladder, images are resampled to balanced display resolutions (such as 1200×1600 px) before compression occurs, retaining crystal-clear alphanumeric legibility on certificates, marks cards, and government identity proofs.
+    </p>
+    <p>
+      <strong>Cross-Platform EXIF Orientation Correction:</strong> When taking photos with a smartphone held vertically or upside-down, the physical image sensor registers the photo in raw landscape orientation and merely writes an EXIF orientation flag into the header. Many institutional portal servers run legacy image parsing scripts that discard EXIF orientation tags, causing passport photos and signature uploads to appear rotated sideways on identity cards and exam hall tickets. PixelKit's engine automatically detects sensor orientation and physically bakes the rotation directly into the raw canvas pixel matrix before export, ensuring every submission displays upright on every legacy or modern system.
+    </p>
+    <p>
+      <strong>Multi-Image Batch Queue with Unlimited File Capacities:</strong> Preparing submissions for multi-member families, travel groups, or multiple government departments often demands processing dozens of photos and supporting documents. PixelKit imposes zero artificial caps on file counts or total megabyte throughput. Drag and drop unlimited images into the processing queue, customize crop and dimension parameters per job or globally, and download the entire batch instantly as individual files or combined archives with zero waiting queues.
     </p>
   </div>
 </section>

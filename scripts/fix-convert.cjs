@@ -1,0 +1,13 @@
+const fs = require('fs');
+let c = fs.readFileSync('src/pages/convert/index.astro', 'utf8');
+c = c.replace(/href={`\/\$\{c\.from\}-to-\$\{c\.to\}`}/g, 'href={`/${c.from}-to-${c.to}/`}');
+c = c.replace(/href: '\/heic-to-jpg-under-100kb'/g, "href: '/heic-to-jpg-under-100kb/'");
+c = c.replace(/href: '\/jpg-to-pdf-under-100kb'/g, "href: '/jpg-to-pdf-under-100kb/'");
+c = c.replace(/href: '\/jpg-to-pdf-under-200kb'/g, "href: '/jpg-to-pdf-under-200kb/'");
+c = c.replace(/href: '\/png-to-jpg-under-50kb'/g, "href: '/png-to-jpg-under-50kb/'");
+c = c.replace(/href: '\/png-to-webp-under-100kb'/g, "href: '/png-to-webp-under-100kb/'");
+c = c.replace(/href: '\/jpg-to-webp-under-50kb'/g, "href: '/jpg-to-webp-under-50kb/'");
+c = c.replace(/href: '\/svg-to-png'/g, "href: '/svg-to-png/'");
+c = c.replace(/href: '\/pdf-to-jpg'/g, "href: '/pdf-to-jpg/'");
+fs.writeFileSync('src/pages/convert/index.astro', c, 'utf8');
+console.log('Fixed convert/index.astro trailing slashes');

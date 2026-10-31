@@ -25,18 +25,18 @@ const isActive = (href: string) =>
           height={28}
           alt={SITE.name}
           loading="eager"
-          class="h-7 w-7 rounded-lg shrink-0 object-contain shadow-sm"
+          class="h-7 w-7 rounded-lg shrink-0 object-contain shadow-sm dark:invert"
         />
         <span class="text-[15px] tracking-tight">{SITE.name}</span>
       </a>
 
       <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-1" aria-label="Primary">
+      <nav class="hidden md:flex items-center gap-0.5 lg:gap-1" aria-label="Primary">
         {NAV.map((item) => (
           <a
             href={item.href}
             class={[
-              'rounded-md px-3 py-2 text-sm transition-colors',
+              'rounded-md px-2.5 py-1.5 lg:px-3 lg:py-2 text-xs lg:text-sm transition-colors font-medium',
               isActive(item.href)
                 ? 'text-fg bg-surface'
                 : 'text-muted hover:text-fg hover:bg-surface',

@@ -1,7 +1,7 @@
 /**
  * Binary-search compression for lossy formats (JPG, WEBP, AVIF, PDF-embedded JPG).
  *
- * Given a canvas and a target byte size, it converges in ~12 iterations to
+ * Given a canvas and a target byte size, it converges rapidly to
  * the highest quality that still fits under the target. Falls back to
  * returning the smallest achievable blob if the target is impossibly small.
  *
@@ -66,8 +66,6 @@ export async function compressToTarget(
     return encodeOnce(canvas, mime, initialQuality);
   }
 
-  // Account for the target being too small for even the lowest quality —
-  // we still try, then return the smallest achievable result.
   let lo = MIN_QUALITY;
   let hi = MAX_QUALITY;
   let best: Blob | null = null;
@@ -75,14 +73,35 @@ export async function compressToTarget(
   let iterations = 0;
   const goal = targetBytes * SAFETY_MARGIN;
 
-  // Fast path: if default-quality already fits, try to preserve more quality.
-  const probe = await canvasToBlob(canvas, mime, MAX_QUALITY);
+  // 1. Fast path: if MAX_QUALITY already fits, preserve 100% fidelity immediately (1 probe)
+  const probeMax = await canvasToBlob(canvas, mime, MAX_QUALITY);
   iterations++;
-  if (probe.size <= goal) {
-    return { blob: probe, quality: MAX_QUALITY, iterations, hitTarget: true };
+  if (probeMax.size <= goal) {
+    return { blob: probeMax, quality: MAX_QUALITY, iterations, hitTarget: true };
   }
 
-  while (iterations < MAX_ITERATIONS && hi - lo > 0.0005) {
+  // 2. Early-abort probe: check MIN_QUALITY.
+  // If even minimum quality cannot fit under the target on this canvas resolution,
+  // report hitTarget: false immediately instead of wasting 10+ CPU encode cycles.
+  const probeMin = await canvasToBlob(canvas, mime, MIN_QUALITY);
+  iterations++;
+  if (probeMin.size > goal) {
+    return {
+      blob: probeMin,
+      quality: MIN_QUALITY,
+      iterations,
+      hitTarget: false,
+    };
+  }
+
+  // A solution definitely exists between MIN_QUALITY and MAX_QUALITY.
+  best = probeMin;
+  bestQuality = MIN_QUALITY;
+  lo = MIN_QUALITY;
+  hi = MAX_QUALITY;
+
+  // 3. Fast binary search down to ~0.5% quality precision (under MAX_ITERATIONS)
+  while (iterations < MAX_ITERATIONS && hi - lo > 0.005) {
     const mid = (lo + hi) / 2;
     const blob = await canvasToBlob(canvas, mime, mid);
     iterations++;
@@ -95,25 +114,12 @@ export async function compressToTarget(
     }
   }
 
-  if (!best) {
-    // Couldn't hit target even at MIN_QUALITY — return smallest possible.
-    const smallest = await canvasToBlob(canvas, mime, MIN_QUALITY);
-    iterations++;
-    return {
-      blob: smallest,
-      quality: MIN_QUALITY,
-      iterations,
-      hitTarget: false,
-    };
-  }
-
   return { blob: best, quality: bestQuality, iterations, hitTarget: true };
 }
 
 /**
- * Optional: try a dimension downscale if the quality search failed and
- * the caller is willing to trade resolution for size. Caller supplies
- * the factor; this module just uses canvas.createImageBitmap.
+ * Optional: try an intelligent dimension downscale if the quality search failed and
+ * the caller is willing to trade resolution for size.
  */
 export async function compressWithDownscale(
   source: ImageBitmap,
@@ -123,42 +129,57 @@ export async function compressWithDownscale(
     scaleStep?: number;
   }
 ): Promise<CompressResult> {
-  const { targetBytes, mime, minScale = 0.3, scaleStep = 0.1 } = opts;
+  const { targetBytes, mime, minScale = 0.2, scaleStep = 0.1 } = opts;
   if (!targetBytes) {
     const canvas = makeCanvas(source, mime);
     return encodeOnce(canvas, mime, DEFAULT_QUALITY);
   }
 
-  let scale = 1;
-  let lastResult: CompressResult | null = null;
+  // Initial attempt at scale 1.0
+  const initialCanvas = makeCanvas(source, mime);
+  let lastResult = await compressToTarget(initialCanvas, { targetBytes, mime });
+  if (lastResult.hitTarget) return lastResult;
+
+  // Intelligent scale estimation:
+  // Pixel area scales with scale^2, so jump directly close to the required resolution
+  let scale = 0.9;
+  if (lastResult.blob.size > targetBytes) {
+    const ratio = targetBytes / lastResult.blob.size;
+    scale = Math.max(minScale, Math.min(0.95, Math.sqrt(ratio) * 0.95));
+  }
+
   while (scale >= minScale) {
     const w = Math.max(1, Math.round(source.width * scale));
     const h = Math.max(1, Math.round(source.height * scale));
     const canvas = new OffscreenCanvas(w, h);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: mime !== 'image/jpeg' });
     if (!ctx) throw new Error('OffscreenCanvas 2D context unavailable');
     if (mime === 'image/jpeg') {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, w, h);
     }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'medium';
     ctx.drawImage(source, 0, 0, w, h);
 
     const result = await compressToTarget(canvas, { targetBytes, mime });
     lastResult = result;
     if (result.hitTarget) return result;
 
-    scale -= scaleStep;
+    if (result.blob.size > targetBytes) {
+      const stepRatio = targetBytes / result.blob.size;
+      scale = Math.min(scale - 0.05, scale * Math.sqrt(stepRatio) * 0.95);
+    } else {
+      scale -= scaleStep;
+    }
   }
 
-  if (!lastResult) {
-    throw new Error('Compression failed: no result');
-  }
   return lastResult;
 }
 
 function makeCanvas(source: ImageBitmap, mime?: string): OffscreenCanvas {
   const c = new OffscreenCanvas(source.width, source.height);
-  const ctx = c.getContext('2d');
+  const ctx = c.getContext('2d', { alpha: mime !== 'image/jpeg' });
   if (!ctx) throw new Error('OffscreenCanvas 2D context unavailable');
   if (mime === 'image/jpeg') {
     ctx.fillStyle = '#FFFFFF';

@@ -4,6 +4,14 @@
 ---
 
 <div id="pk-file-list" class="space-y-3" aria-live="polite" aria-label="Files">
+  <!-- Files count & quick add header (visible when files are present) -->
+  <div id="pk-files-header" class="hidden flex items-center justify-between gap-2 px-1 text-xs">
+    <div class="flex items-center gap-2">
+      <span class="font-semibold text-fg" id="pk-files-count">0 files selected</span>
+      <span class="text-muted text-[11px]">· No size cap limit · Add unlimited photos</span>
+    </div>
+  </div>
+
   <!-- Empty state -->
   <p
     id="pk-empty-state"
@@ -67,6 +75,14 @@
               <p class="pk-file-name text-sm font-semibold text-fg break-all line-clamp-2 leading-snug min-w-0" title=""></p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0 ml-2">
+              <button
+                type="button"
+                class="pk-file-selected-badge hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent text-accent-fg shrink-0 inline-flex items-center gap-1 hover:opacity-90 transition-opacity cursor-pointer"
+                title="Click to deselect photo"
+              >
+                <span>● Selected</span>
+                <span class="text-[9px] opacity-80">✕</span>
+              </button>
               <span class="pk-file-status-badge text-[11px] font-medium px-2 py-0.5 rounded-full bg-surface border border-border text-muted shrink-0">
                 Queued
               </span>
@@ -224,8 +240,10 @@
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
       <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
     </svg>
-    <span>Convert & Compress Now</span>
+    <span>Convert Image Now</span>
   </button>
+
+
 
   <button
     id="pk-clear-btn"
@@ -250,3 +268,20 @@
     <span>Download All (.zip)</span>
   </button>
 </div>
+
+<style>
+  #pk-file-list {
+    contain: layout;
+  }
+  .pk-file-item {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 120px;
+    contain: layout paint;
+    transform: translateZ(0);
+    will-change: auto;
+  }
+  .pk-file-img-preview {
+    transform: translateZ(0);
+    will-change: transform, filter;
+  }
+</style>

@@ -1,11 +1,26 @@
 ---
+import { PORTAL_PRESETS } from '@lib/portal-presets';
 interface Props {
   from: string;
   to: string;
   targetKb: number | null;
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
 }
 
-const { from, to, targetKb } = Astro.props;
+const { from, to, targetKb, initialTool = 'all' } = Astro.props;
+
+// Crop Aspects
+const CROP_ASPECTS = [
+  { value: 'original', label: 'Original', badge: 'AUTO', desc: 'Preserve natural aspect ratio' },
+  { value: '1:1', label: '1:1 Square', badge: '1:1', desc: 'US Visa, WhatsApp, Instagram avatar' },
+  { value: '3.5:4.5', label: '3.5 : 4.5 Passport', badge: '35×45', desc: 'Indian Passport, Schengen, UKVI' },
+  { value: '4:5', label: '4:5 Portrait', badge: '4:5', desc: 'Social mobile feeds' },
+  { value: '16:9', label: '16:9 Landscape', badge: '16:9', desc: 'Widescreen presentation & video' },
+  { value: '9:16', label: '9:16 Story / Reel', badge: '9:16', desc: 'Mobile full screen story' },
+  { value: '3:2', label: '3:2 Photo', badge: '3:2', desc: 'Classic 35mm photography' },
+  { value: '3:4', label: '3:4 Portrait', badge: '3:4', desc: 'Canada visa (50×70mm), official ID' },
+  { value: '2:1', label: '2:1 Signature', badge: '2:1', desc: 'Govt signature upload slot' },
+];
 
 // Target Presets Ladder with KB and MB tiers
 const TARGET_PRESETS = [
@@ -23,8 +38,10 @@ const TARGET_PRESETS = [
   { value: '5120', kb: 5120, badge: '5 MB', label: '5 MB (5,120 KB)', desc: 'High-res photography & web portfolio', section: 'mb' },
   { value: '10240', kb: 10240, badge: '10 MB', label: '10 MB (10,240 KB)', desc: 'Print-ready graphics & high-res assets', section: 'mb' },
   { value: '25600', kb: 25600, badge: '25 MB', label: '25 MB (25,600 KB)', desc: 'Maximum email file attachment limit', section: 'mb' },
+  { value: '51200', kb: 51200, badge: '50 MB', label: '50 MB (51,200 KB)', desc: 'Large raw photo & high-res document', section: 'mb' },
+  { value: '102400', kb: 102400, badge: '100 MB', label: '100 MB (102,400 KB)', desc: 'Ultra high-res print & bulk media', section: 'mb' },
   // Custom
-  { value: 'custom', kb: null, badge: 'CUST', label: 'Custom Size…', desc: 'Enter exact value with KB / MB unit toggle', section: 'custom' },
+  { value: 'custom', kb: null, badge: 'CUST', label: 'Custom Size…', desc: 'Enter any exact KB or MB value without limits', section: 'custom' },
 ];
 
 const activePreset = TARGET_PRESETS.find((p) => p.kb === targetKb) || (targetKb ? TARGET_PRESETS.find(p => p.value === 'custom')! : TARGET_PRESETS[0]!);
@@ -52,17 +69,156 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
 ---
 
 <div class="rounded-xl border border-border bg-bg/40 p-4">
-  <h2 class="text-xs uppercase tracking-wider text-muted font-semibold">
-    Conversion Settings
-  </h2>
+  <!-- Header with Segmented Mode Tabs -->
+  <div class="flex items-center justify-between pb-3 border-b border-border/60">
+    <div class="flex items-center gap-2">
+      <h2 class="text-xs uppercase tracking-wider text-muted font-bold">
+        Settings
+      </h2>
+      <span id="pk-settings-mode-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-border text-muted font-semibold">
+        {initialTool === 'all' ? 'All-in-One' : initialTool.toUpperCase()}
+      </span>
+    </div>
+    <div class="flex items-center gap-1" role="tablist" aria-label="Settings Mode">
+      <button
+        type="button"
+        id="pk-tab-custom"
+        role="tab"
+        aria-selected={initialTool !== 'passport'}
+        aria-controls="pk-panel-custom"
+        class={`rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer font-medium ${
+          initialTool !== 'passport'
+            ? 'font-semibold bg-surface text-fg border border-border/60 shadow-2xs'
+            : 'text-muted hover:text-fg'
+        }`}
+      >
+        Custom
+      </button>
+      <button
+        type="button"
+        id="pk-tab-portal"
+        role="tab"
+        aria-selected={initialTool === 'passport'}
+        aria-controls="pk-panel-portal"
+        class={`rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer flex items-center gap-1 font-medium ${
+          initialTool === 'passport'
+            ? 'font-semibold bg-surface text-fg border border-border/60 shadow-2xs'
+            : 'text-muted hover:text-fg'
+        }`}
+      >
+        <span>Portals</span>
+        <span id="pk-portal-active-dot" class="hidden h-1.5 w-1.5 rounded-full bg-accent"></span>
+      </button>
+    </div>
+  </div>
 
-  <div class="mt-4 space-y-4">
-    <!-- Output format -->
-    <div class="relative" id="pk-output-format-wrapper">
-      <div class="flex items-center justify-between">
-        <span id="pk-output-format-label" class="block text-sm font-medium text-fg">
-          Output format
+  <!-- PANEL 1: Custom Pipeline Settings (Stages 1 through 5) -->
+  <div id="pk-panel-custom" class={`mt-4 space-y-3.5 ${initialTool === 'passport' ? 'hidden' : ''}`}>
+    <!-- Active preset banner in Custom view -->
+    <div id="pk-custom-active-preset-banner" class="hidden rounded-xl border border-accent/30 bg-accent/10 p-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="pk-banner-flag" class="shrink-0 text-accent">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+              <line x1="7" y1="8" x2="17" y2="8"></line>
+              <line x1="7" y1="12" x2="17" y2="12"></line>
+            </svg>
+          </span>
+          <div class="min-w-0">
+            <div class="text-xs font-bold text-fg flex items-center gap-1.5">
+              <span id="pk-banner-name">Preset Active</span>
+              <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-accent text-accent-fg font-extrabold">APPLIED</span>
+            </div>
+            <p id="pk-banner-details" class="text-[11px] text-muted truncate">Specs applied to all cards</p>
+          </div>
+        </div>
+        <button type="button" id="pk-banner-reset" class="text-xs font-semibold text-accent hover:underline shrink-0 cursor-pointer">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Photo Bar (Visible ONLY when a specific photo is selected) -->
+    <div id="pk-active-photo-bar" class="hidden flex-col gap-2 rounded-xl border border-accent/30 bg-accent/5 p-3 text-xs shadow-sm transition-all mb-3.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="inline-block h-2 w-2 rounded-full bg-accent animate-pulse shrink-0"></span>
+          <span class="text-xs font-semibold text-fg truncate max-w-[140px] sm:max-w-[180px]" id="pk-active-photo-name">filename.jpg</span>
+          <span id="pk-active-photo-counter" class="text-[10px] font-mono text-accent font-semibold px-1.5 py-0.5 rounded bg-accent/15 border border-accent/20 shrink-0">1 of 4</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            id="pk-target-prev-btn"
+            class="h-6 w-6 inline-flex items-center justify-center rounded-md text-muted hover:text-fg hover:bg-surface border border-border/60 transition-colors disabled:opacity-20 cursor-pointer"
+            title="Previous photo"
+            aria-label="Previous photo"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="pk-target-next-btn"
+            class="h-6 w-6 inline-flex items-center justify-center rounded-md text-muted hover:text-fg hover:bg-surface border border-border/60 transition-colors disabled:opacity-20 cursor-pointer"
+            title="Next photo"
+            aria-label="Next photo"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="pk-deselect-photo-btn"
+            class="h-6 px-2 inline-flex items-center gap-1 rounded-md bg-surface text-[11px] font-semibold text-fg hover:bg-surface/80 border border-border transition-colors cursor-pointer shadow-2xs"
+            title="Deselect photo and return to all photos"
+          >
+            <span>Done</span>
+            <span class="text-[10px] text-muted">✕</span>
+          </button>
+        </div>
+      </div>
+      <div class="pt-2 border-t border-accent/15 flex items-center justify-between text-[11px]">
+        <span class="text-muted flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Editing this photo only
         </span>
+        <button
+          type="button"
+          id="pk-apply-to-all-btn"
+          class="inline-flex items-center gap-1 font-semibold text-accent hover:underline cursor-pointer transition-colors"
+          title="Apply this photo's crop and resize to all photos in the queue"
+        >
+          <span>Apply to All Photos</span>
+          <span>→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ALL-IN-ONE PIPELINE STAGES (1. Format, 2. Compress, 3. Crop, 4. Resize) -->
+    <div id="pk-stages-list" class="space-y-3.5 flex flex-col">
+<!-- STAGE 1: 🔄 Output Format -->
+    <div
+      id="pk-stage-format"
+      class={`rounded-xl border transition-all p-3 space-y-2.5 ${
+        initialTool === 'convert'
+          ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
+          : 'border-border bg-surface/40'
+      } ${['compress', 'crop', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-fg flex items-center gap-2">
+          <span id="pk-dot-format" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'convert' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span>Output Format</span>
+        </span>
+        <span class="text-[11px] text-muted">Input: <span id="pk-detected-input-badge" class="font-mono uppercase text-fg font-semibold">{from}</span></span>
       </div>
 
       <!-- Hidden standard select for form / worker / test compatibility -->
@@ -75,27 +231,26 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </select>
 
       <!-- Custom High-End Trigger Button -->
-      <div class="mt-1.5 relative">
+      <div class="relative" id="pk-output-format-wrapper">
         <button
           type="button"
           id="pk-custom-format-trigger"
           aria-haspopup="listbox"
           aria-expanded="false"
-          aria-labelledby="pk-output-format-label pk-custom-format-trigger"
-          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface/90 px-3 py-2 text-left text-sm text-fg shadow-sm transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface px-3 py-2 text-left text-xs text-fg shadow-xs transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
         >
-          <div class="flex items-center gap-2.5 min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
             <span
               id="pk-selected-format-badge"
-              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
+              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
             >
               {activeFmt.badge}
             </span>
             <div class="min-w-0 flex-1">
-              <span id="pk-selected-format-title" class="block font-semibold text-fg text-sm truncate">
+              <span id="pk-selected-format-title" class="block font-semibold text-fg text-xs truncate">
                 {activeFmt.label}
               </span>
-              <span id="pk-selected-format-desc" class="block text-[11px] text-muted truncate">
+              <span id="pk-selected-format-desc" class="block text-[10px] text-muted truncate">
                 {activeFmt.desc}
               </span>
             </div>
@@ -104,14 +259,14 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             id="pk-custom-format-chevron"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-2"
+            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-1.5"
           >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -122,7 +277,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           id="pk-custom-format-menu"
           role="listbox"
           tabindex="-1"
-          class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all"
+          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all"
         >
           <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Select Output Format</div>
           {OUTPUT_FORMATS.map((fmt) => (
@@ -134,19 +289,19 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               data-title={fmt.label}
               data-desc={fmt.desc}
               aria-selected={fmt.value === normalizedTo}
-              class={`pk-custom-format-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+              class={`pk-custom-format-option w-full flex items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition-all cursor-pointer group ${
                 fmt.value === normalizedTo ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
               }`}
             >
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
                   {fmt.badge}
                 </span>
                 <div class="min-w-0">
                   <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
                     {fmt.label}
                   </span>
-                  <span class="block text-[11px] text-muted">
+                  <span class="block text-[10px] text-muted">
                     {fmt.desc}
                   </span>
                 </div>
@@ -169,90 +324,86 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           ))}
         </div>
       </div>
-      <p class="mt-1.5 text-xs text-muted flex items-center justify-between">
-        <span>Input: <span id="pk-detected-input-badge" class="font-mono uppercase text-fg font-semibold">{from}</span></span>
-        <span class="text-[11px] text-muted">Auto-detects dropped files</span>
-      </p>
-    </div>
 
-    <!-- Merge Multiple Images into Single Multi-Page PDF -->
-    <div
-      id="pk-merge-pdf-container"
-      class={`rounded-xl border border-accent/30 bg-accent/5 p-3 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
-    >
-      <label for="pk-merge-pdf-toggle" class="flex items-center justify-between text-sm text-fg cursor-pointer select-none">
-        <span class="flex items-center gap-2 font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="12" y1="18" x2="12" y2="12"></line>
-            <line x1="9" y1="15" x2="15" y2="15"></line>
-          </svg>
-          Merge Files into Single PDF
-        </span>
-        <input
-          id="pk-merge-pdf-toggle"
-          type="checkbox"
-          class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
-        />
-      </label>
-      <p class="mt-1 text-[11px] text-muted">
-        Combines all images into one multi-page PDF document. Drag cards to reorder page sequence.
-      </p>
-    </div>
-
-    <!-- SVG Rasterization DPI / Scale Multiplier -->
-    <div
-      id="pk-svg-scale-container"
-      class={`rounded-xl border border-border bg-surface/50 p-3 ${from.toLowerCase() === 'svg' || to.toLowerCase() === 'svg' ? '' : 'hidden'}`}
-    >
-      <div class="flex items-center justify-between">
-        <label for="pk-svg-scale" class="block text-sm font-medium text-fg">
-          SVG Scale (DPI Multiplier)
-        </label>
-        <span id="pk-svg-scale-val" class="text-xs text-accent font-semibold">2x · 192 DPI</span>
-      </div>
-      <div class="mt-1.5 relative">
-        <select
-          id="pk-svg-scale"
-          class="block w-full appearance-none rounded-xl border border-border bg-surface px-3 py-2.5 pr-9 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer transition-colors hover:border-accent/40"
-        >
-          <option value="1">1x · 96 DPI (Standard Web)</option>
-          <option value="2" selected>2x · 192 DPI (Retina / Crisp)</option>
-          <option value="3">3x · 300 DPI (High-Res Document)</option>
-          <option value="4">4x · 600 DPI (Ultra Sharp Print)</option>
-        </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-muted">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+      <!-- Merge Multiple Images into Single Multi-Page PDF -->
+      <div
+        id="pk-merge-pdf-container"
+        class={`rounded-xl border border-accent/30 bg-accent/5 p-2.5 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
+      >
+        <div class="flex items-center justify-between text-xs text-fg cursor-pointer select-none" onclick="document.getElementById('pk-merge-pdf-toggle')?.click()">
+          <span class="flex items-center gap-1.5 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            Merge Files into Single PDF
+          </span>
+          <input
+            id="pk-merge-pdf-toggle"
+            type="checkbox"
+            aria-label="Merge files into single multi-page PDF"
+            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+          />
         </div>
       </div>
-      <p class="mt-1 text-[11px] text-muted">
-        Controls vector resolution and DPI scaling for SVG conversions (1x = 96 DPI, 2x = 192 DPI, 3x = 300 DPI, 4x = 600 DPI).
-      </p>
+
+      <!-- SVG Rasterization DPI / Scale Multiplier -->
+      <div
+        id="pk-svg-scale-container"
+        class={`rounded-xl border border-border bg-surface/50 p-2.5 ${from.toLowerCase() === 'svg' || to.toLowerCase() === 'svg' ? '' : 'hidden'}`}
+      >
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-medium text-fg">
+            SVG Scale Multiplier
+          </span>
+          <span id="pk-svg-scale-val" class="text-accent font-semibold">2x · 192 DPI</span>
+        </div>
+        <div class="mt-1 relative">
+          <select
+            id="pk-svg-scale"
+            aria-label="SVG Scale Multiplier"
+            class="block w-full appearance-none rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent cursor-pointer"
+          >
+            <option value="1">1x · 96 DPI (Standard Web)</option>
+            <option value="2" selected>2x · 192 DPI (Retina / Crisp)</option>
+            <option value="3">3x · 300 DPI (High-Res Document)</option>
+            <option value="4">4x · 600 DPI (Ultra Sharp Print)</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <!-- Target size & Quality controls -->
-    <div class="relative" id="pk-target-kb-wrapper">
+    
+<!-- STAGE 2: 🗜️ Compression & Target Size -->
+    <div
+      id="pk-stage-compress"
+      class={`rounded-xl border transition-all p-3 space-y-2.5 ${
+        initialTool === 'compress'
+          ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
+          : 'border-border bg-surface/40'
+      } ${['convert', 'crop', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+    >
       <div class="flex items-center justify-between">
-        <span id="pk-target-size-label" class="block text-sm font-medium text-fg">
-          Compression & Size
+        <span class="text-xs font-bold text-fg flex items-center gap-2">
+          <span id="pk-dot-compress" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'compress' || targetKb ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span>Compression &amp; Target Size</span>
         </span>
         <span
           id="pk-target-value"
-          class="text-xs text-muted tabular-nums font-medium"
+          class="text-[11px] text-muted tabular-nums font-medium"
         >
           {formatInitialTargetBadge(targetKb)}
         </span>
       </div>
 
       <!-- Mode selection pills -->
-      <div class="mt-2 flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
+      <div class="flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
         <button
           type="button"
           id="pk-size-mode-max"
-          class="flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+          class="flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px]"
           data-mode="max"
         >
           Max Size
@@ -260,7 +411,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-exact"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
           data-mode="exact"
         >
           Exact Size
@@ -268,7 +419,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-range"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
           data-mode="range"
         >
           Range
@@ -276,7 +427,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-quality"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer"
+          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
           data-mode="quality"
         >
           Quality %
@@ -293,27 +444,26 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </select>
 
       <!-- Custom High-End Trigger Button -->
-      <div id="pk-target-preset-container" class="mt-2 relative">
+      <div id="pk-target-preset-container" class="relative" id="pk-target-kb-wrapper">
         <button
           type="button"
           id="pk-custom-target-trigger"
           aria-haspopup="listbox"
           aria-expanded="false"
-          aria-labelledby="pk-target-size-label pk-custom-target-trigger"
-          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface/90 px-3 py-2 text-left text-sm text-fg shadow-sm transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface px-3 py-2 text-left text-xs text-fg shadow-xs transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
         >
-          <div class="flex items-center gap-2.5 min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
             <span
               id="pk-selected-target-badge"
-              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
+              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
             >
               {activePreset.badge}
             </span>
             <div class="min-w-0 flex-1">
-              <span id="pk-selected-target-title" class="block font-semibold text-fg text-sm truncate">
+              <span id="pk-selected-target-title" class="block font-semibold text-fg text-xs truncate">
                 {activePreset.label}
               </span>
-              <span id="pk-selected-target-desc" class="block text-[11px] text-muted truncate">
+              <span id="pk-selected-target-desc" class="block text-[10px] text-muted truncate">
                 {activePreset.desc}
               </span>
             </div>
@@ -322,27 +472,28 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             id="pk-custom-target-chevron"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-2"
+            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-1.5"
           >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
 
-        <!-- Custom Dropdown Popover Menu -->
+        <!-- Custom Dropdown Popover Menu with Section Headers -->
         <div
           id="pk-custom-target-menu"
           role="listbox"
           tabindex="-1"
           class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-72 overflow-y-auto"
         >
-          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Unlimited</div>
+          <!-- Section 1: Unlimited -->
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Original Quality</div>
           {TARGET_PRESETS.filter(p => p.section === 'unlimited').map((preset) => (
             <button
               type="button"
@@ -351,7 +502,6 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               data-badge={preset.badge}
               data-title={preset.label}
               data-desc={preset.desc}
-              data-section={preset.section}
               aria-selected={preset.value === (targetKb ? String(targetKb) : '')}
               class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
                 preset.value === (targetKb ? String(targetKb) : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
@@ -380,16 +530,15 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
+                class={`pk-target-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             </button>
           ))}
 
-          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
-            Portal & Web Limits (KB)
-          </div>
+          <!-- Section 2: Kilobyte Targets -->
+          <div class="pt-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted border-t border-border/40">Kilobyte Limits (KB)</div>
           {TARGET_PRESETS.filter(p => p.section === 'kb').map((preset) => (
             <button
               type="button"
@@ -398,10 +547,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               data-badge={preset.badge}
               data-title={preset.label}
               data-desc={preset.desc}
-              data-section={preset.section}
-              aria-selected={preset.value === String(targetKb)}
+              aria-selected={preset.value === (targetKb ? String(targetKb) : '')}
               class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
-                preset.value === String(targetKb) ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+                preset.value === (targetKb ? String(targetKb) : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
               }`}
             >
               <div class="flex items-center gap-2.5 min-w-0">
@@ -427,16 +575,15 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === String(targetKb) ? '' : 'hidden'}`}
+                class={`pk-target-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             </button>
           ))}
 
-          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
-            Megabyte Limits (Discord, Email, CMS)
-          </div>
+          <!-- Section 3: Megabyte Targets -->
+          <div class="pt-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted border-t border-border/40">Megabyte Limits (MB)</div>
           {TARGET_PRESETS.filter(p => p.section === 'mb').map((preset) => (
             <button
               type="button"
@@ -445,57 +592,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               data-badge={preset.badge}
               data-title={preset.label}
               data-desc={preset.desc}
-              data-section={preset.section}
-              aria-selected={preset.value === String(targetKb)}
+              aria-selected={preset.value === (targetKb ? String(targetKb) : '')}
               class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
-                preset.value === String(targetKb) ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
-              }`}
-            >
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase font-semibold">
-                  {preset.badge}
-                </span>
-                <div class="min-w-0">
-                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
-                    {preset.label}
-                  </span>
-                  <span class="block text-[11px] text-muted">
-                    {preset.desc}
-                  </span>
-                </div>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === String(targetKb) ? '' : 'hidden'}`}
-              >
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </button>
-          ))}
-
-          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted mt-2 border-t border-border/50 pt-2">
-            Custom Target
-          </div>
-          {TARGET_PRESETS.filter(p => p.section === 'custom').map((preset) => (
-            <button
-              type="button"
-              role="option"
-              data-value={preset.value}
-              data-badge={preset.badge}
-              data-title={preset.label}
-              data-desc={preset.desc}
-              data-section={preset.section}
-              aria-selected={preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '')}
-              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
-                preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+                preset.value === (targetKb ? String(targetKb) : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
               }`}
             >
               <div class="flex items-center gap-2.5 min-w-0">
@@ -521,7 +620,52 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class={`pk-target-option-check text-accent shrink-0 ml-2 ${preset.value === (targetKb !== null && !TARGET_PRESETS.some(p => p.kb === targetKb) ? 'custom' : '') ? '' : 'hidden'}`}
+                class={`pk-target-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+
+          <!-- Section 4: Custom Size Option -->
+          <div class="pt-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted border-t border-border/40">Custom Exact Size</div>
+          {TARGET_PRESETS.filter(p => p.section === 'custom').map((preset) => (
+            <button
+              type="button"
+              role="option"
+              data-value={preset.value}
+              data-badge={preset.badge}
+              data-title={preset.label}
+              data-desc={preset.desc}
+              aria-selected={preset.value === (targetKb ? String(targetKb) : '')}
+              class={`pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group ${
+                preset.value === (targetKb ? String(targetKb) : '') ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {preset.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {preset.label}
+                  </span>
+                  <span class="block text-[11px] text-muted">
+                    {preset.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-target-check text-accent shrink-0 ml-2 ${preset.value === (targetKb ? String(targetKb) : '') ? '' : 'hidden'}`}
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
@@ -536,18 +680,17 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           <input
             id="pk-custom-kb-input"
             type="number"
-            min="1"
-            max="50000"
-            step="1"
+            min="0.1"
+            step="any"
             placeholder="e.g. 50"
             value={targetKb ? (targetKb >= 1024 && targetKb % 1024 === 0 ? targetKb / 1024 : targetKb) : ''}
-            class="block w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            class="block w-full rounded-xl border border-border bg-surface px-3 py-2 text-xs text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent font-mono"
           />
           <div class="flex rounded-xl border border-border bg-surface/80 p-0.5 text-xs shrink-0">
             <button
               type="button"
               id="pk-custom-unit-kb"
-              class="rounded-lg px-2.5 py-1 font-semibold transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+              class="rounded-lg px-2 py-1 font-semibold transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px]"
               data-unit="kb"
             >
               KB
@@ -555,7 +698,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             <button
               type="button"
               id="pk-custom-unit-mb"
-              class="rounded-lg px-2.5 py-1 font-semibold transition-colors text-muted hover:text-fg cursor-pointer"
+              class="rounded-lg px-2 py-1 font-semibold transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
               data-unit="mb"
             >
               MB
@@ -563,7 +706,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           </div>
         </div>
         <div id="pk-custom-unit-hint" class="mt-1 text-[11px] text-muted flex items-center justify-between">
-          <span id="pk-custom-hint-text">Enter exact or maximum size.</span>
+          <span id="pk-custom-hint-text">No cap limit — enter any exact or maximum KB / MB.</span>
           <span id="pk-custom-equiv-tag" class="text-accent font-mono font-medium hidden"></span>
         </div>
       </div>
@@ -576,7 +719,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             <button
               type="button"
               id="pk-range-unit-kb"
-              class="rounded-md px-2 py-0.5 font-medium transition-colors bg-surface text-fg shadow-sm cursor-pointer"
+              class="rounded-md px-2 py-0.5 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer"
               data-unit="kb"
             >
               KB
@@ -593,108 +736,590 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="pk-min-kb-input" class="block text-[11px] text-muted">Min</label>
+            <span class="block text-[11px] text-muted">Min</span>
             <input
               id="pk-min-kb-input"
               type="number"
               min="0.1"
-              max="50000"
               step="any"
               placeholder="20"
-              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              aria-label="Minimum target size in KB or MB"
+              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
           </div>
           <div>
-            <label for="pk-max-kb-input" class="block text-[11px] text-muted">Max</label>
+            <span class="block text-[11px] text-muted">Max</span>
             <input
               id="pk-max-kb-input"
               type="number"
               min="0.1"
-              max="50000"
               step="any"
               placeholder="50"
               value={targetKb ?? ''}
-              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-sm text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              aria-label="Maximum target size in KB or MB"
+              class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
           </div>
         </div>
-        <p id="pk-range-hint-text" class="text-[11px] text-muted">Ideal for portal limits (e.g. 20 KB to 50 KB, or 1 MB to 2 MB).</p>
+        <p id="pk-range-hint-text" class="text-[11px] text-muted">Ideal for portal limits (e.g. 20 KB to 50 KB, or 1 MB to 2 MB) with no size cap limit.</p>
       </div>
 
       <!-- Manual Quality Slider Container -->
       <div id="pk-quality-container" class="mt-2.5 space-y-1.5 hidden">
         <div class="flex items-center justify-between text-xs">
-          <label for="pk-quality-slider" class="text-muted font-medium">Image Quality</label>
-          <span id="pk-quality-value" class="font-semibold text-accent tabular-nums text-sm">90%</span>
+          <span class="font-medium text-fg">Manual Quality Factor</span>
+          <span id="pk-quality-value" class="font-mono text-accent font-semibold">85%</span>
         </div>
         <input
           id="pk-quality-slider"
           type="range"
           min="5"
           max="100"
+          value="85"
           step="1"
-          value="90"
-          class="w-full accent-accent h-1.5 bg-border rounded-lg cursor-pointer"
+          aria-label="Manual Quality Factor percentage"
+          class="w-full accent-accent cursor-pointer"
         />
-        <div class="flex justify-between text-[10px] text-muted font-medium">
-          <span>Smaller (5%)</span>
-          <span>Balanced (90%)</span>
+        <div class="flex justify-between text-[10px] text-muted">
+          <span>Min Size (5%)</span>
+          <span>Balanced</span>
           <span>Max Quality (100%)</span>
         </div>
       </div>
     </div>
 
-    <!-- Advanced -->
-    <details open class="group">
-      <summary
-        class="cursor-pointer text-sm text-muted hover:text-fg select-none list-none flex items-center gap-1"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          width="14"
-          height="14"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="transition-transform group-open:rotate-90"
-          aria-hidden="true"
+    
+<!-- STAGE 3: ✂️ Crop & Aspect Ratio -->
+    <div
+      id="pk-stage-crop"
+      class={`rounded-xl border transition-all p-3 space-y-2.5 ${
+        initialTool === 'crop'
+          ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
+          : 'border-border bg-surface/40'
+      } ${['convert', 'compress', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-fg flex items-center gap-2">
+          <span id="pk-dot-crop" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'crop' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span>Crop &amp; Aspect Ratio</span>
+        </span>
+        <span id="pk-crop-hint" class="text-[11px] text-muted font-medium">Original</span>
+      </div>
+
+      <!-- Hidden standard select for form / worker compatibility -->
+      <select id="pk-crop-aspect" class="sr-only" tabindex="-1" aria-hidden="true">
+        {CROP_ASPECTS.map((aspect) => (
+          <option value={aspect.value}>{aspect.label}</option>
+        ))}
+      </select>
+
+      <!-- Custom Aspect Ratio Trigger Button -->
+      <div class="relative" id="pk-crop-aspect-wrapper">
+        <button
+          type="button"
+          id="pk-custom-crop-trigger"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          class="group/trigger relative flex w-full items-center justify-between rounded-xl border border-border bg-surface px-3 py-2 text-left text-xs text-fg shadow-xs transition-all hover:border-accent/50 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
         >
-          <polyline points="9 18 15 12 9 6"></polyline>
+          <div class="flex items-center gap-2 min-w-0">
+            <span
+              id="pk-selected-crop-badge"
+              class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
+            >
+              AUTO
+            </span>
+            <div class="min-w-0 flex-1">
+              <span id="pk-selected-crop-title" class="block font-semibold text-fg truncate">
+                Original Aspect
+              </span>
+              <span id="pk-selected-crop-desc" class="block text-[10px] text-muted truncate">
+                Preserve natural image boundaries
+              </span>
+            </div>
+          </div>
+          <svg
+            id="pk-custom-crop-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted group-hover/trigger:text-fg transition-transform duration-200 shrink-0 ml-1.5"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- Custom Dropdown Popover Menu -->
+        <div
+          id="pk-custom-crop-menu"
+          role="listbox"
+          tabindex="-1"
+          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-64 overflow-y-auto"
+        >
+          <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Select Aspect Ratio</div>
+          {CROP_ASPECTS.map((aspect) => (
+            <button
+              type="button"
+              role="option"
+              data-value={aspect.value}
+              data-badge={aspect.badge}
+              data-title={aspect.label}
+              data-desc={aspect.desc}
+              aria-selected={aspect.value === 'original'}
+              class={`pk-custom-crop-option w-full flex items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition-all cursor-pointer group ${
+                aspect.value === 'original' ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+              }`}
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:text-accent shrink-0 uppercase">
+                  {aspect.badge}
+                </span>
+                <div class="min-w-0">
+                  <span class="block text-xs font-semibold text-fg group-hover:text-accent transition-colors">
+                    {aspect.label}
+                  </span>
+                  <span class="block text-[10px] text-muted">
+                    {aspect.desc}
+                  </span>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class={`pk-crop-option-check text-accent shrink-0 ml-2 ${aspect.value === 'original' ? '' : 'hidden'}`}
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Focal Anchor (Top, Center, Bottom) - shown when crop is active -->
+      <div id="pk-crop-anchor-container" class="hidden pt-1">
+        <div class="flex items-center justify-between text-[11px] text-muted mb-1">
+          <span id="pk-crop-anchor-label">Focal Anchor: Center</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1 text-[11px]">
+          <button
+            type="button"
+            data-anchor="top"
+            class="pk-crop-anchor-btn rounded-lg border border-border py-1 px-1.5 text-center font-medium text-muted hover:text-fg hover:bg-surface transition-colors cursor-pointer"
+          >
+            Top (Face)
+          </button>
+          <button
+            type="button"
+            data-anchor="center"
+            class="pk-crop-anchor-btn rounded-lg border border-accent/40 bg-accent/15 py-1 px-1.5 text-center font-semibold text-accent transition-colors cursor-pointer shadow-xs"
+          >
+            Center
+          </button>
+          <button
+            type="button"
+            data-anchor="bottom"
+            class="pk-crop-anchor-btn rounded-lg border border-border py-1 px-1.5 text-center font-medium text-muted hover:text-fg hover:bg-surface transition-colors cursor-pointer"
+          >
+            Bottom
+          </button>
+        </div>
+      </div>
+
+      <!-- Open Interactive Studio button -->
+      <button
+        type="button"
+        id="pk-open-crop-studio-btn"
+        class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-border/80 bg-surface px-2.5 py-1.5 text-[11px] font-semibold text-fg hover:border-accent hover:text-accent transition-colors cursor-pointer"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
+          <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
         </svg>
-        Advanced Options
+        <span>Open Interactive Crop Studio ↗</span>
+      </button>
+    </div>
+
+    
+<!-- STAGE 4: 📐 Resize Dimensions -->
+    <div
+      id="pk-stage-resize"
+      class={`rounded-xl border transition-all p-3 space-y-2.5 ${
+        initialTool === 'resize'
+          ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
+          : 'border-border bg-surface/40'
+      } ${['convert', 'compress', 'crop'].includes(initialTool) ? 'hidden' : ''}`}
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-fg flex items-center gap-2">
+          <span id="pk-dot-resize" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'resize' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span>Resize Dimensions</span>
+        </span>
+        <span id="pk-resize-hint" class="text-[11px] text-muted font-medium">100% (Original)</span>
+      </div>
+
+      <!-- Scale Pills -->
+      <div class="flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
+        <button
+          type="button"
+          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px]"
+          data-scale="100"
+        >
+          100%
+        </button>
+        <button
+          type="button"
+          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          data-scale="75"
+        >
+          75%
+        </button>
+        <button
+          type="button"
+          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          data-scale="50"
+        >
+          50%
+        </button>
+        <button
+          type="button"
+          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          data-scale="25"
+        >
+          25%
+        </button>
+        <button
+          type="button"
+          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          data-scale="custom"
+        >
+          Custom
+        </button>
+      </div>
+
+      <!-- Custom Dimension Inputs (Width x Height + Lock) -->
+      <div id="pk-custom-dims-container" class="hidden space-y-2 pt-0.5">
+        <div class="flex items-center gap-2">
+          <div class="flex-1">
+            <span class="block text-[10px] text-muted mb-0.5">Width (px)</span>
+            <input
+              id="pk-dim-width"
+              type="number"
+              min="10"
+              step="1"
+              placeholder="e.g. 1920"
+              aria-label="Width in pixels"
+              class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
+            />
+          </div>
+          <button
+            type="button"
+            id="pk-lock-aspect-btn"
+            data-locked="true"
+            class="self-end mb-1 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-surface text-accent hover:border-accent/50 transition-colors cursor-pointer"
+            title="Aspect ratio locked"
+          >
+            <svg id="pk-lock-aspect-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </button>
+          <div class="flex-1">
+            <span class="block text-[10px] text-muted mb-0.5">Height (px)</span>
+            <input
+              id="pk-dim-height"
+              type="number"
+              min="10"
+              step="1"
+              placeholder="e.g. 1080"
+              aria-label="Height in pixels"
+              class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Open Interactive Studio button -->
+      <button
+        type="button"
+        id="pk-open-resize-studio-btn"
+        class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-border/80 bg-surface px-2.5 py-1.5 text-[11px] font-semibold text-fg hover:border-accent hover:text-accent transition-colors cursor-pointer"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+        <span>Open Interactive Resize Studio ↗</span>
+      </button>
+    </div>
+
+    
+    <!-- Toggle More Tools Button (Hidden on Home 'all', visible on dedicated tools) -->
+    <div id="pk-more-tools-toggle-wrapper" class={initialTool === 'all' ? 'hidden' : 'pt-0.5'}>
+      <button
+        type="button"
+        id="pk-toggle-more-tools-btn"
+        class="w-full flex items-center justify-between rounded-xl border border-dashed border-border/80 bg-surface/60 hover:bg-surface px-3.5 py-2.5 text-xs font-medium text-muted hover:text-fg hover:border-accent/40 transition-all cursor-pointer group shadow-2xs"
+        aria-expanded="false"
+      >
+        <span class="flex items-center gap-2">
+          <span class="flex h-5 w-5 items-center justify-center rounded-md bg-accent/15 text-accent font-bold text-xs group-hover:scale-105 transition-transform">+</span>
+          <span id="pk-more-tools-btn-label">
+            {initialTool === 'convert' ? 'Add Compression, Crop, or Resize (Optional)' :
+             initialTool === 'compress' ? 'Add Format, Crop, or Resize (Optional)' :
+             initialTool === 'crop' ? 'Add Resize, Format, or Compression (Optional)' :
+             initialTool === 'resize' ? 'Add Crop, Format, or Compression (Optional)' :
+             'Additional Editing & Compression Tools'}
+          </span>
+          <span id="pk-more-tools-active-badge" class="hidden text-[10px] font-mono px-1.5 py-0.2 rounded bg-accent/20 text-accent font-bold">1 active</span>
+        </span>
+        <span class="text-[11px] text-accent font-semibold flex items-center gap-1 group-hover:underline">
+          <span id="pk-more-tools-action-text">Show</span>
+          <svg id="pk-more-tools-chevron" class="w-3.5 h-3.5 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+<!-- STAGE 5: Advanced Options & Filters -->
+    <details class="group rounded-xl border border-border/80 bg-surface/40 p-3 text-xs" id="pk-stage-advanced">
+      <summary class="flex items-center justify-between font-semibold text-fg cursor-pointer select-none">
+        <div class="flex items-center gap-2">
+          <span>Advanced Options &amp; Filters</span>
+          <span id="pk-editing-active-badge" class="hidden h-2 w-2 rounded-full bg-accent animate-pulse" title="Edits active"></span>
+        </div>
+        <svg class="h-4 w-4 text-muted group-open:rotate-180 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
       </summary>
-      <div class="mt-3 space-y-2">
-        <label for="pk-preserve-metadata" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+      <div class="mt-3 pt-3 border-t border-border/60 space-y-2">
+        <div class="flex items-center gap-2 text-xs text-fg cursor-pointer" onclick="document.getElementById('pk-preserve-metadata')?.click()">
           <input
             id="pk-preserve-metadata"
             type="checkbox"
             checked
-            class="h-4 w-4 rounded border-border accent-accent"
+            aria-label="Preserve EXIF metadata (Camera, GPS, date)"
+            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
           />
-          <span>Preserve EXIF metadata (Camera, GPS, date)</span>
-        </label>
-        <label for="pk-strip-transparency" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+          <span class="select-none">Preserve EXIF metadata (Camera, GPS, date)</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-fg cursor-pointer" onclick="document.getElementById('pk-strip-transparency')?.click()">
           <input
             id="pk-strip-transparency"
             type="checkbox"
             checked
-            class="h-4 w-4 rounded border-border accent-accent"
+            aria-label="Fill transparent backgrounds with white (for JPG)"
+            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
           />
-          <span>Fill transparent backgrounds with white (for JPG)</span>
-        </label>
-        <label for="pk-auto-orient" class="flex items-center gap-2 text-sm text-fg cursor-pointer">
+          <span class="select-none">Fill transparent backgrounds with white (for JPG)</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-fg cursor-pointer" onclick="document.getElementById('pk-auto-orient')?.click()">
           <input
             id="pk-auto-orient"
             type="checkbox"
             checked
-            class="h-4 w-4 rounded border-border accent-accent"
+            aria-label="Auto-orient photos (EXIF correction)"
+            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
           />
-          <span>Auto-orient photos (EXIF correction)</span>
-        </label>
+          <span class="select-none">Auto-orient photos (EXIF correction)</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-fg cursor-pointer" onclick="document.getElementById('pk-grayscale-filter')?.click()">
+          <input
+            id="pk-grayscale-filter"
+            type="checkbox"
+            aria-label="Black & White (Grayscale filter)"
+            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+          />
+          <span class="select-none">Black &amp; White (Grayscale filter)</span>
+        </div>
       </div>
     </details>
+
+    </div>
+
+    <!-- Quick Discovery Card for Portal Presets (Pinned to the very end) -->
+    <div id="pk-card-portal-discovery" class={`rounded-xl border border-border/70 bg-surface/50 p-3 hover:border-accent/40 transition-colors ${initialTool === 'all' ? '' : 'hidden'}`}>
+      <div class="flex items-start gap-2.5">
+        <div class="h-7 w-7 rounded-lg bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0 mt-0.5">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <line x1="7" y1="8" x2="17" y2="8"></line>
+            <line x1="7" y1="12" x2="17" y2="12"></line>
+          </svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <span class="text-xs font-bold text-fg block">Official Visa &amp; Passport Profiles</span>
+          <p class="text-[11px] text-muted mt-0.5 leading-snug">
+            Need 1-click verified specs for US Visa, Indian Passport, Schengen, Exam 50KB or Canada PR?
+          </p>
+          <button
+            type="button"
+            id="pk-btn-switch-to-portal"
+            class="mt-2 text-xs font-bold text-accent hover:underline inline-flex items-center gap-1 cursor-pointer"
+          >
+            Browse 20 Official Portal Presets →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 2: Portal Presets Mode (Dedicated, Spacious, Zero Truncation) -->
+  <div id="pk-panel-portal" class={`mt-4 space-y-3 ${initialTool === 'passport' ? '' : 'hidden'}`}>
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="text-xs font-bold text-fg uppercase tracking-wider block">
+          Official Portal &amp; Visa Profiles
+        </span>
+        <p class="text-[11px] text-muted mt-0.5">
+          20 global standards: auto-crop, scale dimensions &amp; target KB limit.
+        </p>
+      </div>
+      <button
+        type="button"
+        id="pk-portal-panel-reset"
+        class="text-[11px] text-muted hover:text-accent font-medium hidden cursor-pointer shrink-0"
+      >
+        Reset to manual
+      </button>
+    </div>
+
+    <!-- Live Search & Category Filters -->
+    <div class="space-y-2">
+      <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 text-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <input
+          type="search"
+          id="pk-portal-search"
+          placeholder="Filter presets (e.g. US, UK, UPSC, China)..."
+          class="w-full rounded-lg border border-border bg-surface pl-8 pr-3 py-1.5 text-xs text-fg placeholder:text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] scrollbar-none" id="pk-portal-category-filters">
+        <button type="button" class="pk-cat-filter active rounded-md border border-accent bg-accent/15 px-2 py-0.5 font-semibold text-accent cursor-pointer transition-colors" data-cat="all">All (20)</button>
+        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="visa">🛂 Passports (13)</button>
+        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="exam">🎓 Exams &amp; Jobs (5)</button>
+        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="id">🪪 IDs &amp; Scans (2)</button>
+      </div>
+    </div>
+
+    <!-- Hidden standard select for form / test compatibility -->
+    <select id="pk-portal-preset-select" class="sr-only" tabindex="-1" aria-hidden="true">
+      {PORTAL_PRESETS.map((p) => (
+        <option value={p.id}>{p.name}</option>
+      ))}
+    </select>
+
+    <!-- Scrollable Preset Cards List: NO TRUNCATION -->
+    <div id="pk-portal-cards-list" class="max-h-[460px] overflow-y-auto pr-1 space-y-2 scrollbar-thin" role="listbox" aria-label="Portal Presets">
+      {PORTAL_PRESETS.filter((p) => p.id !== 'none').map((preset) => (
+        <button
+          type="button"
+          role="option"
+          data-id={preset.id}
+          data-cat={preset.category}
+          data-flag={preset.flag}
+          data-code={preset.countryCode}
+          data-name={preset.name}
+          data-desc={preset.desc}
+          data-badge={preset.badge}
+          data-target-kb={preset.targetKb ?? ''}
+          data-crop-aspect={preset.cropAspect}
+          data-crop-anchor={preset.cropAnchor}
+          data-width={preset.width ?? ''}
+          data-height={preset.height ?? ''}
+          data-search={`${preset.name} ${preset.countryCode} ${preset.desc} ${preset.dimLabel} ${preset.portalSummary || ''}`.toLowerCase()}
+          class="pk-portal-preset-card group relative w-full rounded-xl border border-border bg-surface p-2.5 text-left transition-all cursor-pointer hover:border-accent/60 hover:bg-surface/90 shadow-2xs"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-start gap-2.5 min-w-0">
+              <span class="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-bg border border-border/80 font-bold text-xs uppercase shrink-0 shadow-2xs group-hover:border-accent/40 group-hover:text-accent transition-colors mt-0.5">
+                <span>{preset.countryCode || preset.flag}</span>
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-fg text-xs group-hover:text-accent transition-colors">
+                    {preset.name}
+                  </span>
+                  {preset.badge && (
+                    <span class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-bg border border-border text-muted font-bold shrink-0">
+                      {preset.badge}
+                    </span>
+                  )}
+                </div>
+
+                <!-- Specs row: Dimensions + File limit -->
+                <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[11px]">
+                  <span class="inline-flex items-center rounded-md bg-bg px-2 py-0.5 font-medium text-fg border border-border/70">
+                    {preset.dimLabel}
+                  </span>
+                  <span class="inline-flex items-center rounded-md bg-accent/10 px-2 py-0.5 font-semibold text-accent border border-accent/25">
+                    Max {preset.targetKb} KB JPG
+                  </span>
+                </div>
+
+                <!-- Description: full text, never truncated with ... -->
+                <p class="mt-1 text-[11px] text-muted leading-relaxed">
+                  {preset.portalSummary || preset.desc}
+                </p>
+              </div>
+            </div>
+
+            <!-- Active Check Badge -->
+            <div class="pk-portal-card-check shrink-0 hidden mt-0.5">
+              <span class="inline-flex items-center gap-1 rounded-full bg-accent text-accent-fg px-2 py-0.5 text-[10px] font-bold">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Active
+              </span>
+            </div>
+          </div>
+        </button>
+      ))}
+
+      <!-- Zero search results message -->
+      <div id="pk-portal-no-matches" class="hidden rounded-xl border border-border/60 bg-bg/50 p-4 text-center">
+        <p class="text-xs text-muted">No presets found matching your filter.</p>
+      </div>
+    </div>
+
+    <!-- Active Summary -->
+    <p id="pk-portal-applied-summary" class="text-[11px] text-accent font-medium hidden">
+    </p>
+
+    <!-- Footer of portal panel -->
+    <div class="pt-2 border-t border-border/60 flex items-center justify-between text-xs">
+      <button
+        type="button"
+        id="pk-btn-back-to-custom"
+        class="text-muted hover:text-accent font-medium transition-colors cursor-pointer inline-flex items-center gap-1"
+      >
+        <span>← Back to Custom Pipeline</span>
+      </button>
+      <span class="text-[11px] text-muted">100% In-Browser</span>
+    </div>
   </div>
 </div>

@@ -52,4 +52,3 @@ for (const [route, count] of Object.entries(incomingCount)) {
 
 console.log(`Single incoming links (${singleIncoming.length}):`, singleIncoming);
 console.log(`Zero incoming links (${zeroIncoming.length}):`, zeroIncoming);
-

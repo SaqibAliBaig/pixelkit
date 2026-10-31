@@ -24,6 +24,9 @@ export interface AdjustmentOptions {
 export const ASPECT_RATIOS: Record<string, number> = {
   '1:1': 1.0,
   '3.5:4.5': 3.5 / 4.5, // ~0.7778 (Passport photo ratio)
+  '2:1': 2 / 1, // Official signature aspect
+  '5:7': 5 / 7,
+  '3:4': 3 / 4, // Canada passport/visa (50x70mm)
   '4:3': 4 / 3,
   '16:9': 16 / 9,
   '9:16': 9 / 16,

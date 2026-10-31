@@ -2,44 +2,38 @@ const fs = require('fs');
 const path = require('path');
 
 function getHtmlFiles(dir) {
-  let files = [];
-  for (const item of fs.readdirSync(dir)) {
-    const full = path.join(dir, item);
-    if (fs.statSync(full).isDirectory()) {
-      files.push(...getHtmlFiles(full));
-    } else if (item.endsWith('.html')) {
-      files.push(full);
+  let results = [];
+  const list = fs.readdirSync(dir);
+  for (const file of list) {
+    const full = path.join(dir, file);
+    const stat = fs.statSync(full);
+    if (stat.isDirectory()) {
+      results = results.concat(getHtmlFiles(full));
+    } else if (file.endsWith('.html')) {
+      results.push(full);
     }
   }
-  return files;
+  return results;
 }
 
-const htmlFiles = getHtmlFiles('dist');
-const lowRatioPages = [];
-
-for (const file of htmlFiles) {
-  const html = fs.readFileSync(file, 'utf8');
-  // Strip scripts, styles, svg
-  const stripped = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-    .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const textLength = stripped.length;
-  const htmlLength = html.length;
-  const ratio = (textLength / htmlLength) * 100;
-
-  let route = file.replace(/^dist/, '').replace(/\\/g, '/').replace(/index\.html$/, '');
-  if (!route.endsWith('/')) route += '/';
-
+const files = getHtmlFiles('dist');
+let failed = 0;
+for (const f of files) {
+  if (f.endsWith('404.html')) continue; // 404 is intentionally non-indexable
+  const html = fs.readFileSync(f, 'utf8');
+  const text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                   .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                   .replace(/<[^>]+>/g, ' ')
+                   .replace(/\s+/g, ' ')
+                   .trim();
+  const ratio = (text.length / html.length) * 100;
   if (ratio < 10) {
-    lowRatioPages.push({ route, ratio: ratio.toFixed(2) + '%', textLength, htmlLength });
+    console.error(`FAIL: ${f} ratio: ${ratio.toFixed(2)}%`);
+    failed++;
   }
 }
-
-console.log(`Pages with <10% text-to-HTML ratio: ${lowRatioPages.length}`);
-console.log(lowRatioPages.slice(0, 40));
-
+if (failed === 0) {
+  console.log(`PASS: All ${files.length - 1} indexable pages exceed 10% text-to-HTML ratio.`);
+} else {
+  process.exit(1);
+}
