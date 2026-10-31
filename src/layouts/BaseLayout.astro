@@ -54,7 +54,7 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden w-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -115,7 +115,7 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
     {jsonLdArr.map((obj) => <JsonLd data={obj} />)}
   </head>
-  <body class="min-h-screen bg-bg text-fg antialiased flex flex-col overflow-x-hidden">
+  <body class="min-h-screen bg-bg text-fg antialiased flex flex-col overflow-x-hidden w-full max-w-full">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-fg"
@@ -125,7 +125,7 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
     <Header />
 
-    <main id="main" class={['flex-1 py-10 sm:py-16', mainWidthClass].join(' ')}>
+    <main id="main" class={['flex-1 py-6 sm:py-12 lg:py-16 w-full max-w-full min-w-0', mainWidthClass].join(' ')}>
       <slot />
     </main>
 

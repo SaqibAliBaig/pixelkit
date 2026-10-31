@@ -79,14 +79,14 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         {initialTool === 'all' ? 'All-in-One' : initialTool.toUpperCase()}
       </span>
     </div>
-    <div class="flex items-center gap-1" role="tablist" aria-label="Settings Mode">
+    <div class="flex items-center gap-1 shrink-0" role="tablist" aria-label="Settings Mode">
       <button
         type="button"
         id="pk-tab-custom"
         role="tab"
         aria-selected={initialTool !== 'passport'}
         aria-controls="pk-panel-custom"
-        class={`rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer font-medium ${
+        class={`rounded-lg px-3 py-1.5 sm:py-1 text-xs transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool !== 'passport'
             ? 'font-semibold bg-surface text-fg border border-border/60 shadow-2xs'
             : 'text-muted hover:text-fg'
@@ -100,7 +100,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         role="tab"
         aria-selected={initialTool === 'passport'}
         aria-controls="pk-panel-portal"
-        class={`rounded-lg px-2.5 py-1 text-xs transition-all cursor-pointer flex items-center gap-1 font-medium ${
+        class={`rounded-lg px-3 py-1.5 sm:py-1 text-xs transition-all cursor-pointer flex items-center gap-1 font-medium touch-manipulation ${
           initialTool === 'passport'
             ? 'font-semibold bg-surface text-fg border border-border/60 shadow-2xs'
             : 'text-muted hover:text-fg'
@@ -277,7 +277,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           id="pk-custom-format-menu"
           role="listbox"
           tabindex="-1"
-          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all"
+          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-[50vh] sm:max-h-72 overflow-y-auto touch-pan-y"
         >
           <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Select Output Format</div>
           {OUTPUT_FORMATS.map((fmt) => (
@@ -403,7 +403,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-max"
-          class="flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px]"
+          class="flex-1 rounded-md py-1.5 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px] touch-manipulation"
           data-mode="max"
         >
           Max Size
@@ -411,7 +411,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-exact"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-mode="exact"
         >
           Exact Size
@@ -419,7 +419,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-range"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-mode="range"
         >
           Range
@@ -427,7 +427,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-quality"
-          class="flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-mode="quality"
         >
           Quality %
@@ -490,7 +490,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           id="pk-custom-target-menu"
           role="listbox"
           tabindex="-1"
-          class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-72 overflow-y-auto"
+          class="absolute left-0 right-0 top-full mt-1.5 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-[50vh] sm:max-h-72 overflow-y-auto touch-pan-y"
         >
           <!-- Section 1: Unlimited -->
           <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Original Quality</div>
@@ -860,7 +860,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           id="pk-custom-crop-menu"
           role="listbox"
           tabindex="-1"
-          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-64 overflow-y-auto"
+          class="absolute left-0 right-0 top-full mt-1 z-50 hidden rounded-2xl border border-border bg-surface/98 backdrop-blur-xl shadow-2xl p-1.5 space-y-1 transition-all max-h-[50vh] sm:max-h-64 overflow-y-auto touch-pan-y"
         >
           <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">Select Aspect Ratio</div>
           {CROP_ASPECTS.map((aspect) => (
@@ -974,35 +974,35 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       <div class="flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px]"
+          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px] touch-manipulation"
           data-scale="100"
         >
           100%
         </button>
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-scale="75"
         >
           75%
         </button>
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-scale="50"
         >
           50%
         </button>
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-scale="25"
         >
           25%
         </button>
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px]"
+          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
           data-scale="custom"
         >
           Custom

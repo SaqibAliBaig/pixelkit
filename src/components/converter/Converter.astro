@@ -40,17 +40,18 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
   aria-label="File converter"
 >
   <!-- Top Mode Segmented Switcher: All-in-One · Convert · Compress · Crop · Resize · Passport -->
-  <div class="mb-4 sm:mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5">
+  <div class="mb-4 sm:mb-5 flex items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5 overflow-hidden">
     <div
       id="pk-top-mode-bar"
-      class="inline-flex items-center gap-1 p-1 rounded-xl bg-surface/60 border border-border text-xs font-semibold overflow-x-auto max-w-full scrollbar-none shadow-2xs"
+      class="flex items-center gap-1 p-1 rounded-xl bg-surface/80 border border-border text-xs font-semibold overflow-x-auto w-full sm:w-auto max-w-full scrollbar-none shadow-2xs touch-pan-x overscroll-contain"
+      style="-webkit-overflow-scrolling: touch;"
       role="tablist"
       aria-label="Processing Mode"
     >
       <a
         href="/"
         data-mode="all"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'all' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -59,7 +60,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/convert/"
         data-mode="convert"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'convert' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -68,7 +69,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/compress-image/"
         data-mode="compress"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'compress' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -77,7 +78,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/crop-image/"
         data-mode="crop"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'crop' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -86,7 +87,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/resize-image/"
         data-mode="resize"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'resize' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -95,7 +96,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/passport-photo-resizer/"
         data-mode="passport"
-        class={`pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
+        class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'passport' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
@@ -103,7 +104,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       </a>
     </div>
 
-    <div class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted">
+    <div class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted shrink-0">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
       <span>100% in-browser · Zero uploads</span>
     </div>

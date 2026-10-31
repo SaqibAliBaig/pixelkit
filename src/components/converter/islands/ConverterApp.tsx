@@ -567,10 +567,10 @@ export function mountConverterApp(): void {
       const isSelected = tab.dataset.mode === mode;
       if (isSelected) {
         tab.className =
-          'pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-semibold bg-surface text-fg shadow-xs border border-border/50';
+          'pk-mode-tab shrink-0 whitespace-nowrap touch-manipulation px-3 py-1.5 rounded-lg transition-all cursor-pointer font-semibold bg-surface text-fg shadow-xs border border-border/50';
       } else {
         tab.className =
-          'pk-mode-tab px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium text-muted hover:text-fg';
+          'pk-mode-tab shrink-0 whitespace-nowrap touch-manipulation px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium text-muted hover:text-fg';
       }
     });
 

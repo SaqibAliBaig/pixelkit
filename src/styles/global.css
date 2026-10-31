@@ -51,6 +51,28 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Enhanced mobile touch behavior & responsiveness */
+  button,
+  a,
+  input,
+  select {
+    touch-action: manipulation;
+  }
+
+  /* Utility for hiding scrollbar while allowing smooth touch scroll */
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar,
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     scroll-behavior: smooth;
     background-color: rgb(var(--bg));
     color: rgb(var(--fg));
@@ -84,6 +106,28 @@
     color: rgb(var(--fg));
     line-height: 1.55;
     text-rendering: optimizeLegibility;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Enhanced mobile touch behavior & responsiveness */
+  button,
+  a,
+  input,
+  select {
+    touch-action: manipulation;
+  }
+
+  /* Utility for hiding scrollbar while allowing smooth touch scroll */
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar,
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   /* Selection */
@@ -260,4 +304,20 @@
   [data-pk-mounted='1'] .pk-js-only {
     visibility: visible;
   }
+  /* Utility for hiding scrollbar while allowing smooth touch scroll */
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar,
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Touch ergonomics */
+  button, a, input, select {
+    touch-action: manipulation;
+  }
+
 }
