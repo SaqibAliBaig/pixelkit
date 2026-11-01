@@ -28,6 +28,7 @@ interface Props {
   related: { label: string; href: string }[];
   useCaseIds?: string[];
   relatedBlogSlugs?: string[];
+  noindex?: boolean;
 }
 
 const {
@@ -39,6 +40,7 @@ const {
   related,
   useCaseIds = [],
   relatedBlogSlugs = [],
+  noindex = false,
 } = Astro.props;
 
 const breadcrumbs = [
@@ -82,6 +84,7 @@ const toolKeywords = [
   description={description}
   keywords={toolKeywords}
   jsonLd={jsonLd}
+  noindex={noindex}
   width="default"
 >
   <Breadcrumbs items={breadcrumbs} />

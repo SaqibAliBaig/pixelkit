@@ -93,14 +93,14 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Online Image & Document Converter',
     description: pageDesc,
-    url: new URL('/convert', SITE.url).href,
+    url: new URL('/convert/', SITE.url).href,
   }),
   {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: pageTitle,
     description: pageDesc,
-    url: new URL('/convert', SITE.url).href,
+    url: new URL('/convert/', SITE.url).href,
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: plainCombos.length,
@@ -108,7 +108,7 @@ const jsonLd = [
         '@type': 'ListItem',
         position: i + 1,
         name: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} Converter`,
-        url: new URL(`/${c.from}-to-${c.to}`, SITE.url).href,
+        url: new URL(`/${c.from}-to-${c.to}/`, SITE.url).href,
       })),
     },
   },

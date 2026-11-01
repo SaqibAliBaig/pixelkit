@@ -1,8 +1,30 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const SITE = 'https://pixelkit.app';
+
+// Index blog dates for accurate sitemap lastmod
+const blogDates = new Map();
+try {
+  const blogDir = path.resolve('src/content/blog');
+  if (fs.existsSync(blogDir)) {
+    for (const file of fs.readdirSync(blogDir)) {
+      if (file.endsWith('.md')) {
+        const slug = file.replace(/\.md$/, '');
+        const text = fs.readFileSync(path.join(blogDir, file), 'utf8');
+        const updatedMatch = text.match(/updatedAt:\s*([^\n\r]+)/);
+        const publishedMatch = text.match(/publishedAt:\s*([^\n\r]+)/);
+        const dateStr = updatedMatch?.[1]?.trim() || publishedMatch?.[1]?.trim();
+        if (dateStr) {
+          blogDates.set(slug, new Date(dateStr));
+        }
+      }
+    }
+  }
+} catch (_) {}
 
 export default defineConfig({
   site: SITE,
@@ -28,69 +50,25 @@ export default defineConfig({
   integrations: [
     tailwind({ applyBaseStyles: false }),
     sitemap({
-      filter: (page) => !page.includes('/404'),
+      filter: (page) =>
+        !page.includes('/404') && !page.match(/\/(bmp|gif|tiff|avif)-to-/),
       serialize(item) {
         if (!item.url.endsWith('/') && !item.url.includes('.')) {
           item.url = `${item.url}/`;
         }
-        const url = item.url.replace(/\/$/, '');
 
-        // Homepage
-        if (url === SITE) {
-          item.priority = 1.0;
-          item.changefreq = 'weekly';
+        // Accurate lastmod: accurate article date or build timestamp
+        const blogMatch = item.url.match(/\/blog\/([^/]+)\/$/);
+        if (blogMatch && blogDates.has(blogMatch[1])) {
+          item.lastmod = blogDates.get(blogMatch[1]);
+        } else {
+          item.lastmod = new Date();
         }
-        // Core pillar hubs (Compress, Convert, Resize, Crop, Passport Workflow)
-        else if (
-          url === `${SITE}/compress-image` ||
-          url === `${SITE}/convert` ||
-          url === `${SITE}/resize-image` ||
-          url === `${SITE}/crop-image` ||
-          url === `${SITE}/passport-photo-resizer`
-        ) {
-          item.priority = 0.95;
-          item.changefreq = 'weekly';
-        }
-        // High-volume standalone compressors & flagship conversions
-        else if (
-          url.includes('/compress-image-to-') ||
-          url.endsWith('/compress-jpg') ||
-          url.endsWith('/compress-png') ||
-          url.endsWith('/compress-webp') ||
-          url.endsWith('/compress-pdf') ||
-          url.endsWith('/heic-to-jpg') ||
-          url.endsWith('/png-to-jpg') ||
-          url.endsWith('/jpg-to-pdf') ||
-          url.endsWith('/pdf-to-jpg') ||
-          url.endsWith('/svg-to-png') ||
-          url.endsWith('/jpg-to-webp') ||
-          url.endsWith('/png-to-webp')
-        ) {
-          item.priority = 0.9;
-          item.changefreq = 'weekly';
-        }
-        // Blog hub & articles
-        else if (url === `${SITE}/blog`) {
-          item.priority = 0.85;
-          item.changefreq = 'weekly';
-        } else if (url.includes('/blog/')) {
-          item.priority = 0.8;
-          item.changefreq = 'monthly';
-        }
-        // Trust and legal pages (E-E-A-T)
-        else if (
-          url.endsWith('/about') ||
-          url.endsWith('/privacy') ||
-          url.endsWith('/terms')
-        ) {
-          item.priority = 0.5;
-          item.changefreq = 'monthly';
-        }
-        // Curated conversion & KB-targeted pages
-        else {
-          item.priority = 0.75;
-          item.changefreq = 'monthly';
-        }
+
+        // Priority and changefreq are officially ignored by Google in 2024–2026.
+        // Google exclusively utilizes accurate lastmod dates.
+        delete item.priority;
+        delete item.changefreq;
 
         return item;
       },

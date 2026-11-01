@@ -1,5 +1,5 @@
 # PixelKit — Free, 100% Client-Side Image & PDF Studio
-> Free online image compressor, converter, resizer, and aspect-ratio cropper running locally in your browser memory without server uploads.
+> Free online image compressor, converter, resizer, and aspect-ratio cropper running locally in browser WebAssembly and Web Workers without server uploads.
 
 ## Core Capabilities
 - Exact Kilobyte & Megabyte Budget Targeting: Binary search compression to Max Size, Exact Size, or Range (20KB, 50KB, 100KB, 200KB, 500KB, etc.).
@@ -7,22 +7,29 @@
 - Integrated Crop Studio: Aspect ratio presets (Passport 3.5x4.5, 1:1, 4:3, 16:9, custom), rotation, and flip.
 - High-DPI SVG Vector Scaling: 1x to 4x (96 to 600 DPI) vector rasterization to transparent PNG.
 - PDF Tools: Merge multiple images/scans into a single compact PDF, or extract PDF pages to JPG/PNG.
-- Zero Server Uploads: 100% private, runs offline as a PWA, no accounts, no ads.
+- Zero Server Uploads: 100% private, files processed strictly on client device via Canvas API and Web Workers, runs offline as a PWA, no accounts, no subscriptions, no ads, no watermarks.
 
 ## Key Links & Tools
 - Homepage & All-in-One Studio: https://pixelkit.app/
-- Image Compressor: https://pixelkit.app/compress-image
-- Image Converter: https://pixelkit.app/convert
-- Scale & Resize: https://pixelkit.app/resize-image
-- Aspect Ratio Cropper: https://pixelkit.app/crop-image
-- Passport & Visa Photo Resizer: https://pixelkit.app/passport-photo-resizer
-- Compress to 50KB: https://pixelkit.app/compress-image-to-50kb
-- Compress to 100KB: https://pixelkit.app/compress-image-to-100kb
-- Compress to 200KB: https://pixelkit.app/compress-image-to-200kb
-- HEIC to JPG Converter: https://pixelkit.app/heic-to-jpg
-- SVG to PNG Converter: https://pixelkit.app/svg-to-png
-- PDF to JPG Converter: https://pixelkit.app/pdf-to-jpg
-- Privacy Policy: https://pixelkit.app/privacy
-- Terms of Service: https://pixelkit.app/terms
+- Image Compressor: https://pixelkit.app/compress-image/
+- Image Converter: https://pixelkit.app/convert/
+- Scale & Resize Tool: https://pixelkit.app/resize-image/
+- Aspect Ratio Cropper: https://pixelkit.app/crop-image/
+- Passport & Visa Photo Resizer: https://pixelkit.app/passport-photo-resizer/
+- Compress JPG: https://pixelkit.app/compress-jpg/
+- Compress PNG: https://pixelkit.app/compress-png/
+- Compress WebP: https://pixelkit.app/compress-webp/
+- Compress PDF: https://pixelkit.app/compress-pdf/
+- Compress to 20KB: https://pixelkit.app/compress-image-to-20kb/
+- Compress to 50KB: https://pixelkit.app/compress-image-to-50kb/
+- Compress to 100KB: https://pixelkit.app/compress-image-to-100kb/
+- Compress to 200KB: https://pixelkit.app/compress-image-to-200kb/
+- Compress to 500KB: https://pixelkit.app/compress-image-to-500kb/
+- HEIC to JPG Converter: https://pixelkit.app/heic-to-jpg/
+- PNG to JPG Converter: https://pixelkit.app/png-to-jpg/
+- JPG to PDF Converter: https://pixelkit.app/jpg-to-pdf/
+- SVG to PNG Converter: https://pixelkit.app/svg-to-png/
+- PDF to JPG Converter: https://pixelkit.app/pdf-to-jpg/
+- Privacy Policy: https://pixelkit.app/privacy/
+- Terms of Service: https://pixelkit.app/terms/
 - XML Sitemap: https://pixelkit.app/sitemap-index.xml
-

@@ -32,21 +32,22 @@ const fullTitle =
     ? title
     : `${title} — ${SITE.name}`;
 
-const keywordsString = Array.isArray(keywords)
-  ? keywords.join(', ')
-  : typeof keywords === 'string'
-  ? keywords
-  : SITE.keywords.join(', ');
 ---
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-<meta name="keywords" content={keywordsString} />
 <meta name="author" content={author} />
 <meta name="publisher" content={SITE.name} />
 
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION && (
+  <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />
+)}
+{import.meta.env.PUBLIC_BING_SITE_VERIFICATION && (
+  <meta name="msvalidate.01" content={import.meta.env.PUBLIC_BING_SITE_VERIFICATION} />
+)}
+
+{noindex && <meta name="robots" content="noindex, follow" />}
 {!noindex && (
   <>
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />

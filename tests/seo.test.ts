@@ -201,7 +201,7 @@ describe('JSON-LD builders', () => {
     expect(me.length).toBe(2);
   });
 
-  it('SoftwareApplication has a free offer and valid aggregateRating for rich results', () => {
+  it('SoftwareApplication has a free offer and omits unverified aggregateRating to protect against Google spam penalties', () => {
     const ld = buildSoftwareApplicationJsonLd({
       name: 'X',
       description: 'Y',
@@ -210,7 +210,17 @@ describe('JSON-LD builders', () => {
     const offers = ld.offers as Record<string, unknown>;
     expect(offers['@type']).toBe('Offer');
     expect(offers.price).toBe('0');
-    const rating = ld.aggregateRating as Record<string, unknown>;
+    // Ensure no unverified aggregateRating is emitted by default
+    expect(ld.aggregateRating).toBeUndefined();
+
+    // Verify rating is only added when authentic reviews are provided
+    const ldWithRating = buildSoftwareApplicationJsonLd({
+      name: 'X',
+      description: 'Y',
+      url: 'https://example.com/',
+      rating: { ratingValue: '4.9', reviewCount: '128' },
+    });
+    const rating = ldWithRating.aggregateRating as Record<string, unknown>;
     expect(rating['@type']).toBe('AggregateRating');
     expect(rating.ratingValue).toBe('4.9');
   });

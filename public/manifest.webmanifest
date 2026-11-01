@@ -48,25 +48,25 @@
     {
       "name": "HEIC to JPG",
       "short_name": "HEIC→JPG",
-      "url": "/heic-to-jpg",
+      "url": "/heic-to-jpg/",
       "description": "Convert iPhone HEIC photos to JPG format"
     },
     {
       "name": "Compress under 50KB",
       "short_name": "<50KB",
-      "url": "/heic-to-jpg-under-50kb",
+      "url": "/heic-to-jpg-under-50kb/",
       "description": "Compress any image under 50KB"
     },
     {
       "name": "JPG to PDF under 100KB",
       "short_name": "PDF<100KB",
-      "url": "/jpg-to-pdf-under-100kb",
+      "url": "/jpg-to-pdf-under-100kb/",
       "description": "Convert photo to PDF under 100KB"
     },
     {
       "name": "Browse All Conversions",
       "short_name": "All Tools",
-      "url": "/convert",
+      "url": "/convert/",
       "description": "Search all 1,000+ file conversions"
     }
   ]

@@ -26,15 +26,15 @@ const { Content } = await post.render();
 const related = (post.data.relatedCombos ?? [])
   .map((slug: string) => {
     if (slug === 'passport-photo-resizer') {
-      return { label: 'Passport Photo Resizer & Compressor', href: `/${slug}` };
+      return { label: 'Passport Photo Resizer & Compressor', href: `/${slug}/` };
     }
     const kbOnly = slug.match(/^compress-image-to-(\d+)kb$/);
     if (kbOnly?.[1]) {
-      return { label: `Compress Image to ${kbOnly[1]}KB`, href: `/${slug}` };
+      return { label: `Compress Image to ${kbOnly[1]}KB`, href: `/${slug}/` };
     }
     const fmtOnly = slug.match(/^compress-([a-z]+)$/);
     if (fmtOnly?.[1]) {
-      return { label: `Compress ${fmtOnly[1].toUpperCase()} Online`, href: `/${slug}` };
+      return { label: `Compress ${fmtOnly[1].toUpperCase()} Online`, href: `/${slug}/` };
     }
     const m = slug.match(/^([a-z]+)-to-([a-z]+)(?:-under-(\d+)kb)?$/);
     if (!m) return null;
@@ -43,7 +43,7 @@ const related = (post.data.relatedCombos ?? [])
     const label = size
       ? `${from.toUpperCase()} to ${to.toUpperCase()} under ${size}KB`
       : `${from.toUpperCase()} to ${to.toUpperCase()}`;
-    const href = `/${slug}`;
+    const href = `/${slug}/`;
     return { label, href };
   })
   .filter((x): x is { label: string; href: string } => x !== null);

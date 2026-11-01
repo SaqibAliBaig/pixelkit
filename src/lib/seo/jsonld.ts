@@ -48,7 +48,7 @@ export function buildWebSiteJsonLd(): Record<string, unknown> {
     },
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://pixelkit.app/convert?q={search_term_string}',
+      target: 'https://pixelkit.app/convert/?q={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   };
@@ -86,8 +86,9 @@ export function buildSoftwareApplicationJsonLd(input: {
   name: string;
   description: string;
   url: string;
+  rating?: { ratingValue: string; reviewCount: string };
 }): Record<string, unknown> {
-  return {
+  const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: input.name,
@@ -100,13 +101,6 @@ export function buildSoftwareApplicationJsonLd(input: {
       price: '0',
       priceCurrency: 'USD',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '128',
-      bestRating: '5',
-      worstRating: '1',
-    },
     featureList: [
       'Client-side file conversion',
       'Zero server upload privacy',
@@ -117,6 +111,20 @@ export function buildSoftwareApplicationJsonLd(input: {
       'Offline PWA support',
     ],
   };
+
+  // Only include aggregateRating if real on-site reviews are provided
+  // (Prevents Google penalty for fake/unverified structured data ratings)
+  if (input.rating) {
+    data.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: input.rating.ratingValue,
+      reviewCount: input.rating.reviewCount,
+      bestRating: '5',
+      worstRating: '1',
+    };
+  }
+
+  return data;
 }
 
 export function buildHowToJsonLd(combo: {
@@ -130,7 +138,7 @@ export function buildHowToJsonLd(combo: {
     ? `How to convert ${from} to ${to} under ${combo.sizeKb}KB`
     : `How to convert ${from} to ${to} in your browser`;
 
-  const baseUrl = `https://pixelkit.app/${combo.from}-to-${combo.to}${combo.sizeKb ? '-under-' + combo.sizeKb + 'kb' : ''}`;
+  const baseUrl = `https://pixelkit.app/${combo.from}-to-${combo.to}${combo.sizeKb ? '-under-' + combo.sizeKb + 'kb' : ''}/`;
 
   return {
     '@context': 'https://schema.org',
