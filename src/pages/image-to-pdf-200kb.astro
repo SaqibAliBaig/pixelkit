@@ -1,0 +1,264 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Image to PDF', href: '/image-to-pdf/' },
+  { label: 'Image to PDF 200KB' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert an image to a PDF under 200KB online?',
+    a: 'Drop your JPG, PNG, or iPhone HEIC document scan into the tool above. PixelKit is pre-configured with a strict 200KB ceiling. The client-side compression engine iteratively optimizes JPEG streams and raster dimensions to guarantee the output PDF lands safely between 170KB and 195KB, fully passing portal upload checks.',
+  },
+  {
+    q: 'Why do exam portals like NEET and JEE enforce a 200KB PDF limit?',
+    a: 'Examination authorities (like NTA for NEET-UG, JEE Main, and CSIR NET) process millions of candidate certificates, category proofs, and PwD papers. Enforcing a 200KB limit conserves server storage while ensuring documents remain legible for verification officers.',
+  },
+  {
+    q: 'Will text and signatures on my certificate remain readable under 200KB?',
+    a: 'Yes. PixelKit uses smart psycho-visual quantization rather than harsh blurring. Document typography, official government stamps, and ink signatures remain crisp and sharp, ensuring zero rejection during physical verification.',
+  },
+  {
+    q: 'Can I combine multiple certificate pages or ID sides into one 200KB PDF?',
+    a: 'Yes. Drop multiple images at once (e.g. front and back of Aadhaar, or multi-page transcripts). PixelKit merges them into a single PDF document while dynamically balancing compression across all pages to stay under the 200KB total limit.',
+  },
+  {
+    q: 'Are confidential document scans uploaded to any third-party server?',
+    a: 'Never. PixelKit is 100% client-side. All PDF assembly and image compression runs locally in your device’s browser memory via WebAssembly. Your tax records, marksheets, and identity scans never leave your computer or phone.',
+  },
+];
+
+const directAnswer = {
+  question: 'How to convert image to PDF under 200KB online for free?',
+  answer:
+    'To convert an image to PDF under 200KB: 1. Drag and drop your JPG, PNG, or HEIC photo into PixelKit. 2. The tool automatically applies a 200KB target ceiling and high-precision document quantization. 3. Drag thumbnails to reorder pages or adjust margins if needed. 4. Click Download to save your compliant, crystal-clear PDF under 200KB with zero server uploads.',
+};
+
+const pageTitle = `Image to PDF 200KB Online — Convert Photo to PDF Under 200KB | ${SITE.name}`;
+const pageDesc =
+  'Convert and compress image to PDF under 200KB online for free. Ideal for NTA NEET, JEE Main, Schengen visas, and government exam document uploads. 100% private in-browser tool.';
+const pageKeywords = [
+  'image to pdf 200kb',
+  'convert image to pdf under 200kb',
+  'image to pdf under 200kb',
+  'photo to pdf 200kb',
+  'photo to pdf under 200kb',
+  'convert photo to pdf under 200kb',
+  'jpg to pdf 200kb',
+  'neet pdf converter 200kb',
+  'image to pdf converter free',
+  'convert image to pdf free',
+  'free image to pdf converter',
+  'image to pdf converter',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert image to PDF under 200KB online',
+  description:
+    'Step-by-step instructions to convert and compress photographs and certificates to a PDF strictly under 200KB.',
+  steps: [
+    {
+      name: 'Upload photo or certificate scan',
+      text: 'Drop your JPG, PNG, or HEIC image into the 200KB PDF converter.',
+    },
+    {
+      name: 'Verify 200KB target ceiling',
+      text: 'PixelKit automatically locks the maximum file size budget to 200KB.',
+    },
+    {
+      name: 'Reorder pages or adjust layout',
+      text: 'Optionally add more pages, arrange sequence, or adjust margins.',
+    },
+    {
+      name: 'Download 200KB PDF document',
+      text: 'Click "Download PDF" to immediately retrieve your compliant document.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Image to PDF 200KB Converter',
+    description: pageDesc,
+    path: '/image-to-pdf-200kb/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+];
+
+const portalsRequiring200kbPdf = [
+  {
+    authority: 'NTA (National Testing Agency)',
+    exams: 'NEET-UG, JEE Main, UGC NET, CUET',
+    doc: 'Category Certificate, PwD Proof, Class 10/12 Marksheets',
+    budget: '50 KB to 200 KB strictly',
+  },
+  {
+    authority: 'Schengen European Consulates',
+    exams: 'Tourist, Business & Student Visas',
+    doc: 'Bank Statements, Flight Itinerary, Hotel Bookings',
+    budget: 'Under 200 KB per attachment',
+  },
+  {
+    authority: 'State Public Service Commissions',
+    exams: 'UPPSC, BPSC, MPSC, TNPSC, WBPSC',
+    doc: 'Domicile Certificate, Educational Degrees, Caste Proof',
+    budget: 'Under 200 KB strictly',
+  },
+  {
+    authority: 'University Admissions & GATE',
+    exams: 'IIT JAM, GATE, DU, BHU Admissions',
+    doc: 'Graduation Marksheets, Identity Proofs, Undertaking Forms',
+    budget: 'Max 200 KB PDF',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonicalUrl="https://pixelkit.app/image-to-pdf-200kb/"
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-4 sm:mt-6 text-center">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        NTA NEET · JEE · Schengen Visas · Official 200KB Limit
+      </div>
+      <h1 class="mt-3 text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-fg">
+        Convert Image to PDF Under 200KB
+      </h1>
+      <p class="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-muted">
+        Compress certificates, identity cards, and document photos into a clean PDF strictly under 200KB. 100% private in-browser conversion with zero cloud uploads.
+      </p>
+    </header>
+
+    <!-- Direct Answer Box (GEO / AI Overview) -->
+    <div class="mt-6 sm:mt-8">
+      <DirectAnswerBox
+        title="How to Convert Image to PDF Under 200KB (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Target File Ceiling', value: 'Strictly ≤ 200 KB (Typical 175–195 KB)', highlight: true },
+          { label: 'Document Presets', value: 'NEET, JEE, Schengen Visas, Marksheets' },
+          { label: 'Supported Inputs', value: 'JPG, JPEG, PNG, WebP, iPhone HEIC', highlight: true },
+          { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
+        ]}
+      />
+    </div>
+
+    <!-- Active Tool Studio Pre-configured for 200KB PDF -->
+    <main class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        targetKb={200}
+        initialTool="compress"
+      />
+    </main>
+
+    <!-- Portals Requiring 200KB PDF Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Portals Enforcing the 200KB PDF Limit
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Guidelines for exams and consular systems requiring documents strictly under 200KB:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Authority &amp; Organization</th>
+              <th class="py-3 px-4">Exams &amp; Applications</th>
+              <th class="py-3 px-4">Document Types</th>
+              <th class="py-3 px-4">Allowable PDF Ceiling</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            {portalsRequiring200kbPdf.map((p) => (
+              <tr class="hover:bg-surface/50 transition-colors">
+                <td class="py-3.5 px-4 font-semibold text-fg">{p.authority}</td>
+                <td class="py-3.5 px-4 text-muted">{p.exams}</td>
+                <td class="py-3.5 px-4 text-fg text-xs">{p.doc}</td>
+                <td class="py-3.5 px-4 font-mono font-bold text-emerald-500 text-xs">{p.budget}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Action Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Related Tools:</span>
+        <a href="/image-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF Hub →</a>
+        <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Merge JPG to PDF</a>
+        <a href="/compress-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress JPG to PDF (under 100KB)</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress Image to 200KB JPG</a>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PDF</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on 200KB Quantization -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How PixelKit Compresses Documents Under 200KB Without Blurry Text
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Smartphone cameras take 12MP to 48MP photos that typically weigh between 3MB and 12MB. If you simply wrap a raw photo into a PDF, the file size remains massive. If you use a crude online compressor, it aggressively reduces resolution until official marksheet grades and serial numbers become illegible.
+        </p>
+        <p>
+          PixelKit solves this with intelligent document quantization:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">High-Frequency Edge Preservation:</strong> Our Web Worker algorithm maintains luminance contrast around character boundaries and stamped signatures while heavily compressing uniform paper background noise.
+          </li>
+          <li>
+            <strong class="text-fg">Iterative Binary Convergence:</strong> The engine tests multiple DCT quantization matrices in client RAM to land just below 200KB (e.g. 185KB), maximizing visual readability while guaranteeing 100% upload acceptance.
+          </li>
+          <li>
+            <strong class="text-fg">Zero Cloud Storage:</strong> Sensitive ID proofs and academic transcripts are never exposed to remote servers or third-party cloud caches.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

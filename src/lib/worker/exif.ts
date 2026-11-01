@@ -151,3 +151,55 @@ export function insertExifIntoJpeg(
 
   return new Blob([combined], { type: 'image/jpeg' });
 }
+
+/**
+ * Safely increases a JPEG file's byte size up to targetBytes by injecting
+ * standard JPEG COM (Comment: 0xFF 0xFE) segments.
+ * Conforms to ISO/IEC 10918-1: ignored by all image decoders and portal validators
+ * while elevating the physical file size to meet portal minimum size requirements.
+ */
+export function padJpegToTargetBytes(
+  jpegBuffer: ArrayBuffer,
+  targetBytes: number
+): Blob {
+  const view = new DataView(jpegBuffer);
+  if (view.byteLength < 4 || view.getUint16(0) !== 0xffd8 || jpegBuffer.byteLength >= targetBytes) {
+    return new Blob([jpegBuffer], { type: 'image/jpeg' });
+  }
+
+  let insertOffset = 2; // Right after SOI (0xFF 0xD8)
+  if (view.getUint16(2) === 0xffe0) {
+    const app0Len = view.getUint16(4);
+    insertOffset = 4 + app0Len;
+  }
+
+  let bytesNeeded = targetBytes - jpegBuffer.byteLength;
+  const segments: Uint8Array[] = [];
+
+  while (bytesNeeded > 0) {
+    // A COM marker needs 2 bytes for 0xFF 0xFE + 2 bytes for length = 4 bytes min
+    const segLen = Math.max(4, Math.min(65535, bytesNeeded));
+    const seg = new Uint8Array(segLen);
+    const segView = new DataView(seg.buffer);
+    segView.setUint16(0, 0xfffe); // COM marker
+    segView.setUint16(2, segLen); // Segment length (includes 2 length bytes)
+    // Payload bytes seg[4..segLen-1] default to 0x00
+    segments.push(seg);
+    bytesNeeded -= segLen;
+  }
+
+  const totalPadding = segments.reduce((sum, s) => sum + s.byteLength, 0);
+  const combined = new Uint8Array(jpegBuffer.byteLength + totalPadding);
+  combined.set(new Uint8Array(jpegBuffer.slice(0, insertOffset)), 0);
+
+  let currentOffset = insertOffset;
+  for (const seg of segments) {
+    combined.set(seg, currentOffset);
+    currentOffset += seg.byteLength;
+  }
+
+  combined.set(new Uint8Array(jpegBuffer.slice(insertOffset)), currentOffset);
+
+  return new Blob([combined], { type: 'image/jpeg' });
+}
+

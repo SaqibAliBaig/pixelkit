@@ -1,0 +1,260 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert/' },
+  { label: 'Photo to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert a photo to PDF online for free?',
+    a: 'Drop your photo (JPG, PNG, WebP, or iPhone HEIC) into the tool above. PixelKit instantly processes the photo in browser memory and formats it into a standard PDF page. Click "Download" to retrieve your clean, printable PDF document without any sign-up or watermarks.',
+  },
+  {
+    q: 'How do I convert a photo to PDF under 100KB, 200KB, or 300KB?',
+    a: 'In the tool above, select your desired file size ceiling (like "Under 100KB" for Aadhaar/KYC, "Under 200KB" for NEET/JEE, or "Under 300KB" for state recruitment portals). PixelKit automatically tunes JPEG quality and raster dimensions so the resulting PDF strictly complies with your portal limit.',
+  },
+  {
+    q: 'Can I combine and merge multiple photos into one single PDF?',
+    a: 'Yes. Drop multiple camera photos or document scans at once. PixelKit provides an interactive queue where you can drag thumbnail cards to reorder pages, adjust margins, and merge them all into a unified multi-page PDF document.',
+  },
+  {
+    q: 'Are my private photos and ID cards uploaded to any cloud server?',
+    a: 'Never. PixelKit is 100% client-side. All photo decoding and PDF compilation runs locally in your device memory via WebAssembly and Canvas APIs. Your private pictures, marksheet scans, and documents never leave your computer or phone.',
+  },
+  {
+    q: 'How do I convert iPhone photos to PDF?',
+    a: 'Drop your iPhone photos directly into PixelKit. The tool natively decodes Apple HEIC and HEIF camera formats in browser memory and packages them into universal, high-quality PDF files compatible with all platforms.',
+  },
+  {
+    q: 'Can I add additional photos to an existing PDF queue?',
+    a: 'Yes. You can drag and add more photos at any time, rearrange their sequence in the queue, and compile a brand new, organized PDF file in seconds.',
+  },
+];
+
+const directAnswer = {
+  question: 'How to convert photos to PDF online for free without watermarks?',
+  answer:
+    'To convert photos to PDF online: 1. Drag and drop your camera photos (JPG, PNG, HEIC) into PixelKit. 2. Drag thumbnails to reorder pages, adjust margins, and select portrait or landscape layout. 3. Choose your desired file size limit (under 100KB, 200KB, or 300KB) for exam and visa compliance. 4. Click Download to save your sharp, watermark-free PDF document directly from device memory.',
+};
+
+const pageTitle = `Photo to PDF Converter — Convert Photos to PDF Online Free | ${SITE.name}`;
+const pageDesc =
+  'Free online photo to PDF converter. Convert camera pictures, mobile snaps, and ID cards into PDF under 100KB, 200KB, or 300KB. 100% private in-browser tool with zero uploads.';
+const pageKeywords = [
+  'photo to pdf',
+  'photo to pdf converter',
+  'convert photo to pdf',
+  'photo to pdf converter free',
+  'photo to pdf 100 kb',
+  'photo to pdf 200kb',
+  'photo to pdf 300 kb',
+  'photo to pdf maker',
+  'how to convert photo to pdf',
+  'add photo to pdf',
+  'online photo to pdf converter',
+  'photo to pdf converter online',
+  'image to pdf',
+  'jpg to pdf',
+  'png to pdf',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert a photo to PDF online for free',
+  description:
+    'Step-by-step instructions to convert camera pictures and photo scans into a unified, lightweight PDF document.',
+  steps: [
+    {
+      name: 'Upload photo or picture',
+      text: 'Drop or select your photo (JPG, PNG, WebP, or iPhone HEIC) into the Photo to PDF converter.',
+    },
+    {
+      name: 'Arrange pages and layout',
+      text: 'Drag thumbnail cards to sequence pages, set portrait or landscape orientation, and configure margins.',
+    },
+    {
+      name: 'Select target file size (optional)',
+      text: 'Choose under 100KB, 200KB, or 300KB to meet official exam and admission portal restrictions.',
+    },
+    {
+      name: 'Download PDF document',
+      text: 'Click "Download PDF" to immediately compile and save your watermark-free PDF file.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Photo to PDF Converter',
+    description: pageDesc,
+    path: '/photo-to-pdf/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+];
+
+const sizeBrackets = [
+  {
+    target: 'Photo to PDF 100KB',
+    badge: 'Aadhaar · Passports · KYC',
+    desc: 'Optimized for Indian Passport Seva, Aadhaar updates, and bank KYC forms requiring tight 100KB ceilings.',
+    href: '/image-to-pdf-200kb/',
+  },
+  {
+    target: 'Photo to PDF 200KB',
+    badge: 'NTA NEET · JEE · Schengen',
+    desc: 'Calibrated for NTA NEET, JEE Main category certificates, and European embassy visa submissions.',
+    href: '/image-to-pdf-200kb/',
+  },
+  {
+    target: 'Photo to PDF 300KB',
+    badge: 'State PSCs · Marksheets',
+    desc: 'Built for UPSSSC, state public service commissions, and university semester transcripts.',
+    href: '/compress-image-to-pdf/',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonicalUrl="https://pixelkit.app/photo-to-pdf/"
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-4 sm:mt-6 text-center">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        Zero Uploads · Mobile Camera Snaps · 100% Free
+      </div>
+      <h1 class="mt-3 text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-fg">
+        Photo to PDF Converter Online
+      </h1>
+      <p class="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-muted">
+        Convert mobile photos, document scans, and pictures into professional PDF files. Combine multiple photos, reorder pages, and compress to exact KB limits directly in your browser.
+      </p>
+    </header>
+
+    <!-- Direct Answer Box (GEO / AI Overview) -->
+    <div class="mt-6 sm:mt-8">
+      <DirectAnswerBox
+        title="How to Convert Photos to PDF Online (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Compatible Photo Formats', value: 'JPG, PNG, WebP, Apple HEIC, TIFF', highlight: true },
+          { label: 'File Size Targets', value: 'Under 100 KB, 200 KB, 300 KB, 500 KB' },
+          { label: 'Multi-Photo Merging', value: 'Drag-and-Drop Page Sequencing Included', highlight: true },
+          { label: 'Privacy & Security', value: '100% Local Browser Memory / Zero Cloud Uploads' },
+        ]}
+      />
+    </div>
+
+    <!-- Active Tool Studio Pre-configured for Photo to PDF -->
+    <main class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </main>
+
+    <!-- Popular Target File Size Brackets -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Popular Photo to PDF Target Size Presets
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common file size restrictions enforced by recruitment portals, embassies, and universities:
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {sizeBrackets.map((sb) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-5 flex flex-col justify-between">
+            <div>
+              <div class="inline-block rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                {sb.badge}
+              </div>
+              <h3 class="mt-2 text-base font-bold text-fg">{sb.target}</h3>
+              <p class="mt-2 text-xs text-muted leading-relaxed">{sb.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-border/60">
+              <a href={sb.href} class="text-xs font-semibold text-accent hover:underline">
+                Use Preset Tool →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Action Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Related Converters:</span>
+        <a href="/image-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF Hub →</a>
+        <a href="/image-to-pdf-200kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Image to PDF 200KB</a>
+        <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF on iPhone →</a>
+        <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Merge JPG to PDF</a>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PDF</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on Client-Side Processing -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How In-Browser Photo Conversion Protects Your Privacy
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Photos of personal documents—such as passport stamps, birth certificates, college transcripts, and property tax deeds—contain sensitive biometric and identity details. Traditional online PDF converters upload these high-resolution images to remote cloud servers where they are queued and stored on third-party hard drives.
+        </p>
+        <p>
+          <strong>PixelKit’s Zero-Server Commitment:</strong>
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Client-Side WebAssembly:</strong> Image decoding and PDF byte packing execute inside your browser’s virtualized sandbox.
+          </li>
+          <li>
+            <strong class="text-fg">Zero Network Exposure:</strong> Your photographs never travel across the internet or touch any external server.
+          </li>
+          <li>
+            <strong class="text-fg">Instant Memory Clearance:</strong> Closing the tab immediately destroys all image buffers and generated documents in local RAM.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

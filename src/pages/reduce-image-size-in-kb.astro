@@ -1,0 +1,240 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: 'Reduce Image Size in KB' },
+];
+
+const faqs = [
+  {
+    q: 'How do I reduce image size in KB online?',
+    a: 'Drag and drop your JPG, PNG, or WebP photo into the upload box above. PixelKit calculates binary-search compression inside your browser to reduce the image size to under 20KB, 50KB, 100KB, or 200KB while preserving maximum visual clarity.',
+  },
+  {
+    q: 'What is the best way to decrease image size in KB without losing quality?',
+    a: 'PixelKit uses smart lossy quantization and WebAssembly encoders that eliminate invisible redundant color metadata and fine-tune high-frequency coefficients. This shrinks file weight by 70% to 90% without visible pixelation or artifacts.',
+  },
+  {
+    q: 'How can I change image size in KB for government job and exam portals?',
+    a: 'Select your required size from the Target Size dropdown (e.g. 20KB for signatures, 50KB for SSC/UPSC photos, or 100KB for document scans). PixelKit guarantees the final file stays strictly below the portal ceiling.',
+  },
+  {
+    q: 'Can I resize image dimensions (pixels) and reduce image size in KB at the same time?',
+    a: 'Yes. Switch to the Resize tab or use the Passport Photo presets to set exact pixel or millimeter dimensions (e.g. 3.5 x 4.5 cm or 200 x 230 px) while simultaneously compressing the file size under 50KB.',
+  },
+  {
+    q: 'Is it safe to reduce confidential photos and ID cards on PixelKit?',
+    a: '100% safe. PixelKit operates purely on client-side Web Workers. Your files are never uploaded, stored, or processed on any remote server. Your personal privacy is completely protected.',
+  },
+  {
+    q: 'Can I reduce image size in KB on an iPhone or Android phone?',
+    a: 'Yes. PixelKit works directly in Safari, Chrome, and Firefox on mobile devices. You can choose photos directly from your photo library and compress them in seconds without installing third-party apps.',
+  },
+];
+
+const pageTitle = `Reduce Image Size in KB Online (Decrease Photo Size) | ${SITE.name}`;
+const pageDesc =
+  'Free online tool to reduce image size in KB, decrease photo size, and compress images to 20KB, 50KB, 100KB, or 200KB. Fast, secure, and 100% private in-browser compression.';
+const pageKeywords = [
+  'reduce image size in kb',
+  'decrease image size in kb',
+  'image size in kb',
+  'compress image size in kb',
+  'how to reduce image size in kb',
+  'change image size in kb',
+  'resize image size in kb',
+  'reduce image size in kb jpg',
+  'reduce photo size in kb',
+  'photo size reduce online',
+  'reduce image size to 50kb',
+  'reduce image size to 20kb',
+  'reduce image size to 100kb',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to reduce image size in KB online',
+  description: 'Step-by-step instructions to decrease image size in KB for web uploads, job applications, and exam portals.',
+  steps: [
+    {
+      name: 'Upload your photo',
+      text: 'Drop any JPG, PNG, WebP, or HEIC image into the tool above.',
+    },
+    {
+      name: 'Select target KB limit',
+      text: 'Pick an exact preset (like 20KB, 50KB, 100KB, 200KB) or enter any custom KB target.',
+    },
+    {
+      name: 'Automatic in-browser optimization',
+      text: 'PixelKit iteratively computes optimal quantization in browser memory to hit the exact target.',
+    },
+    {
+      name: 'Download reduced image',
+      text: 'Save your compressed photo instantly. It is ready for upload with 100% portal acceptance.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Reduce Image Size in KB — PixelKit',
+    description: pageDesc,
+    url: new URL('/reduce-image-size-in-kb/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Decrease File Size · Exact KB Presets · Zero Server Uploads</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Reduce Image Size in KB Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Quickly decrease image size in KB to 20KB, 50KB, 100KB, or 200KB without losing photo quality. Fast, safe, and works entirely in your web browser.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Reduce Image Size in KB Fast"
+      summaryText="To reduce an image's size in KB, upload it to PixelKit, choose an exact kilobyte target (like 50 KB or 100 KB), and download the compressed file. PixelKit runs a fast client-side binary search across JPEG and WebP quantization tables, delivering up to 90% size reduction while retaining sharp text and facial clarity."
+      specs={[
+        { label: 'Popular Presets', value: '20 KB, 50 KB, 100 KB, 200 KB, 500 KB', highlight: true },
+        { label: 'Supported Formats', value: 'JPG, PNG, WebP, HEIC, PDF' },
+        { label: 'Quality Retention', value: 'Iterative Binary-Search Quantization', highlight: true },
+        { label: 'Privacy & Security', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- Quick Size Ladder Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Reduce Image Size to Specific Kilobyte Targets
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Need an exact size for an official form or portal? Choose from our dedicated size reducers:
+      </p>
+
+      <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
+        <a href="/compress-image-to-20kb/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent hover:bg-surface transition-all">
+          <div class="font-bold text-fg group-hover:text-accent">Reduce to 20 KB</div>
+          <div class="text-xs text-muted mt-1">Signatures, thumbprints &amp; avatar stamps</div>
+        </a>
+        <a href="/compress-image-to-50kb/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent hover:bg-surface transition-all">
+          <div class="font-bold text-fg group-hover:text-accent">Reduce to 50 KB</div>
+          <div class="text-xs text-muted mt-1">SSC, UPSC, NEET &amp; state job portal photos</div>
+        </a>
+        <a href="/compress-image-to-100kb/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent hover:bg-surface transition-all">
+          <div class="font-bold text-fg group-hover:text-accent">Reduce to 100 KB</div>
+          <div class="text-xs text-muted mt-1">Passports, visas, KYC &amp; university forms</div>
+        </a>
+        <a href="/compress-image-to-200kb/" class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent hover:bg-surface transition-all">
+          <div class="font-bold text-fg group-hover:text-accent">Reduce to 200 KB</div>
+          <div class="text-xs text-muted mt-1">Document scans, marksheets &amp; certificates</div>
+        </a>
+      </div>
+
+      <!-- Quick Switch to Increase Size -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-muted font-medium">More sizes:</span>
+          <a href="/compress-image-to-15kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">15KB</a>
+          <a href="/compress-image-to-30kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">30KB</a>
+          <a href="/compress-image-to-40kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">40KB</a>
+          <a href="/compress-image-to-300kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">300KB</a>
+          <a href="/compress-image-to-500kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">500KB</a>
+        </div>
+        <a href="/increase-image-size-in-kb/" class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">
+          Need to Increase Size Instead? →
+        </a>
+      </div>
+    </section>
+
+    <!-- Technical Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How to Reduce Image Size in KB Without Sacrificing Visual Quality
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Reducing an image file size does not mean you have to settle for grainy, unreadable photos. High-resolution smartphones routinely produce 5MB to 10MB JPEG files that contain millions of redundant color samples and uncompressed EXIF data.
+        </p>
+        <p>
+          PixelKit utilizes three complementary techniques to reduce image size:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Iterative Binary-Search Quantization:</strong> Instead of fixed compression percentages, PixelKit tests multiple quality levels within milliseconds to find the highest fidelity that fits under your exact KB limit.
+          </li>
+          <li>
+            <strong class="text-fg">Metadata Optimization:</strong> Strips redundant thumbnail previews and non-essential camera tags while keeping essential orientation.
+          </li>
+          <li>
+            <strong class="text-fg">Smart Canvas Downsampling:</strong> When an image resolution is excessively large (e.g. 4000x3000 for a 200x230 portal box), PixelKit proportionally downsamples the raster grid using high-quality bicubic interpolation.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

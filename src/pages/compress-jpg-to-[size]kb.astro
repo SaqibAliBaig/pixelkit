@@ -1,0 +1,568 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+interface JpgKbTargetSpec {
+  size: number;
+  headline: string;
+  badge: string;
+  portalSummary: string;
+  useCases: { title: string; dims: string; body: string }[];
+  tip: string;
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const specs: JpgKbTargetSpec[] = [
+    {
+      size: 10,
+      headline: 'Compress JPG to 10KB Online',
+      badge: 'Signatures · Left Thumbprints · Banking Portals',
+      portalSummary:
+        'Compress JPG and JPEG photos strictly under 10KB without pixelated blur. Engineered for banking (IBPS), police recruitment, railway exams, and signature upload boxes mandating 10KB max.',
+      useCases: [
+        {
+          title: 'IBPS & Bank Exam Signatures',
+          dims: '140 × 60 px · Under 10 KB JPG',
+          body: 'Crop tightly to ink strokes so candidate signatures remain sharp and high-contrast under strict 10KB limits.',
+        },
+        {
+          title: 'Left Thumb Impressions (LTI)',
+          dims: '240 × 240 px · Max 10 KB JPG',
+          body: 'Preserve ridge line fidelity on scanned ink thumb impressions for state police and military recruitment.',
+        },
+        {
+          title: 'Compact Applicant Signatures',
+          dims: 'JPG / JPEG · Max 10 KB',
+          body: 'Binary-search quantization guarantees zero portal upload errors with maximum line clarity.',
+        },
+      ],
+      tip: 'For 10KB limits, open Crop Studio first to remove excess whitespace around the signature, then resize width to 140–200 px before saving.',
+    },
+    {
+      size: 15,
+      headline: 'Compress JPG to 15KB Online',
+      badge: 'State PSC · Police Recruitment · Signatures',
+      portalSummary:
+        'Compress JPG images to under 15KB online with maximum sharpness. Tuned for Indian State PSC, High Court, and police constable online applications enforcing 10KB–15KB limits.',
+      useCases: [
+        {
+          title: 'State PSC Signatures',
+          dims: '160 × 70 px · 10–15 KB JPG',
+          body: 'Keep ink strokes smooth and legible on scanned signature slips without JPEG halo artifacts.',
+        },
+        {
+          title: 'Police & Defense Applications',
+          dims: 'JPG · Under 15 KB',
+          body: 'Strict file size limit for constable and sub-inspector application registration portals.',
+        },
+        {
+          title: 'Applicant Profile Avatars',
+          dims: 'JPG / JPEG · Under 15 KB',
+          body: 'Compress compact thumbnail scans for fast verification without upload failures.',
+        },
+      ],
+      tip: 'If your signature file is slightly over 15KB, set target width to 250–300 px in Resize Studio before downloading.',
+    },
+    {
+      size: 20,
+      headline: 'Compress JPG to 20KB Online',
+      badge: 'Signatures · Thumbprints · Exam Portals',
+      portalSummary:
+        'Compress JPG to 20KB online without unreadable blur. Tuned for strict SSC, UPSC, IBPS, and state exam signature and thumbprint upload slots enforcing 10KB–20KB ceilings.',
+      useCases: [
+        {
+          title: 'SSC & UPSC Signatures',
+          dims: '140 × 60 px · 10–20 KB JPG',
+          body: 'Crop tightly around black or blue ink signatures on white paper so lines stay razor-sharp under 20KB.',
+        },
+        {
+          title: 'Thumbprint Impressions',
+          dims: '240 × 240 px · Under 20 KB JPG',
+          body: 'Preserve ridge contrast on scanned thumb impressions required by banking and recruitment portals.',
+        },
+        {
+          title: 'Compact Exam Avatars',
+          dims: '200 × 230 px · 15–20 KB JPG',
+          body: 'Combine PixelKit Resize Studio with binary-search compression to keep facial features crisp at 20KB.',
+        },
+      ],
+      tip: 'For 20KB targets on smartphone camera photos, open Crop Studio to trim background borders or scale width to 350–500 px before downloading.',
+    },
+    {
+      size: 30,
+      headline: 'Compress JPG to 30KB Online',
+      badge: 'UPSSSC · MPPEB · State Exam Photos',
+      portalSummary:
+        'Reduce JPG to 30KB online without losing facial clarity. Built for UPSSSC PET, MPPEB, APPSC, and state recruitment portals mandating 20KB–30KB upload limits.',
+      useCases: [
+        {
+          title: 'UPSSSC & State PET Headshots',
+          dims: '350 × 450 px · 20–30 KB JPG',
+          body: 'Crop passport-style photos to 3.5 × 4.5 cm and land safely between 20KB and 30KB in a single click.',
+        },
+        {
+          title: 'Railway RRB Photos',
+          dims: 'JPG · Under 30 KB',
+          body: 'Retain clear eyes, ears, and background contrast for automated facial recognition matching.',
+        },
+        {
+          title: 'College Admission Forms',
+          dims: 'JPG · Max 30 KB',
+          body: 'Compress student identity photos for state university admission portals.',
+        },
+      ],
+      tip: 'Need between 20KB and 30KB? Use Range mode in Settings to set min 20KB and max 30KB for 100% portal acceptance.',
+    },
+    {
+      size: 40,
+      headline: 'Compress JPG to 40KB Online',
+      badge: 'Teacher Eligibility (TET) · State University Forms',
+      portalSummary:
+        'Compress JPG and JPEG photos strictly under 40KB. Tailored for Teacher Eligibility Tests (CTET, UPTET, REET) and state college application photos.',
+      useCases: [
+        {
+          title: 'TET & State Exam Photos',
+          dims: '3.5 × 4.5 cm · 20–40 KB JPG',
+          body: 'Ensure clean facial lighting and sharp contrast while meeting strict 40KB upload ceilings.',
+        },
+        {
+          title: 'Polytechnic & ITI Admissions',
+          dims: 'JPG · Under 40 KB',
+          body: 'Shrink mobile phone selfies to passport size for vocational admission forms.',
+        },
+        {
+          title: 'Employee ID Card Photos',
+          dims: 'JPG · Under 40 KB',
+          body: 'Standardize staff photo headshots for corporate HR databases.',
+        },
+      ],
+      tip: 'Targeting 38KB provides a safe 2KB safety margin against server upload recalculation differences.',
+    },
+    {
+      size: 50,
+      headline: 'Compress JPG to 50KB Online',
+      badge: 'SSC CGL/CHSL · UPSC · NEET Exam Photos',
+      portalSummary:
+        'Compress JPG to 50KB online with zero blur. The definitive tool for SSC CGL, CHSL, MTS, UPSC Civil Services, and NEET passport photo uploads enforcing 20KB–50KB brackets.',
+      useCases: [
+        {
+          title: 'SSC CGL, CHSL, MTS Photos',
+          dims: '350 × 450 px (3.5 × 4.5 cm) · 20–50 KB JPG',
+          body: 'Auto-frame with 80% face coverage and compress safely to 35–45 KB to pass automated verification.',
+        },
+        {
+          title: 'UPSC Civil Services OTR Headshot',
+          dims: '350 × 350 to 1000 × 1000 px · 20–50 KB JPG',
+          body: 'Compress crisp formal portraits for One Time Registration (OTR) without visual noise.',
+        },
+        {
+          title: 'PAN Card Applicant Photo',
+          dims: '213 × 213 px at 200/300 DPI · Under 50 KB JPG',
+          body: 'Meet exact NSDL and UTIITSL criteria for instant PAN card application approvals.',
+        },
+      ],
+      tip: 'For SSC and UPSC, use PixelKit’s "SSC Photo Resizer" preset to apply 3.5 × 4.5 cm cropping and 50KB compression in one click.',
+    },
+    {
+      size: 80,
+      headline: 'Compress JPG to 80KB Online',
+      badge: 'Nursing Council · State Medical Admissions',
+      portalSummary:
+        'Shrink JPG photos to under 80KB online. Perfect for state nursing council registrations, secondary board exam forms, and regional government recruitment.',
+      useCases: [
+        {
+          title: 'Nursing & Paramedical Registration',
+          dims: '3.5 × 4.5 cm · Under 80 KB JPG',
+          body: 'Ensure clinical uniform photos meet state healthcare council upload standards.',
+        },
+        {
+          title: 'Secondary Board Admit Cards',
+          dims: 'JPG · Under 80 KB',
+          body: 'Standard photo size for 10th and 12th board candidate registration.',
+        },
+        {
+          title: 'Online Application Portals',
+          dims: 'JPG · Max 80 KB',
+          body: 'Fast client-side compression for government scholarship portals.',
+        },
+      ],
+      tip: 'Compressing from a large phone camera? Scale width to 800px to maintain pristine 300 DPI clarity under 80KB.',
+    },
+    {
+      size: 100,
+      headline: 'Compress JPG to 100KB Online',
+      badge: 'Aadhaar · Passports · Job Portals · KYC',
+      portalSummary:
+        'Compress JPG to 100KB online for free without losing quality. Ideal for Aadhaar updates, Indian Passport Seva, bank KYC, and job portals enforcing strict 100KB limits.',
+      useCases: [
+        {
+          title: 'Aadhaar & Identity Verification',
+          dims: 'JPG · Under 100 KB',
+          body: 'Keep text, official seals, and address details sharp and fully readable on scanned ID documents.',
+        },
+        {
+          title: 'Passport Seva Online Photo',
+          dims: '413 × 531 px (3.5 × 4.5 cm) · Under 100 KB JPG',
+          body: 'Format passport headshots with white background that strictly satisfy consular specifications.',
+        },
+        {
+          title: 'Job Portal Resumes & Profiles',
+          dims: 'JPG · Max 100 KB',
+          body: 'Compress profile pictures for LinkedIn, Naukri, and corporate HR portals for instant upload.',
+        },
+      ],
+      tip: '100KB is the most common portal limit worldwide. PixelKit converges on the highest quality score under 100KB in under 30 milliseconds.',
+    },
+    {
+      size: 150,
+      headline: 'Compress JPG to 150KB Online',
+      badge: 'Degree Certificates · Marksheets · Identity Proofs',
+      portalSummary:
+        'Compress JPG images to 150KB online. Tailored for academic degree certificates, 10th/12th marksheets, and scanned government ID proofs.',
+      useCases: [
+        {
+          title: 'University Degree Marksheets',
+          dims: 'A4 Scan · Under 150 KB JPG',
+          body: 'Ensure tiny roll numbers, university crests, and grade tables remain crystal-clear.',
+        },
+        {
+          title: 'Government Identity Proofs',
+          dims: 'JPG · Max 150 KB',
+          body: 'Compress voter ID, driving licence, and ration card photos for subsidy portals.',
+        },
+        {
+          title: 'Scholarship Document Uploads',
+          dims: 'JPG · Under 150 KB',
+          body: 'Pass automated National Scholarship Portal (NSP) file weight validation.',
+        },
+      ],
+      tip: 'For document scans with small text, enable Grayscale in PixelKit adjustments to dramatically improve contrast and compression ratio.',
+    },
+    {
+      size: 200,
+      headline: 'Compress JPG to 200KB Online',
+      badge: 'NEET Exam Cards · US Visa · Schengen Visa',
+      portalSummary:
+        'Compress JPG to 200KB online without losing quality. Engineered for NTA NEET postcard photos, US DS-160 visa, and Schengen visa application portals.',
+      useCases: [
+        {
+          title: 'NTA NEET Postcard Photo (4" × 6")',
+          dims: '4 × 6 inches (1200 × 1800 px) · 10–200 KB JPG',
+          body: 'Format postcard photos with white background and candidate name/date stamp under 200KB.',
+        },
+        {
+          title: 'US DS-160 & Diversity Visa (DV)',
+          dims: '600 × 600 px (2 × 2") · Under 200–240 KB JPG',
+          body: 'Meet strict US Department of State photo requirements with 1:1 aspect ratio and white background.',
+        },
+        {
+          title: 'Schengen & UK Visa Headshots',
+          dims: '35 × 45 mm · Under 200 KB JPG',
+          body: 'Deliver compliant biometrics for European consulate appointment submissions.',
+        },
+      ],
+      tip: 'Need an exact 4x6 inch postcard size for NEET? Use PixelKit’s "NEET Photo Resizer" tool for automated dimensions and 200KB compression.',
+    },
+    {
+      size: 256,
+      headline: 'Compress JPG to 256KB Online',
+      badge: 'Discord Avatars · US Visa DS-160 · Web Images',
+      portalSummary:
+        'Compress JPG to 256KB online. Tailored for US Visa DS-160 max 240KB threshold, Discord avatar limits, and modern web applications.',
+      useCases: [
+        {
+          title: 'US Visa DS-160 Hard Ceiling',
+          dims: '600 × 600 px · Strictly ≤ 240–256 KB JPG',
+          body: 'Safely land below the US Department of State 240KB maximum file size ceiling.',
+        },
+        {
+          title: 'Discord Profile Photos',
+          dims: '1:1 Square · Max 256 KB JPG',
+          body: 'Compress custom avatars to load instantly across desktop and mobile chat.',
+        },
+        {
+          title: 'Forum & CMS Uploads',
+          dims: 'JPG · Under 256 KB',
+          body: 'Fit legacy CMS attachment limits without sacrificing photo fidelity.',
+        },
+      ],
+      tip: 'Setting a 256KB limit ensures your photo stays under the standard 250KB portal cutoff with zero byte rounding errors.',
+    },
+    {
+      size: 300,
+      headline: 'Compress JPG to 300KB Online',
+      badge: 'UPSC Certificates · National Scholarship Portal',
+      portalSummary:
+        'Compress JPG to under 300KB online. Built for UPSC CSE certificate uploads, National Scholarship Portal (NSP), and state welfare schemes.',
+      useCases: [
+        {
+          title: 'UPSC Degree & Caste Certificates',
+          dims: 'Document Scan · Under 300 KB JPG',
+          body: 'Ensure seal stamps, signatures, and gazetted officer stamps stay fully legible.',
+        },
+        {
+          title: 'National Scholarship Portal (NSP)',
+          dims: 'JPG · Max 300 KB',
+          body: 'Compress domicile and income certificates to fit portal upload limits.',
+        },
+        {
+          title: 'Property & Land Registry Scans',
+          dims: 'High-Res Scan · Under 300 KB JPG',
+          body: 'Compress deed pages and khata documents for online land revenue portals.',
+        },
+      ],
+      tip: 'For multi-page documents, convert to PDF under 300KB using PixelKit’s "JPG to PDF" converter.',
+    },
+    {
+      size: 500,
+      headline: 'Compress JPG to 500KB Online',
+      badge: 'High-Res Portfolios · Job Portals · Web Speed',
+      portalSummary:
+        'Compress JPG to 500KB online without losing sharpness. The gold standard for professional portfolios, corporate recruitment portals, and fast websites.',
+      useCases: [
+        {
+          title: 'Corporate Job Portals (Workday, Lever)',
+          dims: 'Full-Res · Under 500 KB JPG',
+          body: 'Compress headshots and portfolio samples for international job applications.',
+        },
+        {
+          title: 'High-Resolution Photography Portfolios',
+          dims: 'Up to 4K resolution · Under 500 KB JPG',
+          body: 'Preserve deep color grading, dynamic range, and edge sharpness for creative portfolios.',
+        },
+        {
+          title: 'E-commerce & Web Speed Optimization',
+          dims: 'Banner & Product Photos · Under 500 KB JPG',
+          body: 'Boost Google PageSpeed scores by reducing heavy banner images to 500KB.',
+        },
+      ],
+      tip: 'For modern websites, consider exporting to WebP at 500KB to achieve near-lossless 4K visual quality.',
+    },
+  ];
+
+  return specs.map((spec) => ({
+    params: { size: String(spec.size) },
+    props: { spec },
+  }));
+};
+
+const { spec } = Astro.props as { spec: JpgKbTargetSpec };
+const allSizes = [10, 15, 20, 30, 40, 50, 80, 100, 150, 200, 256, 300, 500];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress JPG', href: '/compress-jpg/' },
+  { label: `Compress JPG to ${spec.size}KB` },
+];
+
+const faqs = [
+  {
+    q: `How do I compress a JPG to ${spec.size}KB without losing quality?`,
+    a: `Drop your JPG or JPEG image into the tool above. PixelKit pre-configures a ${spec.size}KB ceiling and runs a 12-iteration binary search algorithm in browser Web Workers to find the highest perceptual quality level that fits strictly at or below ${spec.size}KB.`,
+  },
+  {
+    q: `How can I compress JPG to ${spec.size}KB on mobile (Android and iPhone)?`,
+    a: `PixelKit runs 100% locally in mobile Chrome, Safari, and Firefox. You can select photos directly from your phone gallery or camera and compress JPG to ${spec.size}KB in seconds without downloading any apps.`,
+  },
+  {
+    q: `Why do government exam portals reject JPGs over ${spec.size}KB?`,
+    a: `Portals for SSC, UPSC, NEET, IBPS, and state PSCs receive millions of applications. To prevent server overload, they enforce strict file size gates (such as 20KB–50KB or under ${spec.size}KB). PixelKit ensures your JPG meets these requirements with 100% acceptance.`,
+  },
+  {
+    q: `Can I crop and resize dimensions before compressing JPG to ${spec.size}KB?`,
+    a: `Yes. Click "Crop Studio" to set aspect ratios (1:1, 3:4, 3.5:4.5) or "Scale & Resize" to set exact pixel dimensions (like 350 × 450 px) before downloading your ${spec.size}KB JPG file.`,
+  },
+  {
+    q: `Are my private photos and document scans uploaded to an external server?`,
+    a: `Never. PixelKit is 100% client-side. Every JPG decode, crop, resize, and ${spec.size}KB compression pass runs locally in your device's browser memory. Your files never touch an external server.`,
+  },
+];
+
+const pageTitle = `Compress JPG to ${spec.size}KB Online (Free & Fast) | ${SITE.name}`;
+const pageDesc = `Free online tool to compress JPG to ${spec.size}KB, reduce JPEG size to ${spec.size}KB, or compress photo to ${spec.size}KB without losing quality. 100% private in-browser compression.`;
+const pageKeywords = [
+  `compress jpg to ${spec.size}kb`,
+  `compress jpg to ${spec.size} kb`,
+  `compress jpeg to ${spec.size}kb`,
+  `compress jpeg to ${spec.size} kb`,
+  `reduce jpg size to ${spec.size}kb`,
+  `reduce jpeg to ${spec.size}kb`,
+  `compress jpg to ${spec.size}kb online`,
+  `compress photo to ${spec.size}kb jpg`,
+  `jpg to ${spec.size}kb converter`,
+  `jpg compressor ${spec.size}kb`,
+  `resize jpg to ${spec.size}kb`,
+  `photo resizer in kb jpg`,
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: `How to compress JPG to ${spec.size}KB online`,
+  description: `Step-by-step guide to compress JPG and JPEG files strictly under ${spec.size}KB without blurriness or server uploads.`,
+  steps: [
+    {
+      name: 'Upload your JPG photo',
+      text: 'Drop or select your JPG, JPEG, or phone camera photo into PixelKit.',
+    },
+    {
+      name: `Automatic ${spec.size}KB Target Convergence`,
+      text: `PixelKit automatically configures the target file size to ${spec.size}KB and runs binary-search quantization.`,
+    },
+    {
+      name: 'Optional Crop & Resize',
+      text: 'Optionally adjust aspect ratio (e.g. 3.5 × 4.5 cm passport) or scale pixel dimensions to match portal specs.',
+    },
+    {
+      name: `Download compressed ${spec.size}KB JPG`,
+      text: `Save your compliant JPG file instantly. Zero server uploads and zero privacy risks.`,
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `Compress JPG to ${spec.size}KB — PixelKit`,
+    description: pageDesc,
+    url: new URL(`/compress-jpg-to-${spec.size}kb/`, SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>{spec.badge}</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        {spec.headline}
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        {spec.portalSummary}
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title={`How to Compress JPG to ${spec.size}KB Fast`}
+      summaryText={`To compress a JPG to ${spec.size}KB, drop your image into PixelKit. The browser executes an iterative binary-search quantization algorithm inside a Web Worker, converging on the highest possible visual clarity that stays strictly at or below ${spec.size}KB without uploading files to remote servers.`}
+      specs={[
+        { label: 'Target File Size', value: `Strictly ≤ ${spec.size} KB (Max ${spec.size} KB)`, highlight: true },
+        { label: 'Input Formats', value: 'JPG, JPEG, PNG, WebP, HEIC (iPhone), PDF' },
+        { label: 'Output Format', value: 'Optimized JPEG (.jpg)', highlight: true },
+        { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={spec.size}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- Practical Use Cases Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Use Cases for {spec.size}KB JPG Compression
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common recruitment portals, exam forms, and document upload slots requiring JPG under {spec.size}KB:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        {spec.useCases.map((uc) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-bold text-fg">{uc.title}</div>
+            <div class="font-mono text-accent text-xs mt-1">{uc.dims}</div>
+            <p class="text-muted mt-1.5 text-xs leading-relaxed">{uc.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Links to other sizes -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Other JPG KB Targets:</span>
+        {allSizes.map((sz) => (
+          <a
+            href={`/compress-jpg-to-${sz}kb/`}
+            class={`rounded-lg border px-2.5 py-1 font-medium transition-colors ${
+              sz === spec.size
+                ? 'border-accent bg-accent/15 text-accent font-semibold'
+                : 'border-border bg-bg text-fg hover:border-accent hover:text-accent'
+            }`}
+          >
+            {sz}KB
+          </a>
+        ))}
+        <a href="/compress-jpg-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to PDF →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on JPEG Compression -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How Binary Search JPEG Compression Retains Maximum Detail
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Unlike primitive online image resizers that blindly set arbitrary compression values (e.g. 70%), PixelKit performs an intelligent binary search across the JPEG Discrete Cosine Transform (DCT) quantization tables.
+        </p>
+        <p>
+          In under 30 milliseconds, the engine evaluates up to 12 quality levels in parallel Web Workers to isolate the precise mathematical inflection point where visual sharpness is maximized while file weight remains safely under {spec.size}KB.
+        </p>
+        <div class="rounded-xl border border-accent/20 bg-accent/5 p-4 text-xs sm:text-sm text-fg/90">
+          <strong class="text-accent font-semibold">Pro Tip:</strong> {spec.tip}
+        </div>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

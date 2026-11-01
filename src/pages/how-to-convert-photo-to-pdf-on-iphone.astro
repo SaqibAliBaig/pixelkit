@@ -1,0 +1,244 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Photo to PDF', href: '/photo-to-pdf/' },
+  { label: 'How to Convert Photo to PDF on iPhone' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert photos to PDF on iPhone without installing any apps?',
+    a: 'Open PixelKit in Safari on your iPhone or iPad. Tap the upload area, select photos from your Photo Library or Camera Roll, and tap "Download PDF". PixelKit decodes Apple HEIC/JPEG photos locally in browser memory and generates a clean, printable PDF document ready to save to your Files app or attach to an email.',
+  },
+  {
+    q: 'Does this convert Apple HEIC photos to PDF directly?',
+    a: 'Yes. iPhones automatically shoot in Apple’s High Efficiency format (.HEIC). PixelKit has a built-in client-side WebAssembly HEIC decoder that reads iOS photos natively and bundles them into standard PDF documents without quality loss.',
+  },
+  {
+    q: 'How do I combine multiple iPhone photos into one single PDF?',
+    a: 'Tap the upload area and select multiple photos from your library. PixelKit displays a draggable card queue where you can drag thumbnails to reorder pages (e.g. Page 1, Page 2, Page 3), delete unwanted shots, and export them into a single unified multi-page PDF.',
+  },
+  {
+    q: 'Can I compress the PDF under 200KB or 100KB on my iPhone?',
+    a: 'Yes. iPhone photos can be 3MB to 10MB each, which web forms reject. In PixelKit, select a target size such as "Under 200KB" or "Under 100KB". The in-browser compressor automatically resamples the photo so your PDF fits under upload limits.',
+  },
+  {
+    q: 'Are my private iPhone photos uploaded to any server or cloud?',
+    a: 'Never. PixelKit runs 100% locally on your iPhone using mobile Safari’s WebAssembly engine. Your photos, sensitive documents, and biometric scans never leave your iPhone.',
+  },
+  {
+    q: 'What is the built-in iOS "Print" trick to save photos as PDF?',
+    a: 'In the Apple Photos app: 1. Tap Share. 2. Tap Print. 3. On the print preview screen, pinch outward with two fingers (zoom gesture). 4. Tap the Share icon on the new screen and choose "Save to Files". While this works for single photos, it does not allow file compression or easy multi-page reordering like PixelKit does.',
+  },
+];
+
+const directAnswer = {
+  question: 'How to convert photos to PDF on iPhone for free without apps?',
+  answer:
+    'To convert photos to PDF on iPhone: 1. Open PixelKit in mobile Safari. 2. Tap to select one or multiple photos from your iPhone Camera Roll or Files app. 3. Drag thumbnails to reorder pages or set a target size under 200KB. 4. Tap Download to save your unified PDF directly to the iPhone Files app without installing third-party apps or paying for subscriptions.',
+};
+
+const pageTitle = `How to Convert Photo to PDF on iPhone (Free & Instant) | ${SITE.name}`;
+const pageDesc =
+  'Learn how to convert photos to PDF on iPhone and iPad for free. Convert camera roll pictures and HEIC files to PDF in Safari without installing any apps.';
+const pageKeywords = [
+  'how to convert photo to pdf on iphone',
+  'convert photo to pdf iphone',
+  'how to make photo a pdf on iphone',
+  'turn photo into pdf iphone',
+  'iphone photo to pdf converter',
+  'how to save photo as pdf on iphone',
+  'heic to pdf iphone',
+  'how to convert photo to pdf',
+  'photo to pdf',
+  'image to pdf',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert photos to PDF on iPhone using Safari',
+  description:
+    'Step-by-step instructions to convert iPhone camera roll photos and HEIC pictures into a unified PDF document without app downloads.',
+  steps: [
+    {
+      name: 'Open PixelKit in Safari',
+      text: 'Launch Safari on your iPhone or iPad and navigate to PixelKit.',
+    },
+    {
+      name: 'Select photos from Camera Roll',
+      text: 'Tap "Select Files" and choose one or multiple photos from your iPhone Photo Library.',
+    },
+    {
+      name: 'Reorder pages or choose file size',
+      text: 'Drag thumbnail cards to arrange sequence, and optionally select target compression (under 200KB).',
+    },
+    {
+      name: 'Save PDF to iPhone Files',
+      text: 'Tap "Download PDF" and choose "Save to Files" or share directly via Mail or WhatsApp.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit iPhone Photo to PDF Tool',
+    description: pageDesc,
+    path: '/how-to-convert-photo-to-pdf-on-iphone/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'iOS, iPadOS, Any (Web Browser)',
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+];
+
+const comparisonMethods = [
+  {
+    title: 'Method 1: PixelKit in Safari (Recommended)',
+    badge: 'Fastest & Full Feature',
+    desc: 'Select multiple photos from Camera Roll, drag to reorder pages, compress under 100KB/200KB, and export unified PDF.',
+    benefit: 'Supports multi-page merging, custom KB limits, and works 100% offline.',
+  },
+  {
+    title: 'Method 2: Native iOS Print Gesture',
+    badge: 'Built-in Apple Trick',
+    desc: 'Open Photos app → Share → Print → Pinch outward with two fingers on preview → Share icon → Save to Files.',
+    benefit: 'No internet required, but does not allow file compression or custom page ordering.',
+  },
+  {
+    title: 'Method 3: Apple Books App',
+    badge: 'Built-in App Option',
+    desc: 'Select photo in Photos app → Share → Books. The Books app creates a PDF copy in your library.',
+    benefit: 'Saves to Books library, but creates very heavy uncompressed PDF files.',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonicalUrl="https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/"
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-4 sm:mt-6 text-center">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        iOS 18 · iOS 17 · iPadOS · No Apps Required
+      </div>
+      <h1 class="mt-3 text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-fg">
+        How to Convert Photo to PDF on iPhone
+      </h1>
+      <p class="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-muted">
+        The easiest way to turn iPhone camera photos and HEIC pictures into clean, multi-page PDF documents. Zero App Store downloads, zero subscriptions, and 100% private.
+      </p>
+    </header>
+
+    <!-- Direct Answer Box (GEO / AI Overview) -->
+    <div class="mt-6 sm:mt-8">
+      <DirectAnswerBox
+        title="How to Convert Photos to PDF on iPhone (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'iOS Compatibility', value: 'iOS 18, 17, 16, iPadOS (All iPhones & iPads)', highlight: true },
+          { label: 'Input Formats', value: 'Apple HEIC, Live Photos, PNG, JPEG' },
+          { label: 'Third-Party App Install', value: 'None (Runs 100% in Mobile Safari)', highlight: true },
+          { label: 'Privacy & Security', value: '100% Client-Side Memory / Zero Cloud Uploads' },
+        ]}
+      />
+    </div>
+
+    <!-- Active Tool Studio Pre-configured for iPhone HEIC to PDF -->
+    <main class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="heic"
+        to="pdf"
+        fromMime="image/heic"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </main>
+
+    <!-- 3 Methods Comparison Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        3 Ways to Convert iPhone Photos to PDF
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Compare the fastest methods to create PDF files on your iPhone or iPad:
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {comparisonMethods.map((m) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-5 flex flex-col justify-between">
+            <div>
+              <div class="inline-block rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                {m.badge}
+              </div>
+              <h3 class="mt-2 text-base font-bold text-fg">{m.title}</h3>
+              <p class="mt-2 text-xs text-muted leading-relaxed">{m.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-border/60 text-xs font-medium text-emerald-500">
+              ✓ {m.benefit}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Action Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Related Converters:</span>
+        <a href="/photo-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF Hub →</a>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PDF</a>
+        <a href="/heic-to-jpg/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to JPG</a>
+        <a href="/image-to-pdf-200kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Image to PDF 200KB</a>
+        <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Merge JPG to PDF</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on iPhone Photo File Size -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why Simple iOS Print Trick Often Fails for Web Form Uploads
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          While the hidden iOS "Print pinch-to-zoom" trick works for saving a single photo as a PDF, it suffers from two major limitations when submitting documents online:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Bloated File Sizes (3MB–8MB):</strong> The native iOS print engine packages the full uncompressed sensor bitmap into the PDF. When you try to upload it to a government exam portal, university portal, or visa form, the portal rejects it for exceeding the 200KB or 500KB ceiling.
+          </li>
+          <li>
+            <strong class="text-fg">No Multi-Page Sequencing:</strong> If you have 3 receipts or a 4-page marksheet, the native iOS trick cannot sequence them into an orderly multi-page document.
+          </li>
+          <li>
+            <strong class="text-fg">The PixelKit Solution:</strong> PixelKit gives iPhone users desktop-grade document control directly inside Safari. Drag pages to arrange order, select target compression (under 100KB, 200KB, or 500KB), and download a compliant PDF instantly with 100% privacy.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

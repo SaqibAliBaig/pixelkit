@@ -1,0 +1,221 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Image Resizer', href: '/resize-image/' },
+  { label: 'Bulk Image Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'How do I resize multiple images at once in bulk?',
+    a: 'Drop as many JPG, PNG, WebP, or HEIC images as you want into the tool above. You can set global pixel dimensions or a target KB limit for all files, or customize each file individually. PixelKit processes them in parallel across multi-threaded Web Workers and lets you download them all in a single ZIP archive.',
+  },
+  {
+    q: 'Is there any limit on how many images I can resize in bulk?',
+    a: 'No artificial limits! Because PixelKit processes images locally on your device rather than uploading them to an external server queue, you can process dozens of photos at high speed without hitting daily quota caps.',
+  },
+  {
+    q: 'Can I resize and compress images in bulk at the same time?',
+    a: 'Yes. You can scale pixel dimensions (e.g. 50% or 1920 × 1080 px) and enforce a file size ceiling (e.g. max 100KB or 200KB) across all queued photos simultaneously.',
+  },
+  {
+    q: 'Can I download all resized images as a ZIP file?',
+    a: 'Yes. Once your images finish processing, click "Download All (.ZIP)" to retrieve an organized, lightweight archive containing all your resized and compressed assets.',
+  },
+  {
+    q: 'Are my photos uploaded to a cloud server during bulk resizing?',
+    a: 'Never. PixelKit is 100% client-side. Every image resize and compression pass runs locally in your device’s browser memory via Web Workers and WebAssembly. Your photos never leave your device.',
+  },
+];
+
+const pageTitle = `Bulk Image Resizer — Resize Multiple Images at Once Free | ${SITE.name}`;
+const pageDesc =
+  'Free online bulk image resizer. Resize and compress multiple JPG, PNG, and WebP images in batch at once. Download all as ZIP with 100% client-side privacy.';
+const pageKeywords = [
+  'bulk image resizer',
+  'batch image resizer',
+  'resize multiple images at once',
+  'bulk photo resizer',
+  'batch photo resizer',
+  'bulk image resizer online',
+  'free bulk image resizer',
+  'resize images in bulk',
+  'bulk image compressor',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize multiple images in bulk online',
+  description: 'Step-by-step instructions to batch resize dozens of photos simultaneously and download as a ZIP archive.',
+  steps: [
+    {
+      name: 'Upload multiple images',
+      text: 'Drag and drop multiple JPG, PNG, WebP, or HEIC files into the batch upload zone.',
+    },
+    {
+      name: 'Set batch dimensions and KB limits',
+      text: 'Apply global width/height, percentage scaling, or file size limits to all queued photos.',
+    },
+    {
+      name: 'Parallel Web Worker Processing',
+      text: 'PixelKit executes bicubic resampling and binary-search compression across multi-threaded workers.',
+    },
+    {
+      name: 'Download All as ZIP',
+      text: 'Download individual files or click Download All as ZIP for immediate offline retrieval.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Bulk Image Resizer',
+    description: pageDesc,
+    url: new URL('/bulk-image-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Parallel Multi-File Processing · Download All as ZIP · 100% Private</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Bulk Image Resizer Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize and compress dozens of photos at once in your browser. Batch scale dimensions, adjust file weights, and download everything in one organized ZIP file.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Batch Resize Multiple Images Online for Free"
+      summaryText="To resize multiple images at once, drop your photos into PixelKit. The tool queues all images and processes them simultaneously across multi-threaded Web Workers. You can set global pixel dimensions, scale by percentage, or enforce exact kilobyte ceilings across all images at once, then click 'Download All as ZIP' for immediate offline retrieval."
+      specs={[
+        { label: 'Batch Processing Mode', value: 'Parallel Multi-Threaded Web Workers', highlight: true },
+        { label: 'Archive Export', value: 'Download All as ZIP (.zip)' },
+        { label: 'Supported Inputs', value: 'JPG, PNG, WebP, AVIF, HEIC (iPhone), PDF', highlight: true },
+        { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Cloud Uploads' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- Practical Batch Use Cases -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Popular Bulk Image Resizing Use Cases
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Why professionals and students choose PixelKit for batch image resizing:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">E-Commerce Product Photos</div>
+          <div class="font-mono text-accent text-xs mt-1">Shopify · Amazon · Etsy</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Batch resize 50+ product catalog photos to identical 1000 × 1000 px squares and compress under 200KB for lightning-fast shop loading.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Real Estate &amp; MLS Listings</div>
+          <div class="font-mono text-accent text-xs mt-1">High-Res Property Galleries</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Downscale heavy 24MP camera photos to 1920 × 1080 px Full HD to fit MLS attachment caps without uploading to slow cloud queues.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Student &amp; Job Applicant Batches</div>
+          <div class="font-mono text-accent text-xs mt-1">Candidate Headshots &amp; Signs</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Standardize classroom or batch recruitment applicant photos to strict 3.5 × 4.5 cm dimensions and 50KB limits in one click.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Direct Target Size Resizers:</span>
+        <a href="/image-resizer-50kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer 50KB</a>
+        <a href="/image-resizer-100kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer 100KB</a>
+        <a href="/image-resizer-in-kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in KB</a>
+        <a href="/image-resizer-in-cm/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in CM →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on Parallel Processing -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why Browser-Native Multi-Threaded Resizing is Faster
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Traditional bulk image resizers force you to upload megabytes of image data across your internet connection to a cloud server, wait in a remote queue, and download the output. On slow mobile or broadband connections, this can take minutes.
+        </p>
+        <p>
+          PixelKit utilizes modern HTML5 Web Workers to spin up parallel worker threads on your device's multi-core CPU. Your images are decoded, resampled with bicubic interpolation, and compressed concurrently in RAM at zero network latency.
+        </p>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

@@ -1,0 +1,264 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Resize Image', href: '/resize-image/' },
+  { label: 'Photo Resizer in KB' },
+];
+
+const faqs = [
+  {
+    q: 'How does an online photo resizer in KB work?',
+    a: 'PixelKit combines two adjustments in one step: pixel dimension scaling (e.g., resizing to 350 × 450 px or 3.5 × 4.5 cm) and binary-search file compression (e.g., locking file size under 20KB, 50KB, or 100KB). Both operations happen inside your browser memory in Web Workers.',
+  },
+  {
+    q: 'How do I resize a photo in KB and cm for passport and exam forms?',
+    a: 'Upload your photo, click "Scale & Resize" to set standard passport dimensions (like 3.5 × 4.5 cm or 200 × 230 px), then select your target file size limit (such as 50 KB or 20 KB). PixelKit resizes the visual geometry and compresses the file weight simultaneously.',
+  },
+  {
+    q: 'Can I resize photos to exact KB for SSC, UPSC, and NEET portals?',
+    a: 'Yes. PixelKit has built-in one-click presets for SSC CGL/CHSL (20–50 KB, 3.5 × 4.5 cm), UPSC Civil Services (20–300 KB), NTA NEET (10–200 KB), and digital signatures (10–20 KB). Select your exam preset or enter custom KB limits.',
+  },
+  {
+    q: 'Can I resize a photo in KB to PDF format?',
+    a: 'Yes. In the tool above, change the output format from JPG to PDF. PixelKit will package your resized photo into a clean, single-page PDF document strictly under your specified kilobyte ceiling (such as 100KB or 200KB).',
+  },
+  {
+    q: 'Does resizing a photo in KB make it blurry?',
+    a: 'No. PixelKit uses high-quality bicubic canvas interpolation for dimension changes and iterative quantization search for file size compression. Your facial features, signatures, and document text remain crisp and readable.',
+  },
+  {
+    q: 'Are my photos, certificates, or signatures uploaded to a server?',
+    a: 'Never. PixelKit is 100% client-side. All photo resizing and KB compression runs on your device using WebAssembly and Web Workers. Nothing is transmitted over the internet.',
+  },
+];
+
+const pageTitle = `Photo Resizer in KB Online (Exact KB & Pixel Resizer) | ${SITE.name}`;
+const pageDesc =
+  'Free online photo resizer in KB to resize image dimensions and compress file size to 20KB, 50KB, 100KB, or 200KB. Perfect for SSC, UPSC, NEET, passport, and visa photos.';
+const pageKeywords = [
+  'photo resizer in kb',
+  'online photo resizer in kb',
+  'photo resizer in kb online',
+  'photo resizer in kb jpg',
+  'photo resizer in kb pdf',
+  'photo resizer to 50kb',
+  'photo resizer to 20kb',
+  'photo resizer to 100kb',
+  'photo resizer to 200kb',
+  'photo resizer in kb and cm',
+  'image resizer in kb',
+  'resize photo to kb',
+  'photo resize in kb online',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize a photo in KB online',
+  description: 'Step-by-step instructions to resize photo dimensions and compress file size in KB for online application forms.',
+  steps: [
+    {
+      name: 'Upload your photo',
+      text: 'Drop or select your photo (JPG, PNG, WebP, or HEIC) into the tool above.',
+    },
+    {
+      name: 'Adjust pixel dimensions or aspect ratio',
+      text: 'Optionally choose passport dimensions (3.5 × 4.5 cm, 2 × 2 inches) or custom width and height.',
+    },
+    {
+      name: 'Select target KB limit',
+      text: 'Choose an exact target size (such as 20KB, 50KB, 100KB, or 200KB) to satisfy your upload portal limit.',
+    },
+    {
+      name: 'Download resized photo',
+      text: 'Download your resized, compressed image instantly with zero watermarks and zero privacy risks.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Photo Resizer in KB — PixelKit',
+    description: pageDesc,
+    url: new URL('/photo-resizer-in-kb/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Dual Dimension &amp; KB Resizing · 100% Client-Side · No Blurring</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Photo Resizer in KB Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize photo dimensions (pixels, cm, inches) and compress file weight strictly to 20KB, 50KB, 100KB, or 200KB in one click. Tailored for government job exams, passports, and visa applications.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Resize a Photo in KB for Online Application Portals"
+      summaryText="To resize a photo in KB, drop your image into PixelKit, enter your required pixel dimensions (or pick a passport preset like 3.5 × 4.5 cm), and pick your target KB limit (e.g. 50 KB or 20 KB). PixelKit performs dual-stage processing: bicubic pixel downsampling followed by iterative quantization compression in local Web Workers, ensuring 100% compliance with recruitment portal requirements."
+      specs={[
+        { label: 'Dimension Controls', value: 'Pixels (px), Millimeters (mm), Centimeters (cm)', highlight: true },
+        { label: 'File Size Targets', value: '20 KB, 50 KB, 100 KB, 200 KB, 500 KB, Custom KB' },
+        { label: 'Supported Outputs', value: 'JPG, PNG, WebP, PDF', highlight: true },
+        { label: 'Privacy & Security', value: '100% Client-Side / Zero Server Uploads' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- Official Portal Dimensions & KB Limits Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Standard Photo Resizer in KB Specifications
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common recruitment portals requiring combined pixel dimensions and strict KB ceilings:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-bg/60">
+              <th class="py-3 px-4 font-semibold text-fg">Application / Portal</th>
+              <th class="py-3 px-4 font-semibold text-fg">Required Dimensions</th>
+              <th class="py-3 px-4 font-semibold text-accent">Target Size in KB</th>
+              <th class="py-3 px-4 font-semibold text-fg">Output Format</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC (CGL, CHSL, MTS, GD)</td>
+              <td class="py-3 px-4 text-muted">3.5 × 4.5 cm (350 × 450 px)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">20 KB – 50 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UPSC Civil Services / NDA</td>
+              <td class="py-3 px-4 text-muted">350 × 350 to 1000 × 1000 px</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">20 KB – 300 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UPSC Digital Signature</td>
+              <td class="py-3 px-4 text-muted">2:1 Ratio (280 × 140 px)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">NTA NEET / JEE Main</td>
+              <td class="py-3 px-4 text-muted">3.5 × 4.5 cm (80% face coverage)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">10 KB – 200 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">PAN Card (NSDL / UTIITSL)</td>
+              <td class="py-3 px-4 text-muted">213 × 213 px (200/300 DPI)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">Under 50 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">US Visa &amp; DS-160</td>
+              <td class="py-3 px-4 text-muted">2 × 2 inches (600 × 600 px)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">Under 240 KB</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">JPG / JPEG</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Links to Target Presets -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Direct Target Size Resizers:</span>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize to 20KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize to 50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize to 100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize to 200KB</a>
+        <a href="/increase-image-size-in-kb/" class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Need to Increase KB? →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide: Dimensions vs KB -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Understanding the Difference Between Resizing Pixels and Compressing KB
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Many users get confused when an application portal specifies both dimensions (e.g. 200 × 230 pixels) and a file weight limit (e.g. 20 KB to 50 KB). Resizing pixels changes the physical width and height of the image canvas, whereas reducing KB adjusts compression quantization to minimize file storage on server disks.
+        </p>
+        <p>
+          PixelKit seamlessly integrates both processes:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Stage 1: Spatial Resampling:</strong> The source image bitmap is resampled using high-fidelity bicubic interpolation to match your exact required width and height in pixels or millimeters.
+          </li>
+          <li>
+            <strong class="text-fg">Stage 2: Iterative Quantization:</strong> An automated 12-iteration binary search loop fine-tunes the JPEG discrete cosine transform (DCT) quantization tables to hit your exact KB ceiling without visible blurring or edge halos.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

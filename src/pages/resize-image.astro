@@ -5,48 +5,90 @@ import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
-import { buildSoftwareApplicationJsonLd, buildFaqJsonLd, buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Resize Image' },
+  { label: 'Image Resizer' },
 ];
 
 const faqs = [
   {
-    q: 'How do I resize an image to an exact width and height in pixels?',
-    a: 'Drop your image into PixelKit, click "Scale & Resize" on the file card, and enter your target width and height in pixels (e.g. 1920 × 1080 for Full HD, or 413 × 531 for Passport ID). PixelKit re-renders the image locally using the Canvas API.',
+    q: 'How do I resize an image online for free?',
+    a: 'Drop your image into PixelKit above, enter your target width and height in pixels (e.g. 1920 × 1080 px or 350 × 450 px), or choose a percentage scaling factor (75%, 50%, 25%). PixelKit re-renders the image locally in browser memory using bicubic convolution and downloads immediately with zero watermarks.',
   },
   {
-    q: 'How can I rescale an image resolution by percentage (e.g., 50% or 75%)?',
-    a: 'In the Resize & Rescale Studio, click the percentage buttons (100%, 75%, 50%, 25%) or drag the scale slider. Aspect ratio stays locked automatically for proportional image rescaling without distortion.',
+    q: 'Can I resize images by physical dimensions like cm or mm?',
+    a: 'Yes. Switch to physical dimensions or pick a passport preset (e.g. 3.5 × 4.5 cm at 300 DPI = 413 × 531 px). PixelKit calculates exact print resolution to ensure compliance with official application forms.',
   },
   {
-    q: 'What is the standard passport size photo in pixels?',
-    a: 'For online portals, the standard passport photo dimension is 413 × 531 pixels (3.5 × 4.5 cm at 300 DPI) or 600 × 600 pixels (2 × 2 inches for US Visa). PixelKit has pre-configured 1-click presets for both.',
+    q: 'Can I resize an image and compress its file size in KB at the same time?',
+    a: 'Yes! PixelKit seamlessly combines spatial dimension scaling with binary-search file compression. You can scale your image to passport dimensions and lock the file size under 50KB or 100KB in one step.',
   },
   {
-    q: 'Will resizing my image degrade its quality or blur it?',
-    a: 'PixelKit uses bicubic image interpolation in browser memory. By default, the "Do not upscale" option is enabled to prevent pixelation if the original image is smaller than the target dimension.',
+    q: 'Can I resize multiple images in bulk?',
+    a: 'Yes. Drop multiple images at once into PixelKit. The tool will process all images in parallel across background Web Workers and let you download them individually or as a single combined ZIP archive.',
+  },
+  {
+    q: 'Why choose PixelKit over Canva or Adobe image resizer?',
+    a: 'Unlike Canva or Adobe Express, PixelKit requires zero sign-in, zero account registration, adds no watermarks, and never uploads your images to external cloud servers. All resizing runs 100% locally on your device.',
   },
   {
     q: 'Are my images uploaded to any server when resizing?',
-    a: 'No. PixelKit executes 100% inside your browser using client-side Web Workers and HTML5 Canvas. Your files never touch external servers or cloud storage.',
+    a: 'Never. PixelKit executes 100% inside your browser using client-side Web Workers and HTML5 Canvas. Your files never touch external servers or cloud storage.',
   },
 ];
 
-const pageTitle = `Image Resizer — Resize Pixels Online Free | ${SITE.name}`;
-const pageDesc = 'Free online image resizer and image rescale tool. Rescale photo resolution by percentage or exact pixels (413x531, 600x600, 1920x1080) in your browser.';
+const pageTitle = `Image Resizer — Free Online Image Resizer (Simple & Fast) | ${SITE.name}`;
+const pageDesc =
+  'Free online image resizer to resize image dimensions in pixels, cm, and percentage, or compress file size in KB. Simple, instant, 100% private in your browser.';
 const pageKeywords = [
   'image resizer',
+  'online image resizer',
+  'image resizer online',
+  'simple image resizer',
+  'image resizer in kb',
+  'image resizer 50kb',
+  'image resizer 100kb',
+  'image resizer in cm',
+  'image resizer in pixels',
+  'bulk image resizer',
+  'free image resizer',
+  'image resizer free',
+  'canva image resizer',
+  'adobe image resizer',
   'resize image online',
-  'image rescale',
-  'rescale image online',
-  'photo resizer in pixels',
-  'scale image resolution',
-  'passport photo resize',
 ];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize an image online for free',
+  description: 'Step-by-step instructions to scale image resolution by pixels, percentage, or centimeters in your browser without sign-in.',
+  steps: [
+    {
+      name: 'Upload your image',
+      text: 'Drag and drop any JPG, PNG, WebP, or HEIC photo into PixelKit.',
+    },
+    {
+      name: 'Set target dimensions',
+      text: 'Enter your custom width and height in pixels, pick a scale percentage, or select passport presets.',
+    },
+    {
+      name: 'Optional file size target',
+      text: 'Optionally choose an exact KB limit (like 50KB or 100KB) if required by an upload portal.',
+    },
+    {
+      name: 'Download resized image',
+      text: 'Save your resized file instantly. All processing happens 100% locally on your device.',
+    },
+  ],
+});
 
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
@@ -55,6 +97,7 @@ const jsonLd = [
     url: new URL('/resize-image/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -78,22 +121,97 @@ const jsonLd = [
     <header class="text-center mt-5 sm:mt-8">
       <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
         <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
-        <span>Resolution Scaling · Pixel Presets · 100% Private</span>
+        <span>Resolution Scaling · Pixel &amp; CM Presets · 100% Private</span>
       </Badge>
 
       <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
-        Resize Image Online
+        Online Image Resizer
       </h1>
 
       <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
-        Scale image resolution by percentage or set exact width &amp; height in pixels. Fast, private bicubic resampling running entirely in your browser.
+        Scale image resolution by percentage, pixels, or centimeters—and compress to exact KB limits. Simple, private bicubic resampling running entirely in your browser.
       </p>
     </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Resize an Image Online for Free Without Losing Quality"
+      summaryText="To resize an image online, upload your file to PixelKit. Select your desired width and height in pixels (e.g. 1920 × 1080 px or 350 × 450 px), scale by percentage (50%, 75%), or convert from physical dimensions (cm/mm at 300 DPI). PixelKit uses multi-step bicubic convolution in local browser memory to preserve sharp edges and skin tones without sending data to external servers."
+      specs={[
+        { label: 'Dimension Units', value: 'Pixels (px), Millimeters (mm), Centimeters (cm), Percentage', highlight: true },
+        { label: 'File Size Limits', value: '20 KB, 50 KB, 100 KB, 200 KB, 500 KB, Custom KB' },
+        { label: 'Supported Inputs', value: 'JPG, PNG, WebP, AVIF, HEIC (iPhone), PDF', highlight: true },
+        { label: 'Privacy & Speed', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
 
     <!-- Tool Preview -->
     <div class="mt-6 sm:mt-8">
       <ToolPreview from="jpg" to="jpg" fromMime="image/jpeg" toMime="image/jpeg" initialTool="resize" />
     </div>
+
+    <!-- Quick Target Size & Unit Resizers -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Specialized Image Resizers by Limit &amp; Unit
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Select a specialized tool based on your portal or dimensional requirements:
+      </p>
+
+      <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs sm:text-sm">
+        <a
+          href="/image-resizer-in-kb/"
+          class="group rounded-xl border border-border bg-bg/50 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-fg group-hover:text-accent transition-colors">Image Resizer in KB</div>
+          <div class="font-mono text-accent text-xs mt-1">Exact KB Limits</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Lock image file size strictly to 20KB, 50KB, or 100KB for exam forms.
+          </p>
+        </a>
+
+        <a
+          href="/image-resizer-50kb/"
+          class="group rounded-xl border border-accent/40 bg-accent/5 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-accent">Image Resizer 50KB ★</div>
+          <div class="font-mono text-accent text-xs mt-1">UPSC &amp; SSC Forms</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            High-volume standard: resize to 3.5 × 4.5 cm and compress under 50KB.
+          </p>
+        </a>
+
+        <a
+          href="/image-resizer-100kb/"
+          class="group rounded-xl border border-accent/40 bg-accent/5 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-accent">Image Resizer 100KB ★</div>
+          <div class="font-mono text-accent text-xs mt-1">Aadhaar &amp; Passports</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Standard ceiling for KYC verification and passport application uploads.
+          </p>
+        </a>
+
+        <a
+          href="/image-resizer-in-cm/"
+          class="group rounded-xl border border-border bg-bg/50 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-fg group-hover:text-accent transition-colors">Image Resizer in CM</div>
+          <div class="font-mono text-accent text-xs mt-1">3.5 × 4.5 cm &amp; 300 DPI</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Convert centimeters and inches to exact pixels with DPI print accuracy.
+          </p>
+        </a>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">More tools:</span>
+        <a href="/bulk-image-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">Bulk Image Resizer</a>
+        <a href="/photo-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">Photo Resizer Hub</a>
+        <a href="/passport-photo-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">Passport Photo Maker</a>
+      </div>
+    </section>
 
     <!-- Preset Dimension Guide Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
@@ -122,6 +240,80 @@ const jsonLd = [
         </div>
       </div>
     </section>
+
+    <!-- Comparison: PixelKit vs Canva / Adobe Image Resizer -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why PixelKit is the Best Free Alternative to Canva &amp; Adobe Image Resizer
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          While tools like Canva and Adobe Express image resizer lock bulk resizing behind premium subscriptions and require account sign-ins, PixelKit provides unlimited, free client-side image processing:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">Zero Sign-In or Accounts</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Open PixelKit and resize immediately. No email registration, passwords, or credit cards required.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">100% Client-Side Privacy</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Your images are processed directly in your device’s memory via Web Workers. Files never touch external servers.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">Combined Dimension &amp; KB Engine</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Adjust pixel dimensions (e.g. 350 × 450 px) and compress file weight (e.g. 50 KB) in a single pass.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comprehensive Image Resizing Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Technical Principles of Clean Image Rescaling
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Rescaling digital imagery involves recalculating pixel values across continuous 2D coordinate matrices. When scaling down, high-frequency spatial detail must be filtered smoothly to prevent moiré patterns and jagged pixel aliasing. When scaling up, interpolation algorithms estimate intermediary values to avoid harsh boxy pixelation.
+        </p>
+        <p>
+          PixelKit utilizes multi-step bicubic convolution directly within device RAM. By examining the 16 nearest neighboring pixels for each target sample, bicubic interpolation generates substantially smoother gradients and cleaner tonal gradations than basic nearest-neighbor or bilinear approaches.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2 mt-4 pt-2">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">Aspect Ratio Locking</h3>
+            <p class="text-xs text-muted mt-1">
+              Always leave the aspect ratio link icon toggled on unless intentionally stretching graphic assets. Modifying width and height independently distorts human facial anatomy and graphic geometry.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">DPI &amp; Physical Dimensions</h3>
+            <p class="text-xs text-muted mt-1">
+              Physical print size depends on pixel density. A 413×531 px image prints at exactly 35×45 mm when reproduced at 300 DPI, making it the universal standard for biometric identification photos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+
 
     <!-- Comprehensive Image Resizing Guide -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">

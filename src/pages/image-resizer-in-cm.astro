@@ -1,0 +1,251 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Image Resizer', href: '/resize-image/' },
+  { label: 'Image Resizer in CM' },
+];
+
+const faqs = [
+  {
+    q: 'How do I resize an image in cm (centimeters) online?',
+    a: 'Drop your photo into PixelKit above, select "Passport & ID" or enter your custom width and height in centimeters (e.g. 3.5 × 4.5 cm). PixelKit converts centimeters into exact high-DPI pixels (350 × 450 px at 300 DPI) using standard photographic formulas and resamples your image locally.',
+  },
+  {
+    q: 'How many pixels is 3.5 × 4.5 cm at 300 DPI?',
+    a: 'At 300 DPI (standard print resolution for passports and exam admit cards), 3.5 cm equals 413 pixels (or 350 px at 254 DPI / 100 px per cm), and 4.5 cm equals 531 pixels (or 450 px). PixelKit automatically applies the exact pixel dimensions required by your portal.',
+  },
+  {
+    q: 'Can I resize in cm, mm, inches, and pixels on the same page?',
+    a: 'Yes. PixelKit supports pixels (px), millimeters (mm), centimeters (cm), and inches (in). You can freely switch units or choose pre-calibrated international passport and visa standards.',
+  },
+  {
+    q: 'Can I resize an image in cm and compress to 50KB at the same time?',
+    a: 'Yes! That is PixelKit’s core advantage. You can set the physical dimensions to 3.5 × 4.5 cm and simultaneously lock the file weight under 50KB or 20KB for SSC, UPSC, and NEET exam submissions.',
+  },
+  {
+    q: 'Are my photos uploaded to an external server?',
+    a: 'Never. PixelKit is 100% client-side. All dimension calculations and image resampling run locally on your device in browser memory. Nothing is stored or transmitted over the internet.',
+  },
+];
+
+const pageTitle = `Image Resizer in CM Online (Centimeters & Millimeters to Pixels) | ${SITE.name}`;
+const pageDesc =
+  'Free online image resizer in cm, mm, and inches. Convert 3.5 x 4.5 cm, 2 x 2 inches, and custom physical dimensions to exact pixels and compress to KB limits privately.';
+const pageKeywords = [
+  'image resizer in cm',
+  'image resizer in pixels',
+  'image resizer in mm',
+  'photo resizer in cm',
+  'photo resizer in pixels',
+  'resize image in cm',
+  '3.5 x 4.5 cm photo resizer',
+  'cm to pixel photo converter',
+  'online image resizer in cm',
+  'passport size photo in cm',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize an image in cm online',
+  description: 'Step-by-step instructions to convert physical centimeters to exact pixel dimensions with 300 DPI print accuracy.',
+  steps: [
+    {
+      name: 'Upload your image',
+      text: 'Drop or select your photo into PixelKit.',
+    },
+    {
+      name: 'Choose physical centimeter dimensions',
+      text: 'Enter width and height in centimeters (such as 3.5 × 4.5 cm) or select an official passport preset.',
+    },
+    {
+      name: 'Optional file weight limit',
+      text: 'Optionally set a target KB ceiling (such as 50KB or 100KB) to meet upload portal limits.',
+    },
+    {
+      name: 'Download resized image',
+      text: 'Save your resized photo immediately with 100% print precision and zero server uploads.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Image Resizer in CM — PixelKit',
+    description: pageDesc,
+    url: new URL('/image-resizer-in-cm/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Centimeters · Millimeters · Inches · 300 DPI Print Accuracy</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Image Resizer in CM Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize images and photos to exact centimeter (cm) and millimeter (mm) dimensions. Automatic 300 DPI pixel conversion for official passport, visa, and exam portal forms.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Convert and Resize Images in CM to Pixels"
+      summaryText="To resize an image in cm, enter your required dimensions in PixelKit (e.g. 3.5 × 4.5 cm for passport photos). PixelKit calculates exact print pixel dimensions using the formula: Pixels = (Centimeters / 2.54) × DPI. At 300 DPI, 3.5 × 4.5 cm becomes 413 × 531 pixels (or 350 × 450 px on digital exam portals at 100 px/cm). Bicubic resampling ensures sharp, unblurred print reproduction."
+      specs={[
+        { label: 'Standard Passport CM', value: '3.5 cm (width) × 4.5 cm (height)', highlight: true },
+        { label: 'Pixel Conversion (300 DPI)', value: '413 × 531 px (Passport) / 600 × 600 px (Visa)' },
+        { label: 'DPI Presets', value: '200 DPI, 300 DPI, 600 DPI High-Res', highlight: true },
+        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- CM to Pixel Conversion Reference Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Centimeter to Pixel Conversion Table (Official Standards)
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common physical dimensions and their exact pixel equivalents at 300 DPI and digital portal resolutions:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-bg/60">
+              <th class="py-3 px-4 font-semibold text-fg">Document / Standard</th>
+              <th class="py-3 px-4 font-semibold text-fg">Size in CM / MM</th>
+              <th class="py-3 px-4 font-semibold text-accent">Equivalent Pixels (300 DPI)</th>
+              <th class="py-3 px-4 font-semibold text-fg">Digital Portal Equivalent</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">India Passport / Passport Seva</td>
+              <td class="py-3 px-4 text-muted">3.5 × 4.5 cm (35 × 45 mm)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">413 × 531 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">350 × 450 px</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC (CGL, CHSL, MTS) Headshot</td>
+              <td class="py-3 px-4 text-muted">3.5 × 4.5 cm</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">413 × 531 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">350 × 450 px (20–50 KB)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UPSC Civil Services / OTR Sign</td>
+              <td class="py-3 px-4 text-muted">3.5 × 1.5 cm</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">413 × 177 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">280 × 140 px (10–20 KB)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">US Visa &amp; DS-160 (2 × 2 Inches)</td>
+              <td class="py-3 px-4 text-muted">5.08 × 5.08 cm (51 × 51 mm)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">600 × 600 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">600 × 600 px (&lt; 240 KB)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">NTA NEET Postcard Photo</td>
+              <td class="py-3 px-4 text-muted">10.16 × 15.24 cm (4" × 6")</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">1200 × 1800 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">1200 × 1800 px (&lt; 200 KB)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">PAN Card (NSDL / UTIITSL)</td>
+              <td class="py-3 px-4 text-muted">2.5 × 2.5 cm</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">295 × 295 px</td>
+              <td class="py-3 px-4 text-xs font-mono text-muted">213 × 213 px (&lt; 50 KB)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Direct Target Size Resizers:</span>
+        <a href="/image-resizer-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 50KB</a>
+        <a href="/image-resizer-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 100KB</a>
+        <a href="/image-resizer-in-kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in KB</a>
+        <a href="/photo-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Photo Resizer Hub →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on CM to Pixel Math -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How Centimeters Convert to Digital Pixels
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Digital screens measure images strictly in pixel matrices (dots), whereas physical government documents specify measurements in centimeters or millimeters. The bridge between the two is DPI (Dots Per Inch):
+        </p>
+        <div class="rounded-xl border border-border bg-bg/50 p-4 font-mono text-xs sm:text-sm text-accent">
+          Pixels = (Dimension in Centimeters ÷ 2.54) × Target DPI
+        </div>
+        <p>
+          When submitting images to online portals, candidate photos must match both the aspect ratio of the physical specification (e.g., 3.5:4.5 ratio) and the digital file size ceiling (e.g. 50 KB). PixelKit automatically aligns both constraints so your submissions are accepted without manual calculation.
+        </p>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

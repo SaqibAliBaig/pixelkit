@@ -1,0 +1,262 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'How do I use this free online photo resizer?',
+    a: 'Drop your photo into PixelKit above. You can scale pixel dimensions (e.g. 1920 × 1080 px or 350 × 450 px), scale by percentage (50%, 75%), or set an exact target file size in KB (like 50KB or 100KB). Download your resized photo instantly with zero watermarks.',
+  },
+  {
+    q: 'Is PixelKit really 100% free with no sign-in or subscriptions?',
+    a: 'Yes, completely free. Unlike Adobe photo resizer or other commercial editors that require an account signup, creative cloud subscription, or watermark your photos, PixelKit works immediately in your browser with unlimited free usage.',
+  },
+  {
+    q: 'Can I resize photos for exam and government application forms?',
+    a: 'Yes. PixelKit has dedicated 1-click presets for SSC (3.5 × 4.5 cm, 20–50KB), UPSC Civil Services (20–300KB), NTA NEET (10–200KB), US Visa DS-160 (600 × 600 px), and digital signatures (10–20KB).',
+  },
+  {
+    q: 'Does resizing a photo reduce its visual quality or make it blurry?',
+    a: 'No. PixelKit utilizes high-precision bicubic convolution to interpolate pixel values smoothly without jagged edges or blurriness. When reducing file size, its binary-search engine preserves crisp facial details and text.',
+  },
+  {
+    q: 'Can I resize photos on mobile (Android and iPhone)?',
+    a: 'Yes. PixelKit works directly in Safari, Chrome, and Firefox on mobile devices. You can choose photos directly from your phone gallery or camera and resize them in seconds without installing any mobile app.',
+  },
+  {
+    q: 'Are my private photos uploaded to an external server?',
+    a: 'Never. PixelKit is 100% client-side. Every photo resize and compression pass runs locally in your device’s browser memory via Web Workers and WebAssembly. Your photos never leave your device.',
+  },
+];
+
+const pageTitle = `Photo Resizer — Free Online Photo Resizer (No Sign-in) | ${SITE.name}`;
+const pageDesc =
+  'Free online photo resizer to resize photo dimensions and compress file size to 20KB, 50KB, 100KB, or 200KB. Fast, 100% private, no watermarks, and no sign-in required.';
+const pageKeywords = [
+  'photo resizer',
+  'online photo resizer',
+  'free photo resizer',
+  'photo resizer free',
+  'photo resizer online',
+  'adobe photo resizer',
+  'photo resizer 50kb',
+  'photo resizer 100kb',
+  'photo resizer in kb',
+  'image resizer online free',
+  'resize photo pixels',
+  'passport photo resizer',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize a photo online for free',
+  description: 'Step-by-step instructions to resize photo dimensions and compress file weight in your browser without sign-in or software installation.',
+  steps: [
+    {
+      name: 'Upload your photo',
+      text: 'Drag and drop your photo (JPG, PNG, WebP, or HEIC) into PixelKit.',
+    },
+    {
+      name: 'Choose dimensions or preset',
+      text: 'Enter your desired width and height in pixels, pick a percentage scale, or choose a passport preset.',
+    },
+    {
+      name: 'Optional file size target',
+      text: 'Select an exact kilobyte ceiling (e.g. 50KB or 100KB) if required by an upload portal.',
+    },
+    {
+      name: 'Download resized photo',
+      text: 'Click Download to save your resized photo instantly. Zero server uploads and zero privacy risks.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Photo Resizer',
+    description: pageDesc,
+    url: new URL('/photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>100% Free · No Sign-in · No Watermarks · 100% Private</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Free Online Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize photo dimensions in pixels, millimeters, or percentage—and compress file size to exact KB limits. Fast, private, and runs entirely in your web browser.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Resize Photos Online Free Without Losing Quality"
+      summaryText="To resize a photo online, drop your image into PixelKit. You can instantly adjust width and height in pixels, scale resolution proportionally, crop to passport aspect ratios (3.5 × 4.5 cm), and lock file weight to exact portal limits (such as 50 KB or 100 KB). PixelKit performs all bicubic resampling in browser RAM, ensuring maximum sharpness and zero server logging."
+      specs={[
+        { label: 'Dimension Controls', value: 'Pixels (px), Millimeters (mm), Scale Percentage (25%–100%)', highlight: true },
+        { label: 'File Size Targets', value: '20 KB, 50 KB, 100 KB, 200 KB, Custom KB' },
+        { label: 'Supported Formats', value: 'JPG, PNG, WebP, HEIC (iPhone), PDF', highlight: true },
+        { label: 'Privacy & Security', value: '100% Client-Side / Zero Server Uploads' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- Quick Exact KB Target Cards (Targeting 50kb and 100kb high-volume queries) -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Resize Photo to Specific Kilobyte Limits
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Need an exact file weight for an official application or portal? Choose a dedicated size resizer:
+      </p>
+
+      <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs sm:text-sm">
+        <a
+          href="/photo-resizer-20kb/"
+          class="group rounded-xl border border-border bg-bg/50 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-fg group-hover:text-accent transition-colors">Photo Resizer 20KB</div>
+          <div class="font-mono text-accent text-xs mt-1">Signatures &amp; Thumbprints</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Strict 10KB–20KB limit for SSC, UPSC, and banking exam digital signatures.
+          </p>
+        </a>
+
+        <a
+          href="/photo-resizer-50kb/"
+          class="group rounded-xl border border-accent/40 bg-accent/5 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-accent">Photo Resizer 50KB ★</div>
+          <div class="font-mono text-accent text-xs mt-1">UPSC, SSC &amp; NEET Photos</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            High-volume standard: resize to 3.5 × 4.5 cm and compress strictly under 50KB.
+          </p>
+        </a>
+
+        <a
+          href="/photo-resizer-100kb/"
+          class="group rounded-xl border border-accent/40 bg-accent/5 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-accent">Photo Resizer 100KB ★</div>
+          <div class="font-mono text-accent text-xs mt-1">Aadhaar, Passports &amp; KYC</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Universal ceiling for identity verification, passport seva, and university portals.
+          </p>
+        </a>
+
+        <a
+          href="/photo-resizer-200kb/"
+          class="group rounded-xl border border-border bg-bg/50 p-4 hover:border-accent hover:bg-surface transition-all"
+        >
+          <div class="font-bold text-fg group-hover:text-accent transition-colors">Photo Resizer 200KB</div>
+          <div class="font-mono text-accent text-xs mt-1">Visas &amp; Postcard Photos</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Engineered for US DS-160 visa photos and NTA NEET 4" × 6" postcard requirements.
+          </p>
+        </a>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">More presets:</span>
+        <a href="/photo-resizer-in-kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">Photo Resizer in KB</a>
+        <a href="/passport-photo-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent transition-colors">Passport Photo Maker</a>
+        <a href="/increase-image-size-in-kb/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Increase Photo Size in KB →</a>
+      </div>
+    </section>
+
+    <!-- Why PixelKit vs Adobe Photo Resizer -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why PixelKit is the Best Free Alternative to Adobe Photo Resizer
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          While tools like Adobe Express photo resizer require users to register an account, sign in with Creative Cloud, and upload photos to remote cloud servers, PixelKit is engineered from the ground up for speed, convenience, and complete privacy:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">No Sign-in Required</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Open PixelKit and resize photos instantly. No account creation, no email verification, and no subscription paywalls.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">100% Client-Side Privacy</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Your photos are processed entirely within your computer or phone's memory. Private documents and ID cards are never uploaded to any cloud server.
+            </p>
+          </div>
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-semibold text-fg">Combined Dimension &amp; KB Engine</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">
+              Scale pixel dimensions (e.g. 350 × 450 px) and compress file weight (e.g. 50 KB) simultaneously in a single click.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

@@ -1,0 +1,346 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+interface MbTargetSpec {
+  size: number;
+  kbTarget: number;
+  headline: string;
+  badge: string;
+  portalSummary: string;
+  useCases: { title: string; dims: string; body: string }[];
+  tip: string;
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const specs: MbTargetSpec[] = [
+    {
+      size: 1,
+      kbTarget: 1024,
+      headline: 'Compress Image to 1MB Online',
+      badge: 'Job Applications · Corporate Email · 1024KB Ceiling',
+      portalSummary:
+        'Compress large smartphone photos, DSLR captures, and scanned documents to under 1MB (1024KB) with crisp detail. 100% private in-browser compression with zero server uploads.',
+      useCases: [
+        {
+          title: 'Job Portals & Resumes',
+          dims: '1920 × 1080 px · Under 1MB',
+          body: 'Ensure resumes, portfolios, and certification attachments pass through corporate HR filters (Workday, Greenhouse, Taleo) without getting blocked.',
+        },
+        {
+          title: 'Real Estate & Portfolios',
+          dims: '2560 px Wide · JPG / WebP',
+          body: 'Preserve sharpness on architectural photography and graphic portfolios while keeping page load speeds rapid for web visitors.',
+        },
+        {
+          title: 'Government & Legal Portals',
+          dims: 'Scanned A4 · Under 1024 KB',
+          body: 'Upload deed scans, court declarations, and tax filings to portals enforcing a strict 1MB or 1024KB ceiling per document.',
+        },
+      ],
+      tip: 'Some portal systems calculate 1MB as 1,000 KB instead of 1,024 KB. If 1,020 KB gets rejected, set Custom Size to 950KB for guaranteed acceptance.',
+    },
+    {
+      size: 2,
+      kbTarget: 2048,
+      headline: 'Compress Image to 2MB Online',
+      badge: 'US Job Portals · Common App · Real Estate MLS',
+      portalSummary:
+        'Reduce heavy photos and document scans to strictly under 2MB (2048KB) without blur or compression artifacts. Built for US job boards, Common App college forms, and MLS real estate uploads.',
+      useCases: [
+        {
+          title: 'US Job Boards & Workday',
+          dims: 'PDF or JPG · Max 2 MB',
+          body: 'Strict 2MB file size cap enforced by applicant tracking systems for resumes, CVs, and work sample attachments.',
+        },
+        {
+          title: 'Common App & College Portals',
+          dims: 'Document Scan · Under 2 MB',
+          body: 'Compress student recommendation letters, arts supplements, and transcripts safely below the 2MB upload ceiling.',
+        },
+        {
+          title: 'Real Estate MLS Listings',
+          dims: 'Full HD Photos · Under 2 MB',
+          body: 'Downsize 15MB property shots to 2MB while preserving rich HDR colors and crisp architectural details.',
+        },
+      ],
+      tip: 'Portals enforcing a 2MB ceiling reject files even 1 byte over. PixelKit automatically converges to ~1.95MB to guarantee safe acceptance.',
+    },
+    {
+      size: 5,
+      kbTarget: 5120,
+      headline: 'Compress Image to 5MB Online',
+      badge: 'Email Gateways · IRS Tax E-File · High-Res Proofs',
+      portalSummary:
+        'Compress raw camera captures, print-ready graphics, and multi-page scans strictly under 5MB (5120KB). Ideal for corporate email firewalls, IRS tax schedules, and scholarship submissions.',
+      useCases: [
+        {
+          title: 'Corporate Email Gateways',
+          dims: 'Email Attachment · Max 5 MB',
+          body: 'Prevent automated bounce-backs from corporate Exchange and Outlook gateways that throttle attachments over 5MB.',
+        },
+        {
+          title: 'IRS & Financial E-Filing',
+          dims: 'PDF / Scanned Form · Under 5 MB',
+          body: 'Meet IRS and financial regulatory limits for tax schedule attachments, invoices, and accounting ledgers.',
+        },
+        {
+          title: 'High-Res Design & Print Proofs',
+          dims: '300 DPI · JPG / WebP / PDF',
+          body: 'Shrink 25MB+ Photoshop and Figma exports down to 5MB for fast client review and email distribution.',
+        },
+      ],
+      tip: 'Need to send multiple documents? Switch output format to PDF and enable "Merge Files into Single PDF" to bundle all pages under 5MB.',
+    },
+    {
+      size: 10,
+      kbTarget: 10240,
+      headline: 'Compress Image to 10MB Online',
+      badge: 'Discord File Limits · Slack Attachments · 4K Banners',
+      portalSummary:
+        'Compress high-megapixel camera photos and heavy banners to under 10MB (10240KB). Perfect for Discord free tier uploads (10MB cap), Slack workspaces, and cloud publishing.',
+      useCases: [
+        {
+          title: 'Discord Free Tier Uploads',
+          dims: 'Max 10 MB File Limit',
+          body: 'Discord enforces a strict 10MB file ceiling for non-Nitro users. PixelKit shrinks 30MB+ captures to fit within Discord limits instantly.',
+        },
+        {
+          title: 'Slack Free Workspaces',
+          dims: 'Batch Media · Under 10 MB',
+          body: 'Bypass workspace storage quotas and file size warnings by compressing heavy PNG and JPG exports before sharing.',
+        },
+        {
+          title: '48MP & 108MP Mobile Photos',
+          dims: '4K / 8K Raw · Max 10 MB',
+          body: 'Cut raw smartphone camera files down to size in browser memory with zero loss in visual resolution.',
+        },
+      ],
+      tip: 'Discord raised its free limit from 8MB to 10MB. PixelKit targets ~9.8MB so you never encounter the "Your file is too powerful" error.',
+    },
+  ];
+
+  return specs.map((spec) => ({
+    params: { size: String(spec.size) },
+    props: { spec },
+  }));
+};
+
+const { spec } = Astro.props as { spec: MbTargetSpec };
+const allMbSizes = [1, 2, 5, 10];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: `Under ${spec.size}MB` },
+];
+
+const faqs = [
+  {
+    q: `How do I compress an image to under ${spec.size}MB without losing quality?`,
+    a: `Drop your JPG, PNG, WebP, or HEIC image into the box above. PixelKit automatically sets a ${spec.size}MB (${spec.kbTarget}KB) target and runs a binary-search optimization loop inside your browser to calculate the exact compression ratio that retains maximum sharpness while keeping file size strictly under ${spec.size}MB.`,
+  },
+  {
+    q: `Can I compress multi-page PDF documents to under ${spec.size}MB?`,
+    a: `Yes. Switch the output format to PDF, enable "Merge Files into Single PDF", and drop your document pages. PixelKit compresses each scanned page locally to fit the combined file under your ${spec.size}MB target.`,
+  },
+  {
+    q: `Why do portals reject ${spec.size}MB files that appear to be just under ${spec.size}MB?`,
+    a: `Some portal systems calculate ${spec.size}MB in decimal megabytes (1,000 KB per MB) while others enforce binary megabytes (1,024 KB per MB). To prevent automated upload rejections, PixelKit safely compresses files ~2–5% below the ceiling so they are accepted on all platforms.`,
+  },
+  {
+    q: 'Are high-resolution photos uploaded to a remote server for compression?',
+    a: 'No. PixelKit executes all image processing, decoding, scaling, and compression directly inside your web browser using WebAssembly. Your photos, documents, and private files never leave your device.',
+  },
+];
+
+const pageTitle = `Compress Image to ${spec.size}MB — Reduce Photo Size Online | ${SITE.name}`;
+const pageDesc = `Reduce image size to ${spec.size}MB or compress photo to ${spec.size}MB online for free. Shrink JPG, PNG, WebP and PDF to under ${spec.size}MB (${spec.kbTarget}KB) with zero uploads.`;
+const pageKeywords = [
+  `compress image to ${spec.size}mb`,
+  `compress photo to ${spec.size}mb`,
+  `reduce image size to ${spec.size}mb`,
+  `reduce photo size to ${spec.size}mb`,
+  `compress image to ${spec.size} mb`,
+  `compress photo to ${spec.size} mb`,
+  `reduce image size to ${spec.size} mb`,
+  `image compressor ${spec.size}mb`,
+  `compress photo to ${spec.size}mb online`,
+  `compress image under ${spec.size}mb`,
+  `compress image to ${spec.kbTarget}kb`,
+  'compress image to specific size',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: `How to compress image to ${spec.size}MB online`,
+  description: `Step-by-step instructions to compress JPG, PNG, WebP, or HEIC images strictly under ${spec.size}MB without quality loss or server uploads.`,
+  steps: [
+    {
+      name: 'Upload your image or document scan',
+      text: 'Drag and drop your image file into PixelKit. HEIC, JPG, PNG, WebP, and PDF are supported.',
+    },
+    {
+      name: `Select ${spec.size}MB Target Size`,
+      text: `PixelKit automatically configures the target file weight limit to ${spec.size}MB using binary search quantization.`,
+    },
+    {
+      name: 'Optional Crop & Resize',
+      text: 'Optionally adjust aspect ratio or downscale dimensions if needed.',
+    },
+    {
+      name: `Download compressed ${spec.size}MB file`,
+      text: 'Download your optimized file instantly. All processing happens 100% locally in your device browser.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `Compress Image to ${spec.size}MB — PixelKit`,
+    description: pageDesc,
+    url: new URL(`/compress-image-to-${spec.size}mb/`, SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>{spec.badge}</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        {spec.headline}
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        {spec.portalSummary}
+      </p>
+    </header>
+
+    <!-- Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title={`Official ${spec.size}MB Compression Specification`}
+      summaryText={`To reduce a photo or document to ${spec.size}MB without unreadable blur, PixelKit uses 12-iteration binary search quantization in browser Web Workers. It dynamically determines the optimal JPEG/WebP quality level and downscales excessive pixel density to guarantee the output strictly fits below ${spec.size}MB (${spec.kbTarget}KB).`}
+      specs={[
+        { label: 'Target File Ceiling', value: `Strictly ≤ ${spec.size} MB (${spec.kbTarget} KB)`, highlight: true },
+        { label: 'Input Formats', value: 'JPG, PNG, WebP, HEIC, PDF' },
+        { label: 'Execution', value: '100% In-Browser WebAssembly', highlight: true },
+        { label: 'Privacy', value: 'Zero Server Uploads' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={spec.kbTarget}
+      />
+    </div>
+
+    <!-- Use cases -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        When You Need an Image Under {spec.size}MB
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        {spec.tip}
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        {spec.useCases.map((u) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-bold text-fg">{u.title}</div>
+            <div class="font-mono text-accent text-xs mt-1">{u.dims}</div>
+            <p class="text-muted mt-1.5 text-xs leading-relaxed">{u.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Sibling KB and MB switches -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Other MB targets:</span>
+        {allMbSizes
+          .filter((s) => s !== spec.size)
+          .map((s) => (
+            <a
+              href={`/compress-image-to-${s}mb/`}
+              class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+            >
+              Compress to {s}MB
+            </a>
+          ))}
+        <span class="text-muted font-medium mx-1">| Exact KB:</span>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">200KB</a>
+        <a href="/compress-image-to-500kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">500KB</a>
+        <a
+          href="/compress-image-to-pdf/"
+          class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors"
+        >
+          Compress Image to PDF →
+        </a>
+      </div>
+    </section>
+
+    <!-- Technical Strategies -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Technical Strategies for {spec.size}MB Image Compression
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          High-end smartphones produce photos exceeding 12MB to 25MB with raw sensor resolutions upwards of 48 megapixels. Uploading files of this size to client portals, email systems, or content management systems wastes bandwidth and often triggers upload timeout errors.
+        </p>
+        <p>
+          PixelKit uses client-side WebAssembly to downscale raw dimensions before compressing. Downscaling a 6000×4000 px photo to 2560×1707 px preserves ultra-HD clarity on Retina and 4K displays while reducing uncompressed bitmap size by over 80%. The binary search quantization then selects the optimal JPEG or WebP quality table to ensure your exported file hits exactly below {spec.size}MB ({spec.kbTarget}KB).
+        </p>
+      </div>
+    </section>
+
+    <!-- Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

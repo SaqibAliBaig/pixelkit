@@ -84,6 +84,16 @@ export default defineConfig({
           item.lastmod = getGitDate('src/pages/[from]-to-[to].astro');
         } else if (item.url.match(/\/compress-image-to-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/compress-image-to-[size]kb.astro');
+        } else if (item.url.match(/\/compress-jpg-to-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/compress-jpg-to-[size]kb.astro');
+        } else if (item.url.match(/\/photo-resizer-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/photo-resizer-[size]kb.astro');
+        } else if (item.url.match(/\/image-resizer-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/image-resizer-[size]kb.astro');
+        } else if (item.url.match(/\/resize-image-to-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/resize-image-to-[size]kb.astro');
+        } else if (item.url.match(/\/compress-image-to-\d+mb\/$/)) {
+          item.lastmod = getGitDate('src/pages/compress-image-to-[size]mb.astro');
         } else if (item.url.match(/\/compress-[a-z]+\/$/)) {
           item.lastmod = getGitDate('src/pages/compress-[format].astro');
         } else {

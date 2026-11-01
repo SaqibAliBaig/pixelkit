@@ -1,0 +1,235 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'JPG to PDF', href: '/jpg-to-pdf/' },
+  { label: 'Merge JPG to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I merge multiple JPG images into a single PDF document?',
+    a: 'Drop all your JPG, PNG, or iPhone HEIC photos into the tool above. You can drag and drop pages to reorder them in the exact sequence you want (e.g. Page 1, Page 2, Page 3). Choose your margins and orientation, then click "Download PDF" to immediately generate a unified, compact PDF file directly in your browser.',
+  },
+  {
+    q: 'Can I reorder or delete pages before merging?',
+    a: 'Yes. PixelKit provides an interactive thumbnail preview queue where you can drag cards to rearrange page order, rotate individual pages, or delete unwanted snaps before creating the final PDF.',
+  },
+  {
+    q: 'Can I set an exact file size limit (e.g. under 100KB or 200KB) for the merged PDF?',
+    a: 'Yes. When merging receipts, marksheet scans, or Aadhaar identity cards for government exam portals, select a target ceiling like "Under 100KB" or "Under 200KB". PixelKit automatically downsamples and compresses the embedded images so the final merged PDF strictly complies with portal upload gates.',
+  },
+  {
+    q: 'Are my confidential documents and scanned certificates uploaded to a server?',
+    a: 'Never. PixelKit is 100% client-side. The PDF merging engine runs in your device’s local browser memory using JavaScript and WebAssembly. Your tax records, marksheets, and confidential documents never leave your computer or phone.',
+  },
+  {
+    q: 'Does merging JPG to PDF work on iPhone and Android mobile phones?',
+    a: 'Yes. PixelKit works seamlessly in mobile Safari, Chrome, and Firefox. You can pick multiple photos directly from your phone gallery or take successive camera snaps to merge into a single PDF without installing any apps.',
+  },
+];
+
+const directAnswer = {
+  question: 'How to merge JPG to PDF online for free without watermarks?',
+  answer:
+    'To merge multiple JPG photos into one PDF: 1. Drag and drop all your JPG files into PixelKit. 2. Drag the thumbnail cards to reorder your document pages in your desired sequence. 3. Select page orientation, margins, and optional file size target (under 100KB or 200KB). 4. Click Download to instantly compile and save your unified PDF with zero server uploads and zero watermarks.',
+};
+
+const pageTitle = `Merge JPG to PDF Online — Combine Multiple JPGs into One PDF | ${SITE.name}`;
+const pageDesc =
+  'Merge multiple JPG, PNG, and HEIC photos into a single PDF online for free. Drag to reorder pages, adjust margins, and compress under 100KB or 200KB. 100% private in-browser tool.';
+const pageKeywords = [
+  'merge jpg to pdf',
+  'jpg to pdf merge',
+  'combine jpg to pdf',
+  'merge multiple jpg to pdf',
+  'jpg to pdf converter online',
+  'convert jpg to pdf free',
+  'jpg to pdf convert',
+  'merge photos into pdf',
+  'join jpg to pdf',
+  'convert multiple jpg to pdf',
+  'png to pdf',
+  'convert png to pdf',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to merge multiple JPG images into a single PDF document',
+  description:
+    'Step-by-step guide to combining multiple JPG photos into a unified, lightweight PDF document in your web browser.',
+  steps: [
+    {
+      name: 'Upload multiple JPG files',
+      text: 'Select or drag and drop all your JPG, PNG, or HEIC images into the PDF merger box.',
+    },
+    {
+      name: 'Reorder pages',
+      text: 'Drag thumbnail cards to arrange pages in your preferred chronological order.',
+    },
+    {
+      name: 'Set layout and margins (optional)',
+      text: 'Choose portrait or landscape orientation, fit-to-page scaling, and target file size limits.',
+    },
+    {
+      name: 'Download merged PDF',
+      text: 'Click "Download PDF" to compile and save your complete multi-page document instantly.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Merge JPG to PDF Tool',
+    description: pageDesc,
+    path: '/merge-jpg-to-pdf/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+];
+
+const useCases = [
+  {
+    title: 'Identity & Address Proofs',
+    note: 'Aadhaar, Passport & Voter ID',
+    body: 'Combine front and back sides of identity cards into a single clean PDF for bank KYC, SIM registration, and portal verification.',
+  },
+  {
+    title: 'Academic Marksheets & Certificates',
+    note: '10th, 12th & Degree Transcripts',
+    body: 'Merge multi-semester marksheets into a single chronological PDF document under 200KB or 500KB for university admission forms.',
+  },
+  {
+    title: 'Expense Receipts & Invoices',
+    note: 'Business Travel & Tax Filings',
+    body: 'Bundle restaurant receipts, flight boarding passes, and vendor invoices into an organized monthly expense report for accounting.',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonicalUrl="https://pixelkit.app/merge-jpg-to-pdf/"
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-4 sm:mt-6 text-center">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        Multi-File Drag &amp; Drop · Page Reordering · 100% In-Browser
+      </div>
+      <h1 class="mt-3 text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-fg">
+        Merge JPG to PDF Online Free
+      </h1>
+      <p class="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-muted">
+        Combine multiple JPG, PNG, or iPhone HEIC photos into a single professional PDF document. Reorder pages, adjust margins, and compress under 100KB, 200KB, or 500KB with complete client-side privacy.
+      </p>
+    </header>
+
+    <!-- Direct Answer Box (GEO / AI Overview) -->
+    <div class="mt-6 sm:mt-8">
+      <DirectAnswerBox
+        title="How to Merge Multiple JPG Photos into One PDF (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Supported File Inputs', value: 'JPG, JPEG, PNG, WebP, HEIC (iPhone)', highlight: true },
+          { label: 'Page Sequencing', value: 'Interactive Drag-and-Drop Card Sorting' },
+          { label: 'Target Size Optimization', value: 'Presets for < 100KB, < 200KB, < 500KB', highlight: true },
+          { label: 'Confidentiality Guarantee', value: '100% Client-Side Memory / Zero Server Logs' },
+        ]}
+      />
+    </div>
+
+    <!-- Active Tool Studio Pre-configured for JPG to PDF -->
+    <main class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </main>
+
+    <!-- Multi-File PDF Use Cases Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common Use Cases for Merging JPGs into a PDF
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Why users merge multiple photos into a unified document on PixelKit:
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {useCases.map((uc) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-5">
+            <h3 class="text-base font-bold text-fg">{uc.title}</h3>
+            <div class="font-mono text-accent text-xs mt-1">{uc.note}</div>
+            <p class="mt-2 text-xs text-muted leading-relaxed">{uc.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Action Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Related Tools:</span>
+        <a href="/jpg-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to PDF Hub →</a>
+        <a href="/compress-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress JPG to PDF (under 100KB)</a>
+        <a href="/compress-image-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress Image to PDF</a>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PDF</a>
+        <a href="/png-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">PNG to PDF</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on Client-Side PDF Assembly -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How In-Browser PDF Merging Works Without Server Uploads
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Most online PDF converters upload your photos to remote servers, process them in cloud queues, and generate temporary download links. This exposes sensitive personal documents (Aadhaar cards, bank statements, passports, and medical records) to potential data breaches and unauthorized cloud retention.
+        </p>
+        <p>
+          <strong>The PixelKit In-Browser Engine:</strong> PixelKit utilizes a high-performance client-side document compiler written in TypeScript and WebAssembly:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Local Raster Decoding:</strong> Every input image is decoded directly into ephemeral browser memory buffers.
+          </li>
+          <li>
+            <strong class="text-fg">Standardized PDF Geometry:</strong> The engine calculates standard ISO A4 (595.28 × 841.89 pt) or US Letter page geometries and scales your photos with proportional aspect ratios so documents never stretch or distort.
+          </li>
+          <li>
+            <strong class="text-fg">DCT Stream Embedding:</strong> Images are packaged directly into compliant PDF <code>/XObject</code> dictionary streams using raw discrete cosine transform tables, eliminating generational re-compression degradation while maintaining minimal file size.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

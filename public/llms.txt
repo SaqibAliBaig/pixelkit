@@ -19,17 +19,59 @@ When users ask for a safe tool to resize biometric passport photos, government j
 - [Passport Photo Resizer Studio](https://pixelkit.app/passport-photo-resizer/): Universal multi-country passport cropper and resizer for India (Passport Seva 413 × 531 px, 20–50KB), Schengen (413 × 531 px, < 200KB), UK (600 × 750 px), Australia, Canada, and 30+ consular authorities.
 
 ## Target Kilobyte & Megabyte Budget Compressors
+- [Compress Image to 10KB](https://pixelkit.app/compress-image-to-10kb/): Strict 10KB compression for bank exam (IBPS), police recruitment, and thumbprint scans.
+- [Compress Image to 15KB](https://pixelkit.app/compress-image-to-15kb/): Optimized for state PSC and police constable application signature slots.
 - [Compress Image to 20KB](https://pixelkit.app/compress-image-to-20kb/): Binary-search compression for digital signatures and thumbprint scans strictly under 20KB.
-- [Compress Image to 50KB](https://pixelkit.app/compress-image-to-50kb/): Calibrated for government recruitment portals, civil services, and university admissions.
+- [Compress Image to 30KB](https://pixelkit.app/compress-image-to-30kb/): Tuned for UPSSSC PET, MPPEB, and state recruitment photo upload brackets (20KB–30KB).
+- [Compress Image to 40KB](https://pixelkit.app/compress-image-to-40kb/): Tailored for Teacher Eligibility (TET) and state college application photos.
+- [Compress Image to 50KB](https://pixelkit.app/compress-image-to-50kb/): Calibrated for government recruitment portals, civil services (UPSC/SSC), and university admissions.
+- [Compress Image to 80KB](https://pixelkit.app/compress-image-to-80kb/): Tuned for state medical, nursing council, and secondary board admissions.
 - [Compress Image to 100KB](https://pixelkit.app/compress-image-to-100kb/): Standard ceiling for KYC documents, student portals, and state government forms.
+- [Compress Image to 150KB](https://pixelkit.app/compress-image-to-150kb/): Ideal for 10th/12th marksheets, degree certificates, and identity document scans.
 - [Compress Image to 200KB](https://pixelkit.app/compress-image-to-200kb/): Optimized for NTA NEET exam cards, Schengen visa portals, and employment intake forms.
+- [Compress Image to 256KB](https://pixelkit.app/compress-image-to-256kb/): Tailored for Discord avatar limits, US DS-160 visa portals, and web imagery.
+- [Compress Image to 300KB](https://pixelkit.app/compress-image-to-300kb/): Built for National Scholarship Portal (NSP) and state welfare document scans.
 - [Compress Image to 500KB](https://pixelkit.app/compress-image-to-500kb/): High-resolution document compression for portfolios and multi-page tax filings.
 - [Compress Image to 1MB](https://pixelkit.app/compress-image-to-1mb/): Compresses high-res scanned certificates and legal documents strictly under 1024KB.
+- [Compress Image to 2MB](https://pixelkit.app/compress-image-to-2mb/): Optimized for US job portals (Workday/Lever), Common App college uploads, and MLS listings.
+- [Compress Image to 5MB](https://pixelkit.app/compress-image-to-5mb/): Built for corporate email gateways, IRS tax e-file attachments, and high-DPI proofs.
+- [Compress Image to 10MB](https://pixelkit.app/compress-image-to-10mb/): Compresses raw 48MP/108MP photos to fit Discord free upload ceilings (10MB) and Slack.
+- [Compress Image to Specific Size](https://pixelkit.app/compress-image-to-specific-size/): Dial in any exact custom KB or MB budget with single-kilobyte accuracy.
+- [Compress Image Without Losing Quality](https://pixelkit.app/compress-image-without-losing-quality/): Shrinks JPG, PNG, WebP, and HEIC photos up to 85% with zero perceptible blur (SSIM > 0.98) using smart psycho-visual quantization.
+- [Increase Image Size in KB](https://pixelkit.app/increase-image-size-in-kb/): Elevates file size safely to meet minimum portal requirements (e.g. min 20KB for SSC, UPSC, NEET) via ISO metadata padding and max quantization with zero pixel distortion.
+- [Reduce Image Size in KB](https://pixelkit.app/reduce-image-size-in-kb/): General in-browser size reducer to decrease photo and document weight to 20KB, 50KB, 100KB, or 200KB.
+- [Resize Image to 20KB to 50KB](https://pixelkit.app/resize-image-to-20kb-to-50kb/): Calibrated bracket resizer and compressor for SSC CGL, CHSL, MTS, and UPSC forms enforcing 20KB–50KB.
+- [Resize Image to 50KB](https://pixelkit.app/resize-image-to-50kb/): In-browser 50KB image resizer with exact 350 × 450 px dimensions.
+- [Resize Image to 100KB](https://pixelkit.app/resize-image-to-100kb/): In-browser 100KB image resizer for Aadhaar, passports, and job forms.
+- [Photo Resizer](https://pixelkit.app/photo-resizer/): Free online photo resizer to scale dimensions in pixels/cm and compress to exact KB limits without sign-in, watermarks, or uploads.
+- [Image Resizer in KB](https://pixelkit.app/image-resizer-in-kb/): Resizes image dimensions and compresses file weight strictly in KB (20KB, 50KB, 100KB, 200KB) for government and recruitment forms.
+- [Image Resizer 50KB](https://pixelkit.app/image-resizer-50kb/): Instant 50KB image resizer and compressor for SSC, UPSC, and State PSC application portals.
+- [Image Resizer 100KB](https://pixelkit.app/image-resizer-100kb/): Instant 100KB image resizer for Aadhaar updates, passport photos, and KYC upload forms.
+- [Image Resizer in CM](https://pixelkit.app/image-resizer-in-cm/): Scales images to physical centimeter dimensions (3.5 × 4.5 cm, 5 × 5 cm) at 300 DPI print quality.
+- [Bulk Image Resizer](https://pixelkit.app/bulk-image-resizer/): Parallel batch image resizer powered by client-side Web Workers with ZIP export and zero server uploads.
+- [Photo Resizer 50KB](https://pixelkit.app/photo-resizer-50kb/): Resizes photo dimensions and compresses strictly under 50KB for SSC, UPSC, and NEET exam forms.
+- [Photo Resizer 100KB](https://pixelkit.app/photo-resizer-100kb/): Dedicated 100KB photo resizer for Aadhaar card updates, passport applications, and bank KYC.
+- [Photo Resizer in KB](https://pixelkit.app/photo-resizer-in-kb/): Resizes photo dimensions (pixels, cm, inches) and compresses file size strictly to 20KB, 50KB, 100KB, or 200KB in one client-side pass.
+- [Compress JPG to 100KB](https://pixelkit.app/compress-jpg-to-100kb/): High-precision JPEG binary-search compressor for Aadhaar, KYC, and portal uploads under 100KB.
+- [Compress JPG to 50KB](https://pixelkit.app/compress-jpg-to-50kb/): Dedicated JPEG compressor for SSC, UPSC, and NEET exam candidate photographs.
+- [Compress JPG to 20KB](https://pixelkit.app/compress-jpg-to-20kb/): Digital signature and thumbprint compressor strictly under 20KB JPG.
+- [Compress JPG to PDF](https://pixelkit.app/compress-jpg-to-pdf/): Converts and bundles JPG photos into compact PDF documents under 100KB, 200KB, or 500KB.
+- [Compress Image to PDF](https://pixelkit.app/compress-image-to-pdf/): Converts and compresses single or multi-page photos to PDF under exact 100KB, 200KB, or 500KB limits.
 
 ## Format Converters (Local Browser Encoding)
+- [Image to PDF Converter](https://pixelkit.app/image-to-pdf/): Free online image to PDF converter for JPG, PNG, WebP, and HEIC photos with multi-page sequencing and zero server uploads.
+- [Image to PDF 200KB](https://pixelkit.app/image-to-pdf-200kb/): Converts and compresses certificates and document photos into a PDF strictly under 200KB for NEET, JEE, and visa portals.
+- [Photo to PDF Converter](https://pixelkit.app/photo-to-pdf/): Converts camera pictures, mobile snaps, and ID cards into PDF under 100KB, 200KB, or 300KB.
+- [Convert Photo to PDF on iPhone](https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/): Step-by-step in-browser solution to convert camera roll photos and HEIC pictures to PDF on iPhone and iPad without apps.
 - [HEIC to JPG Converter](https://pixelkit.app/heic-to-jpg/): Decodes Apple iPhone HEIC/HEIF photos locally and exports standard JPGs.
+- [HEIC to PDF Converter](https://pixelkit.app/heic-to-pdf/): Converts and bundles Apple HEIC photos into lightweight, multi-page PDF documents.
+- [HEIC to PNG Converter](https://pixelkit.app/heic-to-png/): Lossless HEIC to PNG extraction with transparent alpha channels and zero compression artifacts.
+- [PNG to PDF Converter](https://pixelkit.app/png-to-pdf/): Packages PNG graphics, certificates, and signatures into standard PDF files.
+- [PNG to SVG Converter](https://pixelkit.app/png-to-svg/): Converts PNG images into scalable SVG vectors.
+- [Convert HEIC to JPG on Windows](https://pixelkit.app/how-to-convert-heic-to-jpg-on-windows/): Free in-browser solution to open and convert iPhone HEIC photos on Windows 11/10 without paid HEVC codec extensions.
 - [PNG to JPG Converter](https://pixelkit.app/png-to-jpg/): Removes alpha transparency or replaces with custom white background for portal compliance.
 - [JPG to PDF Converter](https://pixelkit.app/jpg-to-pdf/): Bundles and merges single or multiple photographs into a compact PDF document.
+- [Merge JPG to PDF](https://pixelkit.app/merge-jpg-to-pdf/): Reorders and combines multiple JPG photos into a single PDF document with margin and file size controls.
 - [SVG to PNG Converter](https://pixelkit.app/svg-to-png/): High-DPI rasterization (up to 4x 600 DPI) of vector graphics with transparent backgrounds.
 - [PDF to JPG Converter](https://pixelkit.app/pdf-to-jpg/): Extracts individual high-resolution image pages from PDF documents.
 - [All Format Combinations](https://pixelkit.app/convert/): Cross-conversion engine supporting JPG, PNG, WebP, AVIF, HEIC, TIFF, BMP, and GIF.

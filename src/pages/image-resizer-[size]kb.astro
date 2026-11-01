@@ -1,0 +1,421 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+interface ImageResizerSpec {
+  size: number;
+  headline: string;
+  badge: string;
+  summary: string;
+  useCases: { title: string; dims: string; body: string }[];
+  tip: string;
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const specs: ImageResizerSpec[] = [
+    {
+      size: 20,
+      headline: 'Image Resizer 20KB Online',
+      badge: 'Signatures · Thumbprints · Exam Portals',
+      summary:
+        'Resize image dimensions and compress file size strictly under 20KB online. Engineered for SSC, UPSC, IBPS, and state recruitment signature and thumbprint upload slots.',
+      useCases: [
+        {
+          title: 'Candidate Signatures',
+          dims: '140 × 60 px · 10–20 KB',
+          body: 'Crop tightly around ink strokes on white paper so signature lines stay crisp and legible under 20KB.',
+        },
+        {
+          title: 'Left Thumb Impressions',
+          dims: '240 × 240 px · Under 20 KB',
+          body: 'Preserve ridge pattern contrast on scanned thumbprints required by banking and recruitment portals.',
+        },
+        {
+          title: 'Compact Applicant Avatars',
+          dims: '200 × 230 px · 15–20 KB',
+          body: 'Scale pixel dimensions and compress simultaneously to keep facial biometrics clear at ultra-low sizes.',
+        },
+      ],
+      tip: 'For 20KB targets on phone camera photos, open Crop Studio to trim background borders or scale width to 350–500 px before downloading.',
+    },
+    {
+      size: 30,
+      headline: 'Image Resizer 30KB Online',
+      badge: 'UPSSSC · MPPEB · State Exam Photos',
+      summary:
+        'Resize image dimensions to passport size and compress to 30KB online without losing clarity. Built for UPSSSC PET, MPPEB, APPSC, and state exam portals requiring 20KB–30KB.',
+      useCases: [
+        {
+          title: 'UPSSSC & State PET Headshots',
+          dims: '350 × 450 px · 20–30 KB',
+          body: 'Crop passport-style photos to 3.5 × 4.5 cm and land safely between 20KB and 30KB in a single click.',
+        },
+        {
+          title: 'Railway RRB Photos',
+          dims: 'JPG · Under 30 KB',
+          body: 'Retain clear eyes, ears, and background contrast for automated facial recognition matching.',
+        },
+        {
+          title: 'College Admission Forms',
+          dims: 'JPG · Max 30 KB',
+          body: 'Compress student identity photos for state university admission portals.',
+        },
+      ],
+      tip: 'Need between 20KB and 30KB? Use Range mode in Settings to set min 20KB and max 30KB for 100% portal acceptance.',
+    },
+    {
+      size: 40,
+      headline: 'Image Resizer 40KB Online',
+      badge: 'Teacher Eligibility (TET) · State University Forms',
+      summary:
+        'Resize image dimensions and compress file size strictly under 40KB. Tailored for Teacher Eligibility Tests (CTET, UPTET, REET) and state college application photos.',
+      useCases: [
+        {
+          title: 'TET & State Exam Photos',
+          dims: '3.5 × 4.5 cm · 20–40 KB',
+          body: 'Ensure clean facial lighting and sharp contrast while meeting strict 40KB upload ceilings.',
+        },
+        {
+          title: 'Polytechnic & ITI Admissions',
+          dims: 'JPG · Under 40 KB',
+          body: 'Shrink mobile phone selfies to passport size for vocational admission forms.',
+        },
+        {
+          title: 'Employee ID Card Photos',
+          dims: 'JPG · Under 40 KB',
+          body: 'Standardize staff photo headshots for corporate HR databases.',
+        },
+      ],
+      tip: 'Targeting 38KB provides a safe 2KB safety margin against server upload recalculation differences.',
+    },
+    {
+      size: 50,
+      headline: 'Image Resizer 50KB Online',
+      badge: 'SSC CGL/CHSL · UPSC · NEET Exam Photos',
+      summary:
+        'Resize image to 50KB online with zero blur. The definitive image resizer for SSC CGL, CHSL, MTS, UPSC Civil Services, and NEET passport photo uploads enforcing 20KB–50KB brackets.',
+      useCases: [
+        {
+          title: 'SSC CGL, CHSL, MTS Photos',
+          dims: '350 × 450 px (3.5 × 4.5 cm) · 20–50 KB',
+          body: 'Auto-frame with 80% face coverage and compress safely to 35–45 KB to pass automated portal verification.',
+        },
+        {
+          title: 'UPSC Civil Services OTR Headshot',
+          dims: '350 × 350 to 1000 × 1000 px · 20–50 KB',
+          body: 'Compress crisp formal portraits for One Time Registration (OTR) without visual noise.',
+        },
+        {
+          title: 'PAN Card Applicant Photo',
+          dims: '213 × 213 px at 200/300 DPI · Under 50 KB',
+          body: 'Meet exact NSDL and UTIITSL criteria for instant PAN card application approvals.',
+        },
+      ],
+      tip: 'For SSC and UPSC, use PixelKit’s "SSC Photo Resizer" preset to apply 3.5 × 4.5 cm cropping and 50KB compression in one click.',
+    },
+    {
+      size: 100,
+      headline: 'Image Resizer 100KB Online',
+      badge: 'Aadhaar · Passports · Job Portals · KYC',
+      summary:
+        'Resize image to 100KB online for free without losing quality. Ideal for Aadhaar card updates, Indian Passport Seva, bank KYC, and job portals enforcing strict 100KB limits.',
+      useCases: [
+        {
+          title: 'Aadhaar & Identity Verification',
+          dims: 'JPG / PNG · Under 100 KB',
+          body: 'Keep text, official seals, and address details sharp and fully readable on scanned ID documents.',
+        },
+        {
+          title: 'Passport Seva Online Photo',
+          dims: '413 × 531 px (3.5 × 4.5 cm) · Under 100 KB',
+          body: 'Format passport headshots with white background that strictly satisfy consular specifications.',
+        },
+        {
+          title: 'Job Portal Resumes & Profiles',
+          dims: 'JPG · Max 100 KB',
+          body: 'Compress profile pictures for LinkedIn, Naukri, and corporate HR portals for instant upload.',
+        },
+      ],
+      tip: '100KB is the most common portal limit worldwide. PixelKit converges on the highest quality score under 100KB in under 30 milliseconds.',
+    },
+    {
+      size: 200,
+      headline: 'Image Resizer 200KB Online',
+      badge: 'NEET Exam Cards · US Visa · Schengen Visa',
+      summary:
+        'Resize image to 200KB online without losing quality. Engineered for NTA NEET postcard photos, US DS-160 visa, and Schengen visa application portals.',
+      useCases: [
+        {
+          title: 'NTA NEET Postcard Photo (4" × 6")',
+          dims: '4 × 6 inches (1200 × 1800 px) · 10–200 KB',
+          body: 'Format postcard photos with white background and candidate name/date stamp under 200KB.',
+        },
+        {
+          title: 'US DS-160 & Diversity Visa (DV)',
+          dims: '600 × 600 px (2 × 2") · Under 200–240 KB',
+          body: 'Meet strict US Department of State photo requirements with 1:1 aspect ratio and white background.',
+        },
+        {
+          title: 'Schengen & UK Visa Headshots',
+          dims: '35 × 45 mm · Under 200 KB',
+          body: 'Deliver compliant biometrics for European consulate appointment submissions.',
+        },
+      ],
+      tip: 'Need an exact 4x6 inch postcard size for NEET? Use PixelKit’s "NEET Photo Resizer" tool for automated dimensions and 200KB compression.',
+    },
+    {
+      size: 500,
+      headline: 'Image Resizer 500KB Online',
+      badge: 'High-Res Portfolios · Job Portals · Web Speed',
+      summary:
+        'Resize image to 500KB online without losing sharpness. The gold standard for professional portfolios, corporate recruitment portals, and high-DPI proofs.',
+      useCases: [
+        {
+          title: 'Corporate Job Portals (Workday, Lever)',
+          dims: 'Full-Res · Under 500 KB',
+          body: 'Compress headshots and portfolio samples for international job applications.',
+        },
+        {
+          title: 'High-Resolution Photography Portfolios',
+          dims: 'Up to 4K resolution · Under 500 KB',
+          body: 'Preserve deep color grading, dynamic range, and edge sharpness for creative portfolios.',
+        },
+        {
+          title: 'E-commerce & Web Speed Optimization',
+          dims: 'Banner & Product Photos · Under 500 KB',
+          body: 'Boost Google PageSpeed scores by reducing heavy banner images to 500KB.',
+        },
+      ],
+      tip: 'For modern websites, consider exporting to WebP at 500KB to achieve near-lossless 4K visual quality.',
+    },
+  ];
+
+  return specs.map((spec) => ({
+    params: { size: String(spec.size) },
+    props: { spec },
+  }));
+};
+
+const { spec } = Astro.props as { spec: ImageResizerSpec };
+const allSizes = [20, 30, 40, 50, 100, 200, 500];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Image Resizer', href: '/resize-image/' },
+  { label: `Image Resizer ${spec.size}KB` },
+];
+
+const faqs = [
+  {
+    q: `How do I resize an image to ${spec.size}KB without losing quality?`,
+    a: `Drop your image into the tool above. PixelKit sets a ${spec.size}KB ceiling and enables pixel dimension adjustments (e.g. 350 × 450 px passport or custom width/height). The browser Web Worker executes binary-search quantization to ensure the highest possible visual clarity under ${spec.size}KB.`,
+  },
+  {
+    q: `Can I resize image dimensions (pixels or cm) and reduce size to ${spec.size}KB at the same time?`,
+    a: `Yes! You can crop to passport aspect ratios (3.5 × 4.5 cm), scale pixel dimensions, and compress the file size under ${spec.size}KB all in one unified client-side step.`,
+  },
+  {
+    q: `How do I resize an image to ${spec.size}KB on mobile (Android and iPhone)?`,
+    a: `PixelKit runs 100% locally in mobile Chrome, Safari, and Firefox. You can pick photos directly from your phone gallery or camera, resize dimensions, and compress to ${spec.size}KB without installing any third-party app.`,
+  },
+  {
+    q: `Why do application portals enforce a ${spec.size}KB limit?`,
+    a: `Recruitment and entrance exam portals (like SSC, UPSC, NEET, and university forms) enforce strict file limits to handle millions of applicant uploads without server crashes. PixelKit guarantees your file strictly conforms to these limits.`,
+  },
+  {
+    q: `Are my private images uploaded to an external server?`,
+    a: `Never. PixelKit is 100% client-side. Every image resize and ${spec.size}KB compression pass runs locally in your device's browser memory. Your files never touch an external server.`,
+  },
+];
+
+const pageTitle = `Image Resizer ${spec.size}KB — Resize Image to ${spec.size}KB Online | ${SITE.name}`;
+const pageDesc = `Free online image resizer ${spec.size}KB. Resize image dimensions and compress file size strictly under ${spec.size}KB for exam forms, passports, and job portals without blurriness.`;
+const pageKeywords = [
+  `image resizer ${spec.size}kb`,
+  `image resizer ${spec.size} kb`,
+  `image resizer to ${spec.size}kb`,
+  `online image resizer ${spec.size}kb`,
+  `image resizer in ${spec.size}kb`,
+  `free image resizer ${spec.size}kb`,
+  `image resize ${spec.size}kb online`,
+  `resize image to ${spec.size}kb`,
+  `image resizer in kb`,
+  `image resizer online`,
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: `How to resize an image to ${spec.size}KB online`,
+  description: `Step-by-step instructions to resize image dimensions and compress file size strictly under ${spec.size}KB for online application portals.`,
+  steps: [
+    {
+      name: 'Upload your image',
+      text: 'Drop or select your image (JPG, PNG, WebP, or HEIC) into the tool above.',
+    },
+    {
+      name: `Automatic ${spec.size}KB Target Convergence`,
+      text: `PixelKit automatically configures the target file size limit to ${spec.size}KB and runs binary-search quantization.`,
+    },
+    {
+      name: 'Adjust dimensions or crop',
+      text: 'Optionally set passport dimensions (3.5 × 4.5 cm or 350 × 450 px) or crop to exact aspect ratios.',
+    },
+    {
+      name: `Download resized ${spec.size}KB image`,
+      text: `Save your compliant image instantly. Zero server uploads and zero privacy risks.`,
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `Image Resizer ${spec.size}KB — PixelKit`,
+    description: pageDesc,
+    url: new URL(`/image-resizer-${spec.size}kb/`, SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>{spec.badge}</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        {spec.headline}
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        {spec.summary}
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title={`How to Resize an Image to ${spec.size}KB Fast`}
+      summaryText={`To resize an image to ${spec.size}KB, upload your image to PixelKit. The tool allows you to scale pixel dimensions (e.g. 350 × 450 px) while simultaneously running binary-search quantization to keep the final file size strictly at or below ${spec.size}KB with zero blurriness and zero server uploads.`}
+      specs={[
+        { label: 'Target File Size', value: `Strictly ≤ ${spec.size} KB (Max ${spec.size} KB)`, highlight: true },
+        { label: 'Dimension Controls', value: 'Pixels (px), Millimeters (mm), Passport Presets' },
+        { label: 'Output Format', value: 'Optimized JPEG / WebP / PNG', highlight: true },
+        { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={spec.size}
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- Practical Use Cases Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Use Cases for {spec.size}KB Image Resizing
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common recruitment portals, exam forms, and document upload slots requiring images under {spec.size}KB:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        {spec.useCases.map((uc) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="font-bold text-fg">{uc.title}</div>
+            <div class="font-mono text-accent text-xs mt-1">{uc.dims}</div>
+            <p class="text-muted mt-1.5 text-xs leading-relaxed">{uc.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Links to other sizes -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Other Image Resizer Sizes:</span>
+        {allSizes.map((sz) => (
+          <a
+            href={`/image-resizer-${sz}kb/`}
+            class={`rounded-lg border px-2.5 py-1 font-medium transition-colors ${
+              sz === spec.size
+                ? 'border-accent bg-accent/15 text-accent font-semibold'
+                : 'border-border bg-bg text-fg hover:border-accent hover:text-accent'
+            }`}
+          >
+            {sz}KB
+          </a>
+        ))}
+        <a href="/image-resizer-in-kb/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image Resizer in KB →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on Resizing & Quantization -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Dual-Stage Resizing: Spatial Scaling &amp; Quantization
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Unlike standard compressors that only alter quality tables, PixelKit’s Image Resizer performs a synchronized two-step process:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Bicubic Spatial Interpolation:</strong> Scales the pixel grid to your required portal dimensions (such as 350 × 450 px for SSC/UPSC) while smoothing gradients and eliminating jagged edge artifacts.
+          </li>
+          <li>
+            <strong class="text-fg">12-Step Binary-Search Quantization:</strong> Automatically converges on the exact mathematical threshold where facial sharpness is preserved while physical file weight stays strictly beneath {spec.size}KB.
+          </li>
+        </ul>
+        <div class="rounded-xl border border-accent/20 bg-accent/5 p-4 text-xs sm:text-sm text-fg/90">
+          <strong class="text-accent font-semibold">Pro Tip:</strong> {spec.tip}
+        </div>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

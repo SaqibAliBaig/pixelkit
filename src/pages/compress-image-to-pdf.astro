@@ -1,0 +1,227 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: 'Compress Image to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I compress an image to PDF under 100KB or 200KB?',
+    a: 'Drop your JPG, PNG, or HEIC photo into the tool above. PixelKit sets PDF as the target format and lets you specify an exact kilobyte ceiling (such as 100KB or 200KB). The browser Web Worker downsamples the image bitmap and creates a standards-compliant PDF file strictly under your target size.',
+  },
+  {
+    q: 'Can I combine multiple images into a single compressed PDF?',
+    a: 'Yes. Drop multiple photos or certificate pages at once, check "Merge Files into Single PDF", and select your desired KB target (e.g. 500KB or 1MB). PixelKit packages all pages into one compact PDF document without uploading anything.',
+  },
+  {
+    q: 'Why do Indian government portals require certificates as PDF under 100KB–200KB?',
+    a: 'Portals for UPSC, SSC, IBPS, state public service commissions, and state universities enforce strict 100KB–300KB PDF caps to prevent server database bloat. PixelKit ensures your marksheets, caste certificates, and ID scans meet these limits while keeping text and official stamps crisp and readable.',
+  },
+  {
+    q: 'Are confidential documents like Aadhaar or PAN card safe when converting to PDF?',
+    a: '100% safe. PixelKit operates entirely inside your local web browser memory using client-side JavaScript and WebAssembly. Your photos and sensitive ID documents are never transmitted, saved, or logged on remote servers.',
+  },
+  {
+    q: 'Can I compress mobile camera photos directly into PDF?',
+    a: 'Yes. Whether your image is taken on an iPhone (HEIC) or Android (JPG/PNG), PixelKit converts and compresses it directly to PDF without requiring desktop software or subscriptions.',
+  },
+];
+
+const pageTitle = `Compress Image to PDF — Convert & Compress Photo to PDF | ${SITE.name}`;
+const pageDesc =
+  'Free online tool to compress image to PDF or compress photo to PDF under 100KB, 200KB, or 500KB. Convert JPG, PNG, and HEIC photos into compact PDF documents privately.';
+const pageKeywords = [
+  'compress image to pdf',
+  'compress photo to pdf',
+  'compress image to pdf online',
+  'compress photo to pdf online',
+  'image to pdf under 100kb',
+  'photo to pdf under 100kb',
+  'image to pdf under 200kb',
+  'photo to pdf under 200kb',
+  'image to pdf under 500kb',
+  'compress jpg to pdf',
+  'reduce image size in pdf',
+  'photo to pdf converter under 200kb',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to compress image to PDF online',
+  description: 'Step-by-step instructions to convert and compress image files into a compact PDF under exact KB limits.',
+  steps: [
+    {
+      name: 'Upload your image or document scan',
+      text: 'Drop one or more JPG, PNG, or HEIC images into PixelKit.',
+    },
+    {
+      name: 'Select PDF and target size',
+      text: 'Choose PDF as the output format and select a target limit like 100KB, 200KB, or 500KB.',
+    },
+    {
+      name: 'Merge or convert',
+      text: 'Optionally enable Merge into Single PDF for multi-page certificates.',
+    },
+    {
+      name: 'Download compressed PDF',
+      text: 'Download your optimized PDF document immediately with zero server uploads.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Compress Image to PDF — PixelKit',
+    description: pageDesc,
+    url: new URL('/compress-image-to-pdf/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Exact KB Targets · Multi-Page Merge · 100% Private</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Compress Image to PDF Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Convert and compress JPG, PNG, and HEIC photos to PDF strictly under 100KB, 200KB, or 500KB. Perfect for government job portals, university admissions, and KYC verification.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Compress Image to PDF Under 100KB or 200KB"
+      summaryText="PixelKit converts images into lightweight PDF documents directly in your browser. Its binary-search compression iteratively adjusts internal raster resolution and JPEG stream quality to guarantee the generated PDF stays strictly below your chosen KB budget."
+      specs={[
+        { label: 'Output Format', value: 'Standard PDF Document (.pdf)', highlight: true },
+        { label: 'Target Size Options', value: '100 KB, 200 KB, 500 KB, 1 MB, Custom' },
+        { label: 'Multi-Page Support', value: 'Merge Multiple Photos into 1 PDF', highlight: true },
+        { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Uploads' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        targetKb={200}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- Portal Use Cases -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Popular Image to PDF Compression Use Cases
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Common recruitment and official portals requiring compressed PDF documents:
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Aadhaar &amp; PAN Card PDF</div>
+          <div class="font-mono text-accent text-xs mt-1">100–200 KB · PDF</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Merge front and back photos of your ID card into a single compact PDF under 200KB for bank KYC and loan approvals.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">UPSC &amp; SSC Certificate Uploads</div>
+          <div class="font-mono text-accent text-xs mt-1">100–300 KB · PDF</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Compress 10th marksheet, degree certificate, and caste proof photos to clean PDF documents that pass automated portal checks.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">University Admissions &amp; Scholarships</div>
+          <div class="font-mono text-accent text-xs mt-1">Under 500 KB · PDF</div>
+          <p class="text-muted mt-1.5 text-xs leading-relaxed">
+            Convert multi-page fee receipts, grade cards, and recommendation letters into a single optimized PDF ready for email or upload.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Links to other sizes -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Exact Image KB targets:</span>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 20KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 200KB</a>
+        <a href="/compress-image-to-500kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 500KB</a>
+        <a href="/compress-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Compress Existing PDF →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why Compressing Images to PDF Inside the Browser is Superior
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Traditional online image-to-PDF converters upload your documents to a cloud server, transcode them in a backend queue, and send you a download link. This poses serious confidentiality risks when handling sensitive tax returns, government IDs, and academic diplomas.
+        </p>
+        <p>
+          PixelKit utilizes in-browser WebAssembly engines (<span class="font-mono text-accent">pdf-lib</span> and Canvas resampling) to generate the PDF stream in your computer's RAM. The file never leaves your device, providing unmatched security and zero upload wait times.
+        </p>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

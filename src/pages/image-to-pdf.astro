@@ -1,0 +1,255 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert/' },
+  { label: 'Image to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert an image to PDF for free?',
+    a: 'Drop your JPG, PNG, WebP, or iPhone HEIC photo into the converter box above. PixelKit instantly processes the image in your browser memory and wraps it into a standard PDF file. Click "Download" to save your clean, printable PDF document without any sign-up or watermarks.',
+  },
+  {
+    q: 'Can I combine and merge multiple images into one single PDF?',
+    a: 'Yes. Drop multiple photos or document pages at once. PixelKit gives you an interactive queue where you can drag thumbnail cards to reorder pages (e.g. Page 1, Page 2), adjust margins, and merge them all into a unified multi-page PDF document.',
+  },
+  {
+    q: 'How can I convert an image to PDF under 200KB or 100KB for government forms?',
+    a: 'When converting photos of Aadhaar cards, marksheets, or exam admit cards, switch to the "Compress" tab or choose our dedicated "Image to PDF 200KB" tool. PixelKit iteratively tunes JPEG quality and dimensions to guarantee your final PDF stays strictly below 200KB or 100KB.',
+  },
+  {
+    q: 'Are my personal images and documents uploaded to a remote server?',
+    a: 'Never. PixelKit is built with 100% client-side technology. All image decoding and PDF assembly takes place entirely in your computer or mobile phone memory using WebAssembly and Web Workers. Zero bytes are uploaded to any external server or saved in the cloud.',
+  },
+  {
+    q: 'Can I convert iPhone HEIC photos directly to PDF?',
+    a: 'Yes. PixelKit natively decodes Apple iPhone HEIC and HEIF camera pictures in browser memory without requiring you to install any codecs, and packages them directly into standard PDF files.',
+  },
+  {
+    q: 'How do I add images to an existing PDF workflow?',
+    a: 'Simply drop your images into PixelKit. You can add new photos at any time, rearrange their sequence in the multi-file queue, and export the combined set as a brand new, organized PDF file.',
+  },
+];
+
+const directAnswer = {
+  question: 'How to convert image to PDF online for free?',
+  answer:
+    'To convert an image to PDF online: 1. Drag and drop your JPG, PNG, WebP, or iPhone HEIC photo into PixelKit. 2. Drag thumbnails to reorder pages, adjust margins, or set page orientation if desired. 3. Optionally select a file size ceiling (e.g. under 100KB, 200KB, or 500KB). 4. Click Download to immediately save your professional, watermark-free PDF document with 100% client-side privacy.',
+};
+
+const pageTitle = `Image to PDF Converter — Free Online Image to PDF | ${SITE.name}`;
+const pageDesc =
+  'Free online image to PDF converter. Convert and merge JPG, PNG, WebP, and HEIC photos into single or multi-page PDF documents. 100% private in-browser tool with zero uploads.';
+const pageKeywords = [
+  'image to pdf',
+  'image to pdf converter',
+  'convert image to pdf',
+  'free image to pdf converter',
+  'image to pdf converter free',
+  'how to convert image to pdf',
+  'add image to pdf',
+  'image to pdf free',
+  'convert image to pdf free',
+  'online image to pdf converter',
+  'image to pdf converter online',
+  'image to pdf 200kb',
+  'merge image to pdf',
+  'jpg to pdf',
+  'png to pdf',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert an image to PDF online for free',
+  description:
+    'Step-by-step instructions to convert and bundle image files into a clean PDF document in your browser.',
+  steps: [
+    {
+      name: 'Upload your image or document scan',
+      text: 'Drop or select your photo (JPG, PNG, WebP, or HEIC) into the Image to PDF converter.',
+    },
+    {
+      name: 'Configure page order and layout',
+      text: 'Reorder pages, set page orientation (portrait/landscape), and adjust margins as needed.',
+    },
+    {
+      name: 'Select optional size limit',
+      text: 'For exam forms and email uploads, select target size presets (e.g. under 200KB or 100KB).',
+    },
+    {
+      name: 'Download PDF document',
+      text: 'Click "Download PDF" to immediately compile and retrieve your compliant PDF file.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Image to PDF Converter',
+    description: pageDesc,
+    path: '/image-to-pdf/',
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+];
+
+const supportedInputs = [
+  {
+    format: 'JPG / JPEG',
+    badge: 'Universal',
+    desc: 'Camera photos, phone headshots, and receipts converted into crisp, high-resolution PDF pages.',
+  },
+  {
+    format: 'PNG',
+    badge: 'Lossless',
+    desc: 'Screenshots, digital signatures, diagrams, and transparent artwork preserved with razor-sharp edges.',
+  },
+  {
+    format: 'Apple HEIC',
+    badge: 'iPhone / iPad',
+    desc: 'Native iOS camera photos converted into universal PDF documents without needing Windows codecs.',
+  },
+  {
+    format: 'WebP & AVIF',
+    badge: 'Modern Web',
+    desc: 'Modern web image assets bundled into printable PDF catalogs, reports, and document portfolios.',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonicalUrl="https://pixelkit.app/image-to-pdf/"
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="mt-4 sm:mt-6 text-center">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        Zero Uploads · Multi-Page Sequencing · 100% Free
+      </div>
+      <h1 class="mt-3 text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-fg">
+        Image to PDF Converter Online
+      </h1>
+      <p class="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-muted">
+        Convert JPG, PNG, WebP, and iPhone HEIC images into clean, professional PDF documents. Combine multiple photos, reorder pages, and compress to exact KB limits directly in your browser.
+      </p>
+    </header>
+
+    <!-- Direct Answer Box (GEO / AI Overview) -->
+    <div class="mt-6 sm:mt-8">
+      <DirectAnswerBox
+        title="How to Convert Image to PDF Online (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Accepted File Formats', value: 'JPG, PNG, WebP, HEIC, TIFF, BMP', highlight: true },
+          { label: 'Page Layout Control', value: 'Portrait, Landscape, Custom Margins' },
+          { label: 'Multi-Page Merging', value: 'Unlimited Pages with Drag-and-Drop Sorting', highlight: true },
+          { label: 'Privacy & Security', value: '100% Client-Side / Zero Cloud Storage' },
+        ]}
+      />
+    </div>
+
+    <!-- Active Tool Studio Pre-configured for Image to PDF -->
+    <main class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </main>
+
+    <!-- Supported Inputs Grid -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Convert Any Image Format to PDF Seamlessly
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        PixelKit handles all common image types without installing third-party software:
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {supportedInputs.map((input) => (
+          <div class="rounded-xl border border-border bg-bg/50 p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-fg">{input.format}</span>
+              <span class="rounded bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent">{input.badge}</span>
+            </div>
+            <p class="mt-2 text-xs text-muted leading-relaxed">{input.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Quick Action Links -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Specialized PDF Tools:</span>
+        <a href="/image-to-pdf-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF 200KB (Exam/Visas) →</a>
+        <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Merge JPG to PDF</a>
+        <a href="/compress-image-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Compress Image to PDF</a>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PDF</a>
+        <a href="/png-to-pdf/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">PNG to PDF</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide on Browser-Based PDF Generation -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser PDF Conversion Protects Your Privacy
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Converting photos to PDF is frequently required for highly sensitive personal paperwork: tax filings, passport biometrics, student marksheets, bank statements, and legal agreements. When you use conventional online converters, your confidential records are sent across the public internet to remote cloud servers, where they may linger in unencrypted temp folders or be indexed by third parties.
+        </p>
+        <p>
+          <strong>PixelKit’s Zero-Trust Architecture:</strong>
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">100% Client-Side Compilation:</strong> Your device CPU processes every pixel directly in browser RAM via modern WebAssembly and Canvas APIs.
+          </li>
+          <li>
+            <strong class="text-fg">Zero Network Transmission:</strong> Turn off your Wi-Fi after opening PixelKit—the tool continues to convert images to PDF completely offline.
+          </li>
+          <li>
+            <strong class="text-fg">Ephemeral In-Memory Buffers:</strong> As soon as you close your browser tab, all image raster buffers and generated PDF objects are instantly garbage-collected with zero footprint.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

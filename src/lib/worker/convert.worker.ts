@@ -20,7 +20,7 @@ import type {
 import { mimeToOutputFormat, buildFilename, mimeForExtension } from '../engines';
 import { detectMimeFromMagicBytes } from '../utils/mime';
 import { compressToTarget, compressWithDownscale } from './compression';
-import { extractExifSegment, insertExifIntoJpeg } from './exif';
+import { extractExifSegment, insertExifIntoJpeg, padJpegToTargetBytes } from './exif';
 import { applyAdjustments } from './adjustments';
 import { jpegToPdf, mergeImagesToPdf, pdfOverheadBytes } from './pdf';
 
@@ -200,6 +200,25 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
         blob = insertExifIntoJpeg(outBuf, exifSegment, req.autoOrient);
       } catch (err) {
         console.warn('[PixelKit] EXIF insertion skipped:', err);
+      }
+    }
+
+    // 8. Safely pad JPEG when output size is smaller than a required minimum or exact target (Increase Image Size in KB)
+    let minBytesRequired: number | null = null;
+    if (req.targetOptions?.mode === 'range' && req.targetOptions.minKb && req.targetOptions.minKb > 0) {
+      minBytesRequired = req.targetOptions.minKb * 1024;
+    } else if (req.targetOptions?.mode === 'exact' && req.targetOptions.targetKb && req.targetOptions.targetKb > 0) {
+      minBytesRequired = req.targetOptions.targetKb * 1024;
+    }
+
+    if (minBytesRequired && blob.size < minBytesRequired && outFormat === 'jpg') {
+      try {
+        const outBuf = await blob.arrayBuffer();
+        // Target safely slightly above minBytes (+128 bytes) to ensure strict portal acceptance
+        const targetPad = Math.round(minBytesRequired + 128);
+        blob = padJpegToTargetBytes(outBuf, targetPad);
+      } catch (err) {
+        console.warn('[PixelKit] JPEG size padding skipped:', err);
       }
     }
   } finally {

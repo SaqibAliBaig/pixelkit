@@ -1,0 +1,245 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: 'Compress Without Losing Quality' },
+];
+
+const faqs = [
+  {
+    q: 'How can I compress an image without losing quality online for free?',
+    a: 'Drop your JPG, PNG, WebP, or HEIC photo into the upload box above. PixelKit uses smart psycho-visual quantization in local browser Web Workers. It eliminates invisible high-frequency color redundancy and strips bloat metadata, shrinking file size by 70% to 85% with zero perceptible loss in visual sharpness.',
+  },
+  {
+    q: 'What is the difference between lossless and perceptually lossless compression?',
+    a: 'Pure lossless compression (like PNG or WebP Lossless) mathematically preserves every single pixel byte, reducing file size by 20%–40%. Perceptually lossless compression (like PixelKit’s smart JPEG/WebP quantization) exploits limitations of the human visual system, halving or quartering file weight while maintaining an SSIM (Structural Similarity) score above 0.98—making it visually indistinguishable from the raw uncompressed original.',
+  },
+  {
+    q: 'Can I compress photos without losing quality on mobile (iPhone & Android)?',
+    a: 'Yes. PixelKit is 100% web-based and runs entirely in your mobile browser (Safari, Chrome, Firefox). Select photos directly from your camera roll or gallery, compress them in seconds, and download the optimized version without downloading any third-party apps.',
+  },
+  {
+    q: 'Will compressing my image blur text, facial features, or official stamps?',
+    a: 'No. PixelKit does not blindly blur your image. Its binary-search algorithm protects sharp high-contrast edges (such as text on certificates, ink signatures, and facial biometrics) while aggressively compressing smooth gradient backgrounds where compression artifacts are invisible.',
+  },
+  {
+    q: 'Can I compare the compressed image with the original before downloading?',
+    a: 'Yes. PixelKit features an integrated split-screen comparison slider. Click "Compare" on any processed image card to slide between the original and compressed image at 100% zoom to verify visual perfection before saving.',
+  },
+  {
+    q: 'Are my private photos and documents uploaded to any server?',
+    a: 'Never. PixelKit executes all image processing locally inside your device’s browser memory using WebAssembly and HTML5 Canvas. Your photos, private documents, and ID cards never leave your phone or computer.',
+  },
+];
+
+const pageTitle = `Compress Image Without Losing Quality (Free & Online) | ${SITE.name}`;
+const pageDesc =
+  'Free online tool to compress image without losing quality. Shrink JPG, PNG, WebP, and HEIC photos up to 85% with zero perceptible blur. 100% private in-browser compression.';
+const pageKeywords = [
+  'compress image without losing quality',
+  'compress image without losing quality free',
+  'how to compress image without losing quality',
+  'compress image without losing quality online',
+  'compress image without quality loss',
+  'compress photo without losing quality',
+  'reduce image size without losing quality',
+  'compress picture without losing quality',
+  'compress image without loss of quality',
+  'reduce photo size without losing quality',
+  'lossless image compressor',
+  'compress jpg without losing quality',
+  'compress png without losing quality',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to compress image without losing quality online',
+  description: 'Step-by-step instructions to reduce image file size by up to 85% while preserving 100% perceptual visual clarity.',
+  steps: [
+    {
+      name: 'Upload your image',
+      text: 'Drop or select any JPG, PNG, WebP, or HEIC photo into the upload area.',
+    },
+    {
+      name: 'Smart Psycho-Visual Optimization',
+      text: 'PixelKit automatically analyzes image entropy, removes invisible chrominance bloat, and calibrates quantization.',
+    },
+    {
+      name: 'Verify Quality with Split-Screen Compare',
+      text: 'Use the interactive comparison slider to verify zero perceptible difference against your original image.',
+    },
+    {
+      name: 'Download Optimized File',
+      text: 'Download your compressed image instantly with zero server uploads, zero watermarks, and 100% privacy.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Compress Image Without Losing Quality — PixelKit',
+    description: pageDesc,
+    url: new URL('/compress-image-without-losing-quality/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Perceptually Lossless · SSIM &gt; 0.98 · Zero Server Uploads</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Compress Image Without Losing Quality
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Shrink JPG, PNG, WebP, and HEIC photos by up to 85% without blurriness, pixelation, or halo artifacts. Free, instant, and runs 100% locally in your web browser.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Compress an Image Without Losing Quality"
+      summaryText="To compress an image without losing quality, upload it to PixelKit. The in-browser Web Worker engine analyzes the image's frequency spectrum, applies 4:2:0 chroma subsampling, and fine-tunes quantization tables to remove redundant color samples that the human eye cannot detect. The result is a 70% to 85% smaller file with an SSIM score above 0.98, maintaining full photographic sharpness."
+      specs={[
+        { label: 'Perceptual Quality Score', value: 'SSIM > 0.98 (Visually Indistinguishable)', highlight: true },
+        { label: 'Supported Formats', value: 'JPG, PNG, WebP, AVIF, HEIC (iPhone), PDF' },
+        { label: 'File Size Reduction', value: '70% – 85% Average Byte Savings', highlight: true },
+        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={null}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- Comparison: Lossless vs Perceptually Lossless -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How Compression Works: Mathematical vs Perceptual Lossless
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Choose the optimal optimization strategy based on your specific use case:
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Smart Perceptual Optimization</div>
+          <div class="font-mono text-accent text-xs mt-1">70% – 85% Size Reduction</div>
+          <p class="text-muted mt-2 text-xs leading-relaxed">
+            Eliminates high-frequency chrominance data that human retinas cannot distinguish. Ideal for website speed, social media, photography portfolios, and exam portal uploads.
+          </p>
+          <div class="mt-3 text-[11px] font-medium text-fg/80">Best for: JPG, WebP, Camera Photos</div>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Pure Lossless Compression</div>
+          <div class="font-mono text-accent text-xs mt-1">20% – 40% Size Reduction</div>
+          <p class="text-muted mt-2 text-xs leading-relaxed">
+            Mathematically preserves 100% of all pixel values bit-for-bit using DEFLATE and Huffman entropy coding. Strips redundant metadata and optimizes palette indexing.
+          </p>
+          <div class="mt-3 text-[11px] font-medium text-fg/80">Best for: PNG Graphics, Logos, Icons</div>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg/50 p-4">
+          <div class="font-bold text-fg">Target Budget Compression</div>
+          <div class="font-mono text-accent text-xs mt-1">Exact KB Limits (e.g. 50KB)</div>
+          <p class="text-muted mt-2 text-xs leading-relaxed">
+            PixelKit's automated binary search iterates DCT quality matrices to converge on the absolute highest visual fidelity that fits under your designated kilobyte ceiling.
+          </p>
+          <div class="mt-3 text-[11px] font-medium text-fg/80">Best for: SSC, UPSC, Visas, Portals</div>
+        </div>
+      </div>
+
+      <!-- Quick Links to specific KB targets -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Need a strict portal limit?</span>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 20KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Under 200KB</a>
+        <a href="/compress-image-to-specific-size/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Specific Size in KB/MB →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why Traditional Image Compressors Ruin Photo Quality
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Most free online tools use primitive, fixed-percentage lossy compression (such as dropping quality straight to 50%). This causes noticeable blocking artifacts, color banding on skin tones, and unreadable blurry text around signatures and stamps.
+        </p>
+        <p>
+          PixelKit solves this through advanced browser-native image engineering:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Psycho-Visual Quantization:</strong> The discrete cosine transform (DCT) isolates luminance (brightness) from chrominance (color). Because human vision is far more sensitive to brightness differences than color nuances, PixelKit compresses color channels more aggressively while preserving razor-sharp edge contrast.
+          </li>
+          <li>
+            <strong class="text-fg">Metadata Pruning:</strong> Uncompressed smartphone photos routinely contain 50KB to 200KB of hidden camera bloat (embedded JPEG thumbnail previews, GPS coordinates, camera serial numbers, and vendor tags). Stripping non-essential tags reduces file weight significantly without altering a single pixel of the visual photo.
+          </li>
+          <li>
+            <strong class="text-fg">High-Precision Canvas Resampling:</strong> When high-megapixel images need downscaling for web use, PixelKit utilizes multi-step bicubic interpolation to prevent jagged moiré patterns and edge aliasing.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

@@ -92,10 +92,10 @@ export const getStaticPaths: GetStaticPaths = () => {
       label: 'WebP',
       mime: 'image/webp',
       defaultKb: null,
-      headline: 'Compress WebP Online',
-      titleTag: 'Compress WebP Online — Optimize Next-Gen WebP',
+      headline: 'Compress Image to WebP Online',
+      titleTag: 'Compress Image to WebP Online — Optimize Next-Gen WebP',
       metaDesc:
-        'Free online WebP compressor. Optimize next-gen WebP images for green Core Web Vitals and instant page loads—100% in-browser, zero server uploads.',
+        'Free online tool to compress image to WebP. Optimize next-gen WebP images for green Core Web Vitals and instant page loads—100% in-browser, zero server uploads.',
       summary:
         'Optimize WebP images for green Core Web Vitals and lightning-fast web pages. Balance lossless transparency and predictive lossy compression with real-time preview and exact byte limits.',
       mechanicsTitle: 'Predictive Intra-Frame Compression for Green Web Vitals',
@@ -252,6 +252,16 @@ const jsonLd = [
         >
           Under 200KB
         </a>
+        {spec.ext === 'jpg' && (
+          <>
+            <a href="/compress-jpg-to-20kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 20KB</a>
+            <a href="/compress-jpg-to-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 50KB</a>
+            <a href="/compress-jpg-to-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 100KB</a>
+            <a href="/compress-jpg-to-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 200KB</a>
+            <a href="/compress-jpg-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to PDF</a>
+            <a href="/photo-resizer-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Photo Resizer in KB</a>
+          </>
+        )}
       </div>
     </section>
 

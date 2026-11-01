@@ -27,6 +27,56 @@ interface KbTargetSpec {
 export const getStaticPaths: GetStaticPaths = () => {
   const specs: KbTargetSpec[] = [
     {
+      size: 10,
+      headline: 'Compress Image to 10KB Online',
+      badge: 'Digital Signatures · Thumbprints · IBPS & State Exams',
+      portalSummary:
+        'Compress JPG, PNG, and photo scans to under 10KB without pixelated blur. Specifically engineered for strict banking (IBPS), police constable, railway RRB, and government thumbprint & signature portals requiring 10KB or less.',
+      useCases: [
+        {
+          title: 'IBPS & Bank Exam Signatures',
+          dims: '140 × 60 px · Under 10–20 KB',
+          body: 'Crop tight to ink strokes so candidate signatures remain dark and fully legible under strict 10KB ceilings.',
+        },
+        {
+          title: 'Left Thumb Impressions (LTI)',
+          dims: '240 × 240 px · Strictly ≤ 10 KB',
+          body: 'Preserve ridge line contrast on scanned left/right thumb impressions required by state police and recruitment boards.',
+        },
+        {
+          title: 'Compact Applicant Signatures',
+          dims: 'JPG / WebP · Max 10 KB',
+          body: 'Iterative binary-search quantization ensures zero file rejection errors while keeping ink lines razor-sharp.',
+        },
+      ],
+      tip: 'For 10KB limits, open Crop Studio first to remove excess white margins around the signature, then resize width to 140–200 px before saving.',
+    },
+    {
+      size: 15,
+      headline: 'Compress Image to 15KB Online',
+      badge: 'State PSC · Police Recruitment · Signatures',
+      portalSummary:
+        'Shrink signature and photo files to under 15KB with maximum sharpness. Tuned for Indian State PSC, High Court, and police constable online applications enforcing 10KB–15KB limits.',
+      useCases: [
+        {
+          title: 'State PSC Signatures',
+          dims: '160 × 70 px · 10–15 KB',
+          body: 'Keep pen strokes smooth and legible on scanned signature slips without JPEG halo artifacts.',
+        },
+        {
+          title: 'Police & Defense Applications',
+          dims: 'JPG · Under 15 KB',
+          body: 'Strict file size limit for constable and sub-inspector application registration portals.',
+        },
+        {
+          title: 'Applicant Profile Avatars',
+          dims: 'JPG / WebP · Under 15 KB',
+          body: 'Compress compact thumbnail scans for fast verification without upload failures.',
+        },
+      ],
+      tip: 'If your signature file is slightly over 15KB, set target width to 250–300 px in Resize Studio before downloading.',
+    },
+    {
       size: 20,
       headline: 'Compress Image to 20KB Online',
       badge: 'Signatures · Thumbprints · Exam Portals',
@@ -50,6 +100,56 @@ export const getStaticPaths: GetStaticPaths = () => {
         },
       ],
       tip: 'For 20KB targets on 12MP phone photos, open Crop Studio first to trim excess background, or scale dimensions to 350–600 px wide before downloading.',
+    },
+    {
+      size: 30,
+      headline: 'Compress Image to 30KB Online',
+      badge: 'UPSSSC · MPPEB · State Exam Photos',
+      portalSummary:
+        'Reduce photo and signature images to under 30KB online without losing facial clarity. Built for UPSSSC PET, MPPEB, APPSC, and state exam portals mandating 20KB–30KB upload limits.',
+      useCases: [
+        {
+          title: 'UPSSSC & State PET Headshots',
+          dims: '350 × 450 px · 20–30 KB',
+          body: 'Crop passport-style photos to 3.5 × 4.5 cm and land safely between 20KB and 30KB in a single click.',
+        },
+        {
+          title: 'Railway RRB Photos',
+          dims: 'JPG · Under 30 KB',
+          body: 'Retain clear eyes, ears, and background contrast for automated facial recognition matching.',
+        },
+        {
+          title: 'High-Res Scanned Signatures',
+          dims: '300 × 120 px · 20–30 KB',
+          body: 'Clean contrast for large signatures requiring higher byte limits than standard 10KB/20KB brackets.',
+        },
+      ],
+      tip: 'Need to stay strictly inside 20KB to 30KB? Switch to "Range" mode in Compression settings and set min 20KB, max 30KB.',
+    },
+    {
+      size: 40,
+      headline: 'Compress Image to 40KB Online',
+      badge: 'TET Exams · University Admissions · Portal Forms',
+      portalSummary:
+        'Compress JPG and PNG images under 40KB online. Perfect for Teacher Eligibility Tests (TET), state universities, and entrance exams specifying 20KB–40KB photo slots.',
+      useCases: [
+        {
+          title: 'Teacher Eligibility (TET) Photos',
+          dims: '350 × 450 px · 20–40 KB',
+          body: 'Optimal photo compression tailored for state education department recruitment portals.',
+        },
+        {
+          title: 'University Admission Forms',
+          dims: 'Passport ratio · Under 40 KB',
+          body: 'Meet strict college registration upload guidelines with high facial sharpness.',
+        },
+        {
+          title: 'Candidate Identification Photos',
+          dims: 'JPG · Max 40 KB',
+          body: 'Compress camera selfies to passport proportions under 40KB in a single click.',
+        },
+      ],
+      tip: 'Use Crop Studio 3:4 or Passport preset before downloading to ensure standard portal aspect ratio compliance.',
     },
     {
       size: 50,
@@ -77,6 +177,31 @@ export const getStaticPaths: GetStaticPaths = () => {
       tip: 'Need an exact bracket like 20KB–50KB? Switch the Compression & Size mode pill to "Range" and enter 20 KB min and 50 KB max.',
     },
     {
+      size: 80,
+      headline: 'Compress Image to 80KB Online',
+      badge: 'Medical Portals · State Exam Forms · High-Res IDs',
+      portalSummary:
+        'Reduce image size to 80KB or compress photo to 80KB online without blur. Ideal for state nursing, medical admissions, and government recruitment forms enforcing strict 50KB–80KB limits.',
+      useCases: [
+        {
+          title: 'State Medical & Nursing Applications',
+          dims: 'Passport ratio · 50–80 KB',
+          body: 'Pass strict photo checks across state health service recruitment and nursing council portals.',
+        },
+        {
+          title: 'High-Res Scanned Signatures',
+          dims: '300 × 150 px · Under 80 KB',
+          body: 'Preserve sharp pen contours on scanned declarations without artifact degradation.',
+        },
+        {
+          title: 'College Registration Forms',
+          dims: 'JPG / WebP · Max 80 KB',
+          body: 'Standard image ceiling for online university enrollment and semester fee slips.',
+        },
+      ],
+      tip: 'Need to stay between 50KB and 80KB? Switch to "Range" mode in Compression settings and set min 50KB and max 80KB.',
+    },
+    {
       size: 100,
       headline: 'Compress Image to 100KB Online',
       badge: 'Aadhaar · PAN · KYC & Fast Web Images',
@@ -102,6 +227,31 @@ export const getStaticPaths: GetStaticPaths = () => {
       tip: 'Uploading an ID card? Use Crop Studio first to remove the desk surface around the card—that single step saves up to 50% of your byte budget for readable text.',
     },
     {
+      size: 150,
+      headline: 'Compress Image to 150KB Online',
+      badge: 'Marksheet Scans · Certificates · Aadhaar & IDs',
+      portalSummary:
+        'Compress high-resolution certificates, 10th/12th marksheets, and scanned government IDs under 150KB in JPG or PDF. Ensures small text, stamps, and signatures stay crisp.',
+      useCases: [
+        {
+          title: '10th & 12th Board Marksheets',
+          dims: 'A4 Scan · Under 150 KB',
+          body: 'Keep roll numbers, marks, and official school seals sharp and legible for portal verification.',
+        },
+        {
+          title: 'Aadhaar & Voter Card Scans',
+          dims: 'JPG or PDF · Max 150 KB',
+          body: 'Preserve small text and QR codes on both front and back identity card sides.',
+        },
+        {
+          title: 'Degree & Category Certificates',
+          dims: 'Document Scan · Under 150 KB',
+          body: 'Shrink 5MB phone photos to under 150KB without blurring essential registration stamps.',
+        },
+      ],
+      tip: 'Crop desk backgrounds out of your marksheet photo before compression to dedicate all 150KB to document text.',
+    },
+    {
       size: 200,
       headline: 'Compress Image to 200KB Online',
       badge: 'Visa DS-160 · Passports · Official Portals',
@@ -125,6 +275,56 @@ export const getStaticPaths: GetStaticPaths = () => {
         },
       ],
       tip: 'Some portals re-encode uploads on their backend and add a few kilobytes. If 198KB is rejected, set Custom Size to 185KB for guaranteed acceptance.',
+    },
+    {
+      size: 256,
+      headline: 'Compress Image to 256KB Online',
+      badge: 'Discord Avatars · US Visa DS-160 · Web Graphics',
+      portalSummary:
+        'Compress JPG, PNG, and WebP images strictly under 256KB without visible distortion. Ideal for Discord avatar upload caps, US visa and consular document forms, and high-performance website imagery.',
+      useCases: [
+        {
+          title: 'Discord Avatars & Emotes',
+          dims: 'Square 1:1 · Under 256 KB',
+          body: 'Bypass Discord profile picture upload limits by compressing animated or static headshots cleanly under 256KB.',
+        },
+        {
+          title: 'US DS-160 Consular Forms',
+          dims: '600 × 600 px · Max 240–256 KB',
+          body: 'Meet strict US Department of State digital visa standards without automated portal upload rejections.',
+        },
+        {
+          title: 'Fast Mobile Web Imagery',
+          dims: '1200 px Wide · WebP / JPG',
+          body: 'Ensure blog headers and product cards load under 256KB for green Google PageSpeed and Core Web Vitals scores.',
+        },
+      ],
+      tip: 'Discord strictly rejects profile pictures over 256KB. PixelKit converges to ~240KB to ensure instant verification.',
+    },
+    {
+      size: 300,
+      headline: 'Compress Image to 300KB Online',
+      badge: 'Scholarship Portals · Certificates · Marksheet Scans',
+      portalSummary:
+        'Compress photo to 300KB or reduce image size to 300KB in JPG or PDF. Tuned for National Scholarship Portal (NSP), state welfare forms, and multi-page certificate scans.',
+      useCases: [
+        {
+          title: 'National Scholarship Portal (NSP)',
+          dims: 'JPG or PDF · Max 300 KB',
+          body: 'Clear, legible scans of income certificates, fee receipts, and domicile papers under 300KB.',
+        },
+        {
+          title: 'State Welfare & Domicile Proofs',
+          dims: 'A4 Scan · Under 300 KB',
+          body: 'Keep government serial numbers and official gazette stamps sharp for fast document approval.',
+        },
+        {
+          title: 'University Degree Marksheets',
+          dims: 'High-Res Document · Under 300 KB',
+          body: 'Shrink 8MB smartphone photos down to 300KB while keeping fine text 100% legible.',
+        },
+      ],
+      tip: 'If uploading a multi-page certificate, choose PDF output format to bundle all pages cleanly under 300KB.',
     },
     {
       size: 500,
@@ -160,7 +360,7 @@ export const getStaticPaths: GetStaticPaths = () => {
 };
 
 const { spec } = Astro.props as { spec: KbTargetSpec };
-const allSizes = [20, 50, 100, 200, 500];
+const allSizes = [10, 15, 20, 30, 40, 50, 80, 100, 150, 200, 256, 300, 500];
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -170,29 +370,55 @@ const breadcrumbs = [
 
 const faqs = [
   {
-    q: `How do I compress an image to ${spec.size}KB without losing quality?`,
+    q: `How do I compress an image or photo to ${spec.size}KB without losing quality?`,
     a: `Drop your JPG, PNG, WebP, or HEIC image into the box above. PixelKit pre-selects a ${spec.size}KB target and runs a 12-step binary-search loop in browser Web Workers to find the highest possible visual quality that fits at or below ${spec.size}KB.`,
   },
   {
+    q: `How can I reduce image size to ${spec.size}KB on mobile?`,
+    a: `PixelKit runs 100% locally on Android and iPhone mobile browsers without requiring apps or account signups. Simply select your photo from your phone gallery, and PixelKit compresses it under ${spec.size}KB directly on your device.`,
+  },
+  {
     q: `Can I crop and resize pixel dimensions before compressing to ${spec.size}KB?`,
-    a: `Yes. Click "Crop Studio" or "Scale & Resize" directly on your dropped image card to set aspect ratios (1:1, 3:4, 16:9) or exact pixel sizes (like 413×531 px passport dimensions) before downloading your ${spec.size}KB output.`,
+    a: `Yes. Click "Crop Studio" or "Scale & Resize" directly on your dropped image card to set aspect ratios (1:1, 3:4, 16:9) or exact pixel sizes (like 350×450 px passport or 140×60 px signature dimensions) before downloading your ${spec.size}KB output.`,
   },
   {
     q: `What if my portal requires a file between a minimum and ${spec.size}KB?`,
     a: `Click the "Range" mode pill in the Compression & Size panel (for example, 20KB min to ${spec.size}KB max). PixelKit will keep the output strictly inside both bounds.`,
   },
   {
-    q: `Are my ID cards or photos uploaded to a server?`,
+    q: `Are my ID cards, signatures, or photos uploaded to a server?`,
     a: `Never. Every decode, crop, resize, and ${spec.size}KB compression pass runs 100% locally in your device browser memory. Nothing touches an external server.`,
   },
 ];
 
-const pageTitle = `Compress Image to ${spec.size}KB Online — Exact Size, Free | ${SITE.name}`;
-const pageDesc = `Compress JPG, PNG, WebP, HEIC and PDF to ${spec.size}KB online without losing clarity. Crop, resize pixels, and hit exact ${spec.size}KB portal limits privately.`;
+const pageTitle = `Compress Image to ${spec.size}KB — Reduce Photo Size Online | ${SITE.name}`;
+const pageDesc = `Reduce image size to ${spec.size}KB or compress photo to ${spec.size}KB online for free. Shrink JPG, PNG, WebP and PDF to exact ${spec.size}KB portal limits privately.`;
+const pageKeywords = [
+  `compress image to ${spec.size}kb`,
+  `compress photo to ${spec.size}kb`,
+  `reduce image size to ${spec.size}kb`,
+  `reduce photo size to ${spec.size}kb`,
+  `compress image to ${spec.size} kb`,
+  `compress photo to ${spec.size} kb`,
+  `reduce image size to ${spec.size} kb`,
+  `reduce photo size to ${spec.size} kb`,
+  `compress photo to ${spec.size}kb online`,
+  `compress image to ${spec.size}kb online`,
+  `photo to ${spec.size}kb converter`,
+  `image compressor ${spec.size}kb`,
+  `resize image to ${spec.size}kb`,
+  `compress photo to ${spec.size}kb jpg`,
+  `compress jpg to ${spec.size}kb`,
+  `compress jpg to ${spec.size} kb`,
+  `compress jpeg to ${spec.size}kb`,
+  `photo resizer in kb`,
+  `photo resizer to ${spec.size}kb`,
+  `image to ${spec.size}kb`,
+];
 
 const howToJsonLd = buildCustomHowToJsonLd({
-  name: `How to compress image under ${spec.size}KB online`,
-  description: `Step-by-step instructions to compress JPG, PNG, WebP, or HEIC images strictly under ${spec.size}KB without unreadable blur or server uploads.`,
+  name: `How to reduce image size to ${spec.size}KB online`,
+  description: `Step-by-step instructions to compress photos or reduce image size strictly under ${spec.size}KB without unreadable blur or server uploads.`,
   steps: [
     {
       name: 'Upload your image',
@@ -233,6 +459,7 @@ const jsonLd = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
+  keywords={pageKeywords}
   jsonLd={jsonLd}
   width="wide"
 >
@@ -257,7 +484,7 @@ const jsonLd = [
     <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title={`Official ${spec.size}KB Compression Specification (2026 Direct Answer)`}
-      summaryText={`To reduce an image to ${spec.size}KB without severe distortion, PixelKit uses 12-iteration binary search quantization in browser Web Workers. It dynamically calculates the exact JPEG/WebP compression quality and optional dimension scaling to land strictly at or below ${spec.size}KB while preserving high perceptual clarity.`}
+      summaryText={`To reduce image size to ${spec.size}KB or compress photos strictly under ${spec.size}KB without blur or artifacts, PixelKit uses 12-iteration binary search quantization in browser Web Workers. It dynamically calculates the exact JPEG/WebP compression quality and optional dimension scaling to land strictly at or below ${spec.size}KB while preserving high perceptual clarity.`}
       specs={[
         { label: 'Target File Ceiling', value: `Strictly ≤ ${spec.size} KB`, highlight: true },
         { label: 'Input Formats', value: 'JPG, PNG, WebP, HEIC, PDF' },
@@ -279,7 +506,7 @@ const jsonLd = [
     <!-- Use cases -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
       <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
-        When You Need an Image Under {spec.size}KB
+        How to Reduce Image Size to {spec.size}KB for Online Portals
       </h2>
       <p class="mt-1 text-xs sm:text-sm text-muted">
         {spec.tip}
@@ -315,8 +542,29 @@ const jsonLd = [
           Compress to 1MB
         </a>
         <a
-          href="/passport-photo-resizer/"
+          href="/compress-image-to-2mb/"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Compress to 2MB
+        </a>
+        <a
+          href="/compress-image-to-5mb/"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Compress to 5MB
+        </a>
+        <a
+          href="/compress-image-to-10mb/"
+          class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+        >
+          Compress to 10MB
+        </a>
+        <a
+          href="/compress-image-to-pdf/"
           class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors"
+        >
+          Compress Image to PDF →
+        </a>
         >
           Passport Photo Crop &amp; Resizer →
         </a>

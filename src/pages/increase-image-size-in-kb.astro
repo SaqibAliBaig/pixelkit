@@ -1,0 +1,257 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Compress Image', href: '/compress-image/' },
+  { label: 'Increase Image Size in KB' },
+];
+
+const faqs = [
+  {
+    q: 'How do I increase image size in KB without losing quality?',
+    a: 'Upload your photo or signature into PixelKit above. PixelKit preserves 100% of your pixel resolution and elevates the file size using maximum quality quantization and ISO-standard JPEG metadata padding. Select your target (e.g. 20KB, 50KB, or 100KB) and download the enlarged file instantly.',
+  },
+  {
+    q: 'Why do Indian exam portals (SSC, UPSC, NEET) reject images for being too small?',
+    a: 'Government recruitment portals enforce a strict minimum file size check (typically min 20KB for photos and min 10KB for signatures) alongside a maximum limit. If your image is 12KB, the portal will reject it with an error like "File size must be between 20KB and 50KB". PixelKit safely elevates your file size into the accepted range.',
+  },
+  {
+    q: 'Can I increase signature size in KB for UPSC, SSC, and IBPS?',
+    a: 'Yes! Signatures frequently end up under 10KB after cropping. Upload your signature image, set the target size to 15KB or 20KB, and PixelKit will increase the file size cleanly so it is accepted by UPSC, SSC CGL/CHSL, IBPS, and state PSC portals without altering your signature stroke.',
+  },
+  {
+    q: 'Does increasing image size make the photo blurry or pixelated?',
+    a: 'No. PixelKit does not stretch or distort your pixels. It elevates file size by calibrating JPEG quantization tables to full fidelity (98–100%) and injecting standard comment markers. Your photo remains crisp, clear, and perfectly readable.',
+  },
+  {
+    q: 'Can I increase image size in KB on mobile (Android and iPhone)?',
+    a: 'Yes. PixelKit runs entirely in your mobile browser (Chrome, Safari, Firefox). You can take a photo from your gallery or files, increase its size to 20KB, 50KB, or 100KB, and save it directly to your device with zero app downloads.',
+  },
+  {
+    q: 'Are my private documents and signatures uploaded to any server?',
+    a: 'Never. PixelKit processes all files locally inside your browser memory using Web Workers and WebAssembly. Your photos, signatures, and ID cards never leave your phone or computer.',
+  },
+];
+
+const pageTitle = `Increase Image Size in KB Online (Exact KB for Portals) | ${SITE.name}`;
+const pageDesc =
+  'Free online tool to increase image size in KB without losing quality. Make photos and signatures bigger to meet minimum 20KB, 50KB, or 100KB portal requirements for SSC, UPSC, and NEET.';
+const pageKeywords = [
+  'increase image size in kb',
+  'increase image size in kb online',
+  'how to increase image size in kb',
+  'increase image size in kb jpg',
+  'increase photo size in kb',
+  'increase signature size in kb',
+  'increase image size to 20kb',
+  'increase image size to 50kb',
+  'increase image size to 100kb',
+  'make image size bigger in kb',
+  'increase file size in kb',
+  'photo size increase online',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to increase image size in KB online',
+  description: 'Step-by-step guide to make your image or signature file size bigger in KB for government portals.',
+  steps: [
+    {
+      name: 'Upload your image or signature',
+      text: 'Drop or select your photo or signature (JPG, PNG, or WebP) into the upload box above.',
+    },
+    {
+      name: 'Choose your desired KB target',
+      text: 'Select your required target size (such as 20KB, 50KB, or 100KB) to satisfy your portal minimum requirement.',
+    },
+    {
+      name: 'PixelKit expands file size safely',
+      text: 'PixelKit elevates quantization density and ISO-compliant metadata padding without degrading pixels or geometry.',
+    },
+    {
+      name: 'Download your enlarged file',
+      text: 'Click Download to save your compliant image. Upload it directly to your application portal with guaranteed acceptance.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Increase Image Size in KB — PixelKit',
+    description: pageDesc,
+    url: new URL('/increase-image-size-in-kb/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span>Fix "File Size Too Small" Errors · Zero Quality Loss · 100% Private</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Increase Image Size in KB Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Make your photo or signature bigger in KB to meet official portal minimums (e.g. min 20KB for SSC, UPSC, NEET, IBPS). Elevate file size safely without pixel distortion or blurriness.
+      </p>
+    </header>
+
+    <!-- Direct Answer GEO Box -->
+    <DirectAnswerBox
+      title="How to Increase Image Size in KB for Online Application Forms"
+      summaryText="When government or university application portals reject your photo with errors like 'File size must be at least 20 KB', your image byte count is below their threshold. PixelKit increases image size in KB by raising quantization tables to full fidelity and injecting ISO-standard JPEG metadata padding, ensuring 100% portal acceptance without distorting your photo."
+      specs={[
+        { label: 'Common Targets', value: 'Increase to 20KB, 50KB, 100KB, 200KB', highlight: true },
+        { label: 'Supported Inputs', value: 'JPG, PNG, WebP, HEIC (iPhone), PDF' },
+        { label: 'Visual Quality', value: '100% Crisp / No Blurriness or Stretching', highlight: true },
+        { label: 'Portal Compliance', value: 'UPSC, SSC, NEET, JEE, IBPS, State PSCs' },
+      ]}
+    />
+
+    <!-- Interactive Tool -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- Minimum Size Table & Use Cases -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why Do You Need to Increase Image Size in KB?
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Most government recruitment and entrance exam portals in India enforce both a lower bound and an upper bound on file size:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-bg/60">
+              <th class="py-3 px-4 font-semibold text-fg">Portal / Examination</th>
+              <th class="py-3 px-4 font-semibold text-fg">Document Type</th>
+              <th class="py-3 px-4 font-semibold text-accent">Required Range (Min – Max)</th>
+              <th class="py-3 px-4 font-semibold text-fg">If Rejected (Under Size)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC (CGL, CHSL, MTS, GD)</td>
+              <td class="py-3 px-4 text-muted">Candidate Photograph</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">20 KB – 50 KB</td>
+              <td class="py-3 px-4 text-xs text-muted">Increase to 25–35 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC (All Exams)</td>
+              <td class="py-3 px-4 text-muted">Candidate Signature</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-xs text-muted">Increase to 12–18 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UPSC Civil Services / NDA / CDS</td>
+              <td class="py-3 px-4 text-muted">Photo &amp; Signature</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">20 KB – 300 KB</td>
+              <td class="py-3 px-4 text-xs text-muted">Increase to 30–50 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">NTA NEET / JEE Main</td>
+              <td class="py-3 px-4 text-muted">Passport Photo (with date)</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">10 KB – 200 KB</td>
+              <td class="py-3 px-4 text-xs text-muted">Increase to 20–50 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">IBPS Bank PO / Clerk / SBI</td>
+              <td class="py-3 px-4 text-muted">Left Thumb Impression &amp; Sign</td>
+              <td class="py-3 px-4 font-mono font-semibold text-accent">20 KB – 50 KB</td>
+              <td class="py-3 px-4 text-xs text-muted">Increase to 30 KB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Links to Target Presets -->
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Direct Target Size Tools:</span>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Target 20KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Target 50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Target 100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Target 200KB</a>
+        <a href="/reduce-image-size-in-kb/" class="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Reduce Image Size in KB →</a>
+      </div>
+    </section>
+
+    <!-- Technical Guide: How It Works -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How PixelKit Increases Image Size in KB Without Blurring
+      </h2>
+      <div class="mt-4 space-y-4 text-sm text-fg/85 leading-relaxed">
+        <p>
+          Many online guides incorrectly advise candidates to take a screenshot of a screenshot or zoom in to increase file size. This degrades the image, causing blurry signatures and rejected exam admit cards.
+        </p>
+        <p>
+          PixelKit utilizes two non-destructive methods to calibrate file size accurately:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-muted">
+          <li>
+            <strong class="text-fg">Uncompressed Quantization Tables:</strong> Setting the JPEG compression encoder to 98%–100% density preserves original high-frequency edge gradients while naturally increasing the encoded byte footprint.
+          </li>
+          <li>
+            <strong class="text-fg">ISO/IEC 10918-1 Metadata Padding:</strong> PixelKit appends standard comment markers (<code class="font-mono text-accent">0xFF 0xFE</code>) into the JPEG stream. Image decoders and portal validation scripts cleanly read the image while recognizing the larger physical file size on disk.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Official Portal Specs Guide -->
+    <div class="mt-12 sm:mt-16">
+      <PortalRequirementsGuide />
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+
