@@ -161,12 +161,13 @@ export function buildSoftwareApplicationJsonLd(input: {
 }): Record<string, unknown> {
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
+    '@type': ['SoftwareApplication', 'WebApplication'],
     name: input.name,
     description: input.description,
     url: input.url,
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'All (Web Browser, Windows, macOS, Linux, iOS, Android)',
+    browserRequirements: 'Requires JavaScript, Canvas API, and WebAssembly support',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -196,6 +197,48 @@ export function buildSoftwareApplicationJsonLd(input: {
   }
 
   return data;
+}
+
+export interface HowToStepItem {
+  name: string;
+  text: string;
+  url?: string;
+  image?: string;
+}
+
+export interface HowToJsonLdInput {
+  name: string;
+  description: string;
+  totalTime?: string;
+  steps: HowToStepItem[];
+  supply?: string[];
+  tool?: string[];
+}
+
+export function buildCustomHowToJsonLd(input: HowToJsonLdInput): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: input.name,
+    description: input.description,
+    totalTime: input.totalTime || 'PT15S',
+    supply: (input.supply || ['Digital photograph or scanned document']).map((s) => ({
+      '@type': 'HowToSupply',
+      name: s,
+    })),
+    tool: (input.tool || ['PixelKit In-Browser Studio']).map((t) => ({
+      '@type': 'HowToTool',
+      name: t,
+    })),
+    step: input.steps.map((s, idx) => ({
+      '@type': 'HowToStep',
+      position: idx + 1,
+      name: s.name,
+      text: s.text,
+      ...(s.url ? { url: s.url } : {}),
+      ...(s.image ? { image: s.image } : {}),
+    })),
+  };
 }
 
 export function buildHowToJsonLd(combo: {

@@ -1,0 +1,150 @@
+---
+interface ExamSpec {
+  exam: string;
+  portal: string;
+  dimensions: string;
+  fileSize: string;
+  format: string;
+  notes: string;
+  link?: string;
+}
+
+const examSpecs: ExamSpec[] = [
+  {
+    exam: 'SSC CGL / CHSL / MTS / GD',
+    portal: 'Staff Selection Commission (SSC OTR)',
+    dimensions: '350 × 450 px (3.5 × 4.5 cm)',
+    fileSize: '20 KB – 50 KB',
+    format: 'JPG / JPEG',
+    notes: 'White/light background, strict 20KB min lower bound',
+    link: '/ssc-photo-resizer/',
+  },
+  {
+    exam: 'UPSC Civil Services / NDA / CDS',
+    portal: 'Union Public Service Commission (OTR)',
+    dimensions: '350 × 450 px (Photo) · 1000 × 560 px max (Signature)',
+    fileSize: '20 KB – 50 KB (Photo) · 20 KB – 50 KB (Sig)',
+    format: 'JPG / JPEG',
+    notes: 'Face must cover ~75% of photograph, no spectacles',
+    link: '/upsc-signature-resizer/',
+  },
+  {
+    exam: 'NEET UG / JEE Main',
+    portal: 'National Testing Agency (NTA)',
+    dimensions: '350 × 450 px (Passport) · 4" × 6" (Postcard)',
+    fileSize: '10 KB – 200 KB',
+    format: 'JPG / JPEG',
+    notes: '80% face coverage showing ears, white background',
+    link: '/neet-photo-resizer/',
+  },
+  {
+    exam: 'US Visa (DS-160) & US Passport',
+    portal: 'US Department of State Consular Affairs',
+    dimensions: '600 × 600 px up to 1200 × 1200 px (2" × 2")',
+    fileSize: 'Under 240 KB',
+    format: 'JPEG',
+    notes: 'Strict 1:1 square ratio, eye height 56%–69% of frame',
+    link: '/us-visa-photo-resizer/',
+  },
+  {
+    exam: 'PAN Card (NSDL / UTIITSL)',
+    portal: 'Protean / UTIITSL Portal',
+    dimensions: '213 × 213 px (Photo) · 400 × 200 px (Signature)',
+    fileSize: 'Under 50 KB (Photo) · Under 30 KB (Signature)',
+    format: 'JPEG (200 / 300 DPI)',
+    notes: 'Square 1:1 aspect ratio with exact 200 DPI calibration',
+    link: '/pan-card-photo-resizer/',
+  },
+  {
+    exam: 'IBPS PO / Clerk / RRB',
+    portal: 'Institute of Banking Personnel Selection',
+    dimensions: '200 × 230 px (Photo) · 140 × 60 px (Signature)',
+    fileSize: '20 KB – 50 KB (Photo) · 10 KB – 20 KB (Signature)',
+    format: 'JPG / JPEG',
+    notes: 'White background, black ink signature on white paper',
+    link: '/passport-photo-resizer/',
+  },
+  {
+    exam: 'Schengen European Visa',
+    portal: 'VFS Global / TLScontact / Consulates',
+    dimensions: '413 × 531 px (35 × 45 mm at 300 DPI)',
+    fileSize: 'Under 200 KB',
+    format: 'JPG / JPEG',
+    notes: 'Light grey or white background, face 32–36 mm height',
+    link: '/passport-photo-resizer/',
+  },
+  {
+    exam: 'UK Passport & Visa',
+    portal: 'HM Passport Office / UKVI',
+    dimensions: 'Minimum 600 × 750 px (3:4 ratio)',
+    fileSize: '50 KB to 10 MB',
+    format: 'JPG / JPEG',
+    notes: 'Plain light-grey or cream background, no shadows',
+    link: '/passport-photo-resizer/',
+  },
+];
+---
+
+<section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs" id="exam-specifications-table">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/80 pb-4">
+    <div>
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Digital Photo &amp; Signature Requirements Master Table (2026)
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Verified dimensions, file weight brackets, and format specifications across national recruitment and visa portals:
+      </p>
+    </div>
+    <span class="inline-flex items-center self-start sm:self-auto rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+      Updated for 2026 Intakes
+    </span>
+  </div>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-left text-xs sm:text-sm border-collapse">
+      <thead>
+        <tr class="border-b border-border bg-surface text-fg font-semibold">
+          <th class="py-3 px-3 sm:px-4">Exam / Portal</th>
+          <th class="py-3 px-3 sm:px-4">Authority</th>
+          <th class="py-3 px-3 sm:px-4">Allowed Dimensions</th>
+          <th class="py-3 px-3 sm:px-4 text-accent">File Size Range</th>
+          <th class="py-3 px-3 sm:px-4">Required Format</th>
+          <th class="py-3 px-3 sm:px-4">Special Rules</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border text-muted">
+        {examSpecs.map((item) => (
+          <tr class="hover:bg-bg/40 transition-colors">
+            <td class="py-3.5 px-3 sm:px-4 font-semibold text-fg whitespace-nowrap">
+              {item.link ? (
+                <a href={item.link} class="text-accent hover:underline flex items-center gap-1">
+                  <span>{item.exam}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-70" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              ) : (
+                item.exam
+              )}
+            </td>
+            <td class="py-3.5 px-3 sm:px-4 text-xs whitespace-nowrap text-fg/80">{item.portal}</td>
+            <td class="py-3.5 px-3 sm:px-4 font-mono text-xs whitespace-nowrap text-fg">{item.dimensions}</td>
+            <td class="py-3.5 px-3 sm:px-4 font-medium text-emerald-500 whitespace-nowrap">{item.fileSize}</td>
+            <td class="py-3.5 px-3 sm:px-4 font-medium text-fg whitespace-nowrap">{item.format}</td>
+            <td class="py-3.5 px-3 sm:px-4 text-xs leading-relaxed text-muted min-w-[200px]">{item.notes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-2 pt-3 text-xs text-muted">
+    <p>
+      * All portals strictly enforce upper and lower bounds. PixelKit automated presets calibrate both dimensions and target file weights client-side.
+    </p>
+    <a href="/passport-photo-resizer/" class="text-accent hover:underline font-medium">
+      Launch Universal Portal Studio &rarr;
+    </a>
+  </div>
+</section>
+

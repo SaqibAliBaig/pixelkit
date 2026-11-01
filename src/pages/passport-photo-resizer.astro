@@ -5,11 +5,14 @@ import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import ExamComparisonTable from '@components/seo/ExamComparisonTable.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -41,6 +44,30 @@ const pageTitle = `Passport Photo Resizer Online — 413x531 px & 50KB | ${SITE.
 const pageDesc =
   'Free private passport and visa photo resizer. Crop aspect ratio, resize to 413x531 px or 600x600 px, and compress under 50KB or 100KB JPG in one step.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to crop, resize, and compress passport and visa photos',
+  description:
+    'Universal guide to crop standard 3:4 portrait or 1:1 square ratios, resize to 413x531 px or 600x600 px, and compress under 50KB-100KB for official passport portals.',
+  steps: [
+    {
+      name: 'Select passport photo',
+      text: 'Drag and drop your photo (JPG, PNG, or Apple HEIC) into PixelKit.',
+    },
+    {
+      name: 'Choose country preset or aspect ratio',
+      text: 'Select 35x45 mm (413 × 531 px) for Passport Seva/Schengen/UK/Australia or 2x2" (600 × 600 px) for US Visa DS-160.',
+    },
+    {
+      name: 'Target file weight bracket',
+      text: 'Set the target size slider to 50KB, 100KB, or 200KB according to your consular portal requirements.',
+    },
+    {
+      name: 'Download formatted file',
+      text: 'Save your compliant biometric image directly to your device with 100% privacy and zero cloud uploads.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Passport Photo Cropper, Resizer & Compressor',
@@ -48,6 +75,7 @@ const jsonLd = [
     url: new URL('/passport-photo-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -80,6 +108,19 @@ const jsonLd = [
         Crop aspect ratio, resize to official dimensions, and compress to exact KB limits—all inside your browser. No server uploads, zero privacy risk for personal IDs.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Passport & Visa Photo Standards Summary (2026 Direct Answer)"
+      summaryText="Standard international biometric passport photos (India Passport Seva, UK, EU/Schengen, Australia) require a 35 × 45 mm format (413 × 531 pixels at 300 DPI) in JPG format between 20 KB and 100 KB. United States passports and DS-160 visas require a 2 × 2 inch square (600 × 600 pixels) under 240 KB. Photos must feature a plain white or light background, neutral facial expression, with ears and eyes clearly visible."
+      portalName="Consular & Passport Authorities Worldwide"
+      specs={[
+        { label: 'Standard Passport', value: '35 × 45 mm (413 × 531 px)' },
+        { label: 'US Visa / Passport', value: '2 × 2 Inches (600 × 600 px)' },
+        { label: 'Standard File Size', value: '20 KB to 100 KB JPG', highlight: true },
+        { label: 'Privacy Standard', value: '100% In-Browser Local Wasm', highlight: true },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview
@@ -229,6 +270,8 @@ const jsonLd = [
         </a>
       </div>
     </section>
+
+    <ExamComparisonTable />
 
     <PortalRequirementsGuide />
 

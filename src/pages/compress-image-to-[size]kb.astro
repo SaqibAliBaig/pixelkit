@@ -6,11 +6,13 @@ import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 interface KbTargetSpec {
@@ -188,6 +190,29 @@ const faqs = [
 const pageTitle = `Compress Image to ${spec.size}KB Online — Exact Size, Free | ${SITE.name}`;
 const pageDesc = `Compress JPG, PNG, WebP, HEIC and PDF to ${spec.size}KB online without losing clarity. Crop, resize pixels, and hit exact ${spec.size}KB portal limits privately.`;
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: `How to compress image under ${spec.size}KB online`,
+  description: `Step-by-step instructions to compress JPG, PNG, WebP, or HEIC images strictly under ${spec.size}KB without unreadable blur or server uploads.`,
+  steps: [
+    {
+      name: 'Upload your image',
+      text: 'Drag and drop your image file into PixelKit. HEIC, JPG, PNG, and WebP are supported.',
+    },
+    {
+      name: `Select ${spec.size}KB Target Size`,
+      text: `PixelKit automatically configures the target file weight limit to ${spec.size}KB using binary search quantization.`,
+    },
+    {
+      name: 'Optional Crop & Resize',
+      text: 'Optionally adjust aspect ratio or rescale dimensions to match portal upload specifications.',
+    },
+    {
+      name: `Download compressed ${spec.size}KB file`,
+      text: 'Download your optimized file instantly. All processing happens 100% locally in your device browser.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: `Compress Image to ${spec.size}KB — PixelKit`,
@@ -195,6 +220,7 @@ const jsonLd = [
     url: new URL(`/compress-image-to-${spec.size}kb/`, SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -227,6 +253,18 @@ const jsonLd = [
         {spec.portalSummary}
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title={`Official ${spec.size}KB Compression Specification (2026 Direct Answer)`}
+      summaryText={`To reduce an image to ${spec.size}KB without severe distortion, PixelKit uses 12-iteration binary search quantization in browser Web Workers. It dynamically calculates the exact JPEG/WebP compression quality and optional dimension scaling to land strictly at or below ${spec.size}KB while preserving high perceptual clarity.`}
+      specs={[
+        { label: 'Target File Ceiling', value: `Strictly ≤ ${spec.size} KB`, highlight: true },
+        { label: 'Input Formats', value: 'JPG, PNG, WebP, HEIC, PDF' },
+        { label: 'Execution', value: '100% In-Browser WebAssembly', highlight: true },
+        { label: 'Privacy', value: 'Zero Server Uploads' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

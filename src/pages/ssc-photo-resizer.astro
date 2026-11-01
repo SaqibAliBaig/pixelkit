@@ -4,11 +4,13 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -40,6 +42,30 @@ const pageTitle = `SSC Photo Resizer Online — 20KB to 50KB JPG | ${SITE.name}`
 const pageDesc =
   'Resize and compress photos for SSC CGL, CHSL, MTS & GD to exact 350x450 px and 20KB-50KB JPG limits directly in your browser with zero server uploads.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize and compress photos for SSC recruitment exams',
+  description:
+    'Step-by-step instructions to crop, resize to 350x450 pixels, and compress photographs between 20KB and 50KB for SSC online application.',
+  steps: [
+    {
+      name: 'Select your photo',
+      text: 'Drag and drop your candidate photograph (JPG, PNG, or iPhone HEIC) into PixelKit or click to upload from your phone or PC.',
+    },
+    {
+      name: 'Apply the SSC 350x450 preset',
+      text: 'PixelKit automatically applies the official 3.5:4.5 aspect ratio framing and scales dimensions to 350 × 450 pixels.',
+    },
+    {
+      name: 'Set target compression to 20KB–50KB',
+      text: 'The binary search compression automatically targets ~35KB–45KB, landing safely within the allowable SSC upload bracket.',
+    },
+    {
+      name: 'Download the compliant JPG',
+      text: 'Click Download to save the SSC-compliant image directly to your device ready for instant portal submission.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit SSC Photo Resizer & Compressor',
@@ -47,6 +73,7 @@ const jsonLd = [
     url: new URL('/ssc-photo-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -79,6 +106,19 @@ const jsonLd = [
         Crop, scale to 350 × 450 px, and compress your photograph between 20KB and 50KB in JPG format. 100% private in-browser processing with zero server uploads.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official SSC Photo Specification Summary (2026 Direct Answer)"
+      summaryText="Staff Selection Commission (SSC CGL, CHSL, MTS, GD, Stenographer) mandates a digital photograph in JPG/JPEG format with file size strictly between 20 KB and 50 KB, and dimensions of 350 × 450 pixels (3.5 cm × 4.5 cm). The photograph must feature a clean light or white background with both ears visible, without spectacles or headwear."
+      portalName="Staff Selection Commission (ssc.gov.in / OTR)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Bracket', value: '20 KB to 50 KB strictly', highlight: true },
+        { label: 'Dimensions', value: '350 × 450 px (3.5 × 4.5 cm)' },
+        { label: 'Background', value: 'Plain White or Light' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

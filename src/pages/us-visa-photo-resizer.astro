@@ -4,11 +4,13 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -40,6 +42,30 @@ const pageTitle = `US Visa Photo Resizer — 600x600 px (2x2") | ${SITE.name}`;
 const pageDesc =
   'Resize and crop photos for US DS-160 visa, passport, and Green Card Diversity Lottery to exact 600x600 px and under 240KB JPG limits directly in your browser.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to crop and resize photo for US Visa DS-160 and US Passport',
+  description:
+    'Instructions to frame 1:1 square ratio, scale to 600x600 pixels (2x2 inches), and compress under 240KB for US Department of State portals.',
+  steps: [
+    {
+      name: 'Upload candidate image',
+      text: 'Drag and drop your photo (JPG, PNG, or Apple HEIC) into PixelKit.',
+    },
+    {
+      name: 'Select 1:1 Square US Visa Preset',
+      text: 'PixelKit locks the 1:1 square ratio and scales to 600 × 600 pixels, ensuring eyes align within official guidelines.',
+    },
+    {
+      name: 'Compress under 240KB',
+      text: 'PixelKit automatically tunes JPEG quantization below the 240 KB ceiling while preserving crisp biometric face detail.',
+    },
+    {
+      name: 'Download CEAC-ready JPG',
+      text: 'Click Download to save the compliant file directly to your device with zero server storage.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit US Visa Photo Resizer & Cropper',
@@ -47,6 +73,7 @@ const jsonLd = [
     url: new URL('/us-visa-photo-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -79,6 +106,19 @@ const jsonLd = [
         Crop to 1:1 square, scale to 600 × 600 pixels (2 × 2 inches), and compress under 240 KB JPG. 100% private, client-side biometric framing.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official US Visa & DS-160 Photo Specification Summary (2026 Direct Answer)"
+      summaryText="The US Department of State requires a 1:1 square digital photograph of 600 × 600 pixels minimum up to 1200 × 1200 pixels maximum (at 300 DPI for a 2 × 2 inch print). The file must be in JPEG format weighing equal to or less than 240 KB. The applicant's head height must be between 50% and 69% of the frame with a neutral expression on a plain white or off-white background. Eyeglasses are strictly prohibited."
+      portalName="US Consular Electronic Application Center (CEAC / DS-160)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Ceiling', value: 'Under 240 KB', highlight: true },
+        { label: 'Dimensions', value: '600 × 600 px (2 × 2 Inches)' },
+        { label: 'Aspect Ratio', value: '1:1 Square (300 DPI)' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

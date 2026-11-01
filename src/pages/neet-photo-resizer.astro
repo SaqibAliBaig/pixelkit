@@ -4,11 +4,13 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -40,6 +42,30 @@ const pageTitle = `NEET Photo Resizer Online — 10KB to 200KB JPG | ${SITE.name
 const pageDesc =
   'Resize and compress passport & 4x6 postcard photos for NTA NEET-UG & JEE Main to exact specifications between 10KB and 200KB JPG directly in your browser.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize and compress photos for NEET UG and JEE Main',
+  description:
+    'Instructions to frame 80% face coverage, resize to passport (350x450 px) or 4x6 inch postcard dimensions, and compress within 10KB to 200KB for NTA portals.',
+  steps: [
+    {
+      name: 'Upload candidate photo',
+      text: 'Drop your recent passport or postcard photo into the editor. iPhone HEIC and PNG formats are automatically decoded.',
+    },
+    {
+      name: 'Select NEET Passport or Postcard preset',
+      text: 'For passport size, choose 350 × 450 px. For postcard size, choose 4 × 6 inches (1200 × 1800 px) with 80% facial framing.',
+    },
+    {
+      name: 'Verify size ceiling within 10KB–200KB',
+      text: 'Set target size to 100KB–150KB to safely pass NTA automated intake validation.',
+    },
+    {
+      name: 'Download formatted JPG',
+      text: 'Click Download to save the NTA-ready image file directly to your device without cloud processing.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit NEET Photo Resizer & Compressor',
@@ -47,6 +73,7 @@ const jsonLd = [
     url: new URL('/neet-photo-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -79,6 +106,19 @@ const jsonLd = [
         Resize passport and 4 × 6" postcard photos between 10KB and 200KB JPG with 80% face coverage. 100% private in-browser tool with zero server uploads.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official NEET Photo Specification Summary (2026 Direct Answer)"
+      summaryText="National Testing Agency (NTA NEET-UG, JEE Main) mandates a digital photograph in JPG/JPEG format with file size strictly between 10 KB and 200 KB. Two uploads are required: Passport size photo (350 × 450 px / 3.5 × 4.5 cm) and Postcard photo (4 × 6 inches / approx 1200 × 1800 px). 80% face coverage showing ears against a clear white background is mandatory."
+      portalName="National Testing Agency (exams.nta.ac.in/NEET)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Bracket', value: '10 KB to 200 KB strictly', highlight: true },
+        { label: 'Passport Size', value: '350 × 450 px (3.5 × 4.5 cm)' },
+        { label: 'Postcard Size', value: '4 × 6 Inches (1200 × 1800 px)' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

@@ -4,11 +4,13 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -40,6 +42,30 @@ const pageTitle = `PAN Card Photo Resizer — 213x213 px & 50KB | ${SITE.name}`;
 const pageDesc =
   'Resize and compress photos for NSDL & UTIITSL PAN card portals to exact 213x213 px and under 50KB JPG limits directly in your browser with zero uploads.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize photo for NSDL or UTIITSL PAN card application',
+  description:
+    'Step-by-step instructions to crop photo to 1:1 square, rescale to 213x213 pixels, and compress under 50KB for PAN card portal upload.',
+  steps: [
+    {
+      name: 'Upload candidate image',
+      text: 'Drag and drop your digital image or passport scan into PixelKit.',
+    },
+    {
+      name: 'Apply PAN 213x213 px preset',
+      text: 'Select the official NSDL/UTIITSL preset to configure 1:1 square aspect ratio at exactly 213 × 213 pixels.',
+    },
+    {
+      name: 'Ensure size is under 50KB',
+      text: 'The automatic binary-search compressor optimizes the file weight safely below the 50KB ceiling.',
+    },
+    {
+      name: 'Download PAN-ready JPG',
+      text: 'Click Download to receive your file immediately without remote cloud uploads.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit PAN Card Photo Resizer & Compressor',
@@ -47,6 +73,7 @@ const jsonLd = [
     url: new URL('/pan-card-photo-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -79,6 +106,19 @@ const jsonLd = [
         Resize candidate photographs to exact 213 × 213 pixels at 200/300 DPI and compress under 50KB JPG in one click. 100% private in-browser tool.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official PAN Card Photo Specification Summary (2026 Direct Answer)"
+      summaryText="Protean (formerly NSDL e-Gov) and UTIITSL PAN card portals mandate applicant photos in JPG/JPEG format with dimensions of exactly 213 × 213 pixels (or 2.5 × 3.5 cm at 200/300 DPI) and maximum file size under 50 KB. Candidate signatures must measure 213 × 426 pixels (2:1 width-to-height ratio) and weigh under 30 KB."
+      portalName="Protean NSDL / UTIITSL PAN Portal"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'Photo Size Limit', value: 'Under 50 KB', highlight: true },
+        { label: 'Dimensions', value: '213 × 213 px (1:1 Square)' },
+        { label: 'Resolution', value: '200 to 300 DPI calibrated' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

@@ -4,11 +4,13 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import { SITE } from '@lib/constants';
 import {
   buildSoftwareApplicationJsonLd,
   buildFaqJsonLd,
   buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
 } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
@@ -40,6 +42,30 @@ const pageTitle = `UPSC Signature Resizer Online — Under 20KB JPG | ${SITE.nam
 const pageDesc =
   'Resize and compress signatures for UPSC CSE, NDA, CDS, and OTR to exact 280x140 px and 10KB-20KB JPG limits directly in your browser with zero server uploads.';
 
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize and compress signature for UPSC exams',
+  description:
+    'Instructions to crop pen signatures, scale to 280x140 pixels (2:1 ratio), and compress between 10KB and 20KB for UPSC online application.',
+  steps: [
+    {
+      name: 'Upload signature photo or scan',
+      text: 'Drop the photo of your black ink signature on plain white paper into PixelKit.',
+    },
+    {
+      name: 'Crop tight margins',
+      text: 'Use Crop Studio to trim unnecessary blank white borders surrounding your signature.',
+    },
+    {
+      name: 'Apply the UPSC 280x140 px preset',
+      text: 'PixelKit locks the official 2:1 width-to-height ratio at 280 × 140 pixels.',
+    },
+    {
+      name: 'Compress strictly under 20KB',
+      text: 'Target 15KB–18KB to ensure instant pass through UPSC OTR validation with sharp ink lines.',
+    },
+  ],
+});
+
 const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit UPSC Signature Resizer & Compressor',
@@ -47,6 +73,7 @@ const jsonLd = [
     url: new URL('/upsc-signature-resizer/', SITE.url).href,
   }),
   buildFaqJsonLd(faqs),
+  howToJsonLd,
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
       name: b.label,
@@ -79,6 +106,19 @@ const jsonLd = [
         Crop excess border margins, rescale to 280 × 140 px (2:1 ratio), and compress under 20KB JPG with pin-sharp ink strokes. Private, client-side processing.
       </p>
     </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official UPSC Signature Specification Summary (2026 Direct Answer)"
+      summaryText="Union Public Service Commission (UPSC Civil Services CSE, NDA, CDS, CMS, and OTR registration) requires candidate signatures in JPG/JPEG format weighing between 10 KB and 20 KB. Standard pixel dimensions are 280 × 140 pixels (or 350 × 350 px min to 1000 × 560 px max), signed with clear black ink on smooth white paper without shadows or smudges."
+      portalName="Union Public Service Commission (upsconline.nic.in)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Bracket', value: '10 KB to 20 KB strictly', highlight: true },
+        { label: 'Dimensions', value: '280 × 140 px (2:1 Ratio)' },
+        { label: 'Ink & Paper', value: 'Black Ink on White Paper' },
+      ]}
+    />
 
     <div class="mt-6 sm:mt-8">
       <ToolPreview

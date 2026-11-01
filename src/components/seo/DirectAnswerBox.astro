@@ -1,0 +1,73 @@
+---
+interface SpecItem {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  summaryText: string;
+  specs: SpecItem[];
+  portalName?: string;
+  verifiedYear?: string;
+}
+
+const {
+  title = 'Official Specification Summary (2026 Direct Answer)',
+  subtitle,
+  summaryText,
+  specs,
+  portalName,
+  verifiedYear = '2026',
+} = Astro.props;
+---
+
+<aside
+  class="my-6 sm:my-8 rounded-2xl border border-accent/25 bg-surface/95 p-5 sm:p-6 shadow-xs backdrop-blur-sm"
+  aria-label={title}
+  data-geo-answer="true"
+>
+  <div class="flex flex-wrap items-center justify-between gap-2 border-b border-border/80 pb-3.5">
+    <div class="flex items-center gap-2">
+      <span class="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent text-xs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </span>
+      <h2 class="text-sm sm:text-base font-semibold tracking-tight text-fg">
+        {title}
+      </h2>
+    </div>
+    <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-500 dark:text-emerald-400">
+      Verified for {verifiedYear} Intake
+    </span>
+  </div>
+
+  <p class="mt-3.5 text-xs sm:text-sm text-fg/90 leading-relaxed font-normal">
+    {summaryText}
+  </p>
+
+  <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
+    {specs.map((item) => (
+      <div class="rounded-xl border border-border/70 bg-bg/50 p-3 flex flex-col justify-between">
+        <span class="text-[11px] font-medium text-muted uppercase tracking-wider">{item.label}</span>
+        <span class={`mt-1 font-semibold text-xs sm:text-sm ${item.highlight ? 'text-accent' : 'text-fg'}`}>
+          {item.value}
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <div class="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border/60 text-[11px] text-muted">
+    <div class="flex items-center gap-1.5">
+      <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+      <span>100% Client-Side WebAssembly · Zero Server Uploads · Instant In-Browser Processing</span>
+    </div>
+    {portalName && (
+      <span class="font-medium text-fg/80">Intake Portal: {portalName}</span>
+    )}
+  </div>
+</aside>
+
