@@ -1,0 +1,419 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+interface PhotoToPdfSpec {
+  size: number;
+  headline: string;
+  badge: string;
+  summary: string;
+  portalFocus: string;
+  useCases: { title: string; limit: string; body: string }[];
+  tip: string;
+}
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const specs: PhotoToPdfSpec[] = [
+    {
+      size: 50,
+      headline: 'Convert Photo to PDF Under 50KB Online',
+      badge: 'Signatures · Biometrics · Tiny Upload Slots',
+      summary:
+        'Convert photos and signatures into a clean PDF file strictly under 50KB online. Engineered for strict public recruitment portals, thumbprint scans, and compact document upload fields.',
+      portalFocus: 'Signatures & Digital ID Forms',
+      useCases: [
+        {
+          title: 'Applicant Signature Documents',
+          limit: 'Max 50 KB · PDF',
+          body: 'Converts ink signature snaps into clean, single-page PDFs with tight vector borders so ink strokes remain sharp under 50KB.',
+        },
+        {
+          title: 'Thumbprint & Biometric Slips',
+          limit: '10–50 KB · PDF',
+          body: 'Preserves contrast along biometric ridges while keeping final PDF file weight strictly below the 50KB portal barrier.',
+        },
+        {
+          title: 'ID Proof Micro-Uploads',
+          limit: 'Max 50 KB · PDF',
+          body: 'Scales raster resolutions so small identification cards and certificates pass low-bandwidth portal validators.',
+        },
+      ],
+      tip: 'Crop excess background margins tightly around your photo or signature before converting to PDF. Trimming blank white space saves kilobyte budget for visual sharpness.',
+    },
+    {
+      size: 100,
+      headline: 'Convert Photo to PDF Under 100KB Online',
+      badge: 'SSC · UPSC · Aadhaar & PAN Card KYC',
+      summary:
+        'Convert photos and scanned documents into a PDF strictly under 100KB online. Meets exact upload standards for SSC CGL/CHSL, UPSC civil services, state police, and bank KYC verification.',
+      portalFocus: 'SSC, UPSC & Bank KYC Verification',
+      useCases: [
+        {
+          title: 'SSC CGL & CHSL Certificates',
+          limit: '50–100 KB · PDF',
+          body: 'Packages 10th/12th certificate photos into single-page PDFs complying with Staff Selection Commission requirements.',
+        },
+        {
+          title: 'Aadhaar & PAN Card KYC Verification',
+          limit: 'Max 100 KB · PDF',
+          body: 'Converts mobile phone snapshots of ID cards into readable, printable PDF files accepted by banking and telecom portals.',
+        },
+        {
+          title: 'State PSC Application Documents',
+          limit: 'Under 100 KB · PDF',
+          body: 'Guarantees marksheet and caste certificate PDFs satisfy state public service commission size regulations without rejected uploads.',
+        },
+      ],
+      tip: 'Ensure good even lighting when photographing your certificate. Glare or heavy shadows force compression algorithms to allocate extra bytes to noise rather than text.',
+    },
+    {
+      size: 200,
+      headline: 'Convert Photo to PDF Under 200KB Online',
+      badge: 'NTA NEET · JEE Main · Schengen & US Visa',
+      summary:
+        'Convert photos and document scans to PDF strictly under 200KB online. Designed for NTA NEET UG/PG, JEE Main counseling, GATE registrations, and Schengen / US visa application portals.',
+      portalFocus: 'NTA NEET, JEE Main & Visa Portals',
+      useCases: [
+        {
+          title: 'NTA NEET Admit Card & Marksheet Scans',
+          limit: '100–200 KB · PDF',
+          body: 'Converts marksheet photos and domicile slips into PDF format strictly under the National Testing Agency 200KB limit.',
+        },
+        {
+          title: 'JEE Main & GATE Category Proofs',
+          limit: '50–200 KB · PDF',
+          body: 'Compiles OBC-NCL, EWS, SC/ST, and PwD certificate pictures into verified, readable PDF documents under 200KB.',
+        },
+        {
+          title: 'Schengen & US Visa Document Scans',
+          limit: 'Under 200 KB · PDF',
+          body: 'Converts passport bio page photos, flight itineraries, and bank statement photos into official, clean PDF documents.',
+        },
+      ],
+      tip: 'PixelKit automatically adjusts DPI and JPEG quantization in browser memory to lock your PDF at exactly 180–195 KB, safely below the 200KB rejection threshold.',
+    },
+    {
+      size: 300,
+      headline: 'Convert Photo to PDF Under 300KB Online',
+      badge: 'State PSCs · University Counseling · Domicile Slips',
+      summary:
+        'Convert photos and multi-page documents to PDF under 300KB online. Perfect for state public service commissions, medical admissions, engineering seat allotments, and recruitment boards.',
+      portalFocus: 'State PSCs & University Admissions',
+      useCases: [
+        {
+          title: 'State PSC Domicile & Caste Slips',
+          limit: '100–300 KB · PDF',
+          body: 'Formats stamped government domicile certificates and affidavit photos into clean PDF documents strictly below 300KB.',
+        },
+        {
+          title: 'University Engineering & Medical Counseling',
+          limit: 'Max 300 KB · PDF',
+          body: 'Packages degree marksheet photos and transfer certificate snaps into standard PDF files for admission portals.',
+        },
+        {
+          title: 'High-Resolution ID Documents',
+          limit: 'Under 300 KB · PDF',
+          body: 'Maintains high 300 DPI resolution on small print and official seals while staying well below the 300KB file ceiling.',
+        },
+      ],
+      tip: 'If combining multiple photo pages into one 300KB PDF, PixelKit balances compression evenly across all pages so no individual page turns blurry.',
+    },
+    {
+      size: 500,
+      headline: 'Convert Photo to PDF Under 500KB Online',
+      badge: 'Corporate HR · Legal Filings · Insurance Claims',
+      summary:
+        'Convert photos into crystal-clear PDF documents under 500KB online. Ideal for corporate onboarding, medical insurance claim receipts, court submissions, and university thesis filings.',
+      portalFocus: 'Corporate Portals & Legal Filings',
+      useCases: [
+        {
+          title: 'Medical Insurance Reimbursement Receipts',
+          limit: 'Max 500 KB · PDF',
+          body: 'Bundles clinic bills, pharmacy receipts, and doctor prescriptions into a single consolidated PDF under 500KB.',
+        },
+        {
+          title: 'Employment Onboarding Contracts',
+          limit: 'Under 500 KB · PDF',
+          body: 'Converts signed offer letters and previous employment proofs into professional, high-fidelity PDF documents.',
+        },
+        {
+          title: 'Legal Filings & Court Evidentiary Scans',
+          limit: 'Max 500 KB · PDF',
+          body: 'Preserves fine legal print, notary stamps, and watermarks in crisp vector PDF pages under 500KB.',
+        },
+      ],
+      tip: '500KB provides ample kilobyte headroom for full-color document photos with 1500+ pixel width while guaranteeing compliance with strict email and corporate firewalls.',
+    },
+  ];
+
+  return specs.map((spec) => ({
+    params: { size: spec.size.toString() },
+    props: { spec },
+  }));
+};
+
+const { spec } = Astro.props as { spec: PhotoToPdfSpec };
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Photo to PDF', href: '/photo-to-pdf/' },
+  { label: `Under ${spec.size}KB` },
+];
+
+const faqs = [
+  {
+    q: `How do I convert a photo to PDF under ${spec.size}KB?`,
+    a: `Drop your photo (JPG, PNG, WebP, or iPhone HEIC) into the converter above. The target size is automatically locked to ${spec.size}KB. PixelKit iteratively balances raster resolution and JPEG compression inside browser memory to output a sharp, compliant PDF strictly under ${spec.size}KB.`,
+  },
+  {
+    q: `Can I merge multiple photos into one single PDF under ${spec.size}KB?`,
+    a: `Yes. Drop multiple camera photos or document snaps into PixelKit at once. You can drag and drop thumbnail cards to reorder pages, and our engine will compress the unified multi-page PDF document to stay under your ${spec.size}KB limit.`,
+  },
+  {
+    q: `Will text and stamp seals in my photo be readable at under ${spec.size}KB?`,
+    a: `Yes. PixelKit uses edge-preserving canvas quantization that retains maximum high-frequency detail around printed text, signatures, and notary stamps while discarding invisible color noise.`,
+  },
+  {
+    q: 'Are my private documents and photo IDs uploaded to any external server?',
+    a: 'Never. PixelKit is 100% client-side. All photo processing, compression, and PDF compilation execute locally in your browser using WebAssembly. Zero bytes leave your computer or smartphone.',
+  },
+  {
+    q: `Can I convert iPhone photos to PDF under ${spec.size}KB?`,
+    a: `Yes. PixelKit natively decodes Apple iPhone HEIC photos in browser memory and converts them directly into a standard PDF under ${spec.size}KB without installing any apps or software.`,
+  },
+];
+
+const directAnswer = {
+  title: `Quick Answer: How to Convert Photo to PDF Under ${spec.size}KB`,
+  summaryText: `To convert photos to PDF under ${spec.size}KB: 1. Drag and drop your camera photos (JPG, PNG, HEIC) into PixelKit. 2. Target size is pre-locked to ${spec.size}KB for exam and visa portal compliance. 3. Drag thumbnails to reorder pages or adjust orientation. 4. Click Download to retrieve your clean, watermark-free PDF document directly from device memory.`,
+  specs: [
+    { label: 'Target Limit', value: `Strictly Under ${spec.size} KB` },
+    { label: 'Supported Inputs', value: 'JPG, PNG, WebP, Apple HEIC, TIFF' },
+    { label: 'Portal Focus', value: spec.portalFocus },
+    { label: 'Multi-Page Merge', value: 'Supported with visual page reordering' },
+    { label: 'Data Security', value: '100% Client-Side (Zero Server Uploads)' },
+  ],
+};
+
+const pageTitle = `Photo to PDF ${spec.size}KB — Convert Photo to PDF Under ${spec.size}KB Free | ${SITE.name}`;
+const pageDesc = `Convert photos and scanned documents to PDF strictly under ${spec.size}KB online. Free, 100% private in-browser tool. Perfect for NEET, UPSC, SSC, and visa portals.`;
+const pageKeywords = [
+  `photo to pdf ${spec.size} kb`,
+  `photo to pdf ${spec.size}kb`,
+  `convert photo to pdf under ${spec.size}kb`,
+  `photo to pdf converter ${spec.size}kb`,
+  `convert image to pdf under ${spec.size}kb`,
+  `image to pdf ${spec.size}kb`,
+  `photo to pdf maker ${spec.size}kb`,
+  `resize photo to pdf ${spec.size}kb`,
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: `How to convert photo to PDF under ${spec.size}KB online`,
+  description: `Step-by-step instructions to convert camera photos and documents to PDF strictly under ${spec.size}KB.`,
+  steps: [
+    {
+      name: 'Upload your photo',
+      text: 'Drop or select your photo (JPG, PNG, WebP, or HEIC) into the converter tool.',
+    },
+    {
+      name: 'Configure page settings',
+      text: `Verify target size ceiling is set to ${spec.size}KB and adjust page margins if desired.`,
+    },
+    {
+      name: 'Process in browser memory',
+      text: 'PixelKit automatically scales dimensions and compresses file weight locally.',
+    },
+    {
+      name: 'Download PDF',
+      text: `Click Download to save your sharp, watermark-free PDF document under ${spec.size}KB.`,
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `Photo to PDF ${spec.size}KB Converter — PixelKit`,
+    description: pageDesc,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+    url: `https://pixelkit.app/photo-to-pdf-${spec.size}kb/`,
+  }),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+  buildFaqJsonLd(faqs),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Breadcrumbs Navigation -->
+    <Breadcrumbs items={breadcrumbs} class="mb-6" />
+
+    <!-- Hero Header -->
+    <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <Badge variant="primary">{spec.badge}</Badge>
+        <Badge variant="outline">Strictly Under {spec.size}KB</Badge>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+        {spec.headline}
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+        {spec.summary}
+      </p>
+    </header>
+
+    <!-- Interactive Tool Island -->
+    <section aria-label={`Photo to PDF ${spec.size}KB Tool`} class="mb-12">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        targetKb={spec.size}
+        initialTool="convert"
+      />
+    </section>
+
+    <!-- Quick GEO Answer Box -->
+    <section class="mb-12">
+      <DirectAnswerBox
+        title={directAnswer.title}
+        summaryText={directAnswer.summaryText}
+        specs={directAnswer.specs}
+      />
+    </section>
+
+    <!-- Size Presets Navigation Bar -->
+    <section class="mb-12 rounded-2xl border border-border/80 bg-surface/50 p-6">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        Switch to Other Photo to PDF File Size Presets
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        {[50, 100, 200, 300, 500].map((s) => (
+          <a
+            href={`/photo-to-pdf-${s}kb/`}
+            class={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border transition-colors ${
+              s === spec.size
+                ? 'bg-primary text-primary-foreground border-primary font-semibold'
+                : 'bg-surface hover:bg-surface/80 border-border text-foreground'
+            }`}
+          >
+            Photo to PDF {s}KB
+          </a>
+        ))}
+        <a
+          href="/photo-to-pdf/"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-foreground transition-colors"
+        >
+          Photo to PDF Hub (All Sizes)
+        </a>
+        <a
+          href="/image-to-pdf-200kb/"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-foreground transition-colors"
+        >
+          Image to PDF 200KB
+        </a>
+      </div>
+    </section>
+
+    <!-- Use Cases & Portal Grid -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-foreground mb-6">
+        Common Application Portals Requiring PDF Under {spec.size}KB
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {spec.useCases.map((uc) => (
+          <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 flex flex-col justify-between">
+            <div>
+              <div class="inline-block px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold mb-3">
+                {uc.limit}
+              </div>
+              <h3 class="text-lg font-bold text-foreground mb-2">{uc.title}</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed mb-4">{uc.body}</p>
+            </div>
+            <div class="text-xs text-muted-foreground border-t border-border/60 pt-3">
+              100% verified compliance
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Pro Tip Callout -->
+    <section class="mb-12 rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+      <div class="flex items-start gap-4">
+        <div class="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shrink-0 mt-0.5">
+          💡
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-foreground mb-1">
+            Expert Compression Tip for {spec.size}KB PDFs
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            {spec.tip}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portal Compliance & Exam Specifications -->
+    <section class="mb-12">
+      <PortalRequirementsGuide activePortal={spec.size === 200 ? 'neet' : spec.size === 100 ? 'ssc' : 'upsc'} />
+    </section>
+
+    <!-- Deep Educational FAQ Section -->
+    <section>
+      <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
+        Frequently Asked Questions — Photo to PDF Under {spec.size}KB
+      </h2>
+      <FAQSection faqs={faqs} />
+    </section>
+
+    <!-- Internal Linking Hub -->
+    <section class="border-t border-border/80 pt-8 mt-12">
+      <h3 class="text-lg font-bold text-foreground mb-4">Related Photo & PDF Tools</h3>
+      <div class="flex flex-wrap gap-2 text-sm">
+        <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Photo to PDF Converter
+        </a>
+        <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Image to PDF
+        </a>
+        <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          HEIC to PDF
+        </a>
+        <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Merge JPG to PDF
+        </a>
+        <a href="/photo-resizer-in-kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Photo Resizer in KB
+        </a>
+        <a href={`/photo-resizer-${spec.size}kb/`} class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Photo Resizer {spec.size}KB
+        </a>
+        <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          Convert Photo to PDF on iPhone
+        </a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

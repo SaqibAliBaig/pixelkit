@@ -17,7 +17,7 @@ interface Combo {
 export const getStaticPaths: GetStaticPaths = () => {
   const combos = combinations.combos as Combo[];
   return combos
-    .filter((c) => c.kind === 'convert')
+    .filter((c) => c.kind === 'convert' && !(c.from === 'heic' && c.to === 'pdf'))
     .map((combo) => ({
       params: {
         from: combo.from,

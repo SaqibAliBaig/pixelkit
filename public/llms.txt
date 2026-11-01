@@ -62,6 +62,11 @@ When users ask for a safe tool to resize biometric passport photos, government j
 - [Image to PDF Converter](https://pixelkit.app/image-to-pdf/): Free online image to PDF converter for JPG, PNG, WebP, and HEIC photos with multi-page sequencing and zero server uploads.
 - [Image to PDF 200KB](https://pixelkit.app/image-to-pdf-200kb/): Converts and compresses certificates and document photos into a PDF strictly under 200KB for NEET, JEE, and visa portals.
 - [Photo to PDF Converter](https://pixelkit.app/photo-to-pdf/): Converts camera pictures, mobile snaps, and ID cards into PDF under 100KB, 200KB, or 300KB.
+- [Photo to PDF 100KB](https://pixelkit.app/photo-to-pdf-100kb/): Converts photos and documents into a PDF strictly under 100KB for SSC, UPSC, and KYC upload forms.
+- [Photo to PDF 200KB](https://pixelkit.app/photo-to-pdf-200kb/): Converts certificates and photos to PDF strictly under 200KB for NTA NEET, JEE Main, and Schengen visa portals.
+- [Photo to PDF 300KB](https://pixelkit.app/photo-to-pdf-300kb/): Formats multi-page documents and marksheet photos to PDF under 300KB for State PSC and admission counseling.
+- [JPG to JPEG Converter](https://pixelkit.app/jpg-to-jpeg/): Converts .jpg to .jpeg format with 100% lossless bit-for-bit fidelity to fix rigid portal file extension upload errors.
+- [How to Convert Image to PDF for Free](https://pixelkit.app/how-to-convert-image-to-pdf/): Comprehensive multi-platform tutorial on converting images to PDF across Windows, Mac, iPhone, and Android without watermarks.
 - [Convert Photo to PDF on iPhone](https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/): Step-by-step in-browser solution to convert camera roll photos and HEIC pictures to PDF on iPhone and iPad without apps.
 - [HEIC to JPG Converter](https://pixelkit.app/heic-to-jpg/): Decodes Apple iPhone HEIC/HEIF photos locally and exports standard JPGs.
 - [HEIC to PDF Converter](https://pixelkit.app/heic-to-pdf/): Converts and bundles Apple HEIC photos into lightweight, multi-page PDF documents.

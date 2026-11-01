@@ -1,0 +1,303 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert/' },
+  { label: 'How to Convert Image to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert an image to PDF for free without watermarks?',
+    a: 'Use PixelKit in your web browser. Drag and drop your JPG, PNG, WebP, or HEIC images into the tool above. Select page orientation, margins, or a target size ceiling (like under 200KB), and click "Download". Your PDF is generated instantly in browser memory with zero watermarks and zero registration fees.',
+  },
+  {
+    q: 'Can I combine multiple pictures into one single PDF file?',
+    a: 'Yes. Drop multiple images at once into PixelKit. You can visually rearrange pages by dragging thumbnail cards into your desired sequence. When you click Download, PixelKit compiles all pages into a unified multi-page PDF document.',
+  },
+  {
+    q: 'How do I convert an image to PDF on Windows 10 or 11 without third-party software?',
+    a: 'Open your image in the Windows Photos app, press Ctrl + P (or click the Print icon), select "Microsoft Print to PDF" from the Printer dropdown, adjust orientation, and click "Print" to save your new PDF. Alternatively, drag it into PixelKit for automatic size compression and multi-image merging.',
+  },
+  {
+    q: 'How do I convert an image to PDF on an iPhone or iPad?',
+    a: 'You can either use PixelKit directly in Mobile Safari, or open the Apple Photos app, tap the Share icon, choose "Print", pinch outward on the preview thumbnail to expand it into a PDF view, and tap the Share icon again to save it to Files as a PDF document.',
+  },
+  {
+    q: 'How can I convert images to PDF under 200KB or 100KB for application forms?',
+    a: 'In PixelKit, select a target size limit like "Under 200KB" or "Under 100KB". Our client-side algorithm automatically calculates optimal resolution and JPEG quantization in device memory so your final PDF complies with strict government or exam portal upload limits.',
+  },
+  {
+    q: 'Is it safe to convert private documents or ID cards to PDF online?',
+    a: 'With most cloud converters, it is risky because files are transmitted and stored on remote servers. With PixelKit, it is 100% safe because the conversion engine runs entirely on your local CPU via WebAssembly. Zero bytes leave your device.',
+  },
+];
+
+const directAnswer = {
+  title: 'Quick Guide: How to Convert Image to PDF for Free',
+  summaryText:
+    'To convert any image (JPG, PNG, HEIC, WebP) to PDF for free: 1. Drag and drop your image into PixelKit. 2. Drag thumbnails to arrange multi-page ordering and select page margins. 3. Optionally choose an exact target size (such as under 100KB or 200KB) for exam compliance. 4. Click Download to retrieve your clean, watermark-free PDF document instantly from device memory.',
+  specs: [
+    { label: 'Supported Platforms', value: 'Windows, macOS, iOS (iPhone/iPad), Android, Linux' },
+    { label: 'Input Formats', value: 'JPG, JPEG, PNG, Apple HEIC, WebP, TIFF, BMP' },
+    { label: 'Multi-Image Merge', value: 'Drag-and-drop page sequencing supported' },
+    { label: 'Cost & Watermarks', value: '100% Free Forever, No Watermark, No Sign-up' },
+    { label: 'Privacy & Security', value: '100% Client-Side In-Browser (Zero File Uploads)' },
+  ],
+};
+
+const pageTitle = `How to Convert Image to PDF for Free (Windows, Mac, iPhone) | ${SITE.name}`;
+const pageDesc =
+  'Learn how to convert images to PDF for free on Windows, Mac, iPhone, and Android. Convert JPG, PNG, and HEIC to single or multi-page PDFs with zero watermarks and 100% privacy.';
+const pageKeywords = [
+  'how to convert image to pdf',
+  'how to convert image to pdf for free',
+  'how to convert image to pdf online',
+  'convert image to pdf free',
+  'how to make image to pdf',
+  'how to convert picture to pdf',
+  'how to turn an image into a pdf',
+  'convert photo to pdf on windows',
+  'convert photo to pdf on mac',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert image to PDF for free',
+  description: 'Step-by-step instructions to convert any image file into a clean, printable PDF document.',
+  steps: [
+    {
+      name: 'Drop image into converter',
+      text: 'Drag your JPG, PNG, WebP, or iPhone HEIC picture into PixelKit.',
+    },
+    {
+      name: 'Set page layout and sequence',
+      text: 'Reorder thumbnail pages, set portrait or landscape orientation, and configure margins.',
+    },
+    {
+      name: 'Select optional size ceiling',
+      text: 'Choose under 100KB, 200KB, or 500KB if submitting to strict recruitment or visa portals.',
+    },
+    {
+      name: 'Download PDF file',
+      text: 'Click Download to immediately save your professional, watermark-free PDF document.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'Image to PDF Converter — PixelKit',
+    description: pageDesc,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+    url: 'https://pixelkit.app/how-to-convert-image-to-pdf/',
+  }),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+  buildFaqJsonLd(faqs),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Breadcrumbs Navigation -->
+    <Breadcrumbs items={breadcrumbs} class="mb-6" />
+
+    <!-- Hero Header -->
+    <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <Badge variant="primary">Comprehensive Step-by-Step Guide</Badge>
+        <Badge variant="outline">Cross-Platform · 100% Free</Badge>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+        How to Convert Image to PDF for Free
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+        Whether you are on Windows, macOS, iPhone, or Android, convert JPG, PNG, and HEIC pictures into clean, professional PDF documents without downloading desktop software, paying subscriptions, or risking your private files.
+      </p>
+    </header>
+
+    <!-- Interactive Tool Island -->
+    <section aria-label="Image to PDF Converter Tool" class="mb-12">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        initialTool="convert"
+      />
+    </section>
+
+    <!-- Quick GEO Answer Box -->
+    <section class="mb-12">
+      <DirectAnswerBox
+        title={directAnswer.title}
+        summaryText={directAnswer.summaryText}
+        specs={directAnswer.specs}
+      />
+    </section>
+
+    <!-- Platform by Platform Step-by-Step Instructions -->
+    <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
+      <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+          Method 1: The Fastest Cross-Platform Method (PixelKit In-Browser)
+        </h2>
+        <p class="text-muted-foreground leading-relaxed mb-4">
+          The easiest method across all devices—including Chromebooks, Windows PCs, Macs, and smartphones—is PixelKit. It requires zero software installation and operates 100% inside your browser memory:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-muted-foreground mb-4">
+          <li><strong>Drop your photos:</strong> Select one or dozens of JPG, PNG, WebP, or iPhone HEIC photos into the tool workspace above.</li>
+          <li><strong>Reorder pages:</strong> Drag thumbnails left and right to set the exact page sequence for your final document.</li>
+          <li><strong>Adjust layout:</strong> Pick page orientation (Portrait or Landscape) and margins (No Margin, Small, or Standard).</li>
+          <li><strong>Lock file size (Optional):</strong> If submitting to strict portals like NEET or UPSC, select "Under 200KB" or "Under 100KB".</li>
+          <li><strong>Download:</strong> Click Download to instantly receive your high-resolution, watermark-free PDF file.</li>
+        </ol>
+      </section>
+
+      <!-- Multi-Platform Grid -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            🪟
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Method 2: Built-in on Windows 10 & 11
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+            Windows includes a native virtual printer named <strong>Microsoft Print to PDF</strong>:
+          </p>
+          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+            <li>Open the image in the Windows <strong>Photos</strong> app.</li>
+            <li>Press <kbd class="px-1.5 py-0.5 rounded bg-surface border border-border text-xs font-mono">Ctrl + P</kbd> or click the printer icon.</li>
+            <li>Under <strong>Printer</strong>, choose <em>Microsoft Print to PDF</em>.</li>
+            <li>Click <strong>Print</strong> and choose where to save your PDF.</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            🍎
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Method 3: Built-in on macOS (Preview)
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+            macOS includes an industrial-grade PDF engine right inside Apple Preview:
+          </p>
+          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+            <li>Select multiple images in <strong>Finder</strong>, right-click and choose <em>Open With &gt; Preview</em>.</li>
+            <li>In the Preview sidebar, drag thumbnails to set the page order.</li>
+            <li>Click <strong>File &gt; Export as PDF...</strong> in the top menu bar.</li>
+            <li>Name your PDF document and click <strong>Save</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            📱
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Method 4: On iPhone and iPad (iOS)
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+            Convert photos directly inside the Apple Photos app using the hidden pinch gesture:
+          </p>
+          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+            <li>Open the <strong>Photos</strong> app and select your picture(s).</li>
+            <li>Tap the <strong>Share</strong> button and choose <strong>Print</strong>.</li>
+            <li>On the print preview page, <strong>pinch outward</strong> with two fingers on the photo thumbnail.</li>
+            <li>Tap the <strong>Share</strong> icon on the newly opened PDF view and select <em>Save to Files</em>.</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            🤖
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Method 5: On Android Devices
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+            Convert camera photos using Google Photos or Android's system print spooler:
+          </p>
+          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+            <li>Open the picture in <strong>Google Photos</strong>.</li>
+            <li>Tap the three vertical dots (menu) in the top-right corner.</li>
+            <li>Swipe across the options and tap <strong>Print</strong>.</li>
+            <li>Select <em>Save as PDF</em> from the top dropdown menu and tap the PDF download button.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Security Advisory -->
+      <section class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-8">
+        <h3 class="text-lg font-bold text-foreground mb-2">
+          Security Warning: Why You Should Avoid Cloud PDF Uploaders
+        </h3>
+        <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+          When converting documents like tax statements, university transcripts, employment contracts, or identity cards (Aadhaar, Passport, SSN), uploading your files to third-party cloud servers poses severe identity theft risks. Cloud conversion companies routinely store files on remote AWS/GCP buckets, analyze metadata, and may expose your sensitive information to data breaches.
+        </p>
+        <p class="text-sm text-muted-foreground leading-relaxed">
+          PixelKit eliminates this danger completely. By executing WebAssembly algorithms directly inside your web browser, our tool processes 100% of your images in local RAM memory. No files are ever uploaded or transmitted across the internet.
+        </p>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section>
+        <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
+          Frequently Asked Questions About Converting Images to PDF
+        </h2>
+        <FAQSection faqs={faqs} />
+      </section>
+
+      <!-- Internal Linking Hub -->
+      <section class="border-t border-border/80 pt-8 mt-12">
+        <h3 class="text-lg font-bold text-foreground mb-4">Related PDF and Image Tools</h3>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Image to PDF Converter
+          </a>
+          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Photo to PDF
+          </a>
+          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            HEIC to PDF
+          </a>
+          <a href="/image-to-pdf-200kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Image to PDF 200KB
+          </a>
+          <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Photo to PDF on iPhone Guide
+          </a>
+          <a href="/how-to-convert-heic-to-jpg-on-windows/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            HEIC to JPG on Windows
+          </a>
+          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Merge JPG to PDF
+          </a>
+          <a href="/jpg-to-jpeg/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            JPG to JPEG Converter
+          </a>
+        </div>
+      </section>
+    </article>
+  </main>
+</BaseLayout>

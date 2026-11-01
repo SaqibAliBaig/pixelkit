@@ -1,0 +1,326 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert/' },
+  { label: 'HEIC to PDF' },
+];
+
+const faqs = [
+  {
+    q: 'How do I convert HEIC photos to PDF online for free?',
+    a: 'Drop your Apple iPhone .heic or .heif photos into the converter box above. PixelKit instantly decodes the HEIC container in your browser memory and formats each image into a standard, printable PDF page. Click "Download" to save your clean, watermark-free PDF without signing up or uploading any data.',
+  },
+  {
+    q: 'Can I merge multiple HEIC photos into a single PDF document?',
+    a: 'Yes. Drop multiple camera photos, handwritten assignments, or receipt pictures into PixelKit simultaneously. Drag and drop thumbnail cards to reorder your pages in sequence, select orientation (portrait or landscape), and click Download to export a unified multi-page PDF.',
+  },
+  {
+    q: 'How can I convert HEIC to PDF under 200KB or 100KB for exam and visa portals?',
+    a: 'Government and university portals (like NTA NEET, SSC, Schengen Visa, and US Visa DS-160) enforce strict file size ceilings. After dropping your HEIC photos, choose a target size ceiling (like 100KB or 200KB). PixelKit iteratively optimizes raster resolution and compression so your final PDF strictly satisfies portal constraints.',
+  },
+  {
+    q: 'Are my private iPhone photos uploaded to any cloud server?',
+    a: 'Never. PixelKit operates on a strict zero-upload security model. All HEIC decoding (via libheif WebAssembly) and PDF compilation execute locally inside your browser memory. Your personal documents, bank statements, and photo IDs never touch any remote server.',
+  },
+  {
+    q: 'How do I convert HEIC to PDF on iPhone without installing an app?',
+    a: 'Open Safari on your iPhone, visit pixelkit.app/heic-to-pdf, and tap the upload box to choose photos from your Photo Library or Files app. PixelKit compiles the PDF right on your iPhone in Safari—no App Store downloads, subscriptions, or watermarks required.',
+  },
+  {
+    q: 'Can I convert HEIC to PDF on Windows 10 or Windows 11?',
+    a: 'Yes. Windows often fails to open HEIC files without paid Microsoft Store extensions. In PixelKit, you can drop any iPhone HEIC photo directly into Chrome, Edge, or Firefox on Windows, and instantly convert it to a universal PDF or JPG with zero third-party software installation.',
+  },
+];
+
+const directAnswer = {
+  title: 'Quick Answer: How to Convert HEIC to PDF Online',
+  summaryText:
+    'To convert Apple iPhone HEIC photos to PDF without uploading your files: 1. Drag and drop your .heic or .heif pictures into PixelKit. 2. Drag thumbnails to reorder pages and set page layout. 3. Optionally pick an exact target size (such as under 100KB, 200KB, or 500KB) for exam or visa compliance. 4. Click Download to retrieve your sharp, watermark-free PDF document instantly from device memory.',
+  specs: [
+    { label: 'Input Formats', value: '.HEIC, .HEIF, Apple Live Photos, Burst Shots' },
+    { label: 'Output Document', value: 'Universal PDF (ISO 32000-1 compliant)' },
+    { label: 'Multi-Page Merge', value: 'Interactive drag-and-drop page sequencing' },
+    { label: 'Size Presets', value: 'Original quality, Under 100KB, 200KB, 300KB, 500KB' },
+    { label: 'Data Privacy', value: '100% Client-Side WebAssembly (Zero Server Uploads)' },
+  ],
+};
+
+const pageTitle = `HEIC to PDF Converter — Convert iPhone Photos to PDF Free | ${SITE.name}`;
+const pageDesc =
+  'Free online HEIC to PDF converter. Convert Apple iPhone photos (.heic/.heif) into single or multi-page PDF documents. 100% private in-browser tool with zero uploads.';
+const pageKeywords = [
+  'heic to pdf',
+  'convert heic to pdf',
+  'heic to pdf converter',
+  'iphone heic to pdf',
+  'heic to pdf online',
+  'heic to pdf free',
+  'convert heic to pdf online',
+  'how to convert heic to pdf',
+  'merge heic to pdf',
+  'iphone photo to pdf',
+  'heic to pdf 200kb',
+  'heic to pdf converter free',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert HEIC photos to PDF online',
+  description: 'Step-by-step instructions to convert iPhone HEIC pictures into clean, printable PDF documents.',
+  steps: [
+    {
+      name: 'Select your HEIC photos',
+      text: 'Drop or browse your Apple iPhone .heic or .heif files into the converter workspace.',
+    },
+    {
+      name: 'Organize pages and settings',
+      text: 'Drag thumbnail cards to sequence pages, set portrait/landscape orientation, and pick margin spacing.',
+    },
+    {
+      name: 'Optionally set size target',
+      text: 'Choose a target size ceiling like under 200KB or 100KB to guarantee acceptance on government portals.',
+    },
+    {
+      name: 'Download PDF document',
+      text: 'Click Download to instantly save your converted PDF file with crisp text and high image clarity.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'HEIC to PDF Converter — PixelKit',
+    description: pageDesc,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+    url: 'https://pixelkit.app/heic-to-pdf/',
+  }),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+  buildFaqJsonLd(faqs),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Breadcrumbs Navigation -->
+    <Breadcrumbs items={breadcrumbs} class="mb-6" />
+
+    <!-- Hero Header -->
+    <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <Badge variant="primary">High-Efficiency iOS to PDF</Badge>
+        <Badge variant="outline">100% Client-Side Privacy</Badge>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+        HEIC to PDF Converter
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+        Convert Apple iPhone photos (<code class="font-mono text-foreground font-semibold">.heic</code> & <code class="font-mono text-foreground font-semibold">.heif</code>) into standardized, high-resolution PDF documents. Merge multi-page receipts, assignments, and certificates instantly in your browser with zero cloud uploads.
+      </p>
+    </header>
+
+    <!-- Interactive Tool Island -->
+    <section aria-label="HEIC to PDF Converter Tool" class="mb-12">
+      <ToolPreview
+        from="heic"
+        to="pdf"
+        fromMime="image/heic"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </section>
+
+    <!-- Quick GEO Answer Box -->
+    <section class="mb-12">
+      <DirectAnswerBox
+        title={directAnswer.title}
+        summaryText={directAnswer.summaryText}
+        specs={directAnswer.specs}
+      />
+    </section>
+
+    <!-- Portal Compliance & Exam Specifications -->
+    <section class="mb-12">
+      <PortalRequirementsGuide activePortal="neet" />
+    </section>
+
+    <!-- Deep Educational Content & Architecture Sections -->
+    <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
+      <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+          Why Does Apple Use HEIC, and Why Do Online Portals Demand PDF?
+        </h2>
+        <p class="text-muted-foreground leading-relaxed mb-4">
+          Since iOS 11, Apple adopted the High Efficiency Image Container (HEIC / HEIF based on HEVC H.265 compression) as the default format for iPhone and iPad cameras. HEIC delivers extraordinary benefits for mobile photography: it stores images at nearly <strong>half the file size of traditional JPEGs</strong> while supporting 16-bit color depth, dynamic range, and embedded depth maps.
+        </p>
+        <p class="text-muted-foreground leading-relaxed mb-4">
+          However, online submission systems—such as university portals (Google Classroom, Canvas, Blackboard), employer ATS systems, tax authorities (IRS, HMRC), and government visa/recruitment portals—were built around universal document standards. These platforms almost universally reject raw HEIC files because legacy enterprise document servers and PDF indexers cannot parse them.
+        </p>
+        <p class="text-muted-foreground leading-relaxed">
+          PixelKit bridges this gap seamlessly. Our client-side WebAssembly engine compiles libheif directly inside your web browser, decoding Apple's modern compression algorithms and compiling your pictures into universal ISO-standard PDF documents that open flawlessly on any computer, tablet, or enterprise filing system.
+        </p>
+      </section>
+
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            1
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Merge Multi-Page iPhone Scans into One PDF
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            Photographing multi-page student homework, legal contracts, or rental agreements? Select all your photos at once. PixelKit allows you to reorder pages intuitively with drag-and-drop thumbnail cards, set portrait or landscape orientation per page, and export a clean, organized multi-page PDF document.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            2
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Strict File Size Compression (Under 100KB / 200KB / 500KB)
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            Many application portals reject PDFs that exceed rigid size ceilings (e.g., 200KB for NEET/JEE or 300KB for PSC portals). PixelKit applies iterative binary quantization search on the canvas stream to ensure your PDF stays strictly under your target kilobyte limit while preserving razor-sharp text legibility.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            3
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            100% Private In-Browser Architecture
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            Most online PDF tools upload your photos to unknown cloud servers where they may be logged or retained. When dealing with passport scans, medical records, or tax receipts, privacy is non-negotiable. PixelKit operates entirely inside your local device memory using WebAssembly—zero bytes leave your computer or phone.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            4
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">
+            Works Everywhere Without App Store Downloads
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            No need to pay \$4.99/week for shady App Store scanner apps or install third-party Windows codec packs. PixelKit runs natively in Mobile Safari, Google Chrome, Edge, and Firefox across iOS, macOS, Windows 10/11, Android, and Linux.
+          </p>
+        </div>
+      </section>
+
+      <!-- Technical Comparison Table -->
+      <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8 overflow-hidden">
+        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+          HEIC vs. PDF for Document Submission
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-border/80 text-foreground font-semibold">
+                <th class="py-3 px-4">Feature</th>
+                <th class="py-3 px-4">Apple HEIC (.heic)</th>
+                <th class="py-3 px-4">Standard PDF (.pdf)</th>
+                <th class="py-3 px-4">PixelKit Conversion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border/40 text-muted-foreground">
+              <tr>
+                <td class="py-3 px-4 font-medium text-foreground">Cross-Platform Compatibility</td>
+                <td class="py-3 px-4 text-amber-500 font-medium">Limited (Apple native only)</td>
+                <td class="py-3 px-4 text-emerald-500 font-medium">Universal (100% devices)</td>
+                <td class="py-3 px-4">Standardized ISO PDF</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-medium text-foreground">Multi-Page Bundling</td>
+                <td class="py-3 px-4">Multiple loose picture files</td>
+                <td class="py-3 px-4 text-emerald-500 font-medium">Single consolidated document</td>
+                <td class="py-3 px-4">Interactive page sequencing</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-medium text-foreground">Government Portal Acceptance</td>
+                <td class="py-3 px-4 text-rose-500 font-medium">Almost universally rejected</td>
+                <td class="py-3 px-4 text-emerald-500 font-medium">100% accepted worldwide</td>
+                <td class="py-3 px-4">Validated against NTA/UPSC/Schengen</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-medium text-foreground">Printing & Margins</td>
+                <td class="py-3 px-4">Irregular aspect ratios</td>
+                <td class="py-3 px-4 text-emerald-500 font-medium">Exact A4 / US Letter pages</td>
+                <td class="py-3 px-4">Auto-centered with clean margins</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4 font-medium text-foreground">Privacy Risk</td>
+                <td class="py-3 px-4">Exposes EXIF location data</td>
+                <td class="py-3 px-4">Clean document metadata</td>
+                <td class="py-3 px-4 text-emerald-500 font-medium">EXIF scrubbed, zero upload</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section>
+        <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
+          Frequently Asked Questions About Converting HEIC to PDF
+        </h2>
+        <FAQSection faqs={faqs} />
+      </section>
+
+      <!-- Internal Linking Hub -->
+      <section class="border-t border-border/80 pt-8 mt-12">
+        <h3 class="text-lg font-bold text-foreground mb-4">Related PDF and Image Tools</h3>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Image to PDF Hub
+          </a>
+          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Photo to PDF
+          </a>
+          <a href="/image-to-pdf-200kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Image to PDF 200KB
+          </a>
+          <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            How to Convert Photo to PDF on iPhone
+          </a>
+          <a href="/how-to-convert-heic-to-jpg-on-windows/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            HEIC to JPG on Windows Guide
+          </a>
+          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Merge JPG to PDF
+          </a>
+          <a href="/heic-to-jpg/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            HEIC to JPG Converter
+          </a>
+          <a href="/compress-image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Compress Image to PDF
+          </a>
+        </div>
+      </section>
+    </article>
+  </main>
+</BaseLayout>

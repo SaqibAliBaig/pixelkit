@@ -1,0 +1,246 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Convert', href: '/convert/' },
+  { label: 'JPG to JPEG' },
+];
+
+const faqs = [
+  {
+    q: 'What is the difference between JPG and JPEG?',
+    a: 'There is zero difference in image quality, compression, or color encoding. Both refer to the exact same Joint Photographic Experts Group image standard (MIME type image/jpeg). The only difference is the file extension: older MS-DOS and Windows 95 systems required strict 3-character extensions (.jpg), whereas Unix, macOS, and modern Linux systems commonly used .jpeg.',
+  },
+  {
+    q: 'Why did my government or university application reject my .jpg file?',
+    a: 'Many legacy recruitment, visa, and banking application portals use outdated upload validators with rigid regular expressions that check only for the literal string ".jpeg". Even though the underlying image is identical, the server script blocks files ending in ".jpg". Converting your file with PixelKit outputs a compliant .jpeg file that passes these validators immediately.',
+  },
+  {
+    q: 'Does converting JPG to JPEG reduce or lose image quality?',
+    a: 'No. PixelKit performs lossless header validation and extension repackaging directly inside your web browser. The underlying pixel matrix and quantization tables remain 100% pristine with zero recompression artifacts or quality loss.',
+  },
+  {
+    q: 'How do I convert JPG to JPEG for free?',
+    a: 'Drag and drop your .jpg photos into the converter box above. PixelKit instantly processes your files in browser memory. Click "Download" to retrieve your verified .jpeg images with zero watermarks and zero registration.',
+  },
+  {
+    q: 'Are my private photos and ID cards uploaded to any remote server?',
+    a: 'Never. PixelKit is 100% client-side. All processing occurs strictly inside your device memory using HTML5 and WebAssembly APIs. Your personal photographs, government IDs, and documents never leave your computer or phone.',
+  },
+  {
+    q: 'Can I batch convert multiple JPG files to JPEG at once?',
+    a: 'Yes. Drop dozens of .jpg files into PixelKit simultaneously. Our batch engine processes them in parallel and lets you download all converted .jpeg files individually or packed together in a clean ZIP archive.',
+  },
+];
+
+const directAnswer = {
+  title: 'Quick Answer: How to Convert JPG to JPEG Online',
+  summaryText:
+    'To convert JPG to JPEG without losing quality: 1. Drag and drop your .jpg photos into PixelKit. 2. The tool preserves 100% of your original pixel data without lossy recompression. 3. Verify target format is set to JPEG. 4. Click Download to immediately save your verified .jpeg files for strict application portal compliance.',
+  specs: [
+    { label: 'Image Quality', value: '100% Lossless (Zero Recompression Artifacts)' },
+    { label: 'File Extension', value: 'Converts .jpg to strict .jpeg extension' },
+    { label: 'Portal Compliance', value: 'Passes rigid government & visa upload filters' },
+    { label: 'Batch Processing', value: 'Unlimited photos at once, ZIP download' },
+    { label: 'Security Model', value: '100% Client-Side (Zero Server Uploads)' },
+  ],
+};
+
+const pageTitle = `JPG to JPEG Converter — Convert JPG to JPEG Online Free | ${SITE.name}`;
+const pageDesc =
+  'Free online JPG to JPEG converter. Convert .jpg to .jpeg files instantly with 100% lossless quality. Fix strict portal upload errors with zero cloud uploads.';
+const pageKeywords = [
+  'jpg to jpeg',
+  'convert jpg to jpeg',
+  'jpg to jpeg converter',
+  'online jpg to jpeg converter',
+  'how to convert jpg to jpeg',
+  'jpg to jpeg online',
+  'jpg to jpeg converter free',
+  'change jpg to jpeg',
+  'difference between jpg and jpeg',
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to convert JPG to JPEG online',
+  description: 'Step-by-step instructions to convert .jpg photos to .jpeg format without quality loss.',
+  steps: [
+    {
+      name: 'Upload JPG photos',
+      text: 'Drop or select your .jpg image files into the converter workspace.',
+    },
+    {
+      name: 'Verify format settings',
+      text: 'Ensure target format is set to JPEG (.jpeg) for portal compliance.',
+    },
+    {
+      name: 'Instant browser conversion',
+      text: 'PixelKit processes your images locally in device memory with zero loss.',
+    },
+    {
+      name: 'Download JPEG files',
+      text: 'Click Download to save your compliant .jpeg images instantly.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'JPG to JPEG Converter — PixelKit',
+    description: pageDesc,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'Any (Web Browser)',
+    url: 'https://pixelkit.app/jpg-to-jpeg/',
+  }),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  howToJsonLd,
+  buildFaqJsonLd(faqs),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  keywords={pageKeywords}
+  jsonLd={jsonLd}
+>
+  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Breadcrumbs Navigation -->
+    <Breadcrumbs items={breadcrumbs} class="mb-6" />
+
+    <!-- Hero Header -->
+    <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <Badge variant="primary">100% Lossless Conversion</Badge>
+        <Badge variant="outline">Strict Portal Validation Ready</Badge>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+        JPG to JPEG Converter
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+        Convert <code class="font-mono text-foreground font-semibold">.jpg</code> photos to <code class="font-mono text-foreground font-semibold">.jpeg</code> format instantly in your browser. Bypass stubborn government and university form validation errors with zero quality loss and 100% client-side privacy.
+      </p>
+    </header>
+
+    <!-- Interactive Tool Island -->
+    <section aria-label="JPG to JPEG Converter Tool" class="mb-12">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="convert"
+      />
+    </section>
+
+    <!-- Quick GEO Answer Box -->
+    <section class="mb-12">
+      <DirectAnswerBox
+        title={directAnswer.title}
+        summaryText={directAnswer.summaryText}
+        specs={directAnswer.specs}
+      />
+    </section>
+
+    <!-- Deep Technical Explanation Section -->
+    <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
+      <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+          Is JPG Different From JPEG? The Historical Truth
+        </h2>
+        <p class="text-muted-foreground leading-relaxed mb-4">
+          The short answer is <strong>no</strong>. In terms of image compression, color channels, bit depth, and raster rendering, JPG and JPEG are 100% identical. Both formats are standardized under ISO/IEC 10918-1 by the Joint Photographic Experts Group and share the universal MIME media type <code class="font-mono text-foreground">image/jpeg</code>.
+        </p>
+        <p class="text-muted-foreground leading-relaxed mb-4">
+          The difference exists solely due to computer operating system history. In the era of MS-DOS and Windows 3.1 / Windows 95, the FAT16 filesystem enforced the famous <strong>8.3 filename convention</strong>: file names could only be up to 8 characters long, followed by a maximum of 3 extension characters. Because <code class="font-mono text-foreground">.jpeg</code> was 4 characters long, Microsoft shortened it to <code class="font-mono text-foreground">.jpg</code>. Meanwhile, Unix, macOS, and Linux operating systems had no such limitation and used <code class="font-mono text-foreground">.jpeg</code>.
+        </p>
+        <p class="text-muted-foreground leading-relaxed">
+          Today, all modern operating systems treat <code class="font-mono text-foreground">.jpg</code> and <code class="font-mono text-foreground">.jpeg</code> as interchangeable. However, older web servers and legacy recruitment platforms still enforce rigid filename regex checks that reject <code class="font-mono text-foreground">.jpg</code> files.
+        </p>
+      </section>
+
+      <!-- Educational Feature Grid -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            🛡️
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">Zero Quality Loss</h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            PixelKit packages your image directly without lossy re-encoding loops. Every pixel, color gradient, and edge sharpness detail remains bit-for-bit identical to your original image.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            ⚡
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">Instant Batch Conversion</h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            Convert hundreds of images in seconds. Because files are processed locally on your CPU via Web Workers, there are no internet upload bottlenecks or bandwidth restrictions.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
+          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+            🔒
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">100% Client-Side Privacy</h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            Never upload sensitive passport scans, exam admit cards, or identity proofs to unverified cloud servers. PixelKit guarantees 100% of the work happens inside your browser.
+          </p>
+        </div>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section>
+        <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
+          Frequently Asked Questions About Converting JPG to JPEG
+        </h2>
+        <FAQSection faqs={faqs} />
+      </section>
+
+      <!-- Internal Linking Hub -->
+      <section class="border-t border-border/80 pt-8 mt-12">
+        <h3 class="text-lg font-bold text-foreground mb-4">Related Format Converters</h3>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Image to PDF
+          </a>
+          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Photo to PDF
+          </a>
+          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Merge JPG to PDF
+          </a>
+          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            HEIC to PDF
+          </a>
+          <a href="/resize-image-to-20kb-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Resize Image to 20KB to 50KB
+          </a>
+          <a href="/compress-jpg-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            Compress JPG to 50KB
+          </a>
+          <a href="/jpg-to-png/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+            JPG to PNG Converter
+          </a>
+        </div>
+      </section>
+    </article>
+  </main>
+</BaseLayout>

@@ -88,6 +88,8 @@ export default defineConfig({
           item.lastmod = getGitDate('src/pages/compress-jpg-to-[size]kb.astro');
         } else if (item.url.match(/\/photo-resizer-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/photo-resizer-[size]kb.astro');
+        } else if (item.url.match(/\/photo-to-pdf-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/photo-to-pdf-[size]kb.astro');
         } else if (item.url.match(/\/image-resizer-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/image-resizer-[size]kb.astro');
         } else if (item.url.match(/\/resize-image-to-\d+kb\/$/)) {
