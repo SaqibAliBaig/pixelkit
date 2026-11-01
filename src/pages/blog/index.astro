@@ -35,7 +35,7 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={`Blog — ${SITE.name}`}
+  title="PixelKit Blog — Image Compression & Portal Guides"
   description="Practical guides on file formats, portals, compression, and getting your upload accepted on the first try."
   jsonLd={jsonLd}
   width="default"
@@ -60,7 +60,7 @@ const jsonLd = [
       {posts.map((post) => (
         <li>
           <a
-            href={`/blog/${post.slug}`}
+            href={`/blog/${post.slug}/`}
             class="group block rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 transition-all hover:border-accent/40 hover:bg-surface hover:shadow-sm active:scale-[0.99] shadow-xs"
           >
             <div class="flex items-center justify-between gap-2 text-[11px] sm:text-xs text-muted">

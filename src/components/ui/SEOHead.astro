@@ -38,6 +38,9 @@ const fullTitle = title.includes(SITE.name)
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+{keywords && (
+  <meta name="keywords" content={Array.isArray(keywords) ? keywords.join(', ') : keywords} />
+)}
 {!noindex && <link rel="canonical" href={canonical} />}
 <meta name="author" content={author} />
 <meta name="publisher" content={SITE.name} />

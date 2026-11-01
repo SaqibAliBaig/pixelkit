@@ -1,5 +1,5 @@
 ---
-title: "How to Crop Images to Exact Aspect Ratios (1:1, 4:5, 16:9)"
+title: "How to Crop Images to Exact Aspect Ratios"
 description: "Master aspect ratio cropping for Instagram, YouTube thumbnails, avatars, and website hero banners without black bars or blur."
 publishedAt: 2026-02-18
 author: "PixelKit"

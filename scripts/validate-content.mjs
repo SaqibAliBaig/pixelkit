@@ -292,7 +292,7 @@ for (const c of combos) {
 
 // ------------------------------------------------------------------
 // Internal Link Trailing Slash Guard
-// Fails if blog markdown links omit a trailing slash (preventing 307 hops)
+// Fails if blog markdown links or component hrefs omit trailing slash
 // ------------------------------------------------------------------
 const blogDir = resolve(ROOT, 'src/content/blog');
 try {
@@ -314,6 +314,27 @@ try {
       }
     }
   }
+
+  // Also check .astro files for dynamic blog links
+  async function scanAstroFiles(dir) {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const e of entries) {
+      const full = resolve(dir, e.name);
+      if (e.isDirectory()) {
+        await scanAstroFiles(full);
+      } else if (e.name.endsWith('.astro')) {
+        const text = await readFile(full, 'utf8');
+        const matches = text.matchAll(/href=\{`(\/[^`#]+)`\}/g);
+        for (const m of matches) {
+          const u = m[1];
+          if (!u.endsWith('/') && !u.includes('.')) {
+            violations.push(`${e.name}: template href missing trailing slash: ${u}`);
+          }
+        }
+      }
+    }
+  }
+  await scanAstroFiles(resolve(ROOT, 'src'));
 } catch (err) {
   violations.push(`Could not read blog directory: ${err.message}`);
 }

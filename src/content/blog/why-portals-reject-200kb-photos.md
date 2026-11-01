@@ -1,5 +1,5 @@
 ---
-title: "Why Portals Reject Your 200KB Photo & How to Fix It"
+title: "Why Portals Reject 200KB Photos & How to Fix"
 description: "The real reasons passport, visa and exam portals reject photos at 200KB — file format, dimensions, and quality — and the fastest way to hit the exact limit."
 publishedAt: 2026-01-15
 author: "PixelKit"

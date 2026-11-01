@@ -80,6 +80,14 @@ export function buildSiteSchemaGraph(): Record<string, unknown> {
         url: 'https://pixelkit.app',
         name: 'PixelKit',
         publisher: { '@id': 'https://pixelkit.app/#organization' },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: 'https://pixelkit.app/convert/?q={search_term_string}',
+          },
+          'query-input': 'required name=search_term_string',
+        },
       },
       {
         '@type': 'WebApplication',
