@@ -27,12 +27,75 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     logo: {
       '@type': 'ImageObject',
       url: 'https://pixelkit.app/icon-512.png',
-      width: '512',
-      height: '512',
+      width: 512,
+      height: 512,
+    },
+    founder: {
+      '@type': 'Person',
+      name: 'Saqib Ali Baig',
+      url: 'https://pixelkit.app/about/',
+      sameAs: [
+        'https://x.com/SaqibBaig1100',
+        'https://github.com/SaqibAliBaig',
+      ],
     },
     sameAs: ['https://x.com/SaqibBaig1100', 'https://github.com/SaqibAliBaig/pixelkit'],
     description:
       'Free, 100% client-side online image compressor, image converter, photo resizer, and aspect-ratio cropper running privately in your browser without server uploads.',
+  };
+}
+
+export function buildSiteSchemaGraph(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://pixelkit.app/#organization',
+        name: 'PixelKit',
+        url: 'https://pixelkit.app',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://pixelkit.app/icon-512.png',
+          width: 512,
+          height: 512,
+        },
+        founder: {
+          '@type': 'Person',
+          name: 'Saqib Ali Baig',
+          url: 'https://pixelkit.app/about/',
+          sameAs: [
+            'https://x.com/SaqibBaig1100',
+            'https://github.com/SaqibAliBaig',
+          ],
+        },
+        sameAs: [
+          'https://x.com/SaqibBaig1100',
+          'https://github.com/SaqibAliBaig/pixelkit',
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://pixelkit.app/#website',
+        url: 'https://pixelkit.app',
+        name: 'PixelKit',
+        publisher: { '@id': 'https://pixelkit.app/#organization' },
+      },
+      {
+        '@type': 'WebApplication',
+        '@id': 'https://pixelkit.app/#application',
+        name: 'PixelKit Image Studio',
+        url: 'https://pixelkit.app',
+        applicationCategory: 'MultimediaApplication',
+        operatingSystem: 'Any (Web Browser)',
+        browserRequirements: 'Requires JavaScript, WebAssembly, and Canvas API support',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+      },
+    ],
   };
 }
 
@@ -217,17 +280,24 @@ export function buildBlogPostingJsonLd(input: BlogPostingInput): Record<string, 
     datePublished: input.publishedAt.toISOString(),
     dateModified: (input.updatedAt ?? input.publishedAt).toISOString(),
     author: {
-      '@type': 'Organization',
-      name: input.author,
-      url: 'https://pixelkit.app',
+      '@type': 'Person',
+      name: input.author || 'Saqib Ali Baig',
+      url: 'https://pixelkit.app/about/',
+      sameAs: [
+        'https://x.com/SaqibBaig1100',
+        'https://github.com/SaqibAliBaig',
+      ],
     },
     publisher: {
       '@type': 'Organization',
+      '@id': 'https://pixelkit.app/#organization',
       name: 'PixelKit',
       url: 'https://pixelkit.app',
       logo: {
         '@type': 'ImageObject',
         url: 'https://pixelkit.app/icon-512.png',
+        width: 512,
+        height: 512,
       },
     },
     inLanguage: 'en-US',

@@ -202,3 +202,219 @@ export function buildFaqs(combo: ComboForMeta): FAQItem[] {
 
   return bank;
 }
+
+export interface FormatComparisonRow {
+  property: string;
+  sourceValue: string;
+  targetValue: string;
+}
+
+export interface TechnicalReferenceData {
+  engineNote: string;
+  comparisonRows: FormatComparisonRow[];
+}
+
+interface RawFormatSpec {
+  name: string;
+  mime: string;
+  compressionType: string;
+  alphaTransparency: string;
+  typicalCompressionRatio: string;
+  colorSpace: string;
+  engine: string;
+}
+
+const FORMAT_TECHNICAL_SPECS: Record<string, RawFormatSpec> = {
+  jpg: {
+    name: 'JPEG (Joint Photographic Experts Group)',
+    mime: 'image/jpeg',
+    compressionType: 'Lossy Discrete Cosine Transform (DCT) with quantization',
+    alphaTransparency: 'No (Opaque; transparent layers filled with white canvas)',
+    typicalCompressionRatio: '10%–25% of uncompressed raw bitmap (75%–90% reduction)',
+    colorSpace: '24-bit sRGB (YCbCr chroma subsampling 4:2:0)',
+    engine: 'Hardware-accelerated browser Canvas 2D JPEG encoder with Web Workers',
+  },
+  png: {
+    name: 'PNG (Portable Network Graphics)',
+    mime: 'image/png',
+    compressionType: 'Lossless 2D predictive filter + DEFLATE byte-stream (UPNG.js)',
+    alphaTransparency: 'Supported (Full 8-bit alpha transparency channel)',
+    typicalCompressionRatio: '100% pixel-perfect baseline (lossless RGBA array)',
+    colorSpace: '32-bit RGBA (sRGB true color)',
+    engine: 'HTML5 Canvas API + UPNG.js lossless quantization engine',
+  },
+  webp: {
+    name: 'WebP Image Container',
+    mime: 'image/webp',
+    compressionType: 'Lossy VP8 predictive intra-frame or lossless VP8L',
+    alphaTransparency: 'Supported (Full 8-bit alpha channel supported)',
+    typicalCompressionRatio: '25%–35% smaller than JPEG at equal visual clarity',
+    colorSpace: '24-bit sRGB / 32-bit RGBA',
+    engine: 'Native browser WebP encoding engine via Canvas API',
+  },
+  avif: {
+    name: 'AVIF (AV1 Image File Format)',
+    mime: 'image/avif',
+    compressionType: 'Lossy & lossless AV1 intra-frame video codec',
+    alphaTransparency: 'Supported (Full 8-bit alpha transparency channel)',
+    typicalCompressionRatio: '40%–50% smaller than JPEG at equivalent structural fidelity',
+    colorSpace: '10-bit / 12-bit HDR wide color gamut & 8-bit sRGB',
+    engine: 'Native browser AV1 Canvas encoder in background threads',
+  },
+  heic: {
+    name: 'HEIC (High Efficiency Image Container)',
+    mime: 'image/heic',
+    compressionType: 'High Efficiency Video Coding (HEVC / H.265 intra-frame)',
+    alphaTransparency: 'Supported (Alpha channels and depth map layers)',
+    typicalCompressionRatio: '40%–50% smaller byte footprint than standard JPEG',
+    colorSpace: '10-bit / 16-bit Apple Wide Color (Display P3) & sRGB',
+    engine: 'WebAssembly libheif v1.17 intra-frame decoder',
+  },
+  svg: {
+    name: 'SVG (Scalable Vector Graphics)',
+    mime: 'image/svg+xml',
+    compressionType: 'Resolution-independent XML vector mathematical paths',
+    alphaTransparency: 'Supported (Full vector layer transparency)',
+    typicalCompressionRatio: 'Resolution-independent scalable vector coordinates',
+    colorSpace: 'CSS sRGB vector color gamut',
+    engine: 'DOMParser XML vector renderer & off-screen Canvas rasterizer',
+  },
+  pdf: {
+    name: 'PDF (Portable Document Format)',
+    mime: 'application/pdf',
+    compressionType: 'PostScript stream / Flate / JPEG embedded stream',
+    alphaTransparency: 'Opaque document pages with embedded raster transparency',
+    typicalCompressionRatio: 'Document wrapper (depends on embedded image compression)',
+    colorSpace: 'sRGB / DeviceRGB / CMYK document profile',
+    engine: 'jsPDF v2.5 document builder & Mozilla PDF.js v4.x worker',
+  },
+  tiff: {
+    name: 'TIFF (Tagged Image File Format)',
+    mime: 'image/tiff',
+    compressionType: 'Uncompressed raster bitmap or LZW / ZIP lossless',
+    alphaTransparency: 'Supported (Multi-channel alpha layers)',
+    typicalCompressionRatio: 'Heavy uncompressed baseline (often 10×–20× heavier than JPEG)',
+    colorSpace: '8-bit / 16-bit sRGB, Adobe RGB, CMYK',
+    engine: 'UTIF.js WebAssembly & pure TypeScript TIFF decoder',
+  },
+  bmp: {
+    name: 'BMP (Windows Bitmap)',
+    mime: 'image/bmp',
+    compressionType: 'Raw uncompressed RGB raster pixel array',
+    alphaTransparency: 'Basic 1-bit or none (uncompressed 24-bit RGB)',
+    typicalCompressionRatio: '100% uncompressed raw pixel payload (maximum byte weight)',
+    colorSpace: '24-bit RGB',
+    engine: 'Native Canvas 2D image bitmap decoder',
+  },
+  gif: {
+    name: 'GIF (Graphics Interchange Format)',
+    mime: 'image/gif',
+    compressionType: 'LZW 8-bit indexed palette compression (max 256 colors)',
+    alphaTransparency: 'Supported (1-bit binary on/off transparency mask)',
+    typicalCompressionRatio: 'Palette-indexed (limited 256-color reproduction)',
+    colorSpace: '8-bit indexed palette',
+    engine: 'Native Canvas 2D frame parser & decoder',
+  },
+};
+
+export function getTechnicalReference(combo: ComboForMeta): TechnicalReferenceData {
+  const fromKey = combo.from.toLowerCase();
+  const toKey = combo.to.toLowerCase();
+  const from = fmt(combo.from);
+  const to = fmt(combo.to);
+
+  const src = FORMAT_TECHNICAL_SPECS[fromKey] || {
+    name: from,
+    mime: `image/${fromKey}`,
+    compressionType: 'Standard raster container',
+    alphaTransparency: 'Container dependent',
+    typicalCompressionRatio: 'Standard baseline',
+    colorSpace: 'sRGB',
+    engine: 'Native browser image decoder',
+  };
+
+  const tgt = FORMAT_TECHNICAL_SPECS[toKey] || {
+    name: to,
+    mime: `image/${toKey}`,
+    compressionType: 'Standard raster container',
+    alphaTransparency: 'Container dependent',
+    typicalCompressionRatio: 'Standard baseline',
+    colorSpace: 'sRGB',
+    engine: 'Native browser image encoder',
+  };
+
+  // Dynamic Alpha Transparency Behavior
+  let alphaTarget = tgt.alphaTransparency;
+  if (toKey === 'jpg') {
+    alphaTarget = fromKey === 'png' || fromKey === 'svg' || fromKey === 'webp' || fromKey === 'heic'
+      ? 'Replaced with solid white background canvas (JPG lacks alpha)'
+      : 'No (JPG does not support alpha transparency)';
+  } else if (toKey === 'png' || toKey === 'webp' || toKey === 'avif') {
+    alphaTarget = 'Full 8-bit alpha transparency channel preserved';
+  }
+
+  // Dynamic Relative Compression Ratio
+  let ratioTarget = tgt.typicalCompressionRatio;
+  if (combo.sizeKb) {
+    ratioTarget = `Targeted under ${combo.sizeKb}KB via iterative binary search`;
+  } else if (toKey === 'jpg') {
+    ratioTarget = '70%–85% reduction vs uncompressed bitmap (DCT quantized)';
+  } else if (toKey === 'webp') {
+    ratioTarget = '25%–35% smaller than JPEG at equal visual clarity';
+  } else if (toKey === 'avif') {
+    ratioTarget = '40%–50% smaller than JPEG with minimal edge ringing';
+  } else if (toKey === 'pdf') {
+    ratioTarget = 'Packaged into standardized, printable single or multi-page PDF';
+  } else if (toKey === 'png') {
+    ratioTarget = '100% lossless pixel reconstruction (DEFLATE compressed)';
+  }
+
+  // Engine & Privacy Note
+  let engineNote = '';
+  if (fromKey === 'heic') {
+    engineNote = `Decoded locally using WebAssembly libheif v1.17, color-corrected to sRGB, and encoded to ${to} via HTML5 Canvas API in a background Web Worker without cloud upload.`;
+  } else if (fromKey === 'pdf') {
+    engineNote = `Decoded locally using Mozilla PDF.js v4.x in an isolated Web Worker, rasterized to Canvas, and exported to ${to} without transmitting any document bytes to a server.`;
+  } else if (fromKey === 'svg') {
+    engineNote = `Parsed locally via DOMParser XML vector engine, rasterized onto an off-screen HTML5 Canvas at selected DPI (96–600 DPI), and encoded to ${to} with 100% client-side privacy.`;
+  } else if (fromKey === 'tiff') {
+    engineNote = `Decoded locally using UTIF.js in a background Web Worker, converted to an RGBA pixel buffer, and re-encoded to ${to} via browser Canvas API without server upload.`;
+  } else if (toKey === 'pdf') {
+    engineNote = `Decoded locally in browser memory, iteratively quantized to your size target in Web Workers, and compiled into a valid PDF document stream using jsPDF v2.5 with zero cloud uploads.`;
+  } else {
+    engineNote = `Decoded locally in browser memory using HTML5 Canvas API and WebAssembly, processed via background Web Workers, and saved directly to your device with zero cloud uploads.`;
+  }
+
+  const comparisonRows: FormatComparisonRow[] = [
+    {
+      property: 'Compression Type',
+      sourceValue: src.compressionType,
+      targetValue: tgt.compressionType,
+    },
+    {
+      property: 'Alpha Transparency',
+      sourceValue: src.alphaTransparency,
+      targetValue: alphaTarget,
+    },
+    {
+      property: 'Typical Compression Ratio',
+      sourceValue: src.typicalCompressionRatio,
+      targetValue: ratioTarget,
+    },
+    {
+      property: 'Color Space Support',
+      sourceValue: src.colorSpace,
+      targetValue: tgt.colorSpace,
+    },
+    {
+      property: 'Execution Engine',
+      sourceValue: src.engine,
+      targetValue: tgt.engine,
+    },
+  ];
+
+  return {
+    engineNote,
+    comparisonRows,
+  };
+}

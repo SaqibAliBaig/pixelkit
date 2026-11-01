@@ -32,12 +32,12 @@ The result: a PDF that is 100KB (or whatever target you set), with a scan that i
 
 ## Step by step
 
-1. Open [PixelKit's JPG to PDF under 100KB tool](/jpg-to-pdf-under-100kb).
+1. Open [PixelKit's JPG to PDF under 100KB tool](/jpg-to-pdf-under-100kb/).
 2. Drop your Aadhaar scan (JPG, PNG, HEIC — any common image format).
 3. The tool converts it to a JPG targeting *slightly under* 100KB (about 97KB, leaving room for the PDF wrapper), then wraps it into a PDF.
 4. Download the PDF. It's a standard, single-page PDF that every portal accepts.
 
-If your portal asks for 200KB, use the [JPG to PDF under 200KB tool](/jpg-to-pdf-under-200kb) — same workflow, larger target.
+If your portal asks for 200KB, use the [JPG to PDF under 200KB tool](/jpg-to-pdf-under-200kb/) — same workflow, larger target.
 
 ## Quality tips for readable text
 
@@ -50,10 +50,10 @@ The pipeline above usually keeps a 12-digit Aadhaar number and the address block
 
 ## What if the portal rejects PDF and asks for JPG?
 
-Some portals flip between "PDF required" and "JPG required" depending on the form step. If yours asks for JPG, use [Compress Image to 100KB](/compress-image-to-100kb) — same compression engine, JPG output.
+Some portals flip between "PDF required" and "JPG required" depending on the form step. If yours asks for JPG, use [Compress Image to 100KB](/compress-image-to-100kb/) — same compression engine, JPG output.
 
 ## One thing to double-check before you submit
 
 Some KYC portals check the **number of pages** as well as the size. Make sure your PDF has exactly the pages the portal asks for — usually one, sometimes two (front and back of the card). PixelKit's PDF tool embeds each image you drop as one page, so drop one file for one page, two for two.
 
-Related reading: [Why portals reject 200KB photos](/blog/why-portals-reject-200kb-photos) · [iPhone HEIC explained](/blog/iphone-heic-explained)
+Related reading: [Why portals reject 200KB photos](/blog/why-portals-reject-200kb-photos/) · [iPhone HEIC explained](/blog/iphone-heic-explained/)

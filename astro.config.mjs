@@ -3,6 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 const SITE = 'https://pixelkit.app';
 
@@ -25,6 +26,22 @@ try {
     }
   }
 } catch (_) {}
+
+// Deterministic Git commit date cache for static & programmatic routes
+const gitDateCache = new Map();
+const getGitDate = (filePath) => {
+  if (gitDateCache.has(filePath)) return gitDateCache.get(filePath);
+  try {
+    const stdout = execSync(`git log -1 --format=%cI -- "${filePath}"`, { encoding: 'utf8' });
+    const d = stdout.trim() ? new Date(stdout.trim()) : new Date('2026-11-01');
+    gitDateCache.set(filePath, d);
+    return d;
+  } catch {
+    const fallback = new Date('2026-11-01');
+    gitDateCache.set(filePath, fallback);
+    return fallback;
+  }
+};
 
 export default defineConfig({
   site: SITE,
@@ -57,12 +74,33 @@ export default defineConfig({
           item.url = `${item.url}/`;
         }
 
-        // Accurate lastmod: accurate article date or build timestamp
+        // Accurate lastmod: accurate article date or source file git commit timestamp
         const blogMatch = item.url.match(/\/blog\/([^/]+)\/$/);
         if (blogMatch && blogDates.has(blogMatch[1])) {
           item.lastmod = blogDates.get(blogMatch[1]);
+        } else if (item.url.match(/\/[a-z]+-to-[a-z]+-under-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/[from]-to-[to]-under-[size]kb.astro');
+        } else if (item.url.match(/\/[a-z]+-to-[a-z]+\/$/)) {
+          item.lastmod = getGitDate('src/pages/[from]-to-[to].astro');
+        } else if (item.url.match(/\/compress-image-to-\d+kb\/$/)) {
+          item.lastmod = getGitDate('src/pages/compress-image-to-[size]kb.astro');
+        } else if (item.url.match(/\/compress-[a-z]+\/$/)) {
+          item.lastmod = getGitDate('src/pages/compress-[format].astro');
         } else {
-          item.lastmod = new Date();
+          const slug = item.url.replace(/^https?:\/\/[^/]+\//, '').replace(/\/$/, '');
+          const candidates = [
+            `src/pages/${slug}.astro`,
+            `src/pages/${slug}/index.astro`,
+            `src/pages/${slug}.html`,
+          ];
+          let matchedDate = null;
+          for (const cand of candidates) {
+            if (fs.existsSync(path.resolve(cand))) {
+              matchedDate = getGitDate(cand);
+              break;
+            }
+          }
+          item.lastmod = matchedDate || getGitDate('src/pages/index.astro');
         }
 
         // Priority and changefreq are officially ignored by Google in 2024–2026.
@@ -75,7 +113,7 @@ export default defineConfig({
     }),
   ],
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
+    prefetchAll: false,
+    defaultStrategy: 'hover',
   },
 });

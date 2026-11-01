@@ -141,6 +141,13 @@ export function mountConverterApp(): void {
   if (!root || root.dataset.pkMounted === '1') return;
   root.dataset.pkMounted = '1';
 
+  // Unpack modals from <template> if present before querying modal DOM
+  const modalsTemplate = document.getElementById('pk-modals-template') as HTMLTemplateElement | null;
+  if (modalsTemplate && modalsTemplate.content) {
+    modalsTemplate.parentNode?.insertBefore(modalsTemplate.content.cloneNode(true), modalsTemplate);
+    modalsTemplate.remove();
+  }
+
   const initialTarget = parseTargetKb(root.dataset.targetKb);
 
   const state: State = {
@@ -5916,6 +5923,10 @@ export function mountConverterApp(): void {
   updateFormatUi();
   renderFiles();
   setToolMode(initialToolMode, false);
+  const initialPreset = root.dataset.preset;
+  if (initialPreset) {
+    applyPortalPreset(initialPreset);
+  }
   updateButtons();
   updateStageDots();
   

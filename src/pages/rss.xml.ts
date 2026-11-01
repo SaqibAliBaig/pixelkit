@@ -13,7 +13,7 @@ export const GET: APIRoute = async (context) => {
 
   const rssItems = posts
     .map((post) => {
-      const link = `${siteUrl}/blog/${post.slug}`;
+      const link = `${siteUrl}/blog/${post.slug}/`;
       const pubDate = post.data.publishedAt.toUTCString();
       const categories = (post.data.tags || [])
         .map((tag) => `<category>${escapeXml(tag)}</category>`)
@@ -35,7 +35,7 @@ export const GET: APIRoute = async (context) => {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(SITE.name)} Blog</title>
-    <link>${siteUrl}/blog</link>
+    <link>${siteUrl}/blog/</link>
     <description>${escapeXml(SITE.defaultDescription)}</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

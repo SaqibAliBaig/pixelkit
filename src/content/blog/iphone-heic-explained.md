@@ -1,5 +1,5 @@
 ---
-title: "iPhone HEIC Explained: Why Portals Reject Your Photos (And the 10-Second Fix)"
+title: "iPhone HEIC Explained: Why Portals Reject Your Photos"
 description: "Every iPhone since iOS 11 saves photos as HEIC. Here's why that breaks most upload forms, and the fastest way to convert to JPG without uploading to a server."
 publishedAt: 2026-01-25
 author: "PixelKit"
@@ -34,14 +34,14 @@ PixelKit's HEIC converter handles all three in one pass. Drop the HEIC file, set
 
 ## The 10-second fix (no upload, no app)
 
-1. Open [PixelKit's HEIC to JPG tool](/heic-to-jpg).
+1. Open [PixelKit's HEIC to JPG tool](/heic-to-jpg/).
 2. Drop the HEIC file into the box. It never leaves your device — PixelKit runs heic2any inside a Web Worker on your phone or laptop.
 3. Download the JPG.
 
 If the portal has a size limit, use the specific target page instead:
-- [HEIC to JPG under 50KB](/heic-to-jpg-under-50kb) — exam portals, signatures
-- [HEIC to JPG under 100KB](/heic-to-jpg-under-100kb) — Aadhaar, most job forms
-- [HEIC to JPG under 200KB](/heic-to-jpg-under-200kb) — passport, visa
+- [HEIC to JPG under 50KB](/heic-to-jpg-under-50kb/) — exam portals, signatures
+- [HEIC to JPG under 100KB](/heic-to-jpg-under-100kb/) — Aadhaar, most job forms
+- [HEIC to JPG under 200KB](/heic-to-jpg-under-200kb/) — passport, visa
 
 Each page targets exactly that limit. No guessing, no slider.
 
@@ -65,4 +65,4 @@ HEIC is also used by some Android phones (Samsung, Google Pixel in certain modes
 
 After converting, before you upload: open the resulting JPG in your normal photo viewer and confirm the image looks correct. This catches the rare case where a Live Photo export produced a frame you didn't mean to send (usually the "key photo" rather than the frame you meant). If so, re-export from the Photos app as a still image and re-run the conversion.
 
-Related reading: [Why portals reject 200KB photos](/blog/why-portals-reject-200kb-photos) · [Compress Aadhaar to 100KB PDF](/blog/compress-aadhaar-to-100kb-pdf)
+Related reading: [Why portals reject 200KB photos](/blog/why-portals-reject-200kb-photos/) · [Compress Aadhaar to 100KB PDF](/blog/compress-aadhaar-to-100kb-pdf/)

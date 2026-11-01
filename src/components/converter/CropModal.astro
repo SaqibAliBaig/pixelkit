@@ -22,9 +22,9 @@
               <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
             </svg>
           </div>
-          <h3 id="pk-crop-modal-title" class="truncate text-sm sm:text-base font-semibold text-fg">
+          <div id="pk-crop-modal-title" role="heading" aria-level="3" class="truncate text-sm sm:text-base font-semibold text-fg">
             Interactive Crop & Framing
-          </h3>
+          </div>
           <span
             id="pk-crop-modal-ratio-badge"
             class="rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/15 text-accent border border-accent/25 uppercase shrink-0"
@@ -116,7 +116,10 @@
         <img
           id="pk-crop-img-source"
           class="block max-h-[64vh] max-w-full w-auto h-auto pointer-events-none rounded select-none object-contain"
-          alt="Crop Target"
+          width="1"
+          height="1"
+          alt=""
+          aria-hidden="true"
         />
 
         <!-- Dark Mask Overlay outside crop box -->

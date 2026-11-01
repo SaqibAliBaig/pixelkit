@@ -1,5 +1,5 @@
 ---
-title: "How to Resize and Crop Image to Passport Size (413×531 px & Under 100KB)"
+title: "How to Resize Image to Passport Size (413×531 px)"
 description: "Step-by-step guide to resizing, cropping, and compressing photos for passport, visa, and exam portal uploads with exact dimensions."
 publishedAt: 2026-02-10
 author: "PixelKit"
@@ -30,7 +30,7 @@ Different portals follow different international specifications:
 
 Before resizing dimensions, crop the photo so your face and shoulders are properly centered:
 
-1. Open [PixelKit Crop Studio](/crop-image) and drop your photo.
+1. Open [PixelKit Crop Studio](/crop-image/) and drop your photo.
 2. Select the **3:4** or **1:1** aspect ratio preset (depending on your country's requirements).
 3. Align the visual rule-of-thirds grid so that your face covers roughly 70% to 80% of the frame.
 4. Click **Apply Crop**.

@@ -1,0 +1,177 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'US Visa Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official US Visa and DS-160 digital photo dimensions?',
+    a: 'The US Department of State requires a 1:1 square digital photograph of 600 × 600 pixels minimum up to 1200 × 1200 pixels maximum (at 300 pixels per inch for a 2 × 2 inch print). The file must be in JPEG format with a file weight equal to or less than 240 KB. Head height (from the top of hair to bottom of chin) must be between 50% and 69% of the total image height.',
+  },
+  {
+    q: 'Why does the CEAC DS-160 photo tool reject photos?',
+    a: 'Rejections most commonly occur due to non-square aspect ratios (e.g., standard 3:4 or 4:3 phone pictures), head size outside the 50%–69% threshold, wearing eyeglasses (banned on US visas since 2016), or shadows on the white background. PixelKit frames your photo to a 1:1 ratio with top-anchor eye level guidance.',
+  },
+  {
+    q: 'Can I convert an iPhone photo to a US Visa 600 × 600 px photo?',
+    a: 'Yes! Drop your Apple HEIC or JPEG picture above. PixelKit crops the image square, scales to 600 × 600 pixels, and compresses the output to under 240 KB JPG in one step.',
+  },
+  {
+    q: 'Is my biometric face photo stored or sent to remote servers?',
+    a: 'Never. Biometric passport imagery is highly private. PixelKit executes all cropping, scaling, and compression inside your local browser via WebAssembly. Zero images leave your computer or phone.',
+  },
+];
+
+const pageTitle = `US Visa Photo Resizer Online — 600x600 px (2x2") | ${SITE.name}`;
+const pageDesc =
+  'Resize and crop photos for US DS-160 visa, passport, and Green Card Diversity Lottery to exact 600x600 px and under 240KB JPG limits directly in your browser.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit US Visa Photo Resizer & Cropper',
+    description: pageDesc,
+    url: new URL('/us-visa-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>US Department of State · DS-160 · DV Lottery · US Passport</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        US Visa &amp; DS-160 Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to 1:1 square, scale to 600 × 600 pixels (2 × 2 inches), and compress under 240 KB JPG. 100% private, client-side biometric framing.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={240}
+        initialTool="passport"
+        preset="us-visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        US Department of State Photo Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory rules enforced by the CEAC consular electronic application center:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Requirement</th>
+              <th class="py-3 px-4">US Consular Specification</th>
+              <th class="py-3 px-4">PixelKit Auto-Configured Settings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-muted">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Dimensions</td>
+              <td class="py-3 px-4">600 × 600 px up to 1200 × 1200 px</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Exact 600 × 600 px rescaler</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Aspect Ratio</td>
+              <td class="py-3 px-4">1:1 Square (2 × 2 inches / 51 × 51 mm)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Pre-configured 1:1 Square Crop Studio</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Size Cap</td>
+              <td class="py-3 px-4">Less than or equal to 240 KB</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Binary-search targets ~180–220 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Head Coverage</td>
+              <td class="py-3 px-4">50% to 69% of total height (1 to 1 3/8 in)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Top-anchor eye line framing guides</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Color &amp; Background</td>
+              <td class="py-3 px-4">Plain white or off-white; no glasses</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">24-bit sRGB color space output</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Common Validation Errors & Solutions -->
+    <section class="mt-8 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common US DS-160 / DV Lottery Upload Errors &amp; Fixes
+      </h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Photo is not square" or "Image dimensions invalid"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Smartphone photos default to 4:3 or 16:9 aspect ratios, causing immediate intake rejection.<br/>
+            <strong>Fix:</strong> PixelKit automatically crops your photo to 1:1 and scales the raster matrix to 600 × 600 px.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "File exceeds the maximum size of 240 KB"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> High-DPI camera exports exceed 3 MB to 10 MB in raw JPEG format.<br/>
+            <strong>Fix:</strong> PixelKit’s intelligent compression algorithms keep your photo around ~200 KB with crystal-clear facial contours.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

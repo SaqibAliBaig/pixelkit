@@ -27,16 +27,18 @@ const {
   keywords = SITE.keywords,
 } = Astro.props;
 
-const fullTitle =
-  title === SITE.defaultTitle || title.includes(SITE.name) || title.length > 58
-    ? title
-    : `${title} — ${SITE.name}`;
+const siteSuffix = ` — ${SITE.name}`;
+const fullTitle = title.includes(SITE.name)
+  ? title
+  : title.length + siteSuffix.length <= 60
+    ? `${title}${siteSuffix}`
+    : title;
 
 ---
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
+{!noindex && <link rel="canonical" href={canonical} />}
 <meta name="author" content={author} />
 <meta name="publisher" content={SITE.name} />
 

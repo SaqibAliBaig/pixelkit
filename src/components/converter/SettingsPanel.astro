@@ -72,9 +72,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
   <!-- Header with Segmented Mode Tabs -->
   <div class="flex items-center justify-between pb-3 border-b border-border/60">
     <div class="flex items-center gap-2">
-      <h2 class="text-xs uppercase tracking-wider text-muted font-bold">
+      <div class="text-xs uppercase tracking-wider text-muted font-bold" role="heading" aria-level="2">
         Settings
-      </h2>
+      </div>
       <span id="pk-settings-mode-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-border text-muted font-semibold">
         {initialTool === 'all' ? 'All-in-One' : initialTool.toUpperCase()}
       </span>

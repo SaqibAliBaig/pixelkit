@@ -1,0 +1,177 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'SSC Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the exact photo size and dimension requirements for SSC exams?',
+    a: 'Staff Selection Commission (SSC CGL, CHSL, MTS, GD, Stenographer) mandates a digital photograph in JPEG/JPG format with a file weight strictly between 20 KB and 50 KB. The required pixel dimensions are 350 × 450 pixels (3.5 cm width × 4.5 cm height). The photo must have a clean white or light background and be taken without a cap or spectacles.',
+  },
+  {
+    q: 'Why does the SSC portal reject photos with "File size not within 20KB to 50KB"?',
+    a: 'SSC automated intake filters enforce both a lower bound (minimum 20 KB) and an upper bound (maximum 50 KB). If your photo is 19.5 KB or 50.2 KB, the upload will fail. PixelKit uses binary-search quantization targeting ~35–45 KB, landing safely within the allowable bracket.',
+  },
+  {
+    q: 'Can I resize and crop my smartphone selfie or iPhone HEIC for SSC?',
+    a: 'Yes. Drop your smartphone photo or Apple HEIC picture above. PixelKit decodes HEIC locally, applies the official 3.5:4.5 aspect ratio framing in Crop Studio, scales to 350 × 450 pixels, and compresses the output to an SSC-compliant JPG under 50KB in one click.',
+  },
+  {
+    q: 'Are candidate photos uploaded to any third-party cloud server?',
+    a: 'Never. Candidate identity documents and biometric photos are sensitive. PixelKit operates 100% on your device using browser WebAssembly and Canvas APIs. Zero images leave your computer or phone.',
+  },
+];
+
+const pageTitle = `SSC Photo Resizer Online — 20KB to 50KB JPG | ${SITE.name}`;
+const pageDesc =
+  'Resize and compress photos for SSC CGL, CHSL, MTS & GD to exact 350x450 px and 20KB-50KB JPG limits directly in your browser with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit SSC Photo Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/ssc-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>SSC CGL · CHSL · MTS · GD Constables · OTR Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        SSC Photo Resizer &amp; Compressor
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop, scale to 350 × 450 px, and compress your photograph between 20KB and 50KB in JPG format. 100% private in-browser processing with zero server uploads.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="passport"
+        preset="exam-ssc"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        SSC Official Photo Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Verified guidelines matching SSC CGL, CHSL, MTS, and Central Armed Police Forces notices:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4">SSC Requirement</th>
+              <th class="py-3 px-4">PixelKit Auto-Configured Settings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-muted">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Format</td>
+              <td class="py-3 px-4">JPEG / JPG only</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Automatic JPG output</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Size Ceiling</td>
+              <td class="py-3 px-4">20 KB to 50 KB strictly</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Binary-search targets ~40 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Pixel Dimensions</td>
+              <td class="py-3 px-4">350 px (W) × 450 px (H)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Exact 350 × 450 px resampler</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Physical Dimensions</td>
+              <td class="py-3 px-4">3.5 cm (width) × 4.5 cm (height)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">3.5:4.5 portrait aspect ratio</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Background &amp; Attire</td>
+              <td class="py-3 px-4">Plain white or light; no caps or goggles</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Interactive Crop Studio framing</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Common Validation Errors & Solutions -->
+    <section class="mt-8 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common SSC Portal Rejection Errors &amp; Solutions
+      </h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Photo size must be between 20KB and 50KB"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Attempting to compress a heavy 12MP phone photo directly without resizing causes files to either overshoot 50KB or collapse into unreadable blur below 20KB.<br/>
+            <strong>Fix:</strong> PixelKit scales your photo to 350 × 450 px first, allowing clear biometric facial features while landing safely at 35–45 KB.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Invalid image dimensions or aspect ratio"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Submitting square 1:1 photos or wide 4:3 camera shots that fail SSC's automated aspect ratio validator.<br/>
+            <strong>Fix:</strong> PixelKit automatically crops your photo to the mandated 3.5:4.5 proportion with eye-line positioning before compression.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

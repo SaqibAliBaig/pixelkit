@@ -12,13 +12,14 @@ import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildMeta } from '../src/lib/seo/meta';
 import { SITE } from '../src/lib/constants';
-import { buildIntro, buildFaqs } from '../src/lib/seo/copy';
+import { buildIntro, buildFaqs, getTechnicalReference } from '../src/lib/seo/copy';
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
   buildSoftwareApplicationJsonLd,
   buildToolJsonLd,
   buildBlogPostingJsonLd,
+  buildSiteSchemaGraph,
 } from '../src/lib/seo/jsonld';
 
 interface Combo {
@@ -85,11 +86,11 @@ describe('meta uniqueness', () => {
     expect(SITE.defaultDescription.length).toBeLessThanOrEqual(160);
   });
 
-  it('every title is between 30 and 70 chars', () => {
+  it('every title is between 30 and 50 chars (under 60 with site suffix)', () => {
     for (const c of combos) {
       const m = buildMeta(c);
       expect(m.title.length).toBeGreaterThanOrEqual(30);
-      expect(m.title.length).toBeLessThanOrEqual(70);
+      expect(m.title.length).toBeLessThanOrEqual(50);
     }
   });
 
@@ -254,5 +255,36 @@ describe('JSON-LD builders', () => {
     expect(ld['@type']).toBe('BlogPosting');
     expect(ld.headline).toBe('Hello');
     expect(typeof ld.datePublished).toBe('string');
+  });
+
+  it('buildSiteSchemaGraph consolidates Organization, WebSite, and WebApplication', () => {
+    const graph = buildSiteSchemaGraph() as { '@context': string; '@graph': Record<string, unknown>[] };
+    expect(graph['@context']).toBe('https://schema.org');
+    expect(Array.isArray(graph['@graph'])).toBe(true);
+    expect(graph['@graph'].length).toBe(3);
+
+    const org = graph['@graph'].find((item) => item['@type'] === 'Organization') as Record<string, unknown>;
+    expect(org).toBeDefined();
+    expect((org.founder as Record<string, unknown>).name).toBe('Saqib Ali Baig');
+
+    const app = graph['@graph'].find((item) => item['@type'] === 'WebApplication') as Record<string, unknown>;
+    expect(app).toBeDefined();
+    expect(app.name).toBe('PixelKit Image Studio');
+    expect(app.operatingSystem).toBe('Any (Web Browser)');
+  });
+});
+
+describe('technical reference data', () => {
+  it('every combo generates valid comparison rows and engine note', () => {
+    for (const c of combos) {
+      const ref = getTechnicalReference(c);
+      expect(ref.engineNote.length).toBeGreaterThan(20);
+      expect(ref.comparisonRows.length).toBe(5);
+      for (const row of ref.comparisonRows) {
+        expect(row.property.length).toBeGreaterThan(0);
+        expect(row.sourceValue.length).toBeGreaterThan(0);
+        expect(row.targetValue.length).toBeGreaterThan(0);
+      }
+    }
   });
 });

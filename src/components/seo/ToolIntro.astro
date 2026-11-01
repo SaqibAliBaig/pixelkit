@@ -1,4 +1,6 @@
 ---
+import { getTechnicalReference } from '@lib/seo/copy';
+
 interface Combo {
   from: string;
   to: string;
@@ -13,103 +15,7 @@ interface Props {
 const { combo, intro } = Astro.props;
 const fromLabel = combo.from.toUpperCase();
 const toLabel = combo.to.toUpperCase();
-
-interface FormatSpec {
-  name: string;
-  mime: string;
-  compression: string;
-  transparency: string;
-  idealUse: string;
-}
-
-const SPECS: Record<string, FormatSpec> = {
-  jpg: {
-    name: 'Joint Photographic Experts Group (JPEG)',
-    mime: 'image/jpeg',
-    compression: 'Discrete Cosine Transform (Lossy)',
-    transparency: 'No (Auto white background fill)',
-    idealUse: 'Photographs, government portal forms, passport applications, universal web sharing',
-  },
-  png: {
-    name: 'Portable Network Graphics',
-    mime: 'image/png',
-    compression: 'DEFLATE lossless byte-stream',
-    transparency: 'Yes (Full 8-bit alpha channel)',
-    idealUse: 'Logos, screenshots, graphics with transparent backgrounds, digital signatures',
-  },
-  webp: {
-    name: 'WebP Image Container',
-    mime: 'image/webp',
-    compression: 'VP8 / VP8L predictive coding (Lossy & Lossless)',
-    transparency: 'Yes (Alpha channel supported)',
-    idealUse: 'Modern high-performance web publishing, next-gen mobile assets, green Core Web Vitals',
-  },
-  avif: {
-    name: 'AV1 Image File Format',
-    mime: 'image/avif',
-    compression: 'AV1 intra-frame coding (Next-Gen Lossy/Lossless)',
-    transparency: 'Yes (Alpha channel supported)',
-    idealUse: 'Cutting-edge web imagery requiring maximal byte reduction with high fidelity',
-  },
-  heic: {
-    name: 'High Efficiency Image Container (HEIF)',
-    mime: 'image/heic',
-    compression: 'High Efficiency Video Coding (HEVC / H.265)',
-    transparency: 'Yes (Depth maps and alpha)',
-    idealUse: 'Apple iOS camera capture, mobile device photo storage',
-  },
-  svg: {
-    name: 'Scalable Vector Graphics (XML)',
-    mime: 'image/svg+xml',
-    compression: 'Lossless resolution-independent XML coordinates',
-    transparency: 'Yes (Vector transparency)',
-    idealUse: 'Icons, brand typography, responsive web vector assets, high-DPI print',
-  },
-  pdf: {
-    name: 'Portable Document Format',
-    mime: 'application/pdf',
-    compression: 'PostScript stream / Flate compression',
-    transparency: 'Preserves raster layers',
-    idealUse: 'Formal visa packets, academic certificates, multi-page document submission, KYC',
-  },
-  tiff: {
-    name: 'Tagged Image File Format',
-    mime: 'image/tiff',
-    compression: 'Uncompressed, LZW, or ZIP lossless compression',
-    transparency: 'Yes (Multi-channel alpha)',
-    idealUse: 'High-end scanner archiving, professional publishing, raw photo master copies',
-  },
-  bmp: {
-    name: 'Bitmap Image File',
-    mime: 'image/bmp',
-    compression: 'Uncompressed raster array',
-    transparency: 'Basic bitmask',
-    idealUse: 'Legacy Windows desktop workflows, uncompressed frame processing',
-  },
-  gif: {
-    name: 'Graphics Interchange Format',
-    mime: 'image/gif',
-    compression: 'LZW 8-bit 256-color palette indexing',
-    transparency: 'Yes (1-bit index transparency)',
-    idealUse: 'Simple retro graphics, animated banners, compact low-color icons',
-  },
-};
-
-const srcSpec = SPECS[combo.from.toLowerCase()] || {
-  name: fromLabel,
-  mime: `image/${combo.from}`,
-  compression: 'Standard container',
-  transparency: 'Standard',
-  idealUse: 'General image handling',
-};
-
-const tgtSpec = SPECS[combo.to.toLowerCase()] || {
-  name: toLabel,
-  mime: `image/${combo.to}`,
-  compression: 'Standard container',
-  transparency: 'Standard',
-  idealUse: 'General image handling',
-};
+const techRef = getTechnicalReference(combo);
 ---
 
 <section class="mx-auto mt-14 max-w-prose" aria-labelledby="tool-intro-heading">
@@ -128,52 +34,46 @@ const tgtSpec = SPECS[combo.to.toLowerCase()] || {
     ))}
   </div>
 
-  <!-- Technical Container Comparison Matrix -->
-  <div class="mt-10 rounded-2xl border border-border bg-surface p-5 sm:p-6">
-    <h3 class="text-base font-semibold text-fg">
-      Technical Architecture: {fromLabel} vs {toLabel}
-    </h3>
-    <p class="mt-1 text-xs text-muted">
-      Architectural differences between the source format and destination encoding container:
+  <!-- Dynamic Technical Format Comparison Table -->
+  <div class="mt-10 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-2xs">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="inline-block h-2 w-2 rounded-full bg-accent"></span>
+      <h3 class="text-base font-semibold text-fg">
+        Format Comparison: {fromLabel} vs {toLabel}
+      </h3>
+    </div>
+    <p class="text-xs text-muted mb-4 leading-relaxed">
+      Core architectural specifications, byte compression behavior, and container capabilities:
     </p>
 
-    <div class="mt-4 overflow-x-auto">
+    <div class="overflow-x-auto">
       <table class="w-full text-left text-xs sm:text-sm">
         <thead>
           <tr class="border-b border-border text-muted">
-            <th class="pb-2.5 font-medium">Specification</th>
-            <th class="pb-2.5 font-medium text-fg">{fromLabel} (Input)</th>
-            <th class="pb-2.5 font-medium text-accent">{toLabel} (Output)</th>
+            <th class="pb-2.5 font-semibold text-fg/70 w-1/4">Property</th>
+            <th class="pb-2.5 font-semibold text-fg w-3/8">{fromLabel} (Source Format)</th>
+            <th class="pb-2.5 font-semibold text-accent w-3/8">{toLabel} (Target Format)</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-border/60 text-fg/85">
-          <tr>
-            <td class="py-2.5 font-medium text-muted">Standard Name</td>
-            <td class="py-2.5">{srcSpec.name}</td>
-            <td class="py-2.5 font-medium text-fg">{tgtSpec.name}</td>
-          </tr>
-          <tr>
-            <td class="py-2.5 font-medium text-muted">MIME Type</td>
-            <td class="py-2.5 font-mono text-xs">{srcSpec.mime}</td>
-            <td class="py-2.5 font-mono text-xs text-accent">{tgtSpec.mime}</td>
-          </tr>
-          <tr>
-            <td class="py-2.5 font-medium text-muted">Compression Type</td>
-            <td class="py-2.5">{srcSpec.compression}</td>
-            <td class="py-2.5">{tgtSpec.compression}</td>
-          </tr>
-          <tr>
-            <td class="py-2.5 font-medium text-muted">Alpha Transparency</td>
-            <td class="py-2.5">{srcSpec.transparency}</td>
-            <td class="py-2.5">{tgtSpec.transparency}</td>
-          </tr>
-          <tr>
-            <td class="py-2.5 font-medium text-muted">Optimal Application</td>
-            <td class="py-2.5">{srcSpec.idealUse}</td>
-            <td class="py-2.5 font-medium text-fg">{tgtSpec.idealUse}</td>
-          </tr>
+          {techRef.comparisonRows.map((row) => (
+            <tr>
+              <td class="py-2.5 font-medium text-muted">{row.property}</td>
+              <td class="py-2.5 text-fg/90">{row.sourceValue}</td>
+              <td class="py-2.5 font-medium text-fg">{row.targetValue}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
+    </div>
+
+    <!-- Engine & Privacy Note -->
+    <div class="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 sm:p-4 text-xs text-fg/90 flex items-start gap-3">
+      <span class="text-emerald-500 text-base shrink-0 leading-none mt-0.5">🔒</span>
+      <div>
+        <strong class="font-semibold text-fg">Engine &amp; Privacy Note:</strong>
+        <span class="ml-1 text-muted">{techRef.engineNote}</span>
+      </div>
     </div>
   </div>
 
@@ -240,61 +140,6 @@ const tgtSpec = SPECS[combo.to.toLowerCase()] || {
       </p>
       <p>
         <strong>Offline Progressivity &amp; Native Device Reliability:</strong> Once loaded into your web browser, PixelKit caches all core WebAssembly binaries and conversion scripts in a Service Worker cache. This means you can continue converting, cropping, and compressing {fromLabel} into {toLabel} on airplanes, remote travel destinations, or in enterprise facilities with zero active internet connectivity.
-      </p>
-    </div>
-  </div>
-
-  
-  <!-- Built-In One-Click Government & Consular Presets -->
-  <div class="mt-10 rounded-2xl border border-border bg-surface p-5 sm:p-6">
-    <h3 class="text-base font-semibold text-fg">
-      Built-In 1-Click Government &amp; Consular Presets
-    </h3>
-    <p class="mt-1 text-xs text-muted leading-relaxed">
-      Instead of calculating millimeter-to-pixel ratios and adjusting quality sliders by hand, PixelKit features dedicated 1-click presets configured to match official biometric compliance specifications:
-    </p>
-    <div class="mt-4 grid gap-3 sm:grid-cols-2 text-xs text-fg/80 leading-relaxed">
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">🇺🇸 US Visa / DS-160 / DV Lottery:</strong>
-        <p class="mt-1 text-muted">Automatically frames a 1:1 square ratio with head-to-chin facial proportions, resamples to 600×600 px (2×2 inches at 300 DPI), and executes binary search compression under the strict 240 KB JPG ceiling.</p>
-      </div>
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">🇮🇳 Indian Passport / PAN / Aadhaar:</strong>
-        <p class="mt-1 text-muted">Applies the official 35×45 mm biometric portrait crop (413×531 px) and compresses under 100 KB (or 50 KB for PAN card portals) without blur.</p>
-      </div>
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">🇪🇺 Schengen / European Visa:</strong>
-        <p class="mt-1 text-muted">Enforces European consular dimensions (35×45 mm / 413×531 px) and stays reliably underneath the 200 KB upload limit for VFS Global and TLScontact.</p>
-      </div>
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">🎓 Civil Service / Exams (UPSC, SSC, NEET):</strong>
-        <p class="mt-1 text-muted">Pre-configures 350×450 px portrait dimensions and optimizes bytes into the narrow 20 KB to 50 KB band required by online examination portals.</p>
-      </div>
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">✍️ Official Signature &amp; Thumbprint:</strong>
-        <p class="mt-1 text-muted">Crops to standard 2:1 horizontal aspect (280×140 px) and applies contrast enhancement under the tight 20 KB limit for admission admit cards.</p>
-      </div>
-      <div class="rounded-xl border border-border/70 bg-bg/40 p-3.5">
-        <strong class="text-fg font-semibold block">🇨🇦 Canada Visa / PR / Express Entry:</strong>
-        <p class="mt-1 text-muted">Frames 50×70 mm (5:7 aspect / 420×540 px) meeting Immigration, Refugees and Citizenship Canada (IRCC) specifications under 240 KB.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Best Practices for Strict Portal Submissions -->
-  <div class="mt-10 rounded-2xl border border-border bg-surface/50 p-5 sm:p-6">
-    <h3 class="text-base font-semibold text-fg">
-      Practical Tips for Portal &amp; Form Submissions
-    </h3>
-    <div class="mt-3 space-y-2.5 text-xs sm:text-sm text-fg/80 leading-relaxed">
-      <p>
-        <strong>Check Dimension vs KB Constraints:</strong> Many official government portals (such as passport renewals, exam admit cards, and visa systems) impose both an aspect ratio limit (like 3.5×4.5 cm or 413×531 px) and a strict file size ceiling (like under 50KB or 100KB). Use the Crop Studio and Resize tools before downloading to hit both criteria in a single pass.
-      </p>
-      <p>
-        <strong>Preserve Text &amp; Signature Clarity:</strong> For digital signatures and scanned documents, prioritize dimension scaling over severe lossy compression. High-contrast bicubic scaling preserves sharp strokes even at very small byte budgets.
-      </p>
-      <p>
-        <strong>100% Confidentiality:</strong> Since PixelKit never uploads your images or documents to remote servers, you can safely process sensitive passports, ID scans, banking records, and medical files without risking personal data leakage.
       </p>
     </div>
   </div>

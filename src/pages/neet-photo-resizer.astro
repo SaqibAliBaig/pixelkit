@@ -1,0 +1,177 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'NEET Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official photo requirements for NEET-UG and NTA exams?',
+    a: 'National Testing Agency (NTA NEET-UG, JEE Main, CUET) mandates two photo formats: (1) Passport size photo: 350 × 450 px (3.5 × 4.5 cm), between 10 KB and 200 KB in JPG format; (2) Postcard size photo: 4 × 6 inches (approx 1200 × 1800 px), between 10 KB and 200 KB in JPG format. 80% face coverage showing ears against a white background is mandatory.',
+  },
+  {
+    q: 'Why does the NTA NEET portal reject photos?',
+    a: 'NTA automated filters reject uploads when face coverage is below 80%, ears are hidden, the background is colored rather than white, or file weight exceeds 200 KB. PixelKit’s framing studio helps you center the candidate face and dial in the exact 10KB–200KB weight.',
+  },
+  {
+    q: 'Can I resize both passport and 4x6 postcard photos for NEET in PixelKit?',
+    a: 'Yes. Drop your photo above. For standard passport size, use the 3.5:4.5 preset (350 × 450 px). For 4×6 inch postcard size, select the 2:3 ratio in Crop Studio and scale to 1200 × 1800 px. In both modes, PixelKit hits the required 100KB–200KB bracket.',
+  },
+  {
+    q: 'Are candidate photos and identity data kept confidential?',
+    a: 'Completely. PixelKit runs 100% inside your client device memory via WebAssembly. Confidential student photos and identification documents are never uploaded to any cloud servers.',
+  },
+];
+
+const pageTitle = `NEET Photo Resizer Online — 10KB to 200KB JPG | ${SITE.name}`;
+const pageDesc =
+  'Resize and compress passport & 4x6 postcard photos for NTA NEET-UG & JEE Main to exact specifications between 10KB and 200KB JPG directly in your browser.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit NEET Photo Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/neet-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>NTA NEET-UG · JEE Main · CUET · Postcard 4×6" Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        NEET Photo Resizer &amp; Compressor
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize passport and 4 × 6" postcard photos between 10KB and 200KB JPG with 80% face coverage. 100% private in-browser tool with zero server uploads.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="passport"
+        preset="exam-neet"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        NTA Official NEET-UG Photo Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Dual upload standards mandated in the official NEET information bulletin:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Photo Category</th>
+              <th class="py-3 px-4">Required Dimensions</th>
+              <th class="py-3 px-4">File Size Limits</th>
+              <th class="py-3 px-4">Key Verification Rules</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-muted">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Passport Size Photo</td>
+              <td class="py-3 px-4">350 × 450 px (3.5 × 4.5 cm)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">10 KB to 200 KB JPG</td>
+              <td class="py-3 px-4">80% face coverage, white background, ears visible</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Postcard Size Photo</td>
+              <td class="py-3 px-4">4 × 6 inches (approx 1200 × 1800 px)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">10 KB to 200 KB JPG</td>
+              <td class="py-3 px-4">High resolution, clear background, full color</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Candidate Signature</td>
+              <td class="py-3 px-4">280 × 140 px (2:1 aspect)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">4 KB to 30 KB JPG</td>
+              <td class="py-3 px-4">Black ink on white paper; no capitals only</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Thumb Impression</td>
+              <td class="py-3 px-4">200 × 200 px (1:1 square)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">10 KB to 200 KB JPG</td>
+              <td class="py-3 px-4">Clear fingerprint ridges in blue or black ink</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Common Validation Errors & Solutions -->
+    <section class="mt-8 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common NEET Portal Upload Errors &amp; Fixes
+      </h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Face coverage less than 80%"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Photos taken from too far away show candidate torso or shoulders instead of a close-up facial view.<br/>
+            <strong>Fix:</strong> Use PixelKit’s Crop Studio with top-anchor alignment to frame the face from hairline to chin tightly.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Postcard photo exceeds 200 KB"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> 4 × 6 inch images at 300 DPI create large raster byte loads that easily exceed 1 MB.<br/>
+            <strong>Fix:</strong> PixelKit’s binary search compresses high-res postcard scans down to ~150–180 KB while keeping sharp facial contours.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

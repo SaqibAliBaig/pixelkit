@@ -10,6 +10,7 @@ interface Props {
   toMime?: string;
   targetKb?: number | null;
   initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
+  preset?: string;
 }
 
 const {
@@ -19,6 +20,7 @@ const {
   toMime = 'image/jpeg',
   targetKb = null,
   initialTool = 'all',
+  preset,
 } = Astro.props;
 ---
 
@@ -30,5 +32,6 @@ const {
     toMime={toMime}
     targetKb={targetKb}
     initialTool={initialTool}
+    preset={preset}
   />
 </div>

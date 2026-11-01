@@ -10,7 +10,7 @@ import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.ast
 import FAQSection from '@components/seo/FAQSection.astro';
 import { buildFaqJsonLd } from '@lib/seo/jsonld';
 import { SITE } from '@lib/constants';
-import { buildWebSiteJsonLd, buildOrganizationJsonLd, buildSoftwareApplicationJsonLd } from '@lib/seo/jsonld';
+import { buildSiteSchemaGraph } from '@lib/seo/jsonld';
 
 
 const homeFaqs = [
@@ -50,13 +50,7 @@ const homeFaqs = [
 
 const jsonLd = [
   buildFaqJsonLd(homeFaqs),
-  buildWebSiteJsonLd(),
-  buildOrganizationJsonLd(),
-  buildSoftwareApplicationJsonLd({
-    name: SITE.name,
-    description: SITE.defaultDescription,
-    url: SITE.url,
-  }),
+  buildSiteSchemaGraph(),
 ];
 ---
 

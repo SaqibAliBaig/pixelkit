@@ -71,6 +71,7 @@ export const NAV: NavItem[] = [
 export const FOOTER_LINKS: {
   tools: NavItem[];
   targets: NavItem[];
+  portals: NavItem[];
   site: NavItem[];
 } = {
   tools: [
@@ -88,10 +89,17 @@ export const FOOTER_LINKS: {
     { label: 'Compress Image to 50KB', href: '/compress-image-to-50kb/' },
     { label: 'Compress Image to 100KB', href: '/compress-image-to-100kb/' },
     { label: 'Compress Image to 200KB', href: '/compress-image-to-200kb/' },
+    { label: 'Compress Image to 500KB', href: '/compress-image-to-500kb/' },
+    { label: 'Compress Image to 1MB', href: '/compress-image-to-1mb/' },
     { label: 'HEIC to JPG under 100KB', href: '/heic-to-jpg-under-100kb/' },
     { label: 'JPG to PDF under 100KB', href: '/jpg-to-pdf-under-100kb/' },
-    { label: 'SVG to PNG Converter', href: '/svg-to-png/' },
-    { label: 'PDF to JPG Converter', href: '/pdf-to-jpg/' },
+  ],
+  portals: [
+    { label: 'SSC Photo Resizer', href: '/ssc-photo-resizer/' },
+    { label: 'UPSC Signature Resizer', href: '/upsc-signature-resizer/' },
+    { label: 'PAN Card Photo Resizer', href: '/pan-card-photo-resizer/' },
+    { label: 'US Visa Photo Resizer', href: '/us-visa-photo-resizer/' },
+    { label: 'NEET Photo Resizer', href: '/neet-photo-resizer/' },
   ],
   site: [
     { label: 'Blog', href: '/blog/' },

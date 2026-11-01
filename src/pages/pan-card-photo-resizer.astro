@@ -1,0 +1,177 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'PAN Card Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official photo and signature size rules for PAN card applications?',
+    a: 'For online PAN applications via Protean (NSDL) or UTIITSL, applicant photographs must be in JPEG/JPG format, cropped square to 213 × 213 pixels (3.5 × 2.5 cm or 1:1 ratio at 200/300 DPI), with a maximum file weight of 50 KB. Signatures must be 213 × 426 pixels (2:1 ratio) under 30 KB.',
+  },
+  {
+    q: 'Why does the NSDL PAN portal require exact 213 × 213 pixels at 200 DPI?',
+    a: 'The physical PAN card printing presses in India print photograph tiles at standard 300 DPI across ~2.5 cm. When digital uploads deviate from 213 × 213 pixels, the NSDL automated ingestion validation script rejects the file.',
+  },
+  {
+    q: 'Can I resize an existing Aadhaar card photo or phone selfie for PAN card upload?',
+    a: 'Yes. Drop your smartphone photo or existing digital image into PixelKit. The tool crops to a 1:1 square, resizes to exactly 213 × 213 px, and compresses below 50KB with clear facial clarity in seconds.',
+  },
+  {
+    q: 'Is my personal ID photo uploaded to any server or database?',
+    a: 'No. PixelKit operates 100% locally on your computer or phone using in-browser WebAssembly. Your identity photos and biometric data never touch external servers.',
+  },
+];
+
+const pageTitle = `PAN Card Photo Resizer Online — 213x213 px & 50KB | ${SITE.name}`;
+const pageDesc =
+  'Resize and compress photos for NSDL & UTIITSL PAN card portals to exact 213x213 px and under 50KB JPG limits directly in your browser with zero uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit PAN Card Photo Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/pan-card-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Protean NSDL · UTIITSL · Instant e-PAN Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        PAN Card Photo Resizer &amp; Compressor
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize candidate photographs to exact 213 × 213 pixels at 200/300 DPI and compress under 50KB JPG in one click. 100% private in-browser tool.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="passport"
+        preset="pan-card"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        NSDL &amp; UTIITSL Official PAN Photo Specifications
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory rules enforced by the Income Tax Department of India:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4">NSDL / UTIITSL Rule</th>
+              <th class="py-3 px-4">PixelKit Auto-Configured Settings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-muted">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Format</td>
+              <td class="py-3 px-4">JPEG / JPG only</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Automatic JPG output</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Pixel Dimensions</td>
+              <td class="py-3 px-4">Exact 213 × 213 px (1:1 square)</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Pixel-perfect 213 × 213 px rescaler</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Size Cap</td>
+              <td class="py-3 px-4">Under 50 KB strictly</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Binary-search targets ~35–45 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Resolution / DPI</td>
+              <td class="py-3 px-4">200 DPI or 300 DPI recommended</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Standard 200/300 DPI header metadata</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Color &amp; Background</td>
+              <td class="py-3 px-4">Color photo with clean light background</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Full 24-bit sRGB color preservation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Common Validation Errors & Solutions -->
+    <section class="mt-8 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common PAN Card Upload Errors &amp; Fixes
+      </h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Photo resolution must be 213 x 213 pixels"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Attempting to upload rectangular passport photos (such as 350 × 450 px or 413 × 531 px).<br/>
+            <strong>Fix:</strong> PixelKit automatically applies the 1:1 square crop ratio and rescales pixel buffers to exactly 213 × 213 px.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Uploaded photo file exceeds 50 KB"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> High-resolution mobile phone camera photos usually produce files between 2 MB and 8 MB.<br/>
+            <strong>Fix:</strong> PixelKit compresses your image down to ~40 KB without washing out facial features or creating blur.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

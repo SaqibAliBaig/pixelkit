@@ -1,0 +1,177 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'UPSC Signature Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the exact signature upload rules for UPSC exams?',
+    a: 'Union Public Service Commission (UPSC Civil Services IAS/IPS, NDA, CDS, and OTR registration) requires candidate signatures in JPG/JPEG format weighing between 10 KB and 20 KB. The recommended pixel dimensions are 280 × 140 pixels (3.5 cm width × 1.5 cm height), written in clear black ink on smooth white paper.',
+  },
+  {
+    q: 'Why does the UPSC portal reject signature uploads?',
+    a: 'The most frequent cause is exceeding the strict 20 KB limit or failing the 2:1 width-to-height ratio. When smartphone photos contain large empty margins around the signature, byte weight balloons. PixelKit’s Crop Studio lets you frame the signature tightly before binary-search compression brings it safely under 20KB.',
+  },
+  {
+    q: 'How do I keep pen strokes sharp when compressing to under 20KB?',
+    a: 'PixelKit uses selective high-contrast chroma sampling and palette optimization that prevents JPEG compression artifact halos around ink lines, preserving legible signature contours.',
+  },
+  {
+    q: 'Is my candidate signature kept secure and private?',
+    a: '100% yes. Signatures are legally binding biometric assets. PixelKit operates entirely inside your device browser memory via HTML5 Canvas and WebAssembly. No files or signatures are ever transmitted to cloud servers.',
+  },
+];
+
+const pageTitle = `UPSC Signature Resizer Online — Under 20KB JPG | ${SITE.name}`;
+const pageDesc =
+  'Resize and compress signatures for UPSC CSE, NDA, CDS, and OTR to exact 280x140 px and 10KB-20KB JPG limits directly in your browser with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit UPSC Signature Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/upsc-signature-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>UPSC Civil Services · NDA · CDS · OTR · SSC Signature Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        UPSC Signature Resizer &amp; Compressor
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop excess border margins, rescale to 280 × 140 px (2:1 ratio), and compress under 20KB JPG with pin-sharp ink strokes. Private, client-side processing.
+      </p>
+    </header>
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={20}
+        initialTool="passport"
+        preset="signature"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        UPSC Official Signature Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Detailed upload parameters mandated by UPSC One-Time Registration (OTR) and exam guidelines:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4">UPSC Specification</th>
+              <th class="py-3 px-4">PixelKit Auto-Configured Settings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-muted">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Format</td>
+              <td class="py-3 px-4">JPG / JPEG format only</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Automatic JPG output</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Size Limits</td>
+              <td class="py-3 px-4">10 KB to 20 KB maximum</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Binary-search lands strictly under 20 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Pixel Dimensions</td>
+              <td class="py-3 px-4">280 × 140 px up to 350 × 350 px</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">Auto-scales to 280 × 140 px</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Aspect Ratio</td>
+              <td class="py-3 px-4">2:1 wide horizontal rectangle</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">2:1 signature crop preset preloaded</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Paper &amp; Ink</td>
+              <td class="py-3 px-4">Black ink on unlined clean white paper</td>
+              <td class="py-3 px-4 text-emerald-500 font-medium">High-contrast ink preservation filter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Common Validation Errors & Solutions -->
+    <section class="mt-8 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Common UPSC Signature Upload Errors &amp; Fixes
+      </h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Signature file size exceeds 20 KB limit"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Scanning a full A4 sheet with vast white margins wastes 90% of your byte budget on background pixels.<br/>
+            <strong>Fix:</strong> Use PixelKit’s 2:1 Crop Studio to tightly outline the ink signatures, cutting file size by 75% before compression.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-border bg-bg/50">
+          <h3 class="text-sm font-semibold text-danger flex items-center gap-1.5">
+            <span>⚠</span> "Uploaded image is blurry or indistinct"
+          </h3>
+          <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+            <strong>Cause:</strong> Aggressive single-pass lossy compression degrades delicate pen strokes.<br/>
+            <strong>Fix:</strong> PixelKit’s iterative quantization preserves sharp text vectors and line art contrast without blocky artifacts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

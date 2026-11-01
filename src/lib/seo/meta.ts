@@ -26,8 +26,8 @@ export function buildMeta(combo: ComboForMeta): MetaResult {
   const to = fmt(combo.to);
 
   const title = combo.sizeKb
-    ? `Convert ${from} to ${to} Under ${combo.sizeKb}KB — Free, Private, Instant`
-    : `Convert ${from} to ${to} — Free, Private, Instant`;
+    ? `Convert ${from} to ${to} Under ${combo.sizeKb}KB — Free, Private`
+    : `Convert ${from} to ${to} — Free & Instant`;
 
   const description = combo.sizeKb
     ? `Convert ${from} to ${to} and hit exactly ${combo.sizeKb}KB — no upload, no signup, 100% in your browser. Works for passport portals, exam forms and email limits.`

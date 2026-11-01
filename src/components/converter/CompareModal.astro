@@ -25,9 +25,9 @@
               <polyline points="21 15 16 10 5 21"/>
             </svg>
           </div>
-          <h3 id="pk-compare-title" class="truncate text-sm sm:text-base font-semibold text-fg">
+          <div id="pk-compare-title" role="heading" aria-level="3" class="truncate text-sm sm:text-base font-semibold text-fg">
             Visual Comparison
-          </h3>
+          </div>
           <span
             id="pk-compare-saved-badge"
             class="hidden rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-bold text-success border border-success/30 shrink-0 font-mono"
@@ -105,8 +105,10 @@
         <div class="absolute inset-0 flex items-center justify-center p-3 sm:p-6 pointer-events-none select-none">
           <img
             id="pk-compare-img-result"
-            src=""
-            alt="Converted"
+            width="1"
+            height="1"
+            alt=""
+            aria-hidden="true"
             class="max-w-full max-h-full object-contain pointer-events-none select-none drop-shadow-md transition-[transform,filter] duration-200"
           />
         </div>
@@ -119,8 +121,10 @@
         >
           <img
             id="pk-compare-img-orig"
-            src=""
-            alt="Original"
+            width="1"
+            height="1"
+            alt=""
+            aria-hidden="true"
             class="max-w-full max-h-full object-contain pointer-events-none select-none drop-shadow-md transition-[transform,filter] duration-200"
           />
         </div>

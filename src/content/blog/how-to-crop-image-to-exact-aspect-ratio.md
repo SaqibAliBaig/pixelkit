@@ -25,7 +25,7 @@ Cropping your images to the exact target ratio **before uploading** gives you fu
 
 ## 2. How to Crop to Exact Ratios in PixelKit
 
-1. Drag any photo or screenshot into [PixelKit](/crop-image).
+1. Drag any photo or screenshot into [PixelKit](/crop-image/).
 2. Click the **Crop Studio** button on the file preview card.
 3. Choose your desired ratio chip (e.g., **1:1 Square**, **4:5 Portrait**, or **16:9 Landscape**).
 4. Drag the framing box across the canvas. Notice how the aspect ratio stays strictly constrained so you never accidentally stretch or skew the proportions.

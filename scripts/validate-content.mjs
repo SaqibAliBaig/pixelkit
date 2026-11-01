@@ -15,7 +15,7 @@
  * Mirrors src/lib/seo/meta.ts and src/lib/seo/copy.ts.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -112,8 +112,8 @@ const SIZE_PORTAL_DETAILS = {
 
 function titleFor(c) {
   return c.sizeKb
-    ? `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} Under ${c.sizeKb}KB — Free, Private, Instant`
-    : `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} — Free, Private, Instant`;
+    ? `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} Under ${c.sizeKb}KB — Free, Private`
+    : `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} — Free & Instant`;
 }
 
 function descriptionFor(c) {
@@ -290,6 +290,34 @@ for (const c of combos) {
   }
 }
 
+// ------------------------------------------------------------------
+// Internal Link Trailing Slash Guard
+// Fails if blog markdown links omit a trailing slash (preventing 307 hops)
+// ------------------------------------------------------------------
+const blogDir = resolve(ROOT, 'src/content/blog');
+try {
+  const blogFiles = (await readdir(blogDir)).filter((f) => f.endsWith('.md'));
+  for (const f of blogFiles) {
+    const content = await readFile(resolve(blogDir, f), 'utf8');
+    const mdMatches = content.matchAll(/\[(?:[^\]]*)\]\((\/[^)#\s]+)\)/g);
+    for (const m of mdMatches) {
+      const url = m[1];
+      if (!url.endsWith('/') && !url.includes('.')) {
+        violations.push(`Blog ${f}: markdown internal link missing trailing slash: ${url}`);
+      }
+    }
+    const htmlMatches = content.matchAll(/href=["'](\/[^"'#\s]+)["']/g);
+    for (const m of htmlMatches) {
+      const url = m[1];
+      if (!url.endsWith('/') && !url.includes('.')) {
+        violations.push(`Blog ${f}: HTML internal link missing trailing slash: ${url}`);
+      }
+    }
+  }
+} catch (err) {
+  violations.push(`Could not read blog directory: ${err.message}`);
+}
+
 if (violations.length) {
   console.error(
     `✖ Content validation failed with ${violations.length} issue(s):\n`
@@ -303,3 +331,4 @@ console.log('  · unique titles');
 console.log('  · unique descriptions');
 console.log('  · unique format-specific intros ≥ 140 words');
 console.log('  · ≥ 3 FAQs per combo');
+console.log('  · blog internal links strictly end with trailing slashes');
