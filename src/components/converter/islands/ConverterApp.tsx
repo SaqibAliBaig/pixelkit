@@ -1986,9 +1986,24 @@ export function mountConverterApp(): void {
   }
 
   activeFileInput.addEventListener('change', () => {
-    if (activeFileInput.files) addFiles(activeFileInput.files);
-    activeFileInput.value = '';
+    if (activeFileInput.files && activeFileInput.files.length > 0) {
+      const selected = Array.from(activeFileInput.files);
+      activeFileInput.value = '';
+      // Yield to let native file picker close and paint frame before CPU work
+      requestAnimationFrame(() => {
+        addFiles(selected);
+      });
+    }
   });
+
+  // If user selected files during deferred boot, ingest them immediately
+  if (activeFileInput.files && activeFileInput.files.length > 0) {
+    const preExisting = Array.from(activeFileInput.files);
+    activeFileInput.value = '';
+    requestAnimationFrame(() => {
+      addFiles(preExisting);
+    });
+  }
 
   // Robust Drag & Drop support across dropzone, file list, converter root, and whole window
   const converterRoot = document.getElementById('pk-converter-root') || activeDropzone;
@@ -2002,11 +2017,12 @@ export function mountConverterApp(): void {
       e.stopPropagation();
       return;
     }
+    // If target is the native overlay input, allow native file picker dispatch
     if ((e.target as HTMLElement).closest('input')) return;
     activeFileInput.click();
   });
   activeDropzone.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement !== activeFileInput) {
       e.preventDefault();
       activeFileInput.click();
     }
@@ -2017,16 +2033,20 @@ export function mountConverterApp(): void {
     e.stopPropagation();
     dragCounter++;
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-    activeDropzone.dataset.dragover = 'true';
-    activeDropzone.classList.add('border-accent', 'bg-bg/70');
+    if (activeDropzone.dataset.dragover !== 'true') {
+      activeDropzone.dataset.dragover = 'true';
+      activeDropzone.classList.add('border-accent', 'bg-bg/70');
+    }
   };
 
   const onDragOver = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-    activeDropzone.dataset.dragover = 'true';
-    activeDropzone.classList.add('border-accent', 'bg-bg/70');
+    if (activeDropzone.dataset.dragover !== 'true') {
+      activeDropzone.dataset.dragover = 'true';
+      activeDropzone.classList.add('border-accent', 'bg-bg/70');
+    }
   };
 
   const onDragLeave = (e: DragEvent) => {
@@ -2047,6 +2067,9 @@ export function mountConverterApp(): void {
     dragCounter = 0;
     activeDropzone.dataset.dragover = 'false';
     activeDropzone.classList.remove('border-accent', 'bg-bg/70');
+
+    // Yield to browser to paint dropzone visual reset before parsing files
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     const dt = e.dataTransfer;
     if (!dt) return;

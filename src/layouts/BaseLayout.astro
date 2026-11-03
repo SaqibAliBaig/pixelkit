@@ -83,25 +83,7 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
     <link rel="preload" href="/fonts/Inter-Variable.woff2?v=4.0" as="font" type="font/woff2" crossorigin />
 
-    {import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN && (
-      <script
-        is:inline
-        defer
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon={JSON.stringify({
-          token: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN,
-        })}
-      ></script>
-    )}
-
     <script is:inline>
-      // Clear legacy stale service worker cache if present
-      try {
-        if ('caches' in window) {
-          caches.delete('pixelkit-cache-v1');
-        }
-      } catch (_) {}
-
       // No-flash theme: read storage or system preference before paint.
       (function () {
         try {
@@ -134,11 +116,27 @@ const jsonLdArr = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
     <script is:inline>
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         window.addEventListener('load', function () {
+          try {
+            if ('caches' in window) {
+              caches.delete('pixelkit-cache-v1');
+            }
+          } catch (_) {}
           navigator.serviceWorker.register('/sw.js').catch(function (err) {
             console.warn('[PixelKit PWA] Service worker registration failed:', err);
           });
         });
       }
     </script>
+
+    {import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({
+          token: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN,
+        })}
+      ></script>
+    )}
   </body>
 </html>

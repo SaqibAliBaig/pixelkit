@@ -151,14 +151,33 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
   </template>
 </section>
 
-<!-- The island: hydrates on visible, runs vanilla TS, no React overhead. -->
+<!-- The island: deferred until browser idle or user interaction for lightning-fast LCP and zero main-thread blocking. -->
 <script>
-  // Instantiate modals template into the active DOM before island mounts
-  const tmpl = document.getElementById('pk-modals-template') as HTMLTemplateElement | null;
-  if (tmpl && tmpl.content) {
-    tmpl.parentNode?.insertBefore(tmpl.content.cloneNode(true), tmpl);
-    tmpl.remove();
+  let isConverterBooted = false;
+  function bootConverter() {
+    if (isConverterBooted) return;
+    isConverterBooted = true;
+
+    ['pointerdown', 'touchstart', 'dragenter', 'keydown'].forEach((ev) => {
+      window.removeEventListener(ev, onInteract, { capture: true });
+    });
+
+    import('./islands/ConverterApp').then(({ mountConverterApp }) => {
+      mountConverterApp();
+    });
   }
-  import { mountConverterApp } from './islands/ConverterApp';
-  mountConverterApp();
+
+  function onInteract() {
+    bootConverter();
+  }
+
+  ['pointerdown', 'touchstart', 'dragenter', 'keydown'].forEach((ev) => {
+    window.addEventListener(ev, onInteract, { capture: true, once: true, passive: true });
+  });
+
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(bootConverter, { timeout: 1500 });
+  } else {
+    setTimeout(bootConverter, 400);
+  }
 </script>

@@ -27,9 +27,8 @@ const promptText =
 <div
   id="pk-dropzone"
   role="region"
-  tabindex="0"
   aria-label={`Dropzone: ${promptText}`}
-  class="group relative flex flex-col items-center justify-center gap-2.5 rounded-xl sm:rounded-2xl border-2 border-dashed border-border bg-bg/40 px-4 py-7 sm:px-6 sm:py-9 text-center cursor-pointer transition-all hover:border-accent hover:bg-bg/60 active:scale-[0.99] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20"
+  class="group relative flex flex-col items-center justify-center gap-2.5 rounded-xl sm:rounded-2xl border-2 border-dashed border-border bg-bg/40 px-4 py-7 sm:px-6 sm:py-9 text-center cursor-pointer transition-colors duration-150 hover:border-accent hover:bg-bg/60 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20"
   data-dragover="false"
 >
   <input
@@ -37,12 +36,12 @@ const promptText =
     type="file"
     accept={accept}
     multiple
-    class="sr-only"
+    class="absolute inset-0 z-10 h-full w-full opacity-0 cursor-pointer"
     aria-label="Upload files from your device"
   />
 
   <div
-    class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:scale-105 transition-transform"
+    class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:scale-105 transition-transform pointer-events-none"
     aria-hidden="true"
   >
     <svg
@@ -61,20 +60,20 @@ const promptText =
     </svg>
   </div>
 
-  <div class="text-sm">
+  <div class="text-sm pointer-events-none">
     <span id="pk-dropzone-prompt" class="font-semibold text-fg">{promptText}</span>
     <span class="text-muted"> or </span>
     <span class="font-semibold text-accent underline underline-offset-4 group-hover:text-accent/90">
       browse files
     </span>
   </div>
-  <p class="text-xs text-muted max-w-sm">
+  <p class="text-xs text-muted max-w-sm pointer-events-none">
     Supports <span class="font-medium text-fg">JPG, PNG, HEIC, WEBP, PDF, SVG, TIFF, AVIF, GIF, BMP</span>
     {toUpper && fromUpper !== toUpper && !['crop', 'resize', 'passport'].includes(initialTool) && (
       <span> · Preset for <span class="font-medium text-fg">{fromUpper}</span> → <span class="text-accent font-semibold">{toUpper}</span></span>
     )}
   </p>
-  <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-[11px] text-muted">
+  <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-[11px] text-muted pointer-events-none">
     <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"></polyline>
