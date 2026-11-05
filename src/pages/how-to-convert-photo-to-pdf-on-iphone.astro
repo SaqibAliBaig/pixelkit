@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
@@ -52,7 +51,7 @@ const directAnswer = {
     'To convert photos to PDF on iPhone: 1. Open PixelKit in mobile Safari. 2. Tap to select one or multiple photos from your iPhone Camera Roll or Files app. 3. Drag thumbnails to reorder pages or set a target size under 200KB. 4. Tap Download to save your unified PDF directly to the iPhone Files app without installing third-party apps or paying for subscriptions.',
 };
 
-const pageTitle = `How to Convert Photo to PDF on iPhone (Free & Instant) | ${SITE.name}`;
+const pageTitle = `Convert Photo to PDF on iPhone Free | ${SITE.name}`;
 const pageDesc =
   'Learn how to convert photos to PDF on iPhone and iPad for free. Convert camera roll pictures and HEIC files to PDF in Safari without installing any apps.';
 const pageKeywords = [
@@ -96,7 +95,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit iPhone Photo to PDF Tool',
     description: pageDesc,
-    path: '/how-to-convert-photo-to-pdf-on-iphone/',
+    url: 'https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'iOS, iPadOS, Any (Web Browser)',
   }),
@@ -130,7 +129,7 @@ const comparisonMethods = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/"
+  canonical="https://pixelkit.app/how-to-convert-photo-to-pdf-on-iphone/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -165,7 +164,7 @@ const comparisonMethods = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for iPhone HEIC to PDF -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="heic"
         to="pdf"
@@ -173,7 +172,7 @@ const comparisonMethods = [
         toMime="application/pdf"
         initialTool="convert"
       />
-    </main>
+    </div>
 
     <!-- 3 Methods Comparison Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

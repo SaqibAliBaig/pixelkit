@@ -43,9 +43,9 @@ const faqs = [
   },
 ];
 
-const pageTitle = `Image Resizer in CM Online (Centimeters & Millimeters to Pixels) | ${SITE.name}`;
+const pageTitle = `Resize Image in CM Online (3.5×4.5 cm at 300 DPI) | ${SITE.name}`;
 const pageDesc =
-  'Free online image resizer in cm, mm, and inches. Convert 3.5 x 4.5 cm, 2 x 2 inches, and custom physical dimensions to exact pixels and compress to KB limits privately.';
+  'Resize images in cm, mm, and inches to exact pixels at 300 DPI. Convert 3.5 x 4.5 cm photos and compress to KB limits privately with zero server uploads.';
 const pageKeywords = [
   'image resizer in cm',
   'image resizer in pixels',
@@ -146,6 +146,10 @@ const jsonLd = [
         toMime="image/jpeg"
         targetKb={50}
         initialTool="resize"
+        initialUnit="cm"
+        initialWidth={3.5}
+        initialHeight={4.5}
+        initialDpi={300}
       />
     </div>
 
@@ -212,10 +216,18 @@ const jsonLd = [
       <!-- Quick Links -->
       <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
         <span class="text-muted font-medium mr-1">Direct Target Size Resizers:</span>
-        <a href="/image-resizer-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 50KB</a>
-        <a href="/image-resizer-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 100KB</a>
-        <a href="/image-resizer-in-kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in KB</a>
-        <a href="/photo-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Photo Resizer Hub →</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer 100KB</a>
+        <a href="/cm-to-pixels-at-300-dpi/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">CM to Pixels at 300 DPI</a>
+        <a href="/resize-image-3-5x4-5-cm/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">3.5×4.5 cm Resizer</a>
+        <a href="/image-resizer-in-mm/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Image Resizer in MM</a>
+        <a href="/image-resizer-in-inches/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Image Resizer in Inches</a>
+        <a href="/mm-to-pixels-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">MM to Pixels</a>
+        <a href="/inches-to-pixels-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Inches to Pixels</a>
+        <a href="/pixels-to-cm-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to CM Converter</a>
+        <a href="/change-image-dpi-to-300/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Change Image DPI to 300</a>
+        <a href="/reduce-image-size-in-kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in KB</a>
+        <a href="/resize-image/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Photo Resizer Hub →</a>
       </div>
     </section>
 

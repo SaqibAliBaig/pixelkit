@@ -59,7 +59,7 @@ const directAnswer = {
   ],
 };
 
-const pageTitle = `JPG to JPEG Converter — Convert JPG to JPEG Online Free | ${SITE.name}`;
+const pageTitle = `JPG to JPEG Converter Online (Fast & Free) | ${SITE.name}`;
 const pageDesc =
   'Free online JPG to JPEG converter. Convert .jpg to .jpeg files instantly with 100% lossless quality. Fix strict portal upload errors with zero cloud uploads.';
 const pageKeywords = [
@@ -117,22 +117,22 @@ const jsonLd = [
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
-  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumbs Navigation -->
     <Breadcrumbs items={breadcrumbs} class="mb-6" />
 
     <!-- Hero Header -->
     <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <Badge variant="primary">100% Lossless Conversion</Badge>
-        <Badge variant="outline">Strict Portal Validation Ready</Badge>
+        <Badge variant="accent">100% Lossless Conversion</Badge>
+        <Badge variant="default">Strict Portal Validation Ready</Badge>
       </div>
 
-      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-fg mb-4">
         JPG to JPEG Converter
       </h1>
-      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
-        Convert <code class="font-mono text-foreground font-semibold">.jpg</code> photos to <code class="font-mono text-foreground font-semibold">.jpeg</code> format instantly in your browser. Bypass stubborn government and university form validation errors with zero quality loss and 100% client-side privacy.
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
+        Convert <code class="font-mono text-fg font-semibold">.jpg</code> photos to <code class="font-mono text-fg font-semibold">.jpeg</code> format instantly in your browser. Bypass stubborn government and university form validation errors with zero quality loss and 100% client-side privacy.
       </p>
     </header>
 
@@ -140,7 +140,7 @@ const jsonLd = [
     <section aria-label="JPG to JPEG Converter Tool" class="mb-12">
       <ToolPreview
         from="jpg"
-        to="jpg"
+        to="jpeg"
         fromMime="image/jpeg"
         toMime="image/jpeg"
         initialTool="convert"
@@ -159,48 +159,48 @@ const jsonLd = [
     <!-- Deep Technical Explanation Section -->
     <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
       <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-fg mb-4">
           Is JPG Different From JPEG? The Historical Truth
         </h2>
-        <p class="text-muted-foreground leading-relaxed mb-4">
-          The short answer is <strong>no</strong>. In terms of image compression, color channels, bit depth, and raster rendering, JPG and JPEG are 100% identical. Both formats are standardized under ISO/IEC 10918-1 by the Joint Photographic Experts Group and share the universal MIME media type <code class="font-mono text-foreground">image/jpeg</code>.
+        <p class="text-muted leading-relaxed mb-4">
+          The short answer is <strong>no</strong>. In terms of image compression, color channels, bit depth, and raster rendering, JPG and JPEG are 100% identical. Both formats are standardized under ISO/IEC 10918-1 by the Joint Photographic Experts Group and share the universal MIME media type <code class="font-mono text-fg">image/jpeg</code>.
         </p>
-        <p class="text-muted-foreground leading-relaxed mb-4">
-          The difference exists solely due to computer operating system history. In the era of MS-DOS and Windows 3.1 / Windows 95, the FAT16 filesystem enforced the famous <strong>8.3 filename convention</strong>: file names could only be up to 8 characters long, followed by a maximum of 3 extension characters. Because <code class="font-mono text-foreground">.jpeg</code> was 4 characters long, Microsoft shortened it to <code class="font-mono text-foreground">.jpg</code>. Meanwhile, Unix, macOS, and Linux operating systems had no such limitation and used <code class="font-mono text-foreground">.jpeg</code>.
+        <p class="text-muted leading-relaxed mb-4">
+          The difference exists solely due to computer operating system history. In the era of MS-DOS and Windows 3.1 / Windows 95, the FAT16 filesystem enforced the famous <strong>8.3 filename convention</strong>: file names could only be up to 8 characters long, followed by a maximum of 3 extension characters. Because <code class="font-mono text-fg">.jpeg</code> was 4 characters long, Microsoft shortened it to <code class="font-mono text-fg">.jpg</code>. Meanwhile, Unix, macOS, and Linux operating systems had no such limitation and used <code class="font-mono text-fg">.jpeg</code>.
         </p>
-        <p class="text-muted-foreground leading-relaxed">
-          Today, all modern operating systems treat <code class="font-mono text-foreground">.jpg</code> and <code class="font-mono text-foreground">.jpeg</code> as interchangeable. However, older web servers and legacy recruitment platforms still enforce rigid filename regex checks that reject <code class="font-mono text-foreground">.jpg</code> files.
+        <p class="text-muted leading-relaxed">
+          Today, all modern operating systems treat <code class="font-mono text-fg">.jpg</code> and <code class="font-mono text-fg">.jpeg</code> as interchangeable. However, older web servers and legacy recruitment platforms still enforce rigid filename regex checks that reject <code class="font-mono text-fg">.jpg</code> files.
         </p>
       </section>
 
       <!-- Educational Feature Grid -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             🛡️
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">Zero Quality Loss</h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
+          <h3 class="text-lg font-bold text-fg mb-2">Zero Quality Loss</h3>
+          <p class="text-sm text-muted leading-relaxed">
             PixelKit packages your image directly without lossy re-encoding loops. Every pixel, color gradient, and edge sharpness detail remains bit-for-bit identical to your original image.
           </p>
         </div>
 
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             ⚡
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">Instant Batch Conversion</h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
+          <h3 class="text-lg font-bold text-fg mb-2">Instant Batch Conversion</h3>
+          <p class="text-sm text-muted leading-relaxed">
             Convert hundreds of images in seconds. Because files are processed locally on your CPU via Web Workers, there are no internet upload bottlenecks or bandwidth restrictions.
           </p>
         </div>
 
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             🔒
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">100% Client-Side Privacy</h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
+          <h3 class="text-lg font-bold text-fg mb-2">100% Client-Side Privacy</h3>
+          <p class="text-sm text-muted leading-relaxed">
             Never upload sensitive passport scans, exam admit cards, or identity proofs to unverified cloud servers. PixelKit guarantees 100% of the work happens inside your browser.
           </p>
         </div>
@@ -208,39 +208,36 @@ const jsonLd = [
 
       <!-- Frequently Asked Questions -->
       <section>
-        <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
-          Frequently Asked Questions About Converting JPG to JPEG
-        </h2>
-        <FAQSection faqs={faqs} />
+        <FAQSection faqs={faqs} heading="Frequently Asked Questions About Converting JPG to JPEG" />
       </section>
 
       <!-- Internal Linking Hub -->
       <section class="border-t border-border/80 pt-8 mt-12">
-        <h3 class="text-lg font-bold text-foreground mb-4">Related Format Converters</h3>
+        <h3 class="text-lg font-bold text-fg mb-4">Related Format Converters</h3>
         <div class="flex flex-wrap gap-2 text-sm">
-          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Image to PDF
           </a>
-          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Photo to PDF
           </a>
-          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Merge JPG to PDF
           </a>
-          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             HEIC to PDF
           </a>
-          <a href="/resize-image-to-20kb-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/resize-image-to-20kb-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Resize Image to 20KB to 50KB
           </a>
-          <a href="/compress-jpg-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/compress-jpg-to-50kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Compress JPG to 50KB
           </a>
-          <a href="/jpg-to-png/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/jpg-to-png/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             JPG to PNG Converter
           </a>
         </div>
       </section>
     </article>
-  </main>
+  </div>
 </BaseLayout>

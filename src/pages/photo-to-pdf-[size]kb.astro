@@ -208,7 +208,7 @@ const directAnswer = {
   ],
 };
 
-const pageTitle = `Photo to PDF ${spec.size}KB — Convert Photo to PDF Under ${spec.size}KB Free | ${SITE.name}`;
+const pageTitle = `Photo to PDF ${spec.size}KB (Convert Under ${spec.size}KB) | ${SITE.name}`;
 const pageDesc = `Convert photos and scanned documents to PDF strictly under ${spec.size}KB online. Free, 100% private in-browser tool. Perfect for NEET, UPSC, SSC, and visa portals.`;
 const pageKeywords = [
   `photo to pdf ${spec.size} kb`,
@@ -264,21 +264,21 @@ const jsonLd = [
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
-  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumbs Navigation -->
     <Breadcrumbs items={breadcrumbs} class="mb-6" />
 
     <!-- Hero Header -->
     <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <Badge variant="primary">{spec.badge}</Badge>
-        <Badge variant="outline">Strictly Under {spec.size}KB</Badge>
+        <Badge variant="accent">{spec.badge}</Badge>
+        <Badge variant="default">Strictly Under {spec.size}KB</Badge>
       </div>
 
-      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-fg mb-4">
         {spec.headline}
       </h1>
-      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
         {spec.summary}
       </p>
     </header>
@@ -288,8 +288,10 @@ const jsonLd = [
       <ToolPreview
         from="jpg"
         to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
         targetKb={spec.size}
-        initialTool="convert"
+        initialTool="compress"
       />
     </section>
 
@@ -304,7 +306,7 @@ const jsonLd = [
 
     <!-- Size Presets Navigation Bar -->
     <section class="mb-12 rounded-2xl border border-border/80 bg-surface/50 p-6">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-muted mb-3">
         Switch to Other Photo to PDF File Size Presets
       </h2>
       <div class="flex flex-wrap gap-2">
@@ -313,8 +315,8 @@ const jsonLd = [
             href={`/photo-to-pdf-${s}kb/`}
             class={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border transition-colors ${
               s === spec.size
-                ? 'bg-primary text-primary-foreground border-primary font-semibold'
-                : 'bg-surface hover:bg-surface/80 border-border text-foreground'
+                ? 'bg-accent text-accent-fg border-accent font-semibold'
+                : 'bg-surface hover:bg-surface/80 border-border text-fg'
             }`}
           >
             Photo to PDF {s}KB
@@ -322,13 +324,13 @@ const jsonLd = [
         ))}
         <a
           href="/photo-to-pdf/"
-          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-foreground transition-colors"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-fg transition-colors"
         >
           Photo to PDF Hub (All Sizes)
         </a>
         <a
           href="/image-to-pdf-200kb/"
-          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-foreground transition-colors"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border bg-surface hover:bg-surface/80 border-border text-fg transition-colors"
         >
           Image to PDF 200KB
         </a>
@@ -337,20 +339,20 @@ const jsonLd = [
 
     <!-- Use Cases & Portal Grid -->
     <section class="mb-12">
-      <h2 class="text-2xl font-bold text-foreground mb-6">
+      <h2 class="text-2xl font-bold text-fg mb-6">
         Common Application Portals Requiring PDF Under {spec.size}KB
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {spec.useCases.map((uc) => (
           <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 flex flex-col justify-between">
             <div>
-              <div class="inline-block px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold mb-3">
+              <div class="inline-block px-2.5 py-1 rounded-md bg-accent/10 text-accent text-xs font-semibold mb-3">
                 {uc.limit}
               </div>
-              <h3 class="text-lg font-bold text-foreground mb-2">{uc.title}</h3>
-              <p class="text-sm text-muted-foreground leading-relaxed mb-4">{uc.body}</p>
+              <h3 class="text-lg font-bold text-fg mb-2">{uc.title}</h3>
+              <p class="text-sm text-muted leading-relaxed mb-4">{uc.body}</p>
             </div>
-            <div class="text-xs text-muted-foreground border-t border-border/60 pt-3">
+            <div class="text-xs text-muted border-t border-border/60 pt-3">
               100% verified compliance
             </div>
           </div>
@@ -359,16 +361,16 @@ const jsonLd = [
     </section>
 
     <!-- Pro Tip Callout -->
-    <section class="mb-12 rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+    <section class="mb-12 rounded-2xl border border-accent/20 bg-accent/5 p-6 sm:p-8">
       <div class="flex items-start gap-4">
-        <div class="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shrink-0 mt-0.5">
+        <div class="h-8 w-8 rounded-lg bg-accent text-accent-fg flex items-center justify-center font-bold text-base shrink-0 mt-0.5">
           💡
         </div>
         <div>
-          <h3 class="text-base font-bold text-foreground mb-1">
+          <h3 class="text-base font-bold text-fg mb-1">
             Expert Compression Tip for {spec.size}KB PDFs
           </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
+          <p class="text-sm text-muted leading-relaxed">
             {spec.tip}
           </p>
         </div>
@@ -382,38 +384,35 @@ const jsonLd = [
 
     <!-- Deep Educational FAQ Section -->
     <section>
-      <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
-        Frequently Asked Questions — Photo to PDF Under {spec.size}KB
-      </h2>
-      <FAQSection faqs={faqs} />
+      <FAQSection faqs={faqs} heading={`Frequently Asked Questions — Photo to PDF Under ${spec.size}KB`} />
     </section>
 
     <!-- Internal Linking Hub -->
     <section class="border-t border-border/80 pt-8 mt-12">
-      <h3 class="text-lg font-bold text-foreground mb-4">Related Photo & PDF Tools</h3>
+      <h3 class="text-lg font-bold text-fg mb-4">Related Photo & PDF Tools</h3>
       <div class="flex flex-wrap gap-2 text-sm">
-        <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+        <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
           Photo to PDF Converter
         </a>
-        <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+        <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
           Image to PDF
         </a>
-        <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+        <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
           HEIC to PDF
         </a>
-        <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+        <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
           Merge JPG to PDF
         </a>
-        <a href="/photo-resizer-in-kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
-          Photo Resizer in KB
+        <a href="/reduce-image-size-in-kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
+          Reduce Size in KB
         </a>
-        <a href={`/photo-resizer-${spec.size}kb/`} class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
-          Photo Resizer {spec.size}KB
+        <a href={`/compress-image-to-${spec.size}kb/`} class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
+          Compress Image to {spec.size}KB
         </a>
-        <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+        <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
           Convert Photo to PDF on iPhone
         </a>
       </div>
     </section>
-  </main>
+  </div>
 </BaseLayout>

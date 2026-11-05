@@ -1,27 +1,129 @@
 ---
+import { PORTAL_PRESETS } from '@lib/portal-presets';
+
 interface Props {
   accept: string;
   from: string;
   to?: string;
   initialTool?: string;
+  initialSizeMode?: 'max' | 'exact' | 'range' | 'quality';
+  targetKb?: number | null;
+  minKb?: number | null;
+  maxKb?: number | null;
+  initialCropAspect?: string;
+  initialUnit?: 'px' | 'cm' | 'mm' | 'in';
+  initialWidth?: number | null;
+  initialHeight?: number | null;
+  initialDpi?: number | null;
+  preserveMetadata?: boolean;
+  initialMergePdf?: boolean;
+  preset?: string;
 }
 
-const { accept, from, to, initialTool = 'all' } = Astro.props;
+const {
+  accept,
+  from,
+  to,
+  initialTool = 'all',
+  initialSizeMode,
+  targetKb,
+  minKb,
+  maxKb,
+  initialCropAspect,
+  initialUnit,
+  initialWidth,
+  initialHeight,
+  initialDpi,
+  preserveMetadata,
+  initialMergePdf,
+  preset,
+} = Astro.props;
 const fromUpper = from.toUpperCase();
 const toUpper = to ? to.toUpperCase() : '';
 
 const promptText =
   initialTool === 'crop'
-    ? 'Drop any photo to crop & frame'
+    ? initialCropAspect && initialCropAspect !== 'original'
+      ? `Drop any photo to crop to ${initialCropAspect}`
+      : 'Drop any photo to crop & frame'
     : initialTool === 'resize'
-    ? 'Drop any photo to resize resolution'
+    ? initialUnit && initialUnit !== 'px'
+      ? `Drop any photo to resize in ${initialUnit.toUpperCase()}`
+      : 'Drop any photo to resize resolution'
+    : initialTool === 'dpi'
+    ? `Drop any photo to convert to ${initialDpi || 300} DPI`
+    : initialTool === 'exif'
+    ? 'Drop any photo to strip EXIF & GPS metadata'
     : initialTool === 'passport'
     ? 'Drop photo for passport or visa portal'
     : initialTool === 'convert'
-    ? 'Drop any photo or document to convert'
+    ? initialMergePdf
+      ? 'Drop multiple photos to merge into PDF'
+      : 'Drop any photo or document to convert'
     : initialTool === 'compress'
-    ? 'Drop any photo to compress file size'
+    ? initialSizeMode === 'exact'
+      ? 'Drop any photo to increase or set exact KB size'
+      : initialSizeMode === 'range' && minKb && maxKb
+      ? `Drop any photo to compress to ${minKb}–${maxKb} KB`
+      : 'Drop any photo to compress file size'
     : 'Drop any image or document here';
+
+const matchedPreset = preset ? PORTAL_PRESETS.find((p) => p.id === preset) : null;
+
+function formatKbOrMb(kb: number): string {
+  if (kb >= 1024 && kb % 1024 === 0) return `${kb / 1024} MB`;
+  return `${kb} KB`;
+}
+
+let lockedPresetLabel = '';
+if (matchedPreset) {
+  const effectiveKb = targetKb ?? matchedPreset.targetKb;
+  const kbPart =
+    initialSizeMode === 'range' && minKb && maxKb
+      ? `${minKb}–${maxKb} KB`
+      : effectiveKb
+      ? `≤ ${formatKbOrMb(effectiveKb)}`
+      : '';
+  const dimPart = matchedPreset.dimLabel || '';
+  const fmtPart = toUpper === 'PDF' ? ' • PDF' : '';
+  if (kbPart && dimPart) {
+    lockedPresetLabel = `Locked Preset: ${kbPart} • ${dimPart}${fmtPart}`;
+  } else if (kbPart) {
+    lockedPresetLabel = `Locked Preset: ${kbPart}${fmtPart}`;
+  } else if (dimPart) {
+    lockedPresetLabel = `Locked Preset: ${matchedPreset.name} (${dimPart})`;
+  } else {
+    lockedPresetLabel = `Locked Preset: ${matchedPreset.name}`;
+  }
+} else if (initialTool === 'dpi' && initialDpi) {
+  lockedPresetLabel = `Active Mode: ${initialDpi} DPI Print Header • 100% Lossless`;
+} else if (initialTool === 'exif' || preserveMetadata === false) {
+  lockedPresetLabel = 'Privacy Mode: Strip All EXIF, GPS & Camera Tags';
+} else if (initialCropAspect && initialCropAspect !== 'original') {
+  lockedPresetLabel = `Active Crop Ratio: ${initialCropAspect} Aspect Lock`;
+} else if (initialUnit && initialUnit !== 'px' && initialWidth && initialHeight) {
+  const dpiPart = initialDpi ? ` @ ${initialDpi} DPI` : '';
+  const kbPart = targetKb ? ` • ≤ ${formatKbOrMb(targetKb)}` : '';
+  lockedPresetLabel = `Preset: ${initialWidth} × ${initialHeight} ${initialUnit}${dpiPart}${kbPart}`;
+} else if (initialWidth && initialHeight) {
+  const dpiPart = initialDpi ? ` • ${initialDpi} DPI` : '';
+  const kbPart = targetKb ? ` • ≤ ${formatKbOrMb(targetKb)}` : '';
+  lockedPresetLabel = `Preset: ${initialWidth} × ${initialHeight} px${dpiPart}${kbPart}`;
+} else if (initialUnit && initialUnit !== 'px') {
+  const dpiPart = initialDpi ? ` @ ${initialDpi} DPI` : '';
+  lockedPresetLabel = `Active Unit: Resize in ${initialUnit.toUpperCase()}${dpiPart}`;
+} else if (initialSizeMode === 'range' && minKb && maxKb) {
+  lockedPresetLabel = `Locked Bracket: ${minKb} KB – ${maxKb} KB`;
+} else if (initialSizeMode === 'quality') {
+  lockedPresetLabel = 'High-Fidelity Compression • 85% Smart Quality';
+} else if (targetKb && initialSizeMode === 'exact') {
+  lockedPresetLabel = `Exact Target: ${formatKbOrMb(targetKb)} • Increase or Compress`;
+} else if (targetKb) {
+  const fmtTarget = toUpper && fromUpper !== toUpper ? `${toUpper} Output` : 'Target File Size';
+  lockedPresetLabel = `Locked Preset: ≤ ${formatKbOrMb(targetKb)} • ${fmtTarget}`;
+} else if (initialMergePdf) {
+  lockedPresetLabel = 'Active Mode: Merge Multiple Images into 1 PDF';
+}
 ---
 
 <div
@@ -39,6 +141,19 @@ const promptText =
     class="absolute inset-0 z-10 h-full w-full opacity-0 cursor-pointer"
     aria-label="Upload files from your device"
   />
+
+  {lockedPresetLabel && (
+    <div
+      id="pk-locked-preset-badge"
+      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/25 shadow-2xs pointer-events-none mb-1 animate-in fade-in duration-200"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <span>{lockedPresetLabel}</span>
+    </div>
+  )}
 
   <div
     class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border text-fg group-hover:border-accent/40 group-hover:scale-105 transition-transform pointer-events-none"
@@ -73,6 +188,7 @@ const promptText =
       <span> · Preset for <span class="font-medium text-fg">{fromUpper}</span> → <span class="text-accent font-semibold">{toUpper}</span></span>
     )}
   </p>
+
   <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-[11px] text-muted pointer-events-none">
     <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

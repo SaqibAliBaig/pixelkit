@@ -36,6 +36,7 @@ import type {
   MergePdfRequest,
   WorkerMessage,
   DimensionOptions,
+  DimensionUnit,
   TargetSizeMode,
   TargetSizeOptions,
   CropAspectPreset,
@@ -43,7 +44,7 @@ import type {
   CustomCropBox,
 } from '@lib/worker/types';
 import { ASPECT_RATIOS } from '@lib/worker/adjustments';
-import { PORTAL_PRESETS, type PortalPreset } from '@lib/portal-presets';
+import { PORTAL_PRESETS } from '@lib/portal-presets';
 import { formatBytes } from '@lib/utils/filesize';
 import { downloadBlob } from '@lib/utils/download';
 import { mimeForExtension } from '@lib/engines';
@@ -71,6 +72,7 @@ interface FileJob {
   maxKb?: number | null;
   targetOptions?: TargetSizeOptions;
   dimensions?: DimensionOptions;
+  dpi?: number | null;
   scalePercent?: number;
   cropAspect?: CropAspectPreset;
   cropAnchor?: CropAnchor;
@@ -119,6 +121,8 @@ interface State {
   cropAnchor: CropAnchor;
   scalePercent: number | null;
   lockAspectRatio: boolean;
+  unit: DimensionUnit;
+  dpi: number | null;
   dimensions: DimensionOptions;
   grayscale: boolean;
   mergePdf: boolean;
@@ -133,6 +137,19 @@ interface State {
 const hardwareCores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency || 4) : 4;
 // Scale up to 4 parallel workers on quad-core/multi-core machines for 2x-4x batch conversion speed
 const MAX_WORKERS = Math.max(2, Math.min(4, Math.floor(hardwareCores / 2) || 2));
+
+/**
+ * Protect INP (< 200ms) on batch operations by yielding execution to the browser
+ * event loop so input events (touch, scroll, click) and rendering stay responsive.
+ */
+function yieldToMain(): Promise<void> {
+  if (typeof window !== 'undefined' && 'scheduler' in window && typeof (window as any).scheduler?.yield === 'function') {
+    return (window as any).scheduler.yield();
+  }
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
 
 // ---------- bootstrap ----------
 
@@ -149,6 +166,46 @@ export function mountConverterApp(): void {
   }
 
   const initialTarget = parseTargetKb(root.dataset.targetKb);
+  const initialSizeModeRaw = root.dataset.sizeMode as SizeControlMode | undefined;
+  const initialSizeMode: SizeControlMode =
+    initialSizeModeRaw && ['max', 'exact', 'range', 'quality'].includes(initialSizeModeRaw)
+      ? initialSizeModeRaw
+      : 'max';
+  const initialMinKb = parseTargetKb(root.dataset.minKb);
+  const initialMaxKb = parseTargetKb(root.dataset.maxKb) ?? initialTarget;
+  const initialUnitRaw = root.dataset.initialUnit as DimensionUnit | undefined;
+  const initialUnit: DimensionUnit =
+    initialUnitRaw && ['px', 'cm', 'mm', 'in'].includes(initialUnitRaw) ? initialUnitRaw : 'px';
+  const initialWidthNum = root.dataset.initialWidth ? Number(root.dataset.initialWidth) : null;
+  const initialHeightNum = root.dataset.initialHeight ? Number(root.dataset.initialHeight) : null;
+  const initialDpiRaw = root.dataset.initialDpi ? Number(root.dataset.initialDpi) : null;
+  const initialDpi =
+    initialDpiRaw && Number.isFinite(initialDpiRaw) && initialDpiRaw > 0
+      ? Math.round(initialDpiRaw)
+      : null;
+  const initialPreserveMetadata =
+    root.dataset.preserveMetadata !== '' && root.dataset.preserveMetadata !== undefined
+      ? root.dataset.preserveMetadata !== 'false'
+      : root.dataset.initialTool !== 'exif';
+  const initialCropAspectRaw = (root.dataset.cropAspect || '').trim() as CropAspectPreset;
+  const initialCropAspect: CropAspectPreset =
+    initialCropAspectRaw && (initialCropAspectRaw === 'original' || Boolean(ASPECT_RATIOS[initialCropAspectRaw]))
+      ? initialCropAspectRaw
+      : 'original';
+  const initialMergePdf = root.dataset.mergePdf === 'true';
+
+  const hasInitialCustomDims = Boolean(
+    initialWidthNum && initialWidthNum > 0 && initialHeightNum && initialHeightNum > 0
+  );
+  const initialEffectiveDpi = initialDpi || 300;
+  const initialPxWidth =
+    hasInitialCustomDims && initialWidthNum
+      ? unitToPx(initialWidthNum, initialUnit, initialEffectiveDpi)
+      : undefined;
+  const initialPxHeight =
+    hasInitialCustomDims && initialHeightNum
+      ? unitToPx(initialHeightNum, initialUnit, initialEffectiveDpi)
+      : undefined;
 
   const state: State = {
     jobs: [],
@@ -158,18 +215,31 @@ export function mountConverterApp(): void {
     fromMime: root.dataset.fromMime || 'image/jpeg',
     toMime: root.dataset.toMime || 'image/png',
     targetKb: initialTarget,
-    targetSizeMode: 'max',
-    minKb: null,
-    maxKb: initialTarget,
-    quality: 0.9,
-    preserveMetadata: true,
-    cropAspect: 'original',
+    targetSizeMode: initialSizeMode,
+    minKb: initialMinKb,
+    maxKb: initialMaxKb,
+    quality: initialSizeMode === 'quality' ? 0.85 : 0.9,
+    preserveMetadata: initialPreserveMetadata,
+    cropAspect: initialCropAspect,
     cropAnchor: 'center',
-    scalePercent: 100,
-    lockAspectRatio: true,
-    dimensions: { mode: 'original' },
+    scalePercent: hasInitialCustomDims || initialUnit !== 'px' ? null : 100,
+    lockAspectRatio: hasInitialCustomDims ? false : true,
+    unit: initialUnit,
+    dpi: initialDpi ?? (initialUnit !== 'px' ? 300 : null),
+    dimensions: hasInitialCustomDims
+      ? {
+          mode: 'custom',
+          width: initialPxWidth,
+          height: initialPxHeight,
+          unit: initialUnit,
+          dpi: initialUnit !== 'px' ? initialEffectiveDpi : (initialDpi ?? undefined),
+          fit: 'cover',
+          lockAspectRatio: false,
+          noUpscale: false,
+        }
+      : { mode: 'original' },
     grayscale: false,
-    mergePdf: false,
+    mergePdf: initialMergePdf,
     svgScale: 2,
     autoOrient: true,
     stripTransparency: true,
@@ -214,6 +284,7 @@ export function mountConverterApp(): void {
   const modeExactBtn = document.getElementById('pk-size-mode-exact') as HTMLButtonElement | null;
   const modeRangeBtn = document.getElementById('pk-size-mode-range') as HTMLButtonElement | null;
   const modeQualityBtn = document.getElementById('pk-size-mode-quality') as HTMLButtonElement | null;
+  const sizeModeHint = document.getElementById('pk-size-mode-hint');
 
   // Custom Dropdown Elements (Output Format & Crop Presets)
   const customFormatTrigger = document.getElementById('pk-custom-format-trigger') as HTMLButtonElement | null;
@@ -251,8 +322,9 @@ export function mountConverterApp(): void {
   const stageCompress = document.getElementById('pk-stage-compress');
   const stageCrop = document.getElementById('pk-stage-crop');
   const stageResize = document.getElementById('pk-stage-resize');
+  const stageDpi = document.getElementById('pk-stage-dpi');
   const stagesList = document.getElementById('pk-stages-list');
-  const stageAdvanced = document.getElementById('pk-stage-advanced');
+  const stageAdvanced = document.getElementById('pk-stage-advanced') as HTMLDetailsElement | null;
   const toggleMoreToolsWrapper = document.getElementById('pk-more-tools-toggle-wrapper');
   const toggleMoreToolsBtn = document.getElementById('pk-toggle-more-tools-btn') as HTMLButtonElement | null;
   const moreToolsLabel = document.getElementById('pk-more-tools-btn-label');
@@ -299,11 +371,20 @@ export function mountConverterApp(): void {
   const btnSwitchToPortal = document.getElementById('pk-btn-switch-to-portal') as HTMLButtonElement | null;
   const btnBackToCustom = document.getElementById('pk-btn-back-to-custom') as HTMLButtonElement | null;
   const portalPanelReset = document.getElementById('pk-portal-panel-reset') as HTMLButtonElement | null;
-  const portalPresetCards = document.querySelectorAll<HTMLButtonElement>('.pk-portal-preset-card');
+  let portalPresetCards = document.querySelectorAll<HTMLButtonElement>('.pk-portal-preset-card');
+  function ensurePortalCardsHydrated(): void {
+    const tpl = document.getElementById('pk-portal-cards-template') as HTMLTemplateElement | null;
+    if (tpl && tpl.content) {
+      tpl.parentNode?.insertBefore(tpl.content.cloneNode(true), tpl);
+      tpl.remove();
+      portalPresetCards = document.querySelectorAll<HTMLButtonElement>('.pk-portal-preset-card');
+    }
+  }
   const portalSearchInput = document.getElementById('pk-portal-search') as HTMLInputElement | null;
   const portalCatFilters = document.querySelectorAll<HTMLButtonElement>('.pk-cat-filter');
   const portalNoMatches = document.getElementById('pk-portal-no-matches');
-  let activePortalCat = 'all';
+  const initialActiveCatBtn = document.querySelector<HTMLButtonElement>('.pk-cat-filter.active');
+  let activePortalCat = initialActiveCatBtn?.dataset.cat || 'all';
   const portalAppliedSummary = document.getElementById('pk-portal-applied-summary');
 
   const rangeUnitKbBtn = document.getElementById('pk-range-unit-kb') as HTMLButtonElement | null;
@@ -320,6 +401,20 @@ export function mountConverterApp(): void {
   const customDimsContainer = document.getElementById('pk-custom-dims-container');
   const dimWidthInput = document.getElementById('pk-dim-width') as HTMLInputElement | null;
   const dimHeightInput = document.getElementById('pk-dim-height') as HTMLInputElement | null;
+  const dimWidthLabel = document.getElementById('pk-dim-width-label');
+  const dimHeightLabel = document.getElementById('pk-dim-height-label');
+  const dimUnitBtns = document.querySelectorAll<HTMLButtonElement>('.pk-dim-unit-btn');
+  const dimDpiWrap = document.getElementById('pk-dim-dpi-wrap');
+  const dimDpiSelect = document.getElementById('pk-dim-dpi') as HTMLSelectElement | null;
+  const dimComputedPx = document.getElementById('pk-dim-computed-px');
+  const cmPresetsRow = document.getElementById('pk-cm-presets-row');
+  const cmPresetBtns = document.querySelectorAll<HTMLButtonElement>('.pk-cm-preset-btn');
+  const dpiValueEl = document.getElementById('pk-dpi-value');
+  const dpiBtns = document.querySelectorAll<HTMLButtonElement>('.pk-dpi-btn');
+  const customDpiWrap = document.getElementById('pk-custom-dpi-wrap');
+  const customDpiInput = document.getElementById('pk-custom-dpi-input') as HTMLInputElement | null;
+  const dpiHint = document.getElementById('pk-dpi-hint');
+  const exifStatusNote = document.getElementById('pk-exif-status-note');
   const lockAspectBtn = document.getElementById('pk-lock-aspect-btn') as HTMLButtonElement | null;
   const grayscaleCheckbox = document.getElementById('pk-grayscale-filter') as HTMLInputElement | null;
   const mergePdfContainer = document.getElementById('pk-merge-pdf-container');
@@ -430,6 +525,11 @@ export function mountConverterApp(): void {
   const modalLockLabel = document.getElementById('pk-modal-lock-label');
   const modalDimW = document.getElementById('pk-modal-dim-w') as HTMLInputElement | null;
   const modalDimH = document.getElementById('pk-modal-dim-h') as HTMLInputElement | null;
+  const modalUnitBtns = document.querySelectorAll<HTMLButtonElement>('.pk-modal-unit-btn');
+  const modalDpiSelect = document.getElementById('pk-modal-dpi') as HTMLSelectElement | null;
+  const modalWLabel = document.getElementById('pk-modal-w-label');
+  const modalHLabel = document.getElementById('pk-modal-h-label');
+  const modalComputedPx = document.getElementById('pk-modal-computed-px');
   const modalFitBtns = document.querySelectorAll<HTMLButtonElement>('.pk-modal-fit-btn');
   const modalNoUpscale = document.getElementById('pk-modal-no-upscale') as HTMLInputElement | null;
   const openResizeStudioBtn = document.getElementById('pk-open-resize-studio-btn');
@@ -443,6 +543,10 @@ export function mountConverterApp(): void {
     scalePercent: 100 as number | null,
     width: null as number | null,
     height: null as number | null,
+    unit: 'px' as DimensionUnit,
+    dpi: 300,
+    unitWidth: null as number | null,
+    unitHeight: null as number | null,
     lockAspect: true,
     fit: 'contain' as FitStrategy,
     noUpscale: true,
@@ -469,7 +573,20 @@ export function mountConverterApp(): void {
 
   
   function filterPortalCards(): void {
+    ensurePortalCardsHydrated();
     const query = (portalSearchInput?.value || '').trim().toLowerCase();
+
+    // When the user enters a search term, expand category to 'all' so matching presets from any category are immediately surfaced
+    if (query && activePortalCat !== 'all') {
+      activePortalCat = 'all';
+      portalCatFilters.forEach((b) => {
+        const isAll = b.dataset.cat === 'all';
+        b.className = isAll
+          ? 'pk-cat-filter active shrink-0 whitespace-nowrap rounded-lg border border-accent bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent cursor-pointer transition-all shadow-xs'
+          : 'pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted hover:text-fg hover:border-accent/40 cursor-pointer transition-all shadow-2xs';
+      });
+    }
+
     let visibleCount = 0;
 
     portalPresetCards.forEach((card) => {
@@ -488,8 +605,22 @@ export function mountConverterApp(): void {
     }
   }
 
+  function selectCategoryFilter(cat: string): void {
+    activePortalCat = cat;
+    portalCatFilters.forEach((b) => {
+      const isSelected = (b.dataset.cat || 'all') === cat;
+      b.className = isSelected
+        ? 'pk-cat-filter active shrink-0 whitespace-nowrap rounded-lg border border-accent bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent cursor-pointer transition-all shadow-xs'
+        : 'pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted hover:text-fg hover:border-accent/40 cursor-pointer transition-all shadow-2xs';
+    });
+    filterPortalCards();
+    const list = document.getElementById('pk-portal-cards-list');
+    if (list) list.scrollTop = 0;
+  }
+
   function switchSettingsTab(mode: 'custom' | 'portal'): void {
     if (mode === 'portal') {
+      ensurePortalCardsHydrated();
       panelCustom?.classList.add('hidden');
       panelPortal?.classList.remove('hidden');
       tabCustom?.classList.remove('bg-surface', 'text-fg', 'shadow-xs', 'border', 'border-border/40');
@@ -534,6 +665,9 @@ export function mountConverterApp(): void {
         activeSecondaryCount++;
       }
     }
+    if (currentToolMode !== 'dpi' && currentToolMode !== 'resize') {
+      if (state.dpi) activeSecondaryCount++;
+    }
 
     if (moreToolsBadge) {
       if (activeSecondaryCount > 0) {
@@ -575,19 +709,30 @@ export function mountConverterApp(): void {
       if (isSelected) {
         tab.className =
           'pk-mode-tab shrink-0 whitespace-nowrap touch-manipulation px-3 py-1.5 rounded-lg transition-all cursor-pointer font-semibold bg-surface text-fg shadow-xs border border-border/50';
+        tab.setAttribute('aria-current', 'page');
       } else {
         tab.className =
           'pk-mode-tab shrink-0 whitespace-nowrap touch-manipulation px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium text-muted hover:text-fg';
+        tab.removeAttribute('aria-current');
       }
     });
 
     if (settingsModeBadge) {
-      settingsModeBadge.textContent = mode === 'all' ? 'All-in-One' : mode.toUpperCase();
+      settingsModeBadge.textContent =
+        mode === 'all'
+          ? 'All-in-One'
+          : mode === 'passport'
+            ? 'PRESETS'
+            : mode === 'dpi'
+              ? `${state.dpi || 300} DPI`
+              : mode === 'exif'
+                ? 'EXIF CLEAN'
+                : mode.toUpperCase();
     }
 
     if (mode === 'passport') {
       switchSettingsTab('portal');
-      if (dropzonePrompt) dropzonePrompt.textContent = 'Drop photo for passport or visa portal';
+      if (dropzonePrompt) dropzonePrompt.textContent = 'Drop any photo or document for presets';
       updateButtons();
       return;
     }
@@ -600,18 +745,23 @@ export function mountConverterApp(): void {
     }
 
     if (mode === 'all') {
-      // Home page: Display all tools in 1-2-3-4 order with NO highlight
+      // Home page: Display all tools in 1-2-3-4-5 order with NO highlight
       if (stageFormat) stagesList.appendChild(stageFormat);
       if (stageCompress) stagesList.appendChild(stageCompress);
       if (stageCrop) stagesList.appendChild(stageCrop);
       if (stageResize) stagesList.appendChild(stageResize);
+      if (stageDpi) stagesList.appendChild(stageDpi);
       if (toggleMoreToolsWrapper) {
         stagesList.appendChild(toggleMoreToolsWrapper);
         toggleMoreToolsWrapper.classList.add('hidden');
       }
-      if (stageAdvanced) stagesList.appendChild(stageAdvanced);
+      if (stageAdvanced) {
+        stagesList.appendChild(stageAdvanced);
+        stageAdvanced.classList.remove('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+        stageAdvanced.classList.add('border-border/80', 'bg-surface/40');
+      }
 
-      [stageFormat, stageCompress, stageCrop, stageResize].forEach((stage) => {
+      [stageFormat, stageCompress, stageCrop, stageResize, stageDpi].forEach((stage) => {
         stage?.classList.remove('hidden');
         stage?.classList.remove('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
         stage?.classList.add('border-border', 'bg-surface/40');
@@ -625,37 +775,92 @@ export function mountConverterApp(): void {
 
     // Dedicated single-tool pages or tabs
     let primary: HTMLElement | null = null;
+    let pinnedSecondary: HTMLElement | null = null;
     let secondary: (HTMLElement | null)[] = [];
     let moreLabel = 'Additional Editing & Compression Tools';
     let dropPrompt = 'Drop any image or document here';
 
+    const hasDistinctFormatPair =
+      state.from.toLowerCase() !== state.to.toLowerCase() &&
+      !(state.from.toLowerCase() === 'jpeg' && state.to.toLowerCase() === 'jpg');
+
     if (mode === 'convert') {
       primary = stageFormat;
-      secondary = [stageCompress, stageCrop, stageResize];
+      if (state.targetKb !== null || state.targetSizeMode === 'range' || state.targetSizeMode === 'quality') {
+        pinnedSecondary = stageCompress;
+        secondary = [stageCrop, stageResize, stageDpi];
+      } else {
+        secondary = [stageCompress, stageCrop, stageResize, stageDpi];
+      }
       moreLabel = 'Add Compression, Crop, or Resize (Optional)';
-      dropPrompt = 'Drop any photo or document to convert';
+      dropPrompt = state.mergePdf ? 'Drop multiple photos to merge into PDF' : 'Drop any photo or document to convert';
     } else if (mode === 'compress') {
       primary = stageCompress;
-      secondary = [stageFormat, stageCrop, stageResize];
+      if (hasDistinctFormatPair) {
+        pinnedSecondary = stageFormat;
+        secondary = [stageCrop, stageResize, stageDpi];
+      } else {
+        secondary = [stageFormat, stageCrop, stageResize, stageDpi];
+      }
       moreLabel = 'Add Format, Crop, or Resize (Optional)';
-      dropPrompt = 'Drop any photo to compress file size';
+      dropPrompt =
+        state.targetSizeMode === 'exact'
+          ? 'Drop any image or PDF to increase or set exact KB'
+          : state.targetSizeMode === 'range' && state.minKb && state.maxKb
+            ? `Drop any photo to compress to ${state.minKb}–${state.maxKb} KB`
+            : 'Drop any photo to compress file size';
     } else if (mode === 'crop') {
       primary = stageCrop;
-      secondary = [stageResize, stageFormat, stageCompress];
+      secondary = [stageResize, stageFormat, stageCompress, stageDpi];
       moreLabel = 'Add Resize, Format, or Compression (Optional)';
-      dropPrompt = 'Drop any photo to crop & frame';
+      dropPrompt =
+        state.cropAspect && state.cropAspect !== 'original'
+          ? `Drop any photo to crop to ${state.cropAspect}`
+          : 'Drop any photo to crop & frame';
     } else if (mode === 'resize') {
       primary = stageResize;
-      secondary = [stageCrop, stageFormat, stageCompress];
+      secondary = [stageCrop, stageFormat, stageCompress, stageDpi];
       moreLabel = 'Add Crop, Format, or Compression (Optional)';
-      dropPrompt = 'Drop any photo to resize resolution';
+      dropPrompt =
+        state.unit !== 'px'
+          ? `Drop any photo to resize in ${state.unit.toUpperCase()}`
+          : 'Drop any photo to resize resolution';
+    } else if (mode === 'dpi') {
+      primary = stageDpi;
+      secondary = [stageResize, stageCompress, stageFormat, stageCrop];
+      moreLabel = 'Add Resize, Compression, or Format (Optional)';
+      dropPrompt = `Drop any photo to convert to ${state.dpi || 300} DPI`;
+    } else if (mode === 'exif') {
+      primary = stageFormat;
+      secondary = [stageCompress, stageResize, stageCrop, stageDpi];
+      moreLabel = 'Add Compression, Resize, or Crop (Optional)';
+      dropPrompt = 'Drop any photo to strip EXIF & GPS metadata';
+    }
+
+    if (pinnedSecondary && mode === 'compress') {
+      stagesList.appendChild(pinnedSecondary);
+      pinnedSecondary.classList.remove('hidden');
+      pinnedSecondary.classList.remove('border-border', 'bg-surface/40');
+      pinnedSecondary.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
     }
 
     if (primary) {
       stagesList.appendChild(primary);
       primary.classList.remove('hidden');
-      primary.classList.remove('border-border', 'bg-surface/40');
-      primary.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+      if (mode === 'exif') {
+        primary.classList.remove('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+        primary.classList.add('border-border', 'bg-surface/40');
+      } else {
+        primary.classList.remove('border-border', 'bg-surface/40');
+        primary.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+      }
+    }
+
+    if (pinnedSecondary && mode === 'convert') {
+      stagesList.appendChild(pinnedSecondary);
+      pinnedSecondary.classList.remove('hidden');
+      pinnedSecondary.classList.remove('border-border', 'bg-surface/40');
+      pinnedSecondary.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
     }
 
     if (toggleMoreToolsWrapper) {
@@ -675,6 +880,11 @@ export function mountConverterApp(): void {
 
     if (stageAdvanced) {
       stagesList.appendChild(stageAdvanced);
+      if (mode === 'exif') {
+        stageAdvanced.open = true;
+        stageAdvanced.classList.remove('border-border/80', 'bg-surface/40');
+        stageAdvanced.classList.add('border-accent', 'bg-accent/5', 'shadow-xs', 'ring-1', 'ring-accent/20');
+      }
     }
 
     if (dropzonePrompt) dropzonePrompt.textContent = dropPrompt;
@@ -691,19 +901,26 @@ export function mountConverterApp(): void {
   function syncPortalPresetUi(id: string): void {
     const preset = PORTAL_PRESETS.find((p) => p.id === id) || PORTAL_PRESETS[0]!;
     const isNone = preset.id === 'none';
+    if (!isNone) {
+      ensurePortalCardsHydrated();
+    }
 
-    // 1. Update full-width preset cards styling and check badge
+    // Auto-switch category filter if preset is outside current filtered category
+    if (!isNone && preset.category && activePortalCat !== 'all' && activePortalCat !== preset.category) {
+      selectCategoryFilter(preset.category);
+    }
+
+    // 1. Update full-width preset cards styling and check badge without altering .hidden
     portalPresetCards.forEach((card) => {
       const cardId = card.dataset.id || 'none';
       const isSelected = cardId === preset.id;
       card.setAttribute('aria-selected', String(isSelected));
-      if (isSelected) {
-        card.className =
-          'pk-portal-preset-card group relative w-full rounded-xl border border-accent bg-accent/10 p-2.5 text-left transition-all cursor-pointer shadow-xs';
-      } else {
-        card.className =
-          'pk-portal-preset-card group relative w-full rounded-xl border border-border bg-surface p-2.5 text-left transition-all cursor-pointer hover:border-accent/60 hover:bg-surface/90 shadow-2xs';
-      }
+      card.classList.toggle('border-accent', isSelected);
+      card.classList.toggle('bg-accent/10', isSelected);
+      card.classList.toggle('shadow-xs', isSelected);
+      card.classList.toggle('border-border', !isSelected);
+      card.classList.toggle('bg-surface', !isSelected);
+      card.classList.toggle('shadow-2xs', !isSelected);
       const check = card.querySelector('.pk-portal-card-check');
       if (check) {
         check.classList.toggle('hidden', !isSelected);
@@ -716,12 +933,17 @@ export function mountConverterApp(): void {
     }
 
     // 3. Custom Mode Active Banner
+    const effectiveFmt = state.to.toUpperCase();
+    const effectiveKbSummary =
+      state.targetSizeMode === 'range' && state.minKb && state.maxKb
+        ? `${state.minKb}–${state.maxKb} KB`
+        : `Max ${state.targetKb ?? preset.targetKb} KB`;
     if (customActiveBanner) {
       customActiveBanner.classList.toggle('hidden', isNone);
     }
     if (bannerFlag) bannerFlag.textContent = preset.countryCode || preset.flag;
     if (bannerName) bannerName.textContent = `${preset.name} Active`;
-    if (bannerDetails) bannerDetails.textContent = `${preset.dimLabel} · Max ${preset.targetKb} KB JPG`;
+    if (bannerDetails) bannerDetails.textContent = `${preset.dimLabel} · ${effectiveKbSummary} ${effectiveFmt}`;
 
     // 4. Panel Reset Buttons
     if (portalPanelReset) {
@@ -731,15 +953,39 @@ export function mountConverterApp(): void {
     // 5. Applied summary inside portal tab
     if (portalAppliedSummary) {
       if (!isNone && preset.portalSummary) {
-        portalAppliedSummary.textContent = `✓ ${preset.dimLabel} (${preset.cropAspect} crop) · Max ${preset.targetKb} KB JPG applied`;
+        portalAppliedSummary.textContent = `✓ ${preset.dimLabel} (${preset.cropAspect} crop) · ${effectiveKbSummary} ${effectiveFmt} applied`;
         portalAppliedSummary.classList.remove('hidden');
       } else {
         portalAppliedSummary.classList.add('hidden');
       }
     }
+
+    // 6. Synchronize DropZone locked badge
+    const dropzoneBadge = document.getElementById('pk-locked-preset-badge');
+    if (dropzoneBadge) {
+      if (!isNone) {
+        const effectiveKb = state.targetKb ?? preset.targetKb;
+        const kbPart =
+          state.targetSizeMode === 'range' && state.minKb && state.maxKb
+            ? `${state.minKb}–${state.maxKb} KB`
+            : effectiveKb
+              ? `≤ ${formatSizeLabel(effectiveKb)}`
+              : '';
+        const dimPart = preset.dimLabel || '';
+        const fmtSuffix = effectiveFmt === 'PDF' ? ' • PDF' : '';
+        const labelText = kbPart && dimPart
+          ? `Locked Preset: ${kbPart} • ${dimPart}${fmtSuffix}`
+          : (dimPart ? `Locked Preset: ${preset.name} (${dimPart})` : `Locked Preset: ${preset.name}`);
+        const span = dropzoneBadge.querySelector('span');
+        if (span) span.textContent = labelText;
+        dropzoneBadge.classList.remove('hidden');
+      } else {
+        dropzoneBadge.classList.add('hidden');
+      }
+    }
   }
 
-  async function applyPortalPreset(id: string): Promise<void> {
+  async function applyPortalPreset(id: string, isInitialBoot = false): Promise<void> {
     const preset = PORTAL_PRESETS.find((p) => p.id === id);
     if (!preset || preset.id === 'none') {
       state.portalPreset = null;
@@ -772,6 +1018,8 @@ export function mountConverterApp(): void {
       // 3. Dimensions & Scale -> Reset to 100% Original
       state.dimensions = { mode: 'original', noUpscale: true };
       state.scalePercent = 100;
+      state.dpi = null;
+      syncDpiUi();
       scaleBtns.forEach((btn) => {
         const isSelected = btn.dataset.scale === '100';
         btn.className = isSelected
@@ -791,6 +1039,7 @@ export function mountConverterApp(): void {
         j.croppedWidth = undefined;
         j.croppedHeight = undefined;
         j.dimensions = { mode: 'original', noUpscale: true };
+        j.dpi = undefined;
         j.scalePercent = 100;
         j.targetKb = null;
         j.to = undefined;
@@ -833,27 +1082,47 @@ export function mountConverterApp(): void {
       return;
     }
 
+    const keepPdfOutput = isInitialBoot && (root?.dataset.to || '').toLowerCase() === 'pdf';
+    const nextTo = keepPdfOutput ? 'pdf' : 'jpg';
+    const nextMime = keepPdfOutput ? 'application/pdf' : 'image/jpeg';
+    const explicitPageKb = isInitialBoot && initialTarget ? initialTarget : preset.targetKb;
+    const preserveRange = isInitialBoot && initialSizeMode === 'range' && initialMinKb && initialMaxKb;
+
     state.portalPreset = preset.id;
-    savedMaxTargetValue = String(preset.targetKb);
-    savedExactTargetValue = String(preset.targetKb);
+    savedMaxTargetValue = String(explicitPageKb);
+    savedExactTargetValue = String(explicitPageKb);
 
-    // 1. Output Format -> JPG
-    state.to = 'jpg';
-    state.toMime = 'image/jpeg';
+    // 1. Output Format -> JPG (or PDF if dedicated PDF portal page)
+    state.to = nextTo;
+    state.toMime = nextMime;
     if (outputSelect) {
-      outputSelect.value = 'jpg';
+      outputSelect.value = nextTo;
     }
-    syncCustomFormatUi('jpg');
+    syncCustomFormatUi(nextTo);
 
-    // 2. Target KB & Mode -> Max Size preset.targetKb
-    state.targetKb = preset.targetKb;
-    state.targetSizeMode = 'max';
-    state.maxKb = preset.targetKb;
-    if (targetSelect) {
-      targetSelect.value = String(preset.targetKb);
+    // 2. Target KB & Mode
+    if (preserveRange) {
+      state.minKb = initialMinKb;
+      state.maxKb = initialMaxKb;
+      state.targetKb = initialMaxKb;
+      state.targetSizeMode = 'range';
+      if (minKbInput) minKbInput.value = String(initialMinKb);
+      if (maxKbInput) maxKbInput.value = String(initialMaxKb);
+      setSizeMode('range');
+    } else {
+      state.targetKb = explicitPageKb;
+      state.targetSizeMode = 'max';
+      state.maxKb = explicitPageKb;
+      if (targetSelect) {
+        const hasOpt = Array.from(targetSelect.options).some((o) => o.value === String(explicitPageKb));
+        targetSelect.value = hasOpt ? String(explicitPageKb) : 'custom';
+        if (targetSelect.value === 'custom' && customKbInput) {
+          customKbInput.value = String(explicitPageKb);
+        }
+      }
+      setSizeMode('max');
+      syncCustomTargetUi(targetSelect?.value || String(explicitPageKb));
     }
-    syncCustomTargetUi(String(preset.targetKb));
-    setSizeMode('max');
 
     // 3. Crop Aspect & Anchor -> preset.cropAspect, preset.cropAnchor
     state.cropAspect = preset.cropAspect;
@@ -863,12 +1132,16 @@ export function mountConverterApp(): void {
     }
     syncCustomCropUi(preset.cropAspect);
 
-    // 4. Dimensions -> Exact pixel bounding dimensions with cover fit
+    // 4. Dimensions -> Exact pixel bounding dimensions with cover fit + official DPI
+    const presetDpi = preset.id === 'pan-card' ? 200 : preset.category === 'social' ? null : 300;
+    state.dpi = presetDpi;
+    syncDpiUi();
     state.scalePercent = null;
     state.dimensions = {
       mode: 'custom',
       width: preset.width ?? undefined,
       height: preset.height ?? undefined,
+      dpi: presetDpi ?? undefined,
       fit: 'cover',
       lockAspectRatio: false,
     };
@@ -888,16 +1161,21 @@ export function mountConverterApp(): void {
       j.croppedWidth = undefined;
       j.croppedHeight = undefined;
       j.scalePercent = undefined;
+      j.dpi = presetDpi;
       j.dimensions = {
         mode: 'custom',
         width: preset.width ?? undefined,
         height: preset.height ?? undefined,
+        dpi: presetDpi ?? undefined,
         fit: 'cover',
         lockAspectRatio: false,
       };
-      j.targetKb = preset.targetKb;
-      j.to = 'jpg';
-      j.toMime = 'image/jpeg';
+      j.targetKb = state.targetKb;
+      j.minKb = state.minKb;
+      j.maxKb = state.maxKb;
+      j.targetSizeMode = state.targetSizeMode;
+      j.to = nextTo;
+      j.toMime = nextMime;
       if (j.status === 'done') {
         j.status = 'queued';
         j.result = undefined;
@@ -913,11 +1191,13 @@ export function mountConverterApp(): void {
     updateLiveDimensionsAndCardPreviews();
     updateStageDots();
     updateButtons();
-    setStatus(`Applied ${preset.flag} ${preset.name}: ${preset.dimLabel}, Max ${preset.targetKb} KB JPG`);
+    const kbLabel = preserveRange ? `${state.minKb}–${state.maxKb} KB` : `Max ${state.targetKb} KB`;
+    setStatus(`Applied ${preset.flag} ${preset.name}: ${preset.dimLabel}, ${kbLabel} ${nextTo.toUpperCase()}`);
   }
 
   function syncCustomFormatUi(toVal: string): void {
-    const norm = toVal.toLowerCase() === 'jpeg' ? 'jpg' : toVal.toLowerCase();
+    const isExplicitJpeg = toVal.toLowerCase() === 'jpeg';
+    const norm = isExplicitJpeg ? 'jpg' : toVal.toLowerCase();
     customFormatOptions.forEach((opt) => {
       const val = (opt.dataset.value || '').toLowerCase();
       const isSelected = val === norm;
@@ -925,9 +1205,9 @@ export function mountConverterApp(): void {
       if (isSelected) {
         opt.className =
           'pk-custom-format-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group bg-accent/10 border border-accent/30';
-        if (selectedFormatBadge) selectedFormatBadge.textContent = opt.dataset.badge || val.toUpperCase();
-        if (selectedFormatTitle) selectedFormatTitle.textContent = opt.dataset.title || val.toUpperCase();
-        if (selectedFormatDesc) selectedFormatDesc.textContent = opt.dataset.desc || '';
+        if (selectedFormatBadge) selectedFormatBadge.textContent = isExplicitJpeg ? 'JPEG' : (opt.dataset.badge || val.toUpperCase());
+        if (selectedFormatTitle) selectedFormatTitle.textContent = isExplicitJpeg ? 'JPEG (.jpeg)' : (opt.dataset.title || val.toUpperCase());
+        if (selectedFormatDesc) selectedFormatDesc.textContent = isExplicitJpeg ? 'Strict .jpeg portal extension' : (opt.dataset.desc || '');
       } else {
         opt.className =
           'pk-custom-format-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group hover:bg-bg/80 border border-transparent';
@@ -949,7 +1229,7 @@ export function mountConverterApp(): void {
         opt.className =
           'pk-custom-crop-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group bg-accent/10 border border-accent/30';
         if (selectedCropBadge) selectedCropBadge.textContent = opt.dataset.badge || val.toUpperCase();
-        if (selectedCropTitle) selectedCropTitle.textContent = opt.dataset.title || val;
+        if (selectedCropTitle) selectedCropTitle.textContent = val === 'original' ? 'Original Aspect' : (opt.dataset.title || val);
         if (selectedCropDesc) selectedCropDesc.textContent = opt.dataset.desc || '';
       } else {
         opt.className =
@@ -970,10 +1250,16 @@ export function mountConverterApp(): void {
         original: 'Original',
         '1:1': '1:1 Square',
         '3.5:4.5': '3.5×4.5 ID',
+        '4:5': '4:5 Portrait',
         '4:3': '4:3 Std',
         '16:9': '16:9 Wide',
         '9:16': '9:16 Story',
         '3:2': '3:2 Classic',
+        '3:4': '3:4 Portrait',
+        '5:7': '5:7 Canada',
+        '2:1': '2:1 Signature',
+        '3:1': '3:1 Header',
+        '4:1': '4:1 LinkedIn',
       };
       cropHint.textContent = presetLabels[norm] || norm;
     }
@@ -1016,14 +1302,20 @@ export function mountConverterApp(): void {
       if (isSelected) {
         opt.className =
           'pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group bg-accent/10 border border-accent/30';
-        if (selectedTargetBadge) selectedTargetBadge.textContent = opt.dataset.badge || (val ? `${val} KB` : 'AUTO');
-        if (selectedTargetTitle) selectedTargetTitle.textContent = displayTitle;
+        if (val === 'custom' && state.targetKb && state.targetKb > 0) {
+          const customLabel = formatSizeLabel(state.targetKb);
+          if (selectedTargetBadge) selectedTargetBadge.textContent = customLabel;
+          if (selectedTargetTitle) selectedTargetTitle.textContent = `${isExact ? 'Exact ' : 'Under '}${customLabel}`;
+        } else {
+          if (selectedTargetBadge) selectedTargetBadge.textContent = opt.dataset.badge || (val ? `${val} KB` : 'AUTO');
+          if (selectedTargetTitle) selectedTargetTitle.textContent = displayTitle;
+        }
         if (selectedTargetDesc) selectedTargetDesc.textContent = opt.dataset.desc || '';
       } else {
         opt.className =
           'pk-custom-target-option w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer group hover:bg-bg/80 border border-transparent';
       }
-      const check = opt.querySelector('.pk-target-option-check');
+      const check = opt.querySelector('.pk-target-check, .pk-target-option-check');
       if (check) {
         check.classList.toggle('hidden', !isSelected);
       }
@@ -1600,7 +1892,16 @@ export function mountConverterApp(): void {
             notes.unshift(`➔ ${jobTo}`);
           }
           if (job.targetKb) {
-            notes.push(`Max ${formatSizeLabel(job.targetKb)}`);
+            const effMode = job.targetSizeMode || state.targetSizeMode;
+            const prefix = effMode === 'exact' ? 'Exact' : effMode === 'range' ? 'Range ≤' : 'Max';
+            notes.push(`${prefix} ${formatSizeLabel(job.targetKb)}`);
+          }
+          const effDpi = job.dpi ?? state.dpi;
+          if (effDpi) {
+            notes.push(`${effDpi} DPI`);
+          }
+          if (!state.preserveMetadata && currentToolMode === 'exif') {
+            notes.push('Strip EXIF');
           }
           const noteStr = notes.length ? ` · ${notes.join(' · ')}` : '';
           liveDimsEl.textContent = `Target: ${pred.w} × ${pred.h} px${noteStr}`;
@@ -1709,7 +2010,7 @@ export function mountConverterApp(): void {
       pending--;
       idle.push(w);
       pump();
-      updateProgress();
+      scheduleUpdateProgress();
       updateButtons();
     } else if (msg.type === 'error') {
       const job = state.jobs.find((j) => j.id === msg.id);
@@ -1721,7 +2022,7 @@ export function mountConverterApp(): void {
       pending--;
       idle.push(w);
       pump();
-      updateProgress();
+      scheduleUpdateProgress();
       updateButtons();
     }
   }
@@ -1828,7 +2129,13 @@ export function mountConverterApp(): void {
 
     let extractedPdfCount = 0;
 
+    let fileCount = 0;
     for (const file of arr) {
+      fileCount++;
+      // Protect INP (< 200ms) on batch mobile uploads by yielding to the browser event loop
+      if (fileCount > 1 && fileCount % 2 === 0) {
+        await yieldToMain();
+      }
       const ext = file.name.split('.').pop()?.toLowerCase() || '';
 
       // Multi-page PDF page inspection & extraction
@@ -1905,6 +2212,10 @@ export function mountConverterApp(): void {
         file,
         status: 'queued',
         targetKb: state.targetKb,
+        targetSizeMode: state.targetSizeMode,
+        minKb: state.minKb,
+        maxKb: state.maxKb,
+        dpi: state.dpi,
         originalSize: file.size,
       };
 
@@ -1946,6 +2257,10 @@ export function mountConverterApp(): void {
                 job.dimensions = { mode: 'custom', scalePercent: state.scalePercent };
               } else if (state.dimensions && state.dimensions.mode !== 'original') {
                 job.dimensions = { ...state.dimensions };
+                generateJobAdjustedPreview(job).then(() => {
+                  updateSingleCardNode(job);
+                  updateLiveDimensionsAndCardPreviews();
+                });
               }
               updateSingleCardNode(job);
               updateLiveDimensionsAndCardPreviews();
@@ -1979,7 +2294,11 @@ export function mountConverterApp(): void {
       const latestJob = state.jobs[state.jobs.length - 1];
       if (currentToolMode === 'crop') {
         setTimeout(() => openCropModal(latestJob), 80);
-      } else if (currentToolMode === 'resize') {
+      } else if (
+        currentToolMode === 'resize' &&
+        (!state.dimensions || state.dimensions.mode === 'original') &&
+        (state.scalePercent === 100 || state.scalePercent === null)
+      ) {
         setTimeout(() => openResizeModal(latestJob), 80);
       }
     }
@@ -2018,7 +2337,7 @@ export function mountConverterApp(): void {
       return;
     }
     // If target is the native overlay input, allow native file picker dispatch
-    if ((e.target as HTMLElement).closest('input')) return;
+    if ((e.target as HTMLElement).closest('input, button')) return;
     activeFileInput.click();
   });
   activeDropzone.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -2218,12 +2537,8 @@ export function mountConverterApp(): void {
     tab.addEventListener('click', (e) => {
       const m = tab.dataset.mode;
       if (!m) return;
-      if (state.jobs.length > 0) {
-        // If files are already loaded in memory, prevent navigation so files aren't lost
-        e.preventDefault();
-        setToolMode(m, true);
-      }
-      // If no files are queued, let the browser follow href to /compress-image/, /convert/, etc.!
+      e.preventDefault();
+      setToolMode(m, false);
     });
   });
 
@@ -2251,34 +2566,23 @@ export function mountConverterApp(): void {
 
   portalCatFilters.forEach((btn) => {
     btn.addEventListener('click', () => {
-      activePortalCat = btn.dataset.cat || 'all';
-      portalCatFilters.forEach((b) => {
-        const isSelected = b === btn;
-        if (isSelected) {
-          b.className =
-            'pk-cat-filter active rounded-md border border-accent bg-accent/15 px-2 py-0.5 font-semibold text-accent cursor-pointer transition-colors';
-        } else {
-          b.className =
-            'pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors';
-        }
-      });
-      filterPortalCards();
+      selectCategoryFilter(btn.dataset.cat || 'all');
     });
   });
 
-  // Select Portal Preset Card
-  portalPresetCards.forEach((card) => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
-      const id = card.dataset.id;
-      if (id) {
-        if (state.portalPreset === id) {
-          applyPortalPreset('none');
-        } else {
-          applyPortalPreset(id);
-        }
+  // Select Portal Preset Card (delegated so cards lazy-hydrated from <template> also work seamlessly)
+  document.getElementById('pk-portal-cards-list')?.addEventListener('click', (e) => {
+    const card = (e.target as HTMLElement).closest<HTMLButtonElement>('.pk-portal-preset-card');
+    if (!card) return;
+    e.preventDefault();
+    const id = card.dataset.id;
+    if (id) {
+      if (state.portalPreset === id) {
+        applyPortalPreset('none');
+      } else {
+        applyPortalPreset(id);
       }
-    });
+    }
   });
 
   // Reset to manual controls
@@ -2412,6 +2716,7 @@ export function mountConverterApp(): void {
     if (
       !target?.closest('#pk-output-format-wrapper') &&
       !target?.closest('#pk-crop-aspect-wrapper') &&
+      !target?.closest('#pk-target-preset-container') &&
       !target?.closest('#pk-target-kb-wrapper')
     ) {
       closeAllCustomDropdowns();
@@ -2521,21 +2826,30 @@ export function mountConverterApp(): void {
       customKbContainer?.classList.add('hidden');
       rangeKbContainer?.classList.add('hidden');
       qualityContainer?.classList.remove('hidden');
+      sizeModeHint?.classList.add('hidden');
       state.targetKb = null;
     } else if (mode === 'range') {
       targetPresetContainer?.classList.add('hidden');
       customKbContainer?.classList.add('hidden');
       qualityContainer?.classList.add('hidden');
       rangeKbContainer?.classList.remove('hidden');
+      sizeModeHint?.classList.add('hidden');
+      updateRangeTargetFromInput();
     } else if (mode === 'exact') {
       rangeKbContainer?.classList.add('hidden');
       qualityContainer?.classList.add('hidden');
       targetPresetContainer?.classList.remove('hidden');
+      sizeModeHint?.classList.remove('hidden');
 
       if (targetSelect) {
-        targetSelect.value = savedExactTargetValue || '100';
+        const nextVal = savedExactTargetValue || '100';
+        const hasOption = Array.from(targetSelect.options).some((o) => o.value === nextVal);
+        targetSelect.value = hasOption ? nextVal : 'custom';
         if (targetSelect.value === 'custom') {
           customKbContainer?.classList.remove('hidden');
+          if (customKbInput && !customKbInput.value && nextVal && nextVal !== 'custom') {
+            customKbInput.value = nextVal;
+          }
           updateCustomTargetFromInput();
         } else {
           customKbContainer?.classList.add('hidden');
@@ -2548,9 +2862,11 @@ export function mountConverterApp(): void {
       rangeKbContainer?.classList.add('hidden');
       qualityContainer?.classList.add('hidden');
       targetPresetContainer?.classList.remove('hidden');
+      sizeModeHint?.classList.add('hidden');
 
       if (targetSelect) {
-        targetSelect.value = savedMaxTargetValue;
+        const hasOption = !savedMaxTargetValue || Array.from(targetSelect.options).some((o) => o.value === savedMaxTargetValue);
+        targetSelect.value = hasOption ? savedMaxTargetValue : 'custom';
         if (targetSelect.value === 'custom') {
           customKbContainer?.classList.remove('hidden');
           updateCustomTargetFromInput();
@@ -2561,7 +2877,20 @@ export function mountConverterApp(): void {
       }
       syncCustomTargetUi(targetSelect?.value || '');
     }
+
+    for (const j of state.jobs) {
+      if (!selectedJobId || j.id === selectedJobId) {
+        j.targetSizeMode = mode;
+        j.targetKb = state.targetKb;
+        j.minKb = state.minKb;
+        j.maxKb = state.maxKb;
+        if (j.status === 'done') j.status = 'queued';
+      }
+    }
     updateTargetLabel();
+    renderFiles();
+    updateLiveDimensionsAndCardPreviews();
+    updateButtons();
   }
 
   modeMaxBtn?.addEventListener('click', () => setSizeMode('max'));
@@ -2594,6 +2923,9 @@ export function mountConverterApp(): void {
     } else {
       state.targetKb = null;
       if (customEquivTag) customEquivTag.classList.add('hidden');
+    }
+    if (targetSelect?.value === 'custom') {
+      syncCustomTargetUi('custom');
     }
     updateTargetLabel();
   }
@@ -2940,15 +3272,235 @@ export function mountConverterApp(): void {
     return 16 / 9;
   }
 
+  function syncDimUnitUi(): void {
+    const u = state.unit;
+    const effDpi = state.dpi || Number(dimDpiSelect?.value) || 300;
+
+    dimUnitBtns.forEach((btn) => {
+      const isSel = btn.dataset.unit === u;
+      btn.className = isSel
+        ? 'pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer bg-accent/15 text-accent'
+        : 'pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer text-muted hover:text-fg';
+    });
+
+    dimDpiWrap?.classList.toggle('hidden', u === 'px');
+    cmPresetsRow?.classList.toggle('hidden', u === 'px');
+
+    if (dimDpiSelect && state.dpi && ['72', '96', '150', '200', '300', '600'].includes(String(state.dpi))) {
+      dimDpiSelect.value = String(state.dpi);
+    }
+
+    if (dimWidthLabel) dimWidthLabel.textContent = `Width (${u})`;
+    if (dimHeightLabel) dimHeightLabel.textContent = `Height (${u})`;
+
+    if (dimWidthInput) {
+      dimWidthInput.step = u === 'px' ? '1' : 'any';
+      dimWidthInput.placeholder = u === 'cm' ? 'e.g. 3.5' : u === 'mm' ? 'e.g. 35' : u === 'in' ? 'e.g. 2' : 'e.g. 1920';
+    }
+    if (dimHeightInput) {
+      dimHeightInput.step = u === 'px' ? '1' : 'any';
+      dimHeightInput.placeholder = u === 'cm' ? 'e.g. 4.5' : u === 'mm' ? 'e.g. 45' : u === 'in' ? 'e.g. 2' : 'e.g. 1080';
+    }
+
+    const rawW = dimWidthInput?.value ? Number(dimWidthInput.value) : 0;
+    const rawH = dimHeightInput?.value ? Number(dimHeightInput.value) : 0;
+    if (dimComputedPx) {
+      if (u !== 'px' && rawW > 0 && rawH > 0) {
+        const pxW = unitToPx(rawW, u, effDpi);
+        const pxH = unitToPx(rawH, u, effDpi);
+        dimComputedPx.textContent = `${rawW} × ${rawH} ${u} @ ${effDpi} DPI = ${pxW} × ${pxH} px`;
+        dimComputedPx.classList.remove('hidden');
+      } else {
+        dimComputedPx.classList.add('hidden');
+      }
+    }
+  }
+
+  function syncDpiUi(): void {
+    const activeDpi = state.dpi;
+    const selectedPill = !activeDpi
+      ? 'auto'
+      : ['72', '150', '200', '300', '600'].includes(String(activeDpi))
+        ? String(activeDpi)
+        : 'custom';
+
+    dpiBtns.forEach((btn) => {
+      const isSel = btn.dataset.dpi === selectedPill;
+      btn.className = isSel
+        ? 'pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation bg-surface text-fg shadow-xs'
+        : 'pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation text-muted hover:text-fg';
+    });
+
+    customDpiWrap?.classList.toggle('hidden', selectedPill !== 'custom');
+    if (selectedPill === 'custom' && customDpiInput && activeDpi) {
+      customDpiInput.value = String(activeDpi);
+    }
+
+    if (dpiValueEl) {
+      dpiValueEl.textContent = activeDpi ? `${activeDpi} DPI` : 'Auto (Original)';
+    }
+    if (dpiHint) {
+      dpiHint.classList.toggle('hidden', !activeDpi && currentToolMode !== 'dpi');
+    }
+    if (dimDpiSelect && activeDpi && ['72', '96', '150', '200', '300', '600'].includes(String(activeDpi))) {
+      dimDpiSelect.value = String(activeDpi);
+    }
+    if (modalDpiSelect && activeDpi && ['72', '96', '150', '200', '300', '600'].includes(String(activeDpi))) {
+      modalDpiSelect.value = String(activeDpi);
+    }
+    if (currentToolMode === 'dpi') {
+      if (settingsModeBadge) settingsModeBadge.textContent = `${activeDpi || 300} DPI`;
+      if (dropzonePrompt) dropzonePrompt.textContent = `Drop any photo to convert to ${activeDpi || 300} DPI`;
+      const dropBadge = document.getElementById('pk-locked-preset-badge');
+      const span = dropBadge?.querySelector('span');
+      if (dropBadge && span) {
+        if (activeDpi) {
+          span.textContent = `Active Mode: ${activeDpi} DPI Print Header • 100% Lossless`;
+          dropBadge.classList.remove('hidden');
+        } else {
+          dropBadge.classList.add('hidden');
+        }
+      }
+    }
+    updateStageDots();
+  }
+
+  dimUnitBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const nextUnit = (btn.dataset.unit || 'px') as DimensionUnit;
+      if (nextUnit === state.unit) return;
+      const prevUnit = state.unit;
+      const effDpi = state.dpi || Number(dimDpiSelect?.value) || 300;
+      if (nextUnit !== 'px' && !state.dpi) {
+        state.dpi = effDpi;
+        syncDpiUi();
+      }
+      if (dimWidthInput && dimWidthInput.value) {
+        const prevW = Number(dimWidthInput.value);
+        if (prevW > 0) {
+          const pxW = unitToPx(prevW, prevUnit, effDpi);
+          dimWidthInput.value = String(pxToUnit(pxW, nextUnit, effDpi));
+        }
+      }
+      if (dimHeightInput && dimHeightInput.value) {
+        const prevH = Number(dimHeightInput.value);
+        if (prevH > 0) {
+          const pxH = unitToPx(prevH, prevUnit, effDpi);
+          dimHeightInput.value = String(pxToUnit(pxH, nextUnit, effDpi));
+        }
+      }
+      state.unit = nextUnit;
+      syncDimUnitUi();
+      updateCustomDimensions();
+      updateLiveDimensionsAndCardPreviews();
+      queueCustomDimensionsPreview();
+    });
+  });
+
+  dimDpiSelect?.addEventListener('change', () => {
+    const nextDpi = Number(dimDpiSelect.value) || 300;
+    state.dpi = nextDpi;
+    state.jobs.forEach((j) => {
+      j.dpi = nextDpi;
+      if (j.status === 'done') j.status = 'queued';
+    });
+    syncDpiUi();
+    syncDimUnitUi();
+    updateCustomDimensions();
+    updateLiveDimensionsAndCardPreviews();
+    queueCustomDimensionsPreview();
+    updateButtons();
+  });
+
+  cmPresetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const u = (btn.dataset.unit || 'cm') as DimensionUnit;
+      const w = btn.dataset.w || '';
+      const h = btn.dataset.h || '';
+      const d = Number(btn.dataset.dpi) || 300;
+      state.unit = u;
+      state.dpi = d;
+      state.scalePercent = null;
+      state.lockAspectRatio = false;
+      if (lockAspectBtn) {
+        lockAspectBtn.dataset.locked = 'false';
+        lockAspectBtn.classList.remove('text-accent');
+        lockAspectBtn.classList.add('text-muted');
+        lockAspectBtn.title = 'Aspect Ratio Unlocked';
+      }
+      if (dimWidthInput) dimWidthInput.value = w;
+      if (dimHeightInput) dimHeightInput.value = h;
+      syncDpiUi();
+      syncDimUnitUi();
+      updateCustomDimensions();
+      updateLiveDimensionsAndCardPreviews();
+      queueCustomDimensionsPreview();
+      updateButtons();
+      setStatus(`Applied physical preset: ${w} × ${h} ${u} @ ${d} DPI (${state.dimensions.width} × ${state.dimensions.height} px)`);
+    });
+  });
+
+  dpiBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const raw = btn.dataset.dpi || 'auto';
+      if (raw === 'auto') {
+        state.dpi = null;
+      } else if (raw === 'custom') {
+        customDpiWrap?.classList.remove('hidden');
+        const customVal = Number(customDpiInput?.value) || 300;
+        state.dpi = Math.max(36, Math.min(2400, Math.round(customVal)));
+      } else {
+        state.dpi = Number(raw) || 300;
+      }
+      state.jobs.forEach((j) => {
+        j.dpi = state.dpi;
+        if (j.status === 'done') j.status = 'queued';
+      });
+      syncDpiUi();
+      if (state.unit !== 'px' && state.scalePercent === null) {
+        syncDimUnitUi();
+        updateCustomDimensions();
+        queueCustomDimensionsPreview();
+      }
+      renderFiles();
+      updateLiveDimensionsAndCardPreviews();
+      updateButtons();
+      setStatus(state.dpi ? `Print resolution set to ${state.dpi} DPI.` : 'Print resolution reset to Auto (Original).');
+    });
+  });
+
+  customDpiInput?.addEventListener('input', () => {
+    const val = Number(customDpiInput.value);
+    if (Number.isFinite(val) && val >= 36 && val <= 2400) {
+      state.dpi = Math.round(val);
+      state.jobs.forEach((j) => {
+        j.dpi = state.dpi;
+        if (j.status === 'done') j.status = 'queued';
+      });
+      syncDpiUi();
+      if (state.unit !== 'px' && state.scalePercent === null) {
+        syncDimUnitUi();
+        updateCustomDimensions();
+        queueCustomDimensionsPreview();
+      }
+      renderFiles();
+      updateLiveDimensionsAndCardPreviews();
+      updateButtons();
+    }
+  });
+
   dimWidthInput?.addEventListener('input', () => {
     if (state.lockAspectRatio && dimWidthInput.value) {
       const w = Number(dimWidthInput.value);
       if (w > 0) {
+        const effDpi = state.dpi || Number(dimDpiSelect?.value) || 300;
         const ratio = getActiveAspectRatio();
-        const calculatedH = Math.max(10, Math.round(w / ratio));
-        if (dimHeightInput) dimHeightInput.value = String(calculatedH);
+        const pxW = unitToPx(w, state.unit, effDpi);
+        const pxH = Math.max(10, Math.round(pxW / ratio));
+        if (dimHeightInput) dimHeightInput.value = String(pxToUnit(pxH, state.unit, effDpi));
       }
     }
+    syncDimUnitUi();
     updateCustomDimensions();
     updateLiveDimensionsAndCardPreviews();
     queueCustomDimensionsPreview();
@@ -2958,27 +3510,50 @@ export function mountConverterApp(): void {
     if (state.lockAspectRatio && dimHeightInput.value) {
       const h = Number(dimHeightInput.value);
       if (h > 0) {
+        const effDpi = state.dpi || Number(dimDpiSelect?.value) || 300;
         const ratio = getActiveAspectRatio();
-        const calculatedW = Math.max(10, Math.round(h * ratio));
-        if (dimWidthInput) dimWidthInput.value = String(calculatedW);
+        const pxH = unitToPx(h, state.unit, effDpi);
+        const pxW = Math.max(10, Math.round(pxH * ratio));
+        if (dimWidthInput) dimWidthInput.value = String(pxToUnit(pxW, state.unit, effDpi));
       }
     }
+    syncDimUnitUi();
     updateCustomDimensions();
     updateLiveDimensionsAndCardPreviews();
     queueCustomDimensionsPreview();
   });
 
   function updateCustomDimensions(): void {
-    const w = dimWidthInput?.value ? Number(dimWidthInput.value) : undefined;
-    const h = dimHeightInput?.value ? Number(dimHeightInput.value) : undefined;
+    const rawW = dimWidthInput?.value ? Number(dimWidthInput.value) : undefined;
+    const rawH = dimHeightInput?.value ? Number(dimHeightInput.value) : undefined;
+    const effDpi = state.dpi || Number(dimDpiSelect?.value) || 300;
+    const pxW = rawW && rawW > 0 ? unitToPx(rawW, state.unit, effDpi) : undefined;
+    const pxH = rawH && rawH > 0 ? unitToPx(rawH, state.unit, effDpi) : undefined;
+    const hasBothExact = Boolean(pxW && pxH && !state.lockAspectRatio);
+
     state.dimensions = {
-      mode: 'custom',
-      width: w,
-      height: h,
+      mode: pxW || pxH ? 'custom' : 'original',
+      width: pxW,
+      height: pxH,
+      unit: state.unit,
+      dpi: state.unit !== 'px' ? effDpi : (state.dpi ?? undefined),
       lockAspectRatio: state.lockAspectRatio,
-      fit: state.dimensions.fit || 'contain',
-      noUpscale: state.dimensions.noUpscale !== false,
+      fit: hasBothExact ? (state.dimensions.fit === 'fill' ? 'fill' : 'cover') : (state.dimensions.fit || 'contain'),
+      noUpscale: hasBothExact ? false : (state.dimensions.noUpscale !== false),
     };
+
+    if (resizeHint) {
+      if (pxW && pxH) {
+        resizeHint.textContent =
+          state.unit === 'px'
+            ? `${pxW}×${pxH} px`
+            : `${rawW}×${rawH} ${state.unit} (${pxW}×${pxH} px)`;
+      } else {
+        resizeHint.textContent = `Custom (${state.unit})`;
+      }
+    }
+    syncDimUnitUi();
+    updateStageDots();
   }
 
   // Quick Dimension Presets (Web HD, Passport, Visa, Banner)
@@ -3052,6 +3627,18 @@ export function mountConverterApp(): void {
 
   preserveMetadataCheckbox?.addEventListener('change', () => {
     state.preserveMetadata = preserveMetadataCheckbox.checked;
+    exifStatusNote?.classList.toggle('hidden', state.preserveMetadata);
+    state.jobs.forEach((j) => {
+      if (j.status === 'done') j.status = 'queued';
+    });
+    renderFiles();
+    updateLiveDimensionsAndCardPreviews();
+    updateButtons();
+    setStatus(
+      state.preserveMetadata
+        ? 'EXIF metadata preservation enabled.'
+        : 'Privacy mode active: EXIF, GPS & camera metadata will be stripped.'
+    );
   });
 
 
@@ -3110,10 +3697,16 @@ export function mountConverterApp(): void {
   }
 
   function setSplitPercent(pct: number): void {
+    const isDone = activeCompareJob?.status === 'done' && !!activeCompareJob?.result;
     const clamped = Math.max(0, Math.min(100, pct));
     if (compareClip) {
-      compareClip.style.clipPath = `inset(0 ${100 - clamped}% 0 0)`;
-      (compareClip.style as unknown as { webkitClipPath?: string }).webkitClipPath = `inset(0 ${100 - clamped}% 0 0)`;
+      if (isDone) {
+        compareClip.style.clipPath = `inset(0 ${100 - clamped}% 0 0)`;
+        (compareClip.style as unknown as { webkitClipPath?: string }).webkitClipPath = `inset(0 ${100 - clamped}% 0 0)`;
+      } else {
+        compareClip.style.clipPath = 'none';
+        (compareClip.style as unknown as { webkitClipPath?: string }).webkitClipPath = 'none';
+      }
     }
     if (compareHandle) compareHandle.style.left = `${clamped}%`;
   }
@@ -3121,6 +3714,27 @@ export function mountConverterApp(): void {
   async function openCompareModal(job: FileJob): Promise<void> {
     if (!compareModal) return;
     activeCompareJob = job;
+
+    // Ensure source preview URL and natural resolution are available
+    if (!job.previewUrl && job.file) {
+      job.previewUrl = URL.createObjectURL(job.file);
+    }
+    if ((!job.originalWidth || !job.originalHeight) && job.file) {
+      try {
+        const dims = await readImageDimensionsFast(job.file);
+        if (dims) {
+          job.originalWidth = dims.width;
+          job.originalHeight = dims.height;
+        } else {
+          const bmp = await createImageBitmap(job.file);
+          job.originalWidth = bmp.width;
+          job.originalHeight = bmp.height;
+          bmp.close?.();
+        }
+      } catch {
+        // non-blocking fallback
+      }
+    }
 
     const hasAdjustments = !!(
       job.customCropBox ||
@@ -3136,18 +3750,13 @@ export function mountConverterApp(): void {
     }
 
     const isDone = job.status === 'done' && !!job.result;
+    if (isDone && !job.resultPreviewUrl && job.result) {
+      job.resultPreviewUrl = URL.createObjectURL(job.result);
+    }
+
     const isAdjusted = !isDone && !!(job.adjustedPreviewUrl || job.croppedPreviewUrl);
     const uneditedOrigSrc = job.previewUrl || (job.file ? URL.createObjectURL(job.file) : '');
     const adjustedSrc = job.adjustedPreviewUrl || job.croppedPreviewUrl || uneditedOrigSrc;
-
-    // When conversion is done, the "Before" picture MUST be the unedited original image.
-    // When previewing queued adjustments before conversion, show the adjusted composition.
-    let currentBeforeMode: 'orig' | 'adj' = isDone ? 'orig' : (isAdjusted ? 'adj' : 'orig');
-    const origSrc = currentBeforeMode === 'orig' ? uneditedOrigSrc : adjustedSrc;
-    const resSrc = isDone ? (job.resultPreviewUrl || adjustedSrc) : adjustedSrc;
-
-    if (compareImgOrig) compareImgOrig.src = origSrc;
-    if (compareImgResult) compareImgResult.src = resSrc;
 
     if (compareTitle) {
       const effW = isDone
@@ -3157,7 +3766,9 @@ export function mountConverterApp(): void {
         ? (job.resultHeight || job.adjustedHeight || job.croppedHeight || job.originalHeight)
         : (job.adjustedHeight || job.croppedHeight || job.originalHeight);
       const dimStr = effW && effH ? ` (${effW}×${effH}px)` : '';
-      const suffix = isAdjusted ? ` · Live Preview${dimStr}` : (isDone ? ` · Visual Comparison${dimStr}` : ' · Full Resolution Preview');
+      const suffix = isDone
+        ? ` · Visual Comparison${dimStr}`
+        : (isAdjusted ? ` · Live Preview${dimStr}` : ' · Full Resolution Preview');
       compareTitle.textContent = `${job.file.name}${suffix}`;
     }
 
@@ -3174,9 +3785,9 @@ export function mountConverterApp(): void {
           <span class="text-accent font-bold">➔</span>
           <span class="font-medium text-fg">After:</span> <span>${resSize} (${resDim})</span>
         `;
-      } else if (isAdjusted) {
-        const effW = job.adjustedWidth || job.croppedWidth;
-        const effH = job.adjustedHeight || job.croppedHeight;
+      } else if (hasAdjustments) {
+        const effW = job.adjustedWidth || job.croppedWidth || job.originalWidth;
+        const effH = job.adjustedHeight || job.croppedHeight || job.originalHeight;
         const adjDim = effW && effH ? `${effW}×${effH}px` : 'Adjusted';
         const notes: string[] = [];
         if (job.customCropBox) notes.push('Custom Framing');
@@ -3210,67 +3821,111 @@ export function mountConverterApp(): void {
       }
     }
 
-    if (compareToggleContainer && compareViewOrigBtn && compareViewAdjBtn) {
+    if (isDone) {
+      // 1. Hide the pre-conversion toggle buttons
+      if (compareToggleContainer) compareToggleContainer.classList.add('hidden');
+
+      // 2. Show Before / After tags
+      if (compareOrigTag) {
+        compareOrigTag.textContent = 'Original (Before)';
+        compareOrigTag.classList.remove('hidden');
+      }
+      if (compareResTag) {
+        compareResTag.textContent = 'Converted (After)';
+        compareResTag.classList.remove('hidden');
+      }
+
+      // 3. Show split slider handle
+      if (compareHandle) compareHandle.classList.remove('hidden');
+
+      // 4. Set images
+      if (compareImgOrig) {
+        compareImgOrig.src = uneditedOrigSrc;
+        compareImgOrig.style.transform = '';
+        compareImgOrig.style.filter = '';
+      }
+      if (compareImgResult) {
+        compareImgResult.src = job.resultPreviewUrl || adjustedSrc;
+        compareImgResult.style.transform = '';
+        compareImgResult.style.filter = '';
+      }
+
+      // 5. Saved badge and download button
+      if (compareSavedBadge) {
+        if (job.result && job.result.size < job.file.size) {
+          const savedPct = Math.round(((job.file.size - job.result.size) / job.file.size) * 100);
+          compareSavedBadge.textContent = `-${savedPct}% saved`;
+          compareSavedBadge.classList.remove('hidden');
+        } else {
+          compareSavedBadge.classList.add('hidden');
+        }
+      }
+      if (compareDlBtn) compareDlBtn.classList.remove('hidden');
+
+      if (compareTip) {
+        compareTip.textContent = 'Drag split handle to compare · Scroll or pinch to zoom';
+      }
+    } else {
+      // Not converted yet: Live preview / framing inspection
+      if (compareSavedBadge) compareSavedBadge.classList.add('hidden');
+      if (compareDlBtn) compareDlBtn.classList.add('hidden');
+      if (compareHandle) compareHandle.classList.add('hidden');
+      if (compareResTag) compareResTag.classList.add('hidden');
+
+      if (compareClip) {
+        compareClip.style.clipPath = 'none';
+        (compareClip.style as unknown as { webkitClipPath?: string }).webkitClipPath = 'none';
+      }
+
       if (hasAdjustments) {
-        compareToggleContainer.classList.remove('hidden');
         if (compareOrigTag) compareOrigTag.classList.add('hidden');
+        if (compareToggleContainer) compareToggleContainer.classList.remove('hidden');
+
+        let currentBeforeMode: 'orig' | 'adj' = 'adj';
 
         const updateToggleButtons = () => {
-          const deg = job.rotate ?? 0;
-          const sx = job.flipH ? -1 : 1;
-          const isGray = job.grayscale ?? state.grayscale;
           const needsCss = currentBeforeMode === 'adj' && !job.adjustedPreviewUrl && !job.croppedPreviewUrl;
           const trans: string[] = [];
           if (needsCss) {
+            const deg = job.rotate ?? 0;
+            const sx = job.flipH ? -1 : 1;
             if (deg !== 0) trans.push(`rotate(${deg}deg)`);
             if (sx !== 1) trans.push(`scaleX(${sx})`);
           }
-
-          // Calculate visual scale difference between original/cropped base and target output
-          const origW = job.originalWidth || 1;
-          const origH = job.originalHeight || 1;
-          const baseW = job.croppedWidth || origW;
-          const baseH = job.croppedHeight || origH;
-
-          let relScale = 1.0;
-          const dims = job.dimensions ?? state.dimensions;
-          if (dims && dims.mode !== 'original') {
-            if (dims.scalePercent && dims.scalePercent > 0) {
-              relScale = Math.max(0.1, Math.min(2.0, dims.scalePercent / 100));
-            } else if (dims.width && dims.height) {
-              relScale = Math.max(0.1, Math.min(2.0, Math.min(dims.width / baseW, dims.height / baseH)));
-            }
-          }
-
-          if (currentBeforeMode === 'adj' && relScale !== 1.0) {
-            trans.unshift(`scale(${relScale.toFixed(3)})`);
-          }
-
           const transformStr = trans.join(' ');
+          const isGray = job.grayscale ?? state.grayscale;
           const filterStr = needsCss && isGray ? 'grayscale(100%)' : '';
 
           if (currentBeforeMode === 'orig') {
-            compareViewOrigBtn.className = 'px-2.5 py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer';
-            compareViewAdjBtn.className = 'px-2.5 py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer';
+            if (compareViewOrigBtn) {
+              compareViewOrigBtn.className = 'px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer';
+            }
+            if (compareViewAdjBtn) {
+              compareViewAdjBtn.className = 'px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer';
+            }
             if (compareImgOrig) {
               compareImgOrig.src = uneditedOrigSrc;
               compareImgOrig.style.transform = '';
               compareImgOrig.style.filter = '';
             }
-            if (!isDone && compareImgResult) {
+            if (compareImgResult) {
               compareImgResult.src = uneditedOrigSrc;
               compareImgResult.style.transform = '';
               compareImgResult.style.filter = '';
             }
           } else {
-            compareViewOrigBtn.className = 'px-2.5 py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer';
-            compareViewAdjBtn.className = 'px-2.5 py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer';
+            if (compareViewOrigBtn) {
+              compareViewOrigBtn.className = 'px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-muted hover:text-fg transition-colors cursor-pointer';
+            }
+            if (compareViewAdjBtn) {
+              compareViewAdjBtn.className = 'px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-accent text-accent-fg font-bold transition-colors cursor-pointer';
+            }
             if (compareImgOrig) {
               compareImgOrig.src = adjustedSrc;
               compareImgOrig.style.transform = transformStr;
               compareImgOrig.style.filter = filterStr;
             }
-            if (!isDone && compareImgResult) {
+            if (compareImgResult) {
               compareImgResult.src = adjustedSrc;
               compareImgResult.style.transform = transformStr;
               compareImgResult.style.filter = filterStr;
@@ -3278,79 +3933,44 @@ export function mountConverterApp(): void {
           }
         };
 
-        compareViewOrigBtn.onclick = (e) => {
-          e.stopPropagation();
-          currentBeforeMode = 'orig';
-          updateToggleButtons();
-        };
-
-        compareViewAdjBtn.onclick = (e) => {
-          e.stopPropagation();
-          currentBeforeMode = 'adj';
-          updateToggleButtons();
-        };
+        if (compareViewOrigBtn) {
+          compareViewOrigBtn.onclick = (e) => {
+            e.stopPropagation();
+            currentBeforeMode = 'orig';
+            updateToggleButtons();
+          };
+        }
+        if (compareViewAdjBtn) {
+          compareViewAdjBtn.onclick = (e) => {
+            e.stopPropagation();
+            currentBeforeMode = 'adj';
+            updateToggleButtons();
+          };
+        }
 
         updateToggleButtons();
       } else {
-        compareToggleContainer.classList.add('hidden');
+        if (compareToggleContainer) compareToggleContainer.classList.add('hidden');
         if (compareOrigTag) {
-          compareOrigTag.textContent = isDone ? 'Original (Before)' : `High-Res Source (${job.originalWidth && job.originalHeight ? `${job.originalWidth}×${job.originalHeight}px` : 'Original'})`;
+          const origDim = job.originalWidth && job.originalHeight ? `${job.originalWidth}×${job.originalHeight}px` : 'Original';
+          compareOrigTag.textContent = `High-Res Source (${origDim})`;
           compareOrigTag.classList.remove('hidden');
         }
+        if (compareImgOrig) {
+          compareImgOrig.src = uneditedOrigSrc;
+          compareImgOrig.style.transform = '';
+          compareImgOrig.style.filter = '';
+        }
+        if (compareImgResult) {
+          compareImgResult.src = uneditedOrigSrc;
+          compareImgResult.style.transform = '';
+          compareImgResult.style.filter = '';
+        }
       }
-    } else if (compareOrigTag) {
-      if (isDone) {
-        compareOrigTag.textContent = 'Original (Before)';
-        compareOrigTag.classList.remove('hidden');
-      } else if (isAdjusted) {
-        const effW = job.adjustedWidth || job.croppedWidth || job.originalWidth;
-        const effH = job.adjustedHeight || job.croppedHeight || job.originalHeight;
-        compareOrigTag.textContent = `Adjusted Preview (${effW}×${effH} px)`;
-        compareOrigTag.classList.remove('hidden');
-      } else {
-        const origDim = job.originalWidth && job.originalHeight ? `${job.originalWidth}×${job.originalHeight}px` : 'Original';
-        compareOrigTag.textContent = `High-Res Source (${origDim})`;
-        compareOrigTag.classList.remove('hidden');
+
+      if (compareTip) {
+        compareTip.textContent = 'High-fidelity preview · Scroll or pinch to zoom';
       }
-    }
-
-    if (compareResTag) {
-      if (isDone) {
-        compareResTag.textContent = 'Converted (After)';
-        compareResTag.classList.remove('hidden');
-      } else {
-        compareResTag.classList.add('hidden');
-      }
-    }
-
-    if (compareTip) {
-      compareTip.textContent = isDone
-        ? 'Drag split handle to compare · Scroll or pinch to zoom'
-        : 'High-fidelity preview · Scroll or pinch to zoom';
-    }
-
-    if (compareSavedBadge) {
-      if (isDone && job.result && job.result.size < job.file.size) {
-        const savedPct = Math.round(((job.file.size - job.result.size) / job.file.size) * 100);
-        compareSavedBadge.textContent = `-${savedPct}% saved`;
-        compareSavedBadge.classList.remove('hidden');
-      } else {
-        compareSavedBadge.classList.add('hidden');
-      }
-    }
-
-    // Modal download button
-    if (compareDlBtn) {
-      compareDlBtn.classList.toggle('hidden', !isDone);
-    }
-
-    // Divider handle & clip path
-    if (compareHandle) {
-      compareHandle.classList.toggle('hidden', !isDone);
-    }
-    if (compareClip) {
-      compareClip.style.clipPath = isDone ? 'inset(0 50% 0 0)' : 'none';
-      (compareClip.style as unknown as { webkitClipPath?: string }).webkitClipPath = isDone ? 'inset(0 50% 0 0)' : 'none';
     }
 
     // Reset split & zoom
@@ -4023,6 +4643,8 @@ export function mountConverterApp(): void {
       ? null
       : (job ? (job.dimensions?.scalePercent ?? state.scalePercent ?? 100) : (state.scalePercent ?? 100));
     resizeStudioState.scalePercent = currentScale;
+    resizeStudioState.unit = currentDims?.unit || state.unit || 'px';
+    resizeStudioState.dpi = currentDims?.dpi || state.dpi || 300;
     resizeStudioState.lockAspect = currentDims?.lockAspectRatio ?? state.lockAspectRatio ?? true;
     resizeStudioState.fit = currentDims?.fit ?? state.dimensions.fit ?? 'contain';
     resizeStudioState.noUpscale = currentDims?.noUpscale ?? state.dimensions.noUpscale ?? true;
@@ -4038,6 +4660,35 @@ export function mountConverterApp(): void {
     } else {
       resizeStudioState.width = srcW;
       resizeStudioState.height = srcH;
+    }
+
+    if (resizeStudioState.unit === 'px') {
+      resizeStudioState.unitWidth = resizeStudioState.width;
+      resizeStudioState.unitHeight = resizeStudioState.height;
+    } else {
+      const panelW = dimWidthInput?.value ? Number(dimWidthInput.value) : 0;
+      const panelH = dimHeightInput?.value ? Number(dimHeightInput.value) : 0;
+      if (
+        panelW > 0 &&
+        panelH > 0 &&
+        state.unit === resizeStudioState.unit &&
+        unitToPx(panelW, resizeStudioState.unit, resizeStudioState.dpi) === resizeStudioState.width &&
+        unitToPx(panelH, resizeStudioState.unit, resizeStudioState.dpi) === resizeStudioState.height
+      ) {
+        resizeStudioState.unitWidth = panelW;
+        resizeStudioState.unitHeight = panelH;
+      } else {
+        resizeStudioState.unitWidth = pxToUnit(
+          resizeStudioState.width || srcW,
+          resizeStudioState.unit,
+          resizeStudioState.dpi
+        );
+        resizeStudioState.unitHeight = pxToUnit(
+          resizeStudioState.height || srcH,
+          resizeStudioState.unit,
+          resizeStudioState.dpi
+        );
+      }
     }
 
     syncResizeStudioUi();
@@ -4075,12 +4726,49 @@ export function mountConverterApp(): void {
       resizeBadge.textContent = resizeStudioState.scalePercent ? `${resizeStudioState.scalePercent}%` : 'CUSTOM';
     }
 
-    // Input values
-    if (modalDimW && resizeStudioState.width) {
-      modalDimW.value = String(resizeStudioState.width);
+    // Unit pills & Print DPI select
+    modalUnitBtns.forEach((btn) => {
+      const isSel = btn.dataset.unit === resizeStudioState.unit;
+      btn.className = isSel
+        ? 'pk-modal-unit-btn rounded-md px-2.5 py-1 font-semibold bg-accent/15 text-accent cursor-pointer'
+        : 'pk-modal-unit-btn rounded-md px-2.5 py-1 font-medium text-muted hover:text-fg cursor-pointer';
+    });
+    if (modalDpiSelect && ['72', '96', '150', '200', '300', '600'].includes(String(resizeStudioState.dpi))) {
+      modalDpiSelect.value = String(resizeStudioState.dpi);
     }
-    if (modalDimH && resizeStudioState.height) {
-      modalDimH.value = String(resizeStudioState.height);
+    if (modalWLabel) modalWLabel.textContent = `Width (${resizeStudioState.unit})`;
+    if (modalHLabel) modalHLabel.textContent = `Height (${resizeStudioState.unit})`;
+
+    // Input values
+    const dispW =
+      resizeStudioState.unit === 'px'
+        ? resizeStudioState.width
+        : (resizeStudioState.unitWidth ??
+            (resizeStudioState.width
+              ? pxToUnit(resizeStudioState.width, resizeStudioState.unit, resizeStudioState.dpi)
+              : null));
+    const dispH =
+      resizeStudioState.unit === 'px'
+        ? resizeStudioState.height
+        : (resizeStudioState.unitHeight ??
+            (resizeStudioState.height
+              ? pxToUnit(resizeStudioState.height, resizeStudioState.unit, resizeStudioState.dpi)
+              : null));
+
+    if (modalDimW && dispW !== null && document.activeElement !== modalDimW) {
+      modalDimW.value = String(dispW);
+    }
+    if (modalDimH && dispH !== null && document.activeElement !== modalDimH) {
+      modalDimH.value = String(dispH);
+    }
+
+    if (modalComputedPx) {
+      if (resizeStudioState.unit !== 'px' && resizeStudioState.width && resizeStudioState.height && dispW && dispH) {
+        modalComputedPx.textContent = `${dispW} × ${dispH} ${resizeStudioState.unit} @ ${resizeStudioState.dpi} DPI = ${resizeStudioState.width} × ${resizeStudioState.height} px`;
+        modalComputedPx.classList.remove('hidden');
+      } else {
+        modalComputedPx.classList.add('hidden');
+      }
     }
 
     // Lock button
@@ -4198,6 +4886,8 @@ export function mountConverterApp(): void {
         resizeStudioState.scalePercent = pct;
         resizeStudioState.width = Math.round((srcW * pct) / 100);
         resizeStudioState.height = Math.round((srcH * pct) / 100);
+        resizeStudioState.unitWidth = pxToUnit(resizeStudioState.width, resizeStudioState.unit, resizeStudioState.dpi);
+        resizeStudioState.unitHeight = pxToUnit(resizeStudioState.height, resizeStudioState.unit, resizeStudioState.dpi);
       }
       syncResizeStudioUi();
     });
@@ -4209,6 +4899,8 @@ export function mountConverterApp(): void {
     const { w: srcW, h: srcH } = getResizeBaseDimensions();
     resizeStudioState.width = Math.round((srcW * pct) / 100);
     resizeStudioState.height = Math.round((srcH * pct) / 100);
+    resizeStudioState.unitWidth = pxToUnit(resizeStudioState.width, resizeStudioState.unit, resizeStudioState.dpi);
+    resizeStudioState.unitHeight = pxToUnit(resizeStudioState.height, resizeStudioState.unit, resizeStudioState.dpi);
     scheduleResizeStudioUi();
   });
 
@@ -4220,10 +4912,41 @@ export function mountConverterApp(): void {
       if (w && h) {
         resizeStudioState.width = w;
         resizeStudioState.height = h;
+        resizeStudioState.unitWidth = pxToUnit(w, resizeStudioState.unit, resizeStudioState.dpi);
+        resizeStudioState.unitHeight = pxToUnit(h, resizeStudioState.unit, resizeStudioState.dpi);
         resizeStudioState.scalePercent = null;
+        if (modalDimW) modalDimW.value = String(resizeStudioState.unitWidth);
+        if (modalDimH) modalDimH.value = String(resizeStudioState.unitHeight);
         syncResizeStudioUi();
       }
     });
+  });
+
+  modalUnitBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const nextUnit = (btn.dataset.unit || 'px') as DimensionUnit;
+      if (nextUnit === resizeStudioState.unit) return;
+      const { w: srcW, h: srcH } = getResizeBaseDimensions();
+      const curPxW = resizeStudioState.width || srcW;
+      const curPxH = resizeStudioState.height || srcH;
+      resizeStudioState.unit = nextUnit;
+      resizeStudioState.unitWidth = pxToUnit(curPxW, nextUnit, resizeStudioState.dpi);
+      resizeStudioState.unitHeight = pxToUnit(curPxH, nextUnit, resizeStudioState.dpi);
+      if (modalDimW) modalDimW.value = String(resizeStudioState.unitWidth);
+      if (modalDimH) modalDimH.value = String(resizeStudioState.unitHeight);
+      syncResizeStudioUi();
+    });
+  });
+
+  modalDpiSelect?.addEventListener('change', () => {
+    const nextDpi = Number(modalDpiSelect.value) || 300;
+    resizeStudioState.dpi = nextDpi;
+    if (resizeStudioState.unit !== 'px' && resizeStudioState.unitWidth && resizeStudioState.unitHeight) {
+      resizeStudioState.width = unitToPx(resizeStudioState.unitWidth, resizeStudioState.unit, nextDpi);
+      resizeStudioState.height = unitToPx(resizeStudioState.unitHeight, resizeStudioState.unit, nextDpi);
+      resizeStudioState.scalePercent = null;
+    }
+    syncResizeStudioUi();
   });
 
   modalLockBtn?.addEventListener('click', () => {
@@ -4234,11 +4957,16 @@ export function mountConverterApp(): void {
   modalDimW?.addEventListener('input', () => {
     const val = Number(modalDimW.value);
     if (val > 0) {
-      resizeStudioState.width = val;
+      resizeStudioState.unitWidth = val;
+      const pxW = unitToPx(val, resizeStudioState.unit, resizeStudioState.dpi);
+      resizeStudioState.width = pxW;
       resizeStudioState.scalePercent = null;
       if (resizeStudioState.lockAspect) {
         const { w: srcW, h: srcH } = getResizeBaseDimensions();
-        resizeStudioState.height = Math.round((val * srcH) / srcW);
+        const pxH = Math.max(10, Math.round((pxW * srcH) / srcW));
+        resizeStudioState.height = pxH;
+        resizeStudioState.unitHeight = pxToUnit(pxH, resizeStudioState.unit, resizeStudioState.dpi);
+        if (modalDimH) modalDimH.value = String(resizeStudioState.unitHeight);
       }
       scheduleResizeStudioUi();
     }
@@ -4247,11 +4975,16 @@ export function mountConverterApp(): void {
   modalDimH?.addEventListener('input', () => {
     const val = Number(modalDimH.value);
     if (val > 0) {
-      resizeStudioState.height = val;
+      resizeStudioState.unitHeight = val;
+      const pxH = unitToPx(val, resizeStudioState.unit, resizeStudioState.dpi);
+      resizeStudioState.height = pxH;
       resizeStudioState.scalePercent = null;
       if (resizeStudioState.lockAspect) {
         const { w: srcW, h: srcH } = getResizeBaseDimensions();
-        resizeStudioState.width = Math.round((val * srcW) / srcH);
+        const pxW = Math.max(10, Math.round((pxH * srcW) / srcH));
+        resizeStudioState.width = pxW;
+        resizeStudioState.unitWidth = pxToUnit(pxW, resizeStudioState.unit, resizeStudioState.dpi);
+        if (modalDimW) modalDimW.value = String(resizeStudioState.unitWidth);
       }
       scheduleResizeStudioUi();
     }
@@ -4274,9 +5007,13 @@ export function mountConverterApp(): void {
     resizeStudioState.scalePercent = 100;
     resizeStudioState.width = srcW;
     resizeStudioState.height = srcH;
+    resizeStudioState.unitWidth = pxToUnit(srcW, resizeStudioState.unit, resizeStudioState.dpi);
+    resizeStudioState.unitHeight = pxToUnit(srcH, resizeStudioState.unit, resizeStudioState.dpi);
     resizeStudioState.lockAspect = true;
     resizeStudioState.fit = 'contain';
     resizeStudioState.noUpscale = true;
+    if (modalDimW) modalDimW.value = String(resizeStudioState.unitWidth);
+    if (modalDimH) modalDimH.value = String(resizeStudioState.unitHeight);
     syncResizeStudioUi();
   });
 
@@ -4311,11 +5048,13 @@ export function mountConverterApp(): void {
         fit: resizeStudioState.fit,
         noUpscale: resizeStudioState.noUpscale,
       };
-    } else if (hasDimChange) {
+    } else if (hasDimChange || resizeStudioState.unit !== 'px') {
       dims = {
         mode: 'custom',
         width: resizeStudioState.width || srcW,
         height: resizeStudioState.height || srcH,
+        unit: resizeStudioState.unit,
+        dpi: resizeStudioState.unit !== 'px' ? resizeStudioState.dpi : (state.dpi ?? undefined),
         scalePercent: undefined,
         lockAspectRatio: resizeStudioState.lockAspect,
         fit: resizeStudioState.fit,
@@ -4325,8 +5064,16 @@ export function mountConverterApp(): void {
       dims = { mode: 'original', noUpscale: resizeStudioState.noUpscale };
     }
 
+    if (resizeStudioState.unit !== 'px') {
+      state.dpi = resizeStudioState.dpi;
+      syncDpiUi();
+    }
+
     if (!isGlobalResizeModal && activeResizeJob) {
       activeResizeJob.dimensions = dims;
+      if (resizeStudioState.unit !== 'px') {
+        activeResizeJob.dpi = resizeStudioState.dpi;
+      }
       if (activeResizeJob.status === 'done') {
         activeCropJob = null;
         activeResizeJob.status = 'queued';
@@ -4335,7 +5082,9 @@ export function mountConverterApp(): void {
       await generateJobAdjustedPreview(activeResizeJob);
       const resDesc = hasScaleChange
         ? `${resizeStudioState.scalePercent}% Scale`
-        : (hasDimChange ? `${dims.width}×${dims.height}px` : 'Original Size');
+        : dims.mode === 'custom'
+          ? `${dims.width}×${dims.height}px`
+          : 'Original Size';
       setStatus(`Applied resize (${resDesc}) to ${activeResizeJob.file.name}`);
     } else {
       state.dimensions = dims;
@@ -4343,6 +5092,7 @@ export function mountConverterApp(): void {
       await Promise.all(
         state.jobs.map(async (j) => {
           j.dimensions = dims;
+          if (resizeStudioState.unit !== 'px') j.dpi = resizeStudioState.dpi;
           if (j.status === 'done') j.status = 'queued';
           await generateJobAdjustedPreview(j);
         })
@@ -4350,10 +5100,15 @@ export function mountConverterApp(): void {
       setStatus('Applied resize settings to all files in queue.');
     }
 
+    state.unit = resizeStudioState.unit;
+    state.lockAspectRatio = resizeStudioState.lockAspect;
+
     if (resizeHint) {
       resizeHint.textContent = resizeStudioState.scalePercent
         ? (resizeStudioState.scalePercent === 100 ? '100% (Original)' : `${resizeStudioState.scalePercent}% Scale`)
-        : `${resizeStudioState.width}×${resizeStudioState.height}px`;
+        : resizeStudioState.unit === 'px'
+          ? `${resizeStudioState.width}×${resizeStudioState.height}px`
+          : `${resizeStudioState.unitWidth}×${resizeStudioState.unitHeight} ${resizeStudioState.unit} (${resizeStudioState.width}×${resizeStudioState.height}px)`;
     }
 
     // Sync right-hand Settings Panel UI controls
@@ -4373,8 +5128,11 @@ export function mountConverterApp(): void {
           : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
       });
       customDimsContainer?.classList.remove('hidden');
-      if (dimWidthInput && resizeStudioState.width) dimWidthInput.value = String(resizeStudioState.width);
-      if (dimHeightInput && resizeStudioState.height) dimHeightInput.value = String(resizeStudioState.height);
+      const uW = resizeStudioState.unit === 'px' ? resizeStudioState.width : resizeStudioState.unitWidth;
+      const uH = resizeStudioState.unit === 'px' ? resizeStudioState.height : resizeStudioState.unitHeight;
+      if (dimWidthInput && uW) dimWidthInput.value = String(uW);
+      if (dimHeightInput && uH) dimHeightInput.value = String(uH);
+      syncDimUnitUi();
     }
     renderFiles();
     updateLiveDimensionsAndCardPreviews();
@@ -4532,7 +5290,13 @@ export function mountConverterApp(): void {
 
     const isMergePdf = state.mergePdf && state.to === 'pdf' && state.jobs.length > 1;
 
+    let jobCount = 0;
     for (const job of pendingJobs) {
+      jobCount++;
+      // Protect INP (< 200ms) by yielding between batch job configurations
+      if (jobCount > 1 && jobCount % 3 === 0) {
+        await yieldToMain();
+      }
       job.status = 'queued';
 
       // Detect individual file MIME type for universal input support
@@ -4604,7 +5368,7 @@ export function mountConverterApp(): void {
         targetKb: jobSizeMode === 'quality' ? null : jobTargetKb,
         autoOrient: state.autoOrient,
         preserveMetadata: state.preserveMetadata,
-        quality: state.quality,
+        quality: jobSizeMode === 'quality' ? state.quality : undefined,
         stripTransparency: state.stripTransparency,
         cropAspect: job.cropAspect ?? state.cropAspect,
         cropAnchor: job.cropAnchor ?? state.cropAnchor,
@@ -4614,6 +5378,7 @@ export function mountConverterApp(): void {
         flipV: job.flipV ?? false,
         grayscale: job.grayscale ?? state.grayscale,
         dimensions: job.dimensions ?? state.dimensions,
+        dpi: job.dpi ?? state.dpi ?? undefined,
         targetOptions: targetOpts,
         svgScale: state.svgScale,
         pdfPageNumber: job.pdfPageNumber,
@@ -4648,7 +5413,7 @@ export function mountConverterApp(): void {
     selectedJobId = null;
     activePhotoBar?.classList.add('hidden');
     syncSidebarToSelectedJob(null);
-    renderFiles();
+    scheduleRenderFiles();
     updateButtons();
     updateProgress();
     updateStageDots();
@@ -4809,14 +5574,21 @@ export function mountConverterApp(): void {
       const metaParts: string[] = [];
       if (job.error) {
         metaParts.push(`Error: ${job.error}`);
-      } else if (
-        job.originalWidth &&
-        job.originalHeight &&
-        job.resultWidth &&
-        job.resultHeight &&
-        (job.resultWidth !== job.originalWidth || job.resultHeight !== job.originalHeight)
-      ) {
-        metaParts.push(`Resized: ${job.originalWidth}×${job.originalHeight} ➔ ${job.resultWidth}×${job.resultHeight}px`);
+      } else {
+        if (
+          job.originalWidth &&
+          job.originalHeight &&
+          job.resultWidth &&
+          job.resultHeight &&
+          (job.resultWidth !== job.originalWidth || job.resultHeight !== job.originalHeight)
+        ) {
+          metaParts.push(`Resized: ${job.originalWidth}×${job.originalHeight} ➔ ${job.resultWidth}×${job.resultHeight}px`);
+        }
+        if (job.status === 'done') {
+          const appliedDpi = job.dpi ?? state.dpi;
+          if (appliedDpi) metaParts.push(`${appliedDpi} DPI print header`);
+          if (!state.preserveMetadata) metaParts.push('EXIF stripped');
+        }
       }
       if (metaParts.length > 0) {
         meta.textContent = metaParts.join(' · ');
@@ -5024,6 +5796,13 @@ export function mountConverterApp(): void {
       }
       dotResize.className = isResizeActive ? DOT_ACTIVE : DOT_INACTIVE;
     }
+
+    // 5. DPI Dot: enabled when print resolution DPI is set or in dedicated dpi mode
+    const dotDpi = document.getElementById('pk-dot-dpi');
+    if (dotDpi) {
+      const isDpiActive = currentToolMode === 'dpi' || Boolean(activeJob?.dpi ?? state.dpi);
+      dotDpi.className = isDpiActive ? DOT_ACTIVE : DOT_INACTIVE;
+    }
   }
 
   function syncSidebarToSelectedJob(job: FileJob | null): void {
@@ -5072,7 +5851,7 @@ export function mountConverterApp(): void {
       if (cropAspectSelect) cropAspectSelect.value = aspect;
       syncCustomCropUi(aspect);
 
-      const globalScale = state.scalePercent ?? 100;
+      const globalScale = state.dimensions?.mode === 'custom' ? 'custom' : (state.scalePercent ?? 100);
       const scaleStr = String(globalScale);
       scaleBtns.forEach((btn) => {
         const isSelected = btn.dataset.scale === scaleStr;
@@ -5081,7 +5860,12 @@ export function mountConverterApp(): void {
           : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
       });
       if (resizeHint) {
-        resizeHint.textContent = globalScale === 100 ? '100% (Original)' : `${globalScale}% Scale`;
+        resizeHint.textContent =
+          globalScale === 'custom'
+            ? (state.unit !== 'px' ? `Custom (${state.unit} @ ${state.dpi || 300} DPI)` : 'Custom (px)')
+            : globalScale === 100
+            ? '100% (Original)'
+            : `${globalScale}% Scale`;
       }
     }
     updateStageDots();
@@ -5337,14 +6121,21 @@ export function mountConverterApp(): void {
         const metaParts: string[] = [];
         if (job.error) {
           metaParts.push(`Error: ${job.error}`);
-        } else if (
-          job.originalWidth &&
-          job.originalHeight &&
-          job.resultWidth &&
-          job.resultHeight &&
-          (job.resultWidth !== job.originalWidth || job.resultHeight !== job.originalHeight)
-        ) {
-          metaParts.push(`Resized: ${job.originalWidth}×${job.originalHeight} ➔ ${job.resultWidth}×${job.resultHeight}px`);
+        } else {
+          if (
+            job.originalWidth &&
+            job.originalHeight &&
+            job.resultWidth &&
+            job.resultHeight &&
+            (job.resultWidth !== job.originalWidth || job.resultHeight !== job.originalHeight)
+          ) {
+            metaParts.push(`Resized: ${job.originalWidth}×${job.originalHeight} ➔ ${job.resultWidth}×${job.resultHeight}px`);
+          }
+          if (job.status === 'done') {
+            const appliedDpi = job.dpi ?? state.dpi;
+            if (appliedDpi) metaParts.push(`${appliedDpi} DPI print header`);
+            if (!state.preserveMetadata) metaParts.push('EXIF stripped');
+          }
         }
         if (metaParts.length > 0) {
           meta.textContent = metaParts.join(' · ');
@@ -5848,12 +6639,19 @@ export function mountConverterApp(): void {
       let btnText = 'Convert & Compress Now';
       if (isMerge) {
         btnText = 'Merge & Convert to Single PDF';
+      } else if (currentToolMode === 'dpi') {
+        btnText = `Apply ${state.dpi || 300} DPI Now`;
+      } else if (currentToolMode === 'exif') {
+        btnText = state.preserveMetadata ? 'Convert Image Now' : 'Remove EXIF Metadata Now';
       } else if (currentToolMode === 'crop') {
         btnText = 'Crop & Frame Now';
       } else if (currentToolMode === 'resize') {
-        btnText = 'Resize Resolution Now';
+        btnText = state.unit !== 'px' ? `Resize in ${state.unit.toUpperCase()} Now` : 'Resize Resolution Now';
       } else if (currentToolMode === 'compress') {
-        btnText = 'Compress Image Now';
+        btnText =
+          state.targetSizeMode === 'exact' && state.targetKb
+            ? `Apply Exact ${formatSizeLabel(state.targetKb)} Size Now`
+            : 'Compress Image Now';
       } else if (currentToolMode === 'convert') {
         btnText = 'Convert Image Now';
       } else if (currentToolMode === 'passport') {
@@ -5902,6 +6700,7 @@ export function mountConverterApp(): void {
     const editingActiveBadge = document.getElementById('pk-editing-active-badge');
     if (editingActiveBadge) {
       const hasGlobalEdits =
+        !state.preserveMetadata ||
         (state.cropAspect && state.cropAspect !== 'original') ||
         (state.scalePercent && state.scalePercent !== 100) ||
         (state.dimensions && state.dimensions.mode !== 'original') ||
@@ -5918,6 +6717,15 @@ export function mountConverterApp(): void {
       );
       editingActiveBadge.classList.toggle('hidden', !hasGlobalEdits && !hasAnyJobEdits);
     }
+  }
+
+  let progressRafId: number | null = null;
+  function scheduleUpdateProgress(): void {
+    if (progressRafId !== null) return;
+    progressRafId = requestAnimationFrame(() => {
+      progressRafId = null;
+      updateProgress();
+    });
   }
 
   function updateProgress(): void {
@@ -5943,12 +6751,200 @@ export function mountConverterApp(): void {
   }
 
   // Initial render & format UI setup
+  if (preserveMetadataCheckbox) {
+    preserveMetadataCheckbox.checked = state.preserveMetadata;
+  }
+  exifStatusNote?.classList.toggle('hidden', state.preserveMetadata);
+  if (mergePdfToggle) {
+    mergePdfToggle.checked = state.mergePdf;
+  }
+  if (cropAspectSelect) {
+    cropAspectSelect.value = state.cropAspect;
+  }
+  syncCustomCropUi(state.cropAspect);
+  setSizeMode(state.targetSizeMode);
+  syncDimUnitUi();
+  syncDpiUi();
   updateFormatUi();
   renderFiles();
   setToolMode(initialToolMode, false);
-  const initialPreset = root.dataset.preset;
+
+  function applyExternalResizeDims(payload: {
+    unit: DimensionUnit;
+    width: number;
+    height: number;
+    dpi: number;
+  }): void {
+    const u = payload.unit || 'px';
+    const d = payload.dpi && payload.dpi > 0 ? Math.round(payload.dpi) : 300;
+    const w = Number(payload.width);
+    const h = Number(payload.height);
+    if (!(w > 0 && h > 0)) return;
+
+    if (currentToolMode !== 'resize' && currentToolMode !== 'all') {
+      setToolMode('resize', false);
+    } else {
+      switchSettingsTab('custom');
+    }
+
+    state.unit = u;
+    state.dpi = d;
+    state.scalePercent = null;
+    state.lockAspectRatio = false;
+    if (lockAspectBtn) {
+      lockAspectBtn.dataset.locked = 'false';
+      lockAspectBtn.classList.remove('text-accent');
+      lockAspectBtn.classList.add('text-muted');
+      lockAspectBtn.title = 'Aspect Ratio Unlocked';
+    }
+    scaleBtns.forEach((b) => {
+      const isSel = b.dataset.scale === 'custom';
+      b.className = isSel
+        ? 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors bg-surface text-fg shadow-sm'
+        : 'pk-scale-btn flex-1 rounded-md py-1 font-medium transition-colors text-muted hover:text-fg';
+    });
+    customDimsContainer?.classList.remove('hidden');
+    if (dimWidthInput) dimWidthInput.value = String(w);
+    if (dimHeightInput) dimHeightInput.value = String(h);
+
+    syncDpiUi();
+    syncDimUnitUi();
+    updateCustomDimensions();
+
+    const dropBadge = document.getElementById('pk-locked-preset-badge');
+    const span = dropBadge?.querySelector('span');
+    if (dropBadge && span && state.dimensions.width && state.dimensions.height) {
+      span.textContent =
+        u === 'px'
+          ? `Preset: ${state.dimensions.width} × ${state.dimensions.height} px • ${d} DPI`
+          : `Preset: ${w} × ${h} ${u} @ ${d} DPI (${state.dimensions.width} × ${state.dimensions.height} px)`;
+      dropBadge.classList.remove('hidden');
+    }
+
+    applyCustomDimensionsToJobs();
+    updateButtons();
+    setStatus(
+      `Ready to resize photos to ${w} × ${h} ${u} @ ${d} DPI (${state.dimensions.width} × ${state.dimensions.height} px). Drop an image below!`
+    );
+    root?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  window.addEventListener('pk:set-resize-dims', (ev: Event) => {
+    delete (window as unknown as Record<string, unknown>).__pkPendingResizeDims;
+    const detail = (ev as CustomEvent).detail;
+    if (detail) applyExternalResizeDims(detail);
+  });
+
+  const pendingDims = (window as unknown as Record<string, unknown>).__pkPendingResizeDims as
+    | { unit: DimensionUnit; width: number; height: number; dpi: number }
+    | undefined;
+  if (pendingDims) {
+    delete (window as unknown as Record<string, unknown>).__pkPendingResizeDims;
+    applyExternalResizeDims(pendingDims);
+  }
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const urlPreset = searchParams?.get('preset') || searchParams?.get('portal');
+  const initialPreset = urlPreset || root.dataset.preset;
   if (initialPreset) {
-    applyPortalPreset(initialPreset);
+    applyPortalPreset(initialPreset, !urlPreset);
+    switchSettingsTab('portal');
+    const activeCard = document.querySelector<HTMLButtonElement>(`.pk-portal-preset-card[data-id="${initialPreset}"]`);
+    const cardsList = document.getElementById('pk-portal-cards-list');
+    if (activeCard && cardsList) {
+      const listRect = cardsList.getBoundingClientRect();
+      const cardRect = activeCard.getBoundingClientRect();
+      if (cardRect.top < listRect.top) {
+        cardsList.scrollTop -= (listRect.top - cardRect.top + 8);
+      } else if (cardRect.bottom > listRect.bottom) {
+        cardsList.scrollTop += (cardRect.bottom - listRect.bottom + 8);
+      }
+    }
+  }
+
+  // Universal URL Query Parameter Overrides (?tool=, ?from=, ?to=, ?kb=, ?minKb=, ?maxKb=, ?mode=, ?crop=, ?dpi=, ?unit=, ?w=, ?h=, ?merge=)
+  if (searchParams && Array.from(searchParams.keys()).length > 0) {
+    const qFrom = searchParams.get('from')?.toLowerCase();
+    const qTo = searchParams.get('to')?.toLowerCase();
+    const qTool = searchParams.get('tool')?.toLowerCase();
+    const qMode = searchParams.get('mode')?.toLowerCase() as SizeControlMode | undefined;
+    const qKb = parseTargetKb(searchParams.get('kb') || searchParams.get('size') || undefined);
+    const qMinKb = parseTargetKb(searchParams.get('minKb') || undefined);
+    const qMaxKb = parseTargetKb(searchParams.get('maxKb') || undefined);
+    const qCrop = searchParams.get('crop') as CropAspectPreset | null;
+    const qDpi = Number(searchParams.get('dpi') || 0);
+    const qUnit = searchParams.get('unit')?.toLowerCase() as DimensionUnit | undefined;
+    const qW = Number(searchParams.get('w') || 0);
+    const qH = Number(searchParams.get('h') || 0);
+    const qMerge = searchParams.get('merge');
+
+    if (qFrom) {
+      state.from = qFrom;
+      state.fromMime = mimeForExtension(qFrom) || state.fromMime;
+      if (inputBadge) inputBadge.textContent = qFrom.toUpperCase();
+    }
+    if (qTo && mimeForExtension(qTo)) {
+      state.to = qTo;
+      state.toMime = mimeForExtension(qTo)!;
+      if (outputSelect) outputSelect.value = qTo === 'jpeg' ? 'jpg' : qTo;
+      syncCustomFormatUi(qTo);
+      updateFormatUi();
+    }
+    if (qMerge === '1' || qMerge === 'true') {
+      state.mergePdf = true;
+      if (mergePdfToggle) mergePdfToggle.checked = true;
+    }
+    if (qMinKb && qMaxKb) {
+      state.minKb = qMinKb;
+      state.maxKb = qMaxKb;
+      state.targetKb = qMaxKb;
+      if (minKbInput) minKbInput.value = String(qMinKb);
+      if (maxKbInput) maxKbInput.value = String(qMaxKb);
+      setSizeMode('range');
+    } else if (qKb) {
+      state.targetKb = qKb;
+      savedMaxTargetValue = String(qKb);
+      savedExactTargetValue = String(qKb);
+      const targetMode: SizeControlMode = qMode && ['max', 'exact', 'range', 'quality'].includes(qMode) ? qMode : 'max';
+      if (targetSelect) {
+        const hasOpt = Array.from(targetSelect.options).some((o) => o.value === String(qKb));
+        targetSelect.value = hasOpt ? String(qKb) : 'custom';
+        if (!hasOpt && customKbInput) customKbInput.value = String(qKb);
+      }
+      setSizeMode(targetMode);
+      syncCustomTargetUi(targetSelect?.value || 'custom');
+    } else if (qMode && ['max', 'exact', 'range', 'quality'].includes(qMode)) {
+      setSizeMode(qMode);
+    }
+    if (qCrop && (qCrop === 'original' || ASPECT_RATIOS[qCrop])) {
+      state.cropAspect = qCrop;
+      if (cropAspectSelect) cropAspectSelect.value = qCrop;
+      syncCustomCropUi(qCrop);
+    }
+    if (qDpi >= 36 && qDpi <= 2400) {
+      state.dpi = Math.round(qDpi);
+      syncDpiUi();
+    }
+    if (qW > 0 && qH > 0) {
+      const unitUse: DimensionUnit = qUnit && ['px', 'cm', 'mm', 'in'].includes(qUnit) ? qUnit : state.unit;
+      applyExternalResizeDims({
+        unit: unitUse,
+        width: qW,
+        height: qH,
+        dpi: state.dpi || 300,
+      });
+    } else if (qUnit && ['px', 'cm', 'mm', 'in'].includes(qUnit)) {
+      state.unit = qUnit;
+      if (qUnit !== 'px') {
+        state.scalePercent = null;
+        customDimsContainer?.classList.remove('hidden');
+      }
+      syncDimUnitUi();
+    }
+    if (qTool && ['all', 'convert', 'compress', 'crop', 'resize', 'passport', 'dpi', 'exif'].includes(qTool)) {
+      setToolMode(qTool, false);
+    } else if (qFrom || qTo || qKb || qMinKb || qCrop || qDpi > 0) {
+      setToolMode(currentToolMode, false);
+    }
   }
   updateButtons();
   updateStageDots();
@@ -5978,6 +6974,22 @@ function parseTargetKb(v: string | undefined): number | null {
   if (!v) return null;
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function unitToPx(val: number, unit: DimensionUnit, dpi: number): number {
+  const safeDpi = dpi > 0 ? dpi : 300;
+  if (unit === 'cm') return Math.max(10, Math.round((val / 2.54) * safeDpi));
+  if (unit === 'mm') return Math.max(10, Math.round((val / 25.4) * safeDpi));
+  if (unit === 'in') return Math.max(10, Math.round(val * safeDpi));
+  return Math.max(10, Math.round(val));
+}
+
+function pxToUnit(px: number, unit: DimensionUnit, dpi: number): number {
+  const safeDpi = dpi > 0 ? dpi : 300;
+  if (unit === 'cm') return Math.round(((px * 2.54) / safeDpi) * 100) / 100;
+  if (unit === 'mm') return Math.round(((px * 25.4) / safeDpi) * 10) / 10;
+  if (unit === 'in') return Math.round((px / safeDpi) * 1000) / 1000;
+  return Math.round(px);
 }
 
 function delay(ms: number): Promise<void> {

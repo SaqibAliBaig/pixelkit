@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
@@ -48,9 +47,9 @@ const directAnswer = {
     'To merge multiple JPG photos into one PDF: 1. Drag and drop all your JPG files into PixelKit. 2. Drag the thumbnail cards to reorder your document pages in your desired sequence. 3. Select page orientation, margins, and optional file size target (under 100KB or 200KB). 4. Click Download to instantly compile and save your unified PDF with zero server uploads and zero watermarks.',
 };
 
-const pageTitle = `Merge JPG to PDF Online — Combine Multiple JPGs into One PDF | ${SITE.name}`;
+const pageTitle = `Merge JPG to PDF Online (Combine JPGs to PDF) | ${SITE.name}`;
 const pageDesc =
-  'Merge multiple JPG, PNG, and HEIC photos into a single PDF online for free. Drag to reorder pages, adjust margins, and compress under 100KB or 200KB. 100% private in-browser tool.';
+  'Merge multiple JPG, PNG, and HEIC photos into one PDF. Reorder pages and compress under 100KB or 200KB privately in your browser with zero server uploads.';
 const pageKeywords = [
   'merge jpg to pdf',
   'jpg to pdf merge',
@@ -94,7 +93,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Merge JPG to PDF Tool',
     description: pageDesc,
-    path: '/merge-jpg-to-pdf/',
+    url: 'https://pixelkit.app/merge-jpg-to-pdf/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any (Web Browser)',
   }),
@@ -125,7 +124,7 @@ const useCases = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/merge-jpg-to-pdf/"
+  canonical="https://pixelkit.app/merge-jpg-to-pdf/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -160,15 +159,16 @@ const useCases = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for JPG to PDF -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
         fromMime="image/jpeg"
         toMime="application/pdf"
         initialTool="convert"
+        initialMergePdf={true}
       />
-    </main>
+    </div>
 
     <!-- Multi-File PDF Use Cases Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

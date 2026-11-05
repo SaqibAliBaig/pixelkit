@@ -20,7 +20,18 @@ import type {
 import { mimeToOutputFormat, buildFilename, mimeForExtension } from '../engines';
 import { detectMimeFromMagicBytes } from '../utils/mime';
 import { compressToTarget, compressWithDownscale } from './compression';
-import { extractExifSegment, insertExifIntoJpeg, padJpegToTargetBytes } from './exif';
+import {
+  extractExifSegment,
+  insertExifIntoJpeg,
+  padJpegToTargetBytes,
+  padPngToTargetBytes,
+  padWebpToTargetBytes,
+  readExifOrientation,
+  setJpegDpi,
+  setPngDpi,
+  stripExifFromJpeg,
+  stripMetadataFromPng,
+} from './exif';
 import { applyAdjustments } from './adjustments';
 import { jpegToPdf, mergeImagesToPdf, pdfOverheadBytes } from './pdf';
 
@@ -128,16 +139,44 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
   let resultWidth = workingBitmap.width;
   let resultHeight = workingBitmap.height;
 
-  // 4. Calculate target bytes based on targetOptions / targetKb
+  // 4. Calculate target bytes and minimum/padding target bytes based on targetOptions / targetKb
   let targetBytes: number | null = null;
-  if (req.targetOptions?.mode === 'range' && req.targetOptions.maxKb) {
-    const maxB = req.targetOptions.maxKb * 1024;
-    const minB = (req.targetOptions.minKb ?? 0) * 1024;
-    // Aim safely in the upper half of the range
-    targetBytes = Math.round(minB + (maxB - minB) * 0.85);
+  let minBytesRequired: number | null = null;
+  let padTargetBytes: number | null = null;
+
+  if (req.targetOptions?.mode === 'range') {
+    const maxB = req.targetOptions.maxKb && req.targetOptions.maxKb > 0 ? Math.round(req.targetOptions.maxKb * 1024) : null;
+    const minB = req.targetOptions.minKb && req.targetOptions.minKb > 0 ? Math.round(req.targetOptions.minKb * 1024) : 0;
+    if (maxB) {
+      targetBytes = Math.round(minB + (maxB - minB) * 0.85);
+    }
+    if (minB > 0) {
+      minBytesRequired = minB;
+      padTargetBytes = maxB && maxB > minB ? Math.min(maxB - 64, minB + 256) : minB + 256;
+    }
   } else if (req.targetKb && req.targetKb > 0) {
-    targetBytes = req.targetKb * 1024;
+    targetBytes = Math.round(req.targetKb * 1024);
+    if (req.targetOptions?.mode === 'exact') {
+      minBytesRequired = targetBytes;
+      padTargetBytes = targetBytes;
+    }
   }
+
+  const effectiveDpi =
+    req.dpi && req.dpi > 0
+      ? Math.round(req.dpi)
+      : req.dimensions?.dpi && req.dimensions.dpi > 0
+        ? Math.round(req.dimensions.dpi)
+        : null;
+
+  const hasCrop = !!req.customCropBox || (!!req.cropAspect && req.cropAspect !== 'original');
+  const hasResize = !!(
+    req.dimensions &&
+    req.dimensions.mode !== 'original' &&
+    (req.dimensions.scalePercent !== 100 || Boolean(req.dimensions.width || req.dimensions.height))
+  );
+  const hasTransform = (req.rotate ?? 0) !== 0 || !!req.flipH || !!req.flipV || !!req.grayscale;
+  const hasQualityOverride = req.quality !== undefined && req.quality > 0 && req.quality < 1;
 
   // 5. Extract EXIF if metadata preservation is enabled
   let exifSegment: Uint8Array | null = null;
@@ -156,6 +195,68 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
   let blob: Blob;
 
   try {
+    // Lossless byte-level fast-paths for pure DPI header updates or pure EXIF removal (zero pixel re-encoding)
+    const canLosslessBypass =
+      !hasCrop && !hasResize && !hasTransform && !targetBytes && !minBytesRequired && !hasQualityOverride;
+
+    if (
+      canLosslessBypass &&
+      effectiveFromMime === 'image/jpeg' &&
+      outFormat === 'jpg' &&
+      (effectiveDpi !== null || req.preserveMetadata === false)
+    ) {
+      const rawBuf = await req.file.arrayBuffer();
+      const orient = readExifOrientation(rawBuf);
+      if (req.preserveMetadata !== false) {
+        blob = setJpegDpi(rawBuf, effectiveDpi!);
+        return {
+          blob,
+          originalWidth,
+          originalHeight,
+          resultWidth: originalWidth,
+          resultHeight: originalHeight,
+          originalPreviewBlob,
+        };
+      } else if (orient === 1 || req.autoOrient === false) {
+        blob = stripExifFromJpeg(rawBuf);
+        if (effectiveDpi !== null) {
+          blob = setJpegDpi(await blob.arrayBuffer(), effectiveDpi);
+        }
+        return {
+          blob,
+          originalWidth,
+          originalHeight,
+          resultWidth: originalWidth,
+          resultHeight: originalHeight,
+          originalPreviewBlob,
+        };
+      }
+    }
+
+    if (
+      canLosslessBypass &&
+      effectiveFromMime === 'image/png' &&
+      outFormat === 'png' &&
+      (effectiveDpi !== null || req.preserveMetadata === false)
+    ) {
+      const rawBuf = await req.file.arrayBuffer();
+      blob = new Blob([rawBuf], { type: 'image/png' });
+      if (req.preserveMetadata === false) {
+        blob = stripMetadataFromPng(await blob.arrayBuffer());
+      }
+      if (effectiveDpi !== null) {
+        blob = setPngDpi(await blob.arrayBuffer(), effectiveDpi);
+      }
+      return {
+        blob,
+        originalWidth,
+        originalHeight,
+        resultWidth: originalWidth,
+        resultHeight: originalHeight,
+        originalPreviewBlob,
+      };
+    }
+
     switch (outFormat) {
       case 'png':
         blob = await encodePngOutput(workingBitmap, targetBytes);
@@ -169,13 +270,35 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
         break;
       }
       case 'pdf':
-        blob = await encodePdfOutput(workingBitmap, targetBytes, req.file.name);
+        blob = await encodePdfOutput(
+          workingBitmap,
+          targetBytes,
+          req.file.name,
+          effectiveDpi,
+          minBytesRequired ? padTargetBytes : null
+        );
         break;
       case 'webp':
-        blob = await encodeCanvasOutput(workingBitmap, 'image/webp', targetBytes, true, false, req.quality);
+        blob = await encodeCanvasOutput(
+          workingBitmap,
+          'image/webp',
+          targetBytes,
+          true,
+          false,
+          req.quality,
+          Boolean(minBytesRequired)
+        );
         break;
       case 'avif':
-        blob = await encodeCanvasOutput(workingBitmap, 'image/avif', targetBytes, true, false, req.quality);
+        blob = await encodeCanvasOutput(
+          workingBitmap,
+          'image/avif',
+          targetBytes,
+          true,
+          false,
+          req.quality,
+          Boolean(minBytesRequired)
+        );
         break;
       case 'jpg':
       default:
@@ -185,15 +308,13 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
           targetBytes,
           true,
           req.stripTransparency !== false,
-          req.quality
+          req.quality,
+          Boolean(minBytesRequired)
         );
         break;
     }
 
-    // 7. Inject preserved EXIF metadata into output JPEG (only when not cropped/resized/transformed to prevent stale geometry and thumbnail overriding)
-    const hasCrop = !!req.customCropBox || (!!req.cropAspect && req.cropAspect !== 'original');
-    const hasResize = !!(req.dimensions && req.dimensions.mode !== 'original' && req.dimensions.scalePercent !== 100);
-    const hasTransform = (req.rotate ?? 0) !== 0 || !!req.flipH || !!req.flipV;
+    // 7. Inject preserved EXIF metadata into output JPEG (only when not cropped/resized/transformed)
     if (exifSegment && outFormat === 'jpg' && !hasCrop && !hasResize && !hasTransform) {
       try {
         const outBuf = await blob.arrayBuffer();
@@ -203,22 +324,32 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
       }
     }
 
-    // 8. Safely pad JPEG when output size is smaller than a required minimum or exact target (Increase Image Size in KB)
-    let minBytesRequired: number | null = null;
-    if (req.targetOptions?.mode === 'range' && req.targetOptions.minKb && req.targetOptions.minKb > 0) {
-      minBytesRequired = req.targetOptions.minKb * 1024;
-    } else if (req.targetOptions?.mode === 'exact' && req.targetOptions.targetKb && req.targetOptions.targetKb > 0) {
-      minBytesRequired = req.targetOptions.targetKb * 1024;
+    // 7b. Inject Print DPI metadata (JFIF APP0 & EXIF IFD0 for JPEG, pHYs chunk for PNG)
+    if (effectiveDpi !== null) {
+      try {
+        if (outFormat === 'jpg') {
+          blob = setJpegDpi(await blob.arrayBuffer(), effectiveDpi);
+        } else if (outFormat === 'png') {
+          blob = setPngDpi(await blob.arrayBuffer(), effectiveDpi);
+        }
+      } catch (err) {
+        console.warn('[PixelKit] DPI header injection skipped:', err);
+      }
     }
 
-    if (minBytesRequired && blob.size < minBytesRequired && outFormat === 'jpg') {
+    // 8. Safely elevate file size when output is smaller than required exact or minimum target (Increase Image Size in KB)
+    if (minBytesRequired && padTargetBytes && blob.size < minBytesRequired) {
       try {
         const outBuf = await blob.arrayBuffer();
-        // Target safely slightly above minBytes (+128 bytes) to ensure strict portal acceptance
-        const targetPad = Math.round(minBytesRequired + 128);
-        blob = padJpegToTargetBytes(outBuf, targetPad);
+        if (outFormat === 'jpg') {
+          blob = padJpegToTargetBytes(outBuf, padTargetBytes);
+        } else if (outFormat === 'png') {
+          blob = padPngToTargetBytes(outBuf, padTargetBytes);
+        } else if (outFormat === 'webp') {
+          blob = padWebpToTargetBytes(outBuf, padTargetBytes);
+        }
       } catch (err) {
-        console.warn('[PixelKit] JPEG size padding skipped:', err);
+        console.warn('[PixelKit] Size elevation padding skipped:', err);
       }
     }
   } finally {
@@ -303,7 +434,8 @@ async function encodeCanvasOutput(
   targetBytes: number | null,
   allowDownscale: boolean,
   stripTransparency = true,
-  quality?: number
+  quality?: number,
+  preferMaxFidelityWhenUnder = false
 ): Promise<Blob> {
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx2d = canvas.getContext('2d', {
@@ -319,6 +451,13 @@ async function encodeCanvasOutput(
   }
 
   ctx2d.drawImage(bitmap, 0, 0);
+
+  if (preferMaxFidelityWhenUnder && targetBytes && targetBytes > 0) {
+    const q100 = await canvas.convertToBlob({ type: mime, quality: 1.0 });
+    if (q100.size <= targetBytes) {
+      return q100;
+    }
+  }
 
   const initialQuality =
     quality !== undefined && quality > 0
@@ -369,7 +508,9 @@ async function encodePngOutput(
 async function encodePdfOutput(
   bitmap: ImageBitmap,
   targetBytes: number | null,
-  originalName: string
+  originalName: string,
+  dpi: number | null = null,
+  padTargetBytes: number | null = null
 ): Promise<Blob> {
   const overhead = pdfOverheadBytes();
   const jpegTarget = targetBytes ? Math.max(1024, targetBytes - overhead) : null;
@@ -389,10 +530,33 @@ async function encodePdfOutput(
     initialQuality: 0.9,
   });
 
-  return await jpegToPdf({
-    jpegBlob: jpeg.blob,
+  let jpegBlob = jpeg.blob;
+  if (dpi && dpi > 0) {
+    jpegBlob = setJpegDpi(await jpegBlob.arrayBuffer(), dpi);
+  }
+
+  let pdfBlob = await jpegToPdf({
+    jpegBlob,
     widthPx: bitmap.width,
     heightPx: bitmap.height,
     title: originalName,
+    dpi: dpi ?? undefined,
   });
+
+  if (padTargetBytes && pdfBlob.size < padTargetBytes) {
+    const actualOverhead = Math.max(256, pdfBlob.size - jpegBlob.size);
+    const desiredJpegBytes = padTargetBytes - actualOverhead;
+    if (desiredJpegBytes > jpegBlob.size + 4) {
+      const paddedJpeg = padJpegToTargetBytes(await jpegBlob.arrayBuffer(), desiredJpegBytes);
+      pdfBlob = await jpegToPdf({
+        jpegBlob: paddedJpeg,
+        widthPx: bitmap.width,
+        heightPx: bitmap.height,
+        title: originalName,
+        dpi: dpi ?? undefined,
+      });
+    }
+  }
+
+  return pdfBlob;
 }

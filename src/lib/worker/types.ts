@@ -32,10 +32,13 @@ export type CropAspectPreset =
   | '2:1'
   | '5:7'
   | '3:4'
+  | '4:5'
   | '4:3'
   | '16:9'
   | '9:16'
-  | '3:2';
+  | '3:2'
+  | '3:1'
+  | '4:1';
 
 export type CropAnchor = 'top' | 'center' | 'bottom';
 
@@ -46,6 +49,8 @@ export interface CustomCropBox {
   height: number; // 0 to 1 relative to source height
 }
 
+export type DimensionUnit = 'px' | 'cm' | 'mm' | 'in';
+
 export interface DimensionOptions {
   mode: DimensionMode;
   width?: number;
@@ -54,6 +59,8 @@ export interface DimensionOptions {
   scalePercent?: number; // 25, 50, 75, 100
   fit?: 'cover' | 'contain' | 'fill';
   noUpscale?: boolean;
+  unit?: DimensionUnit;
+  dpi?: number;
 }
 
 export type TargetSizeMode = 'max' | 'exact' | 'range';
@@ -99,6 +106,7 @@ export interface ConvertRequest {
   dimensions?: DimensionOptions;
   targetOptions?: TargetSizeOptions;
   svgScale?: number;
+  dpi?: number;
   pdfPageNumber?: number;
   pdfTotalPages?: number;
   file: File;

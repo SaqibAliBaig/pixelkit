@@ -1,5 +1,5 @@
 ---
-title: "How to Compress an Aadhaar Card to a 100KB PDF (Step by Step)"
+title: "How to Compress an Aadhaar Card to 100KB PDF"
 description: "Aadhaar and PAN portals reject PDFs over 100KB or 200KB. Here's the exact workflow to hit the limit without losing readable text on the scan."
 publishedAt: 2026-01-20
 author: "PixelKit"

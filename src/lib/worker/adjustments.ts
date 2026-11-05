@@ -27,10 +27,13 @@ export const ASPECT_RATIOS: Record<string, number> = {
   '2:1': 2 / 1, // Official signature aspect
   '5:7': 5 / 7,
   '3:4': 3 / 4, // Canada passport/visa (50x70mm)
+  '4:5': 4 / 5, // Portrait social & mobile feed
   '4:3': 4 / 3,
   '16:9': 16 / 9,
   '9:16': 9 / 16,
   '3:2': 3 / 2,
+  '3:1': 3 / 1,
+  '4:1': 4 / 1,
 };
 
 /**

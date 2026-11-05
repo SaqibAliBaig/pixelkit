@@ -10,7 +10,7 @@
 const CACHE_NAME = 'pixelkit-cache-v2';
 const CORE_ASSETS = [
   '/',
-  '/convert',
+  '/convert/',
   '/manifest.webmanifest',
   '/favicon.svg',
   '/apple-touch-icon.png',

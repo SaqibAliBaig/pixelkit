@@ -1,0 +1,59 @@
+# PixelKit — Cloudflare Pages 301 Permanent Redirects
+# Consolidated canonical hubs to eliminate keyword cannibalization & doorway duplication
+
+# Duplicate Synonym KB Resizers -> /compress-image-to-[size]kb/
+/image-resizer-20kb /compress-image-to-20kb/ 301
+/image-resizer-20kb/ /compress-image-to-20kb/ 301
+/image-resizer-30kb /compress-image-to-30kb/ 301
+/image-resizer-30kb/ /compress-image-to-30kb/ 301
+/image-resizer-40kb /compress-image-to-40kb/ 301
+/image-resizer-40kb/ /compress-image-to-40kb/ 301
+/image-resizer-50kb /compress-image-to-50kb/ 301
+/image-resizer-50kb/ /compress-image-to-50kb/ 301
+/image-resizer-100kb /compress-image-to-100kb/ 301
+/image-resizer-100kb/ /compress-image-to-100kb/ 301
+/image-resizer-200kb /compress-image-to-200kb/ 301
+/image-resizer-200kb/ /compress-image-to-200kb/ 301
+/image-resizer-500kb /compress-image-to-500kb/ 301
+/image-resizer-500kb/ /compress-image-to-500kb/ 301
+
+/photo-resizer-20kb /compress-image-to-20kb/ 301
+/photo-resizer-20kb/ /compress-image-to-20kb/ 301
+/photo-resizer-30kb /compress-image-to-30kb/ 301
+/photo-resizer-30kb/ /compress-image-to-30kb/ 301
+/photo-resizer-40kb /compress-image-to-40kb/ 301
+/photo-resizer-40kb/ /compress-image-to-40kb/ 301
+/photo-resizer-50kb /compress-image-to-50kb/ 301
+/photo-resizer-50kb/ /compress-image-to-50kb/ 301
+/photo-resizer-100kb /compress-image-to-100kb/ 301
+/photo-resizer-100kb/ /compress-image-to-100kb/ 301
+/photo-resizer-200kb /compress-image-to-200kb/ 301
+/photo-resizer-200kb/ /compress-image-to-200kb/ 301
+/photo-resizer-500kb /compress-image-to-500kb/ 301
+/photo-resizer-500kb/ /compress-image-to-500kb/ 301
+
+/resize-image-to-20kb /compress-image-to-20kb/ 301
+/resize-image-to-20kb/ /compress-image-to-20kb/ 301
+/resize-image-to-30kb /compress-image-to-30kb/ 301
+/resize-image-to-30kb/ /compress-image-to-30kb/ 301
+/resize-image-to-50kb /compress-image-to-50kb/ 301
+/resize-image-to-50kb/ /compress-image-to-50kb/ 301
+/resize-image-to-100kb /compress-image-to-100kb/ 301
+/resize-image-to-100kb/ /compress-image-to-100kb/ 301
+/resize-image-to-200kb /compress-image-to-200kb/ 301
+/resize-image-to-200kb/ /compress-image-to-200kb/ 301
+/resize-image-to-500kb /compress-image-to-500kb/ 301
+/resize-image-to-500kb/ /compress-image-to-500kb/ 301
+
+# Flagship Resizer Synonym -> /resize-image/
+/photo-resizer /resize-image/ 301
+/photo-resizer/ /resize-image/ 301
+/image-resizer-in-pixels /resize-image/ 301
+/image-resizer-in-pixels/ /resize-image/ 301
+
+# Generic KB Resizers -> /reduce-image-size-in-kb/
+/image-resizer-in-kb /reduce-image-size-in-kb/ 301
+/image-resizer-in-kb/ /reduce-image-size-in-kb/ 301
+/photo-resizer-in-kb /reduce-image-size-in-kb/ 301
+/photo-resizer-in-kb/ /reduce-image-size-in-kb/ 301
+

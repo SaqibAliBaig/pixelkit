@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
@@ -55,7 +54,7 @@ const directAnswer = {
 
 const pageTitle = `Image to PDF Converter — Free Online Image to PDF | ${SITE.name}`;
 const pageDesc =
-  'Free online image to PDF converter. Convert and merge JPG, PNG, WebP, and HEIC photos into single or multi-page PDF documents. 100% private in-browser tool with zero uploads.';
+  'Convert and merge JPG, PNG, WebP, and HEIC images into compact PDFs. 100% private in-browser conversion with zero server uploads, watermarks, or sign-up.';
 const pageKeywords = [
   'image to pdf',
   'image to pdf converter',
@@ -102,7 +101,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Image to PDF Converter',
     description: pageDesc,
-    path: '/image-to-pdf/',
+    url: 'https://pixelkit.app/image-to-pdf/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any (Web Browser)',
   }),
@@ -138,7 +137,7 @@ const supportedInputs = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/image-to-pdf/"
+  canonical="https://pixelkit.app/image-to-pdf/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -173,7 +172,7 @@ const supportedInputs = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for Image to PDF -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
@@ -181,7 +180,7 @@ const supportedInputs = [
         toMime="application/pdf"
         initialTool="convert"
       />
-    </main>
+    </div>
 
     <!-- Supported Inputs Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

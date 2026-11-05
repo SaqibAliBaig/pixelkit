@@ -234,10 +234,10 @@
           </div>
         </div>
 
-        <!-- 3. Exact Pixel Dimensions with Aspect Lock -->
-        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-semibold text-fg">Exact Pixel Dimensions</span>
+        <!-- 3. Exact Dimensions (px / cm / mm / in + DPI) with Aspect Lock -->
+        <div class="rounded-xl border border-border bg-bg/40 p-3 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-semibold text-fg">Exact Dimensions</span>
             <button
               id="pk-modal-lock-btn"
               type="button"
@@ -249,33 +249,61 @@
             </button>
           </div>
 
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex rounded-lg border border-border bg-surface p-0.5 text-[11px]" role="group" aria-label="Dimension unit">
+              <button type="button" class="pk-modal-unit-btn rounded-md px-2.5 py-1 font-semibold bg-accent/15 text-accent cursor-pointer" data-unit="px">PX</button>
+              <button type="button" class="pk-modal-unit-btn rounded-md px-2.5 py-1 font-medium text-muted hover:text-fg cursor-pointer" data-unit="cm">CM</button>
+              <button type="button" class="pk-modal-unit-btn rounded-md px-2.5 py-1 font-medium text-muted hover:text-fg cursor-pointer" data-unit="mm">MM</button>
+              <button type="button" class="pk-modal-unit-btn rounded-md px-2.5 py-1 font-medium text-muted hover:text-fg cursor-pointer" data-unit="in">IN</button>
+            </div>
+            <label class="flex items-center gap-1.5 text-[11px] text-muted">
+              <span class="font-semibold">Print DPI:</span>
+              <select
+                id="pk-modal-dpi"
+                aria-label="Print DPI resolution"
+                class="rounded-lg border border-border bg-surface px-2 py-1 text-[11px] font-mono font-semibold text-fg focus:border-accent focus:outline-none cursor-pointer"
+              >
+                <option value="72">72</option>
+                <option value="96">96</option>
+                <option value="150">150</option>
+                <option value="200">200</option>
+                <option value="300" selected>300</option>
+                <option value="600">600</option>
+              </select>
+            </label>
+          </div>
+
           <div class="flex items-center gap-2">
             <div class="flex-1">
-              <span class="block text-[10px] text-muted mb-0.5">Width (px)</span>
+              <span id="pk-modal-w-label" class="block text-[10px] text-muted mb-0.5">Width (px)</span>
               <input
                 id="pk-modal-dim-w"
                 type="number"
-                min="10"
+                min="0.1"
                 max="16000"
+                step="any"
                 placeholder="e.g. 1920"
-                aria-label="Width in pixels"
+                aria-label="Width dimension"
                 class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
               />
             </div>
             <span class="text-muted font-bold mt-3">×</span>
             <div class="flex-1">
-              <span class="block text-[10px] text-muted mb-0.5">Height (px)</span>
+              <span id="pk-modal-h-label" class="block text-[10px] text-muted mb-0.5">Height (px)</span>
               <input
                 id="pk-modal-dim-h"
                 type="number"
-                min="10"
+                min="0.1"
                 max="16000"
+                step="any"
                 placeholder="e.g. 1080"
-                aria-label="Height in pixels"
+                aria-label="Height dimension"
                 class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus:border-accent focus:outline-none"
               />
             </div>
           </div>
+
+          <p id="pk-modal-computed-px" class="hidden text-[11px] font-mono text-accent font-medium"></p>
         </div>
 
         <!-- 4. Fit Strategy & Guardrail -->

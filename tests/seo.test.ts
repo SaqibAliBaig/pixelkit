@@ -7,11 +7,12 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildMeta } from '../src/lib/seo/meta';
 import { SITE } from '../src/lib/constants';
+import { PORTAL_PRESETS } from '../src/lib/portal-presets';
 import { buildIntro, buildFaqs, getTechnicalReference } from '../src/lib/seo/copy';
 import {
   buildBreadcrumbJsonLd,
@@ -20,6 +21,7 @@ import {
   buildToolJsonLd,
   buildBlogPostingJsonLd,
   buildSiteSchemaGraph,
+  buildConnectedGraph,
 } from '../src/lib/seo/jsonld';
 
 interface Combo {
@@ -226,7 +228,7 @@ describe('JSON-LD builders', () => {
     expect(rating.ratingValue).toBe('4.9');
   });
 
-  it('buildToolJsonLd composes 4 JSON-LD objects including HowTo', () => {
+  it('buildToolJsonLd composes SoftwareApplication, FAQPage, and BreadcrumbList without deprecated HowTo', () => {
     const arr = buildToolJsonLd({
       combo: { from: 'heic', to: 'jpg', sizeKb: 50 },
       title: 'T',
@@ -235,13 +237,13 @@ describe('JSON-LD builders', () => {
       url: 'https://example.com/heic-to-jpg-under-50kb',
       breadcrumbs: [{ name: 'Home', url: 'https://example.com/' }],
     });
-    expect(arr.length).toBe(4);
-    expect(arr[0]!['@type']).toBe('SoftwareApplication');
+    expect(arr.length).toBe(3);
+    expect(arr[0]!['@type']).toEqual(['SoftwareApplication', 'WebApplication']);
     expect(arr[1]!['@type']).toBe('FAQPage');
     expect(arr[2]!['@type']).toBe('BreadcrumbList');
-    expect(arr[3]!['@type']).toBe('HowTo');
-    const steps = (arr[3]! as Record<string, unknown>).step as unknown[];
-    expect(steps.length).toBe(3);
+
+
+
   });
 
   it('BlogPosting has headline and dates', () => {
@@ -272,6 +274,65 @@ describe('JSON-LD builders', () => {
     expect(app.name).toBe('PixelKit Image Studio');
     expect(app.operatingSystem).toBe('Any (Web Browser)');
   });
+
+  it('buildConnectedGraph links WebPage to WebSite, Organization, Breadcrumb, and SoftwareApplication via @id', () => {
+    const canonicalUrl = 'https://pixelkit.app/compress-image-to-50kb/';
+    const result = buildConnectedGraph({
+      canonicalUrl,
+      title: 'Compress Image to 50KB Online Free',
+      description: 'Compress image under 50KB privately.',
+      items: [
+        buildSoftwareApplicationJsonLd({
+          name: 'Compress Image to 50KB',
+          description: 'Compress image under 50KB.',
+          url: canonicalUrl,
+        }),
+        buildBreadcrumbJsonLd([
+          { label: 'Home', href: '/' },
+          { label: '50KB' },
+        ]),
+        {
+          '@type': 'HowTo',
+          name: 'Deprecated step',
+        },
+      ],
+    }) as { '@context': string; '@graph': Record<string, unknown>[] };
+
+    expect(result['@context']).toBe('https://schema.org');
+    expect(Array.isArray(result['@graph'])).toBe(true);
+
+    const webpage = result['@graph'].find((item) => item['@type'] === 'WebPage') as Record<string, unknown>;
+    expect(webpage).toBeDefined();
+    expect(webpage['@id']).toBe('https://pixelkit.app/compress-image-to-50kb/#webpage');
+    expect(webpage.isPartOf).toEqual({ '@id': 'https://pixelkit.app/#website' });
+    expect(webpage.publisher).toEqual({ '@id': 'https://pixelkit.app/#organization' });
+    expect(webpage.mainEntity).toEqual({ '@id': 'https://pixelkit.app/compress-image-to-50kb/#app' });
+    expect(webpage.breadcrumb).toEqual({ '@id': 'https://pixelkit.app/compress-image-to-50kb/#breadcrumb' });
+
+    // Ensure deprecated HowTo is purged
+    const howTo = result['@graph'].find((item) => String(item['@type']).includes('HowTo'));
+    expect(howTo).toBeUndefined();
+  });
+
+  it('buildConnectedGraph connects CollectionPage and Blog entities via mainEntity @id', () => {
+    const convertGraph = buildConnectedGraph({
+      canonicalUrl: 'https://pixelkit.app/convert/',
+      title: 'Convert Hub',
+      description: 'Convert formats.',
+      items: [{ '@type': 'CollectionPage', name: 'Convert Hub' }],
+    }) as { '@graph': Record<string, unknown>[] };
+    const convertWebPage = convertGraph['@graph'].find((item) => item['@type'] === 'WebPage') as Record<string, unknown>;
+    expect(convertWebPage.mainEntity).toEqual({ '@id': 'https://pixelkit.app/convert/#collection' });
+
+    const blogGraph = buildConnectedGraph({
+      canonicalUrl: 'https://pixelkit.app/blog/',
+      title: 'Blog Hub',
+      description: 'Guides.',
+      items: [{ '@type': 'Blog', name: 'Blog' }],
+    }) as { '@graph': Record<string, unknown>[] };
+    const blogWebPage = blogGraph['@graph'].find((item) => item['@type'] === 'WebPage') as Record<string, unknown>;
+    expect(blogWebPage.mainEntity).toEqual({ '@id': 'https://pixelkit.app/blog/#blog' });
+  });
 });
 
 describe('technical reference data', () => {
@@ -285,6 +346,56 @@ describe('technical reference data', () => {
         expect(row.sourceValue.length).toBeGreaterThan(0);
         expect(row.targetValue.length).toBeGreaterThan(0);
       }
+    }
+  });
+});
+
+describe('IndexNow and LLM automated synchronization', () => {
+  it('public IndexNow key verification file exists and matches key', () => {
+    const key = 'e2a48f93b1c04d8e95712fa6b301c89e';
+    const keyPath = resolve('public', `${key}.txt`);
+    expect(existsSync(keyPath)).toBe(true);
+    const content = readFileSync(keyPath, 'utf8').trim();
+    expect(content).toBe(key);
+  });
+
+  it('public/llms.txt contains privacy guarantees and official portal presets', () => {
+    const llmsPath = resolve('public/llms.txt');
+    expect(existsSync(llmsPath)).toBe(true);
+    const text = readFileSync(llmsPath, 'utf8');
+    expect(text).toContain('# PixelKit');
+    expect(text).toContain('Zero Server Uploads');
+    expect(text).toContain('Official Government & Consular Exam Presets');
+    expect(text).toContain('https://pixelkit.app/ssc-photo-resizer/');
+    expect(text).toContain('https://pixelkit.app/signature-resizer/');
+  });
+
+  it('public/llms-full.txt contains master requirements matrix and query instructions', () => {
+    const fullPath = resolve('public/llms-full.txt');
+    expect(existsSync(fullPath)).toBe(true);
+    const text = readFileSync(fullPath, 'utf8');
+    expect(text).toContain('Official Portal Requirements Master Matrix');
+    expect(text).toContain('Step-by-Step Instructions for AI Agent Queries');
+    expect(text).toContain('Codec & Processing Engine Specifications');
+  });
+
+  it('every preset in PORTAL_PRESETS has an explicit mapping in generate-llms.mjs and appears in llms.txt', () => {
+    const llmsScript = readFileSync(resolve('scripts/generate-llms.mjs'), 'utf8');
+    const llmsTxt = readFileSync(resolve('public/llms.txt'), 'utf8');
+    for (const preset of PORTAL_PRESETS.filter((p) => p.id !== 'none')) {
+      expect(llmsScript, `Missing PRESET_URL_MAP key '${preset.id}' in generate-llms.mjs`).toContain(`'${preset.id}':`);
+      expect(llmsTxt, `Missing preset '${preset.name}' in public/llms.txt`).toContain(`[${preset.name}]`);
+    }
+  });
+
+  it('every static .astro page in src/pages has a matching OG image in public/og/', () => {
+    const pageEntries = readdirSync(resolve('src/pages'), { withFileTypes: true });
+    for (const entry of pageEntries) {
+      if (!entry.isFile() || !entry.name.endsWith('.astro')) continue;
+      if (entry.name === 'index.astro' || entry.name.includes('[')) continue;
+      const slug = entry.name.replace(/\.astro$/, '');
+      const ogFile = resolve('public/og', `${slug}.png`);
+      expect(existsSync(ogFile), `Missing OG image for /${slug}/ at public/og/${slug}.png`).toBe(true);
     }
   });
 });

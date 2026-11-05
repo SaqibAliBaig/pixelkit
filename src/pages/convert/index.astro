@@ -23,6 +23,8 @@ interface Combo {
 
 const allCombos = combinations.combos as Combo[];
 const plainCombos = allCombos.filter((c) => c.kind === 'convert');
+const WEAK_SOURCES = new Set(['bmp', 'gif', 'tiff', 'avif']);
+const indexedPlainCombos = plainCombos.filter((c) => !WEAK_SOURCES.has(c.from.toLowerCase()));
 
 // Group by "from" for cleaner navigation.
 const byFrom = new Map<string, Combo[]>();
@@ -103,8 +105,8 @@ const jsonLd = [
     url: new URL('/convert/', SITE.url).href,
     mainEntity: {
       '@type': 'ItemList',
-      numberOfItems: plainCombos.length,
-      itemListElement: plainCombos.slice(0, 50).map((c, i) => ({
+      numberOfItems: indexedPlainCombos.length,
+      itemListElement: indexedPlainCombos.map((c, i) => ({
         '@type': 'ListItem',
         position: i + 1,
         name: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} Converter`,
@@ -187,6 +189,18 @@ const jsonLd = [
       </div>
     </div>
 
+    <!-- Smart Tool Suggestions (Shown when query matches a preset, KB target, dimension, DPI, or crop) -->
+    <div id="pk-smart-suggestions" class="hidden mt-8 rounded-2xl border border-accent/30 bg-surface/80 p-5 shadow-sm">
+      <div class="flex items-center justify-between pb-3 border-b border-border/60">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-accent/15 text-accent text-xs">✨</span>
+          <h3 class="text-sm font-semibold text-fg">Recommended Tool &amp; Preset Matches</h3>
+        </div>
+        <span class="text-[11px] text-muted">Pre-configured with requested settings</span>
+      </div>
+      <div id="pk-smart-suggestions-list" class="mt-3 grid gap-2.5 sm:grid-cols-2"></div>
+    </div>
+
     <!-- Zero Results State -->
     <div id="pk-no-results" class="mt-12 hidden rounded-2xl border border-border bg-surface p-12 text-center">
       <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
@@ -221,6 +235,7 @@ const jsonLd = [
                 <li class="pk-converter-item" data-from={c.from.toLowerCase()} data-to={c.to.toLowerCase()} data-query={`${c.from} to ${c.to} ${c.from} ${c.to}`}>
                   <a
                     href={`/${c.from}-to-${c.to}/`}
+                    rel={WEAK_SOURCES.has(c.from.toLowerCase()) ? 'nofollow' : undefined}
                     class="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm text-fg transition-colors hover:bg-bg/60"
                   >
                     <span>
@@ -579,65 +594,35 @@ const jsonLd = [
           </div>
         </div>
       </div>
-
-    
-      <!-- Frequently Converted Workflows -->
-      <div class="mt-8 border-t border-border pt-6">
-        <h4 class="text-sm font-semibold text-fg">
-          High-Demand Conversion Workflows &amp; Technical Tips
-        </h4>
-        <div class="mt-3 grid gap-4 sm:grid-cols-2 text-xs text-muted leading-relaxed">
-          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
-            <h5 class="font-semibold text-fg">iPhone HEIC to JPG for Visa and Exam Uploads</h5>
-            <p class="mt-1">
-              Apple iOS devices capture photos in high-efficiency HEIC files by default. While HEIC offers excellent dynamic range, almost all international consular systems, university portals, and state government verification services immediately fail with unsupported format errors when uploading .heic files. Converting to standardized JPG guarantees 100% acceptance without losing facial sharpness or color fidelity.
-            </p>
-          </div>
-          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
-            <h5 class="font-semibold text-fg">PNG to WebP for Maximum Page Speed</h5>
-            <p class="mt-1">
-              Heavy PNG graphics such as UI wireframes, software screenshots, and transparent brand marks frequently bloat website bundles. Converting to lossy or lossless WebP maintains complete transparent alpha channel cutouts and crisp vector typography while reducing HTTP payload weight by an average of 35% to 45%, directly improving Core Web Vitals LCP benchmarks.
-            </p>
-          </div>
-          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
-            <h5 class="font-semibold text-fg">SVG to Raster PNG for Print &amp; Legacy Platforms</h5>
-            <p class="mt-1">
-              Scalable Vector Graphics (SVG) scale infinitely in modern browsers, but email marketing clients, document processors, and social media platforms require raster bitmap images. PixelKit's SVG converter allows you to specify custom scale multipliers (1x, 2x, 4x) to render ultra-sharp high-DPI Retina PNG or JPG assets with crystal-clear edges.
-            </p>
-          </div>
-          <div class="rounded-xl border border-border/60 bg-bg/40 p-4">
-            <h5 class="font-semibold text-fg">PDF Page Extraction &amp; Archival Image Packaging</h5>
-            <p class="mt-1">
-              Extract high-resolution raster images from multi-page PDF documents without installing bloated desktop software or compromising confidential financial or medical reports. PixelKit decodes individual PDF pages at full 300 DPI clarity directly in your local browser sandbox, preserving crisp document legibility for official re-use.
-            </p>
-          </div>
-        </div>
-      </div>
-
     </section>
 
     <div class="mt-12 sm:mt-16"><FAQSection faqs={convertFaqs} heading="Image Conversion Frequently Asked Questions" /></div>
   </div>
 
-  <script is:inline>
-    (function () {
-      const searchInput = document.getElementById('pk-search-conversions');
+  <script>
+    import { searchTools } from '../../lib/tool-search';
+
+    (() => {
+      const searchInput = document.getElementById('pk-search-conversions') as HTMLInputElement | null;
       const searchCount = document.getElementById('pk-search-count');
       const noResults = document.getElementById('pk-no-results');
       const queryDisplay = document.getElementById('pk-query-display');
       const resetBtn = document.getElementById('pk-reset-search');
-      const sections = document.querySelectorAll('.pk-from-section');
-      const items = document.querySelectorAll('.pk-converter-item');
-      const quickFilters = document.querySelectorAll('.pk-quick-filter');
+      const suggestionsBox = document.getElementById('pk-smart-suggestions');
+      const suggestionsList = document.getElementById('pk-smart-suggestions-list');
+      const sections = document.querySelectorAll<HTMLElement>('.pk-from-section');
+      const items = document.querySelectorAll<HTMLElement>('.pk-converter-item');
+      const quickFilters = document.querySelectorAll<HTMLElement>('.pk-quick-filter');
       const totalCount = items.length;
 
-      function filter(q) {
-        const query = q.trim().toLowerCase();
+      function filter(q: string) {
+        const query = q.trim();
+        const lowerQ = query.toLowerCase();
         let matchedCount = 0;
 
         sections.forEach((sec) => {
           let secMatched = 0;
-          const secItems = sec.querySelectorAll('.pk-converter-item');
+          const secItems = sec.querySelectorAll<HTMLElement>('.pk-converter-item');
 
           secItems.forEach((item) => {
             const dataQuery = (item.getAttribute('data-query') || '').toLowerCase();
@@ -646,11 +631,11 @@ const jsonLd = [
             const comboText = `${from} to ${to}`;
 
             const isMatch =
-              !query ||
-              dataQuery.includes(query) ||
-              comboText.includes(query) ||
-              from.includes(query) ||
-              to.includes(query);
+              !lowerQ ||
+              dataQuery.includes(lowerQ) ||
+              comboText.includes(lowerQ) ||
+              from.includes(lowerQ) ||
+              to.includes(lowerQ);
 
             if (isMatch) {
               item.classList.remove('hidden');
@@ -664,14 +649,50 @@ const jsonLd = [
           sec.classList.toggle('hidden', secMatched === 0);
         });
 
+        // Smart suggestions from searchTools
+        let smartMatchesCount = 0;
+        if (query && suggestionsBox && suggestionsList) {
+          const smartResults = searchTools(query).slice(0, 4);
+          smartMatchesCount = smartResults.length;
+          if (smartResults.length > 0) {
+            suggestionsList.innerHTML = '';
+            smartResults.forEach((res) => {
+              const card = document.createElement('a');
+              card.href = res.href;
+              card.className = 'group flex items-center justify-between gap-3 rounded-xl border border-border bg-bg/80 p-3 transition-all hover:border-accent/40 hover:bg-surface';
+              card.innerHTML = `
+                <div class="min-w-0">
+                  <div class="font-semibold text-xs sm:text-sm text-fg group-hover:text-accent transition-colors">${res.title}</div>
+                  <div class="text-[11px] text-muted truncate mt-0.5">${res.subtitle}</div>
+                </div>
+                <span class="shrink-0 rounded-md font-mono text-[10px] font-bold px-2 py-0.5 bg-accent/10 border border-accent/20 text-accent uppercase">
+                  ${res.badge}
+                </span>
+              `;
+              suggestionsList.appendChild(card);
+            });
+            suggestionsBox.classList.remove('hidden');
+          } else {
+            suggestionsBox.classList.add('hidden');
+          }
+        } else if (suggestionsBox) {
+          suggestionsBox.classList.add('hidden');
+        }
+
         if (searchCount) {
-          searchCount.textContent = query
-            ? `Showing ${matchedCount} of ${totalCount} converters`
-            : `Showing all ${totalCount} converters`;
+          if (!query) {
+            searchCount.textContent = `Showing all ${totalCount} converters`;
+          } else if (matchedCount > 0) {
+            searchCount.textContent = `Showing ${matchedCount} of ${totalCount} converters`;
+          } else if (smartMatchesCount > 0) {
+            searchCount.textContent = `Found ${smartMatchesCount} recommended tool${smartMatchesCount > 1 ? 's' : ''}`;
+          } else {
+            searchCount.textContent = `0 converters found`;
+          }
         }
 
         if (noResults && queryDisplay) {
-          if (matchedCount === 0 && query) {
+          if (matchedCount === 0 && smartMatchesCount === 0 && query) {
             queryDisplay.textContent = q;
             noResults.classList.remove('hidden');
           } else {
@@ -691,7 +712,7 @@ const jsonLd = [
       } catch (_) {}
 
       searchInput?.addEventListener('input', (e) => {
-        filter(e.target.value);
+        filter((e.target as HTMLInputElement).value);
       });
 
       quickFilters.forEach((btn) => {
@@ -718,11 +739,11 @@ const jsonLd = [
           e.preventDefault();
           searchInput?.focus();
         } else if (e.key === 'Escape' && document.activeElement === searchInput) {
-          if (searchInput.value) {
+          if (searchInput && searchInput.value) {
             searchInput.value = '';
             filter('');
           } else {
-            searchInput.blur();
+            searchInput?.blur();
           }
         }
       });

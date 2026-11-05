@@ -49,6 +49,6 @@ export function mimeForExtension(ext: string): string | undefined {
 export function buildFilename(originalName: string, toExt: string): string {
   const dot = originalName.lastIndexOf('.');
   const base = dot >= 0 ? originalName.slice(0, dot) : originalName;
-  const normalized = toExt.toLowerCase() === 'jpeg' ? 'jpg' : toExt.toLowerCase();
+  const normalized = toExt.toLowerCase();
   return `${base}.${normalized}`;
 }

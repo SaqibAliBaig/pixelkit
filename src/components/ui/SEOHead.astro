@@ -24,8 +24,9 @@ const {
   publishedAt,
   updatedAt,
   author = SITE.author,
-  keywords = SITE.keywords,
+  keywords: _keywords = SITE.keywords,
 } = Astro.props;
+void _keywords;
 
 const siteSuffix = ` — ${SITE.name}`;
 const fullTitle = title.includes(SITE.name)
@@ -38,9 +39,6 @@ const fullTitle = title.includes(SITE.name)
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-{keywords && (
-  <meta name="keywords" content={Array.isArray(keywords) ? keywords.join(', ') : keywords} />
-)}
 {!noindex && <link rel="canonical" href={canonical} />}
 <meta name="author" content={author} />
 <meta name="publisher" content={SITE.name} />
@@ -66,7 +64,7 @@ const fullTitle = title.includes(SITE.name)
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:type" content={type} />
-<meta property="og:url" content={canonical} />
+{!noindex && <meta property="og:url" content={canonical} />}
 <meta property="og:image" content={image} />
 <meta property="og:image:secure_url" content={image} />
 <meta property="og:image:type" content="image/png" />

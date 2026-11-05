@@ -1,0 +1,205 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import DimensionCalculator from '@components/converter/DimensionCalculator.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Image Tools",
+    "href": "/image-resizer-in-cm/"
+  },
+  {
+    "label": "CM to Pixels at 300 DPI"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why 300 DPI for printing photos and documents?",
+    "a": "At a normal reading distance of 12 to 15 inches, the human eye cannot distinguish individual dots exceeding 300 DPI. It produces photographic continuous-tone quality without visible pixels."
+  }
+];
+
+const pageTitle = 'CM to Pixels at 300 DPI Calculator & Resizer';
+const pageDesc = 'Convert centimeters to pixels at 300 DPI print resolution. Instant calculation table for 3.5x4.5cm, 2x2 inch and A4 with 1-click image resizing.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit CM to Pixels at 300 DPI Calculator',
+    description: pageDesc,
+    url: new URL('/cm-to-pixels-at-300-dpi/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>300 DPI Exact Pixel Calculator & Converter</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        CM to Pixels at 300 DPI Calculator
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Find exact pixel dimensions for any centimeter or millimeter measurement at 300 DPI. Pre-calibrated for passport, visa, and document printing standards.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="CM to Pixels Formula at 300 DPI (2026 Direct Answer)"
+      summaryText="At 300 DPI (dots per inch), the conversion formula is: Pixels = (Centimeters × 300) ÷ 2.54. Each centimeter contains exactly 118.1102 pixels. Multiplying any centimeter measurement by 118.11 gives the exact pixel dimension required for crystal-clear 300 DPI printing."
+      portalName="International Print & Digital Photography Standard"
+      specs={[{"label":"Multiplier","value":"1 cm = 118.11 pixels (@ 300 DPI)","highlight":true},{"label":"3.5 × 4.5 cm","value":"413 × 531 pixels","highlight":true},{"label":"5.0 × 5.0 cm","value":"591 × 591 pixels"},{"label":"A4 (21×29.7 cm)","value":"2480 × 3508 pixels"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <DimensionCalculator mode="cm-to-px" defaultDpi={300} />
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="resize"
+        initialUnit="cm"
+        initialWidth={3.5}
+        initialHeight={4.5}
+        initialDpi={300}
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Centimeter to Pixel Conversion Table at 300 DPI
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Precise pixel calculations for common international photo and paper dimensions:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Centimeters (CM)</th>
+              <th class="py-3 px-4">Millimeters (MM)</th>
+              <th class="py-3 px-4">Inches</th>
+              <th class="py-3 px-4">Exact Pixels at 300 DPI</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">3.5 × 4.5 cm</td>
+              <td class="py-3 px-4 text-muted">35 × 45 mm</td>
+              <td class="py-3 px-4 text-muted">1.38 × 1.77 in</td>
+              <td class="py-3 px-4 text-muted">413 × 531 pixels</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">5.0 × 5.0 cm</td>
+              <td class="py-3 px-4 text-muted">50 × 50 mm</td>
+              <td class="py-3 px-4 text-muted">1.97 × 1.97 in</td>
+              <td class="py-3 px-4 text-muted">591 × 591 pixels</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">5.08 × 5.08 cm</td>
+              <td class="py-3 px-4 text-muted">50.8 × 50.8 mm</td>
+              <td class="py-3 px-4 text-muted">2.0 × 2.0 in</td>
+              <td class="py-3 px-4 text-muted">600 × 600 pixels</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">5.0 × 7.0 cm</td>
+              <td class="py-3 px-4 text-muted">50 × 70 mm</td>
+              <td class="py-3 px-4 text-muted">1.97 × 2.76 in</td>
+              <td class="py-3 px-4 text-muted">591 × 827 pixels</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">10.0 × 15.0 cm</td>
+              <td class="py-3 px-4 text-muted">100 × 150 mm</td>
+              <td class="py-3 px-4 text-muted">3.94 × 5.91 in</td>
+              <td class="py-3 px-4 text-muted">1181 × 1772 pixels</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">21.0 × 29.7 cm</td>
+              <td class="py-3 px-4 text-muted">210 × 297 mm</td>
+              <td class="py-3 px-4 text-muted">8.27 × 11.69 in</td>
+              <td class="py-3 px-4 text-muted">2480 × 3508 pixels</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">More Unit Calculators &amp; Resizers:</span>
+        <a href="/mm-to-pixels-converter/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">MM to Pixels Converter</a>
+        <a href="/inches-to-pixels-converter/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Inches to Pixels Converter</a>
+        <a href="/pixels-to-cm-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to CM</a>
+        <a href="/pixels-to-mm-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to MM</a>
+        <a href="/pixels-to-inches-converter/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to Inches</a>
+        <a href="/image-resizer-in-cm/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in CM</a>
+        <a href="/image-resizer-in-mm/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in MM</a>
+        <a href="/image-resizer-in-inches/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in Inches</a>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

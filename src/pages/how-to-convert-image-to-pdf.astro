@@ -59,9 +59,9 @@ const directAnswer = {
   ],
 };
 
-const pageTitle = `How to Convert Image to PDF for Free (Windows, Mac, iPhone) | ${SITE.name}`;
+const pageTitle = `How to Convert Image to PDF Free (Step-by-Step) | ${SITE.name}`;
 const pageDesc =
-  'Learn how to convert images to PDF for free on Windows, Mac, iPhone, and Android. Convert JPG, PNG, and HEIC to single or multi-page PDFs with zero watermarks and 100% privacy.';
+  'Learn how to convert images to PDF free on Windows, Mac, and iPhone. Convert JPG, PNG, and HEIC to PDFs with zero watermarks and 100% in-browser privacy.';
 const pageKeywords = [
   'how to convert image to pdf',
   'how to convert image to pdf for free',
@@ -117,21 +117,21 @@ const jsonLd = [
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
-  <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumbs Navigation -->
     <Breadcrumbs items={breadcrumbs} class="mb-6" />
 
     <!-- Hero Header -->
     <header class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <Badge variant="primary">Comprehensive Step-by-Step Guide</Badge>
-        <Badge variant="outline">Cross-Platform · 100% Free</Badge>
+        <Badge variant="accent">Comprehensive Step-by-Step Guide</Badge>
+        <Badge variant="default">Cross-Platform · 100% Free</Badge>
       </div>
 
-      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-foreground mb-4">
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-fg mb-4">
         How to Convert Image to PDF for Free
       </h1>
-      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed">
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
         Whether you are on Windows, macOS, iPhone, or Android, convert JPG, PNG, and HEIC pictures into clean, professional PDF documents without downloading desktop software, paying subscriptions, or risking your private files.
       </p>
     </header>
@@ -141,6 +141,8 @@ const jsonLd = [
       <ToolPreview
         from="jpg"
         to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
         initialTool="convert"
       />
     </section>
@@ -157,13 +159,13 @@ const jsonLd = [
     <!-- Platform by Platform Step-by-Step Instructions -->
     <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
       <section class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-        <h2 class="text-xl sm:text-2xl font-bold text-foreground mb-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-fg mb-4">
           Method 1: The Fastest Cross-Platform Method (PixelKit In-Browser)
         </h2>
-        <p class="text-muted-foreground leading-relaxed mb-4">
+        <p class="text-muted leading-relaxed mb-4">
           The easiest method across all devices—including Chromebooks, Windows PCs, Macs, and smartphones—is PixelKit. It requires zero software installation and operates 100% inside your browser memory:
         </p>
-        <ol class="list-decimal list-inside space-y-2 text-muted-foreground mb-4">
+        <ol class="list-decimal list-inside space-y-2 text-muted mb-4">
           <li><strong>Drop your photos:</strong> Select one or dozens of JPG, PNG, WebP, or iPhone HEIC photos into the tool workspace above.</li>
           <li><strong>Reorder pages:</strong> Drag thumbnails left and right to set the exact page sequence for your final document.</li>
           <li><strong>Adjust layout:</strong> Pick page orientation (Portrait or Landscape) and margins (No Margin, Small, or Standard).</li>
@@ -175,16 +177,16 @@ const jsonLd = [
       <!-- Multi-Platform Grid -->
       <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             🪟
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">
+          <h3 class="text-lg font-bold text-fg mb-2">
             Method 2: Built-in on Windows 10 & 11
           </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p class="text-sm text-muted leading-relaxed mb-3">
             Windows includes a native virtual printer named <strong>Microsoft Print to PDF</strong>:
           </p>
-          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+          <ul class="list-disc list-inside text-sm text-muted space-y-1.5">
             <li>Open the image in the Windows <strong>Photos</strong> app.</li>
             <li>Press <kbd class="px-1.5 py-0.5 rounded bg-surface border border-border text-xs font-mono">Ctrl + P</kbd> or click the printer icon.</li>
             <li>Under <strong>Printer</strong>, choose <em>Microsoft Print to PDF</em>.</li>
@@ -193,16 +195,16 @@ const jsonLd = [
         </div>
 
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             🍎
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">
+          <h3 class="text-lg font-bold text-fg mb-2">
             Method 3: Built-in on macOS (Preview)
           </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p class="text-sm text-muted leading-relaxed mb-3">
             macOS includes an industrial-grade PDF engine right inside Apple Preview:
           </p>
-          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+          <ul class="list-disc list-inside text-sm text-muted space-y-1.5">
             <li>Select multiple images in <strong>Finder</strong>, right-click and choose <em>Open With &gt; Preview</em>.</li>
             <li>In the Preview sidebar, drag thumbnails to set the page order.</li>
             <li>Click <strong>File &gt; Export as PDF...</strong> in the top menu bar.</li>
@@ -211,16 +213,16 @@ const jsonLd = [
         </div>
 
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             📱
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">
+          <h3 class="text-lg font-bold text-fg mb-2">
             Method 4: On iPhone and iPad (iOS)
           </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p class="text-sm text-muted leading-relaxed mb-3">
             Convert photos directly inside the Apple Photos app using the hidden pinch gesture:
           </p>
-          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+          <ul class="list-disc list-inside text-sm text-muted space-y-1.5">
             <li>Open the <strong>Photos</strong> app and select your picture(s).</li>
             <li>Tap the <strong>Share</strong> button and choose <strong>Print</strong>.</li>
             <li>On the print preview page, <strong>pinch outward</strong> with two fingers on the photo thumbnail.</li>
@@ -229,16 +231,16 @@ const jsonLd = [
         </div>
 
         <div class="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
-          <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4">
+          <div class="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold text-lg mb-4">
             🤖
           </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">
+          <h3 class="text-lg font-bold text-fg mb-2">
             Method 5: On Android Devices
           </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+          <p class="text-sm text-muted leading-relaxed mb-3">
             Convert camera photos using Google Photos or Android's system print spooler:
           </p>
-          <ul class="list-disc list-inside text-sm text-muted-foreground space-y-1.5">
+          <ul class="list-disc list-inside text-sm text-muted space-y-1.5">
             <li>Open the picture in <strong>Google Photos</strong>.</li>
             <li>Tap the three vertical dots (menu) in the top-right corner.</li>
             <li>Swipe across the options and tap <strong>Print</strong>.</li>
@@ -249,55 +251,52 @@ const jsonLd = [
 
       <!-- Security Advisory -->
       <section class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-8">
-        <h3 class="text-lg font-bold text-foreground mb-2">
+        <h3 class="text-lg font-bold text-fg mb-2">
           Security Warning: Why You Should Avoid Cloud PDF Uploaders
         </h3>
-        <p class="text-sm text-muted-foreground leading-relaxed mb-3">
+        <p class="text-sm text-muted leading-relaxed mb-3">
           When converting documents like tax statements, university transcripts, employment contracts, or identity cards (Aadhaar, Passport, SSN), uploading your files to third-party cloud servers poses severe identity theft risks. Cloud conversion companies routinely store files on remote AWS/GCP buckets, analyze metadata, and may expose your sensitive information to data breaches.
         </p>
-        <p class="text-sm text-muted-foreground leading-relaxed">
+        <p class="text-sm text-muted leading-relaxed">
           PixelKit eliminates this danger completely. By executing WebAssembly algorithms directly inside your web browser, our tool processes 100% of your images in local RAM memory. No files are ever uploaded or transmitted across the internet.
         </p>
       </section>
 
       <!-- Frequently Asked Questions -->
       <section>
-        <h2 class="text-2xl sm:text-3xl font-bold text-foreground mb-6">
-          Frequently Asked Questions About Converting Images to PDF
-        </h2>
-        <FAQSection faqs={faqs} />
+        <FAQSection faqs={faqs} heading="Frequently Asked Questions About Converting Images to PDF" />
       </section>
 
       <!-- Internal Linking Hub -->
       <section class="border-t border-border/80 pt-8 mt-12">
-        <h3 class="text-lg font-bold text-foreground mb-4">Related PDF and Image Tools</h3>
+        <h3 class="text-lg font-bold text-fg mb-4">Related PDF and Image Tools</h3>
         <div class="flex flex-wrap gap-2 text-sm">
-          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/image-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Image to PDF Converter
           </a>
-          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/photo-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Photo to PDF
           </a>
-          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/heic-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             HEIC to PDF
           </a>
-          <a href="/image-to-pdf-200kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/image-to-pdf-200kb/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Image to PDF 200KB
           </a>
-          <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Photo to PDF on iPhone Guide
           </a>
-          <a href="/how-to-convert-heic-to-jpg-on-windows/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/how-to-convert-heic-to-jpg-on-windows/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             HEIC to JPG on Windows
           </a>
-          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/merge-jpg-to-pdf/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             Merge JPG to PDF
           </a>
-          <a href="/jpg-to-jpeg/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-foreground transition-colors">
+          <a href="/jpg-to-jpeg/" class="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface/80 border border-border text-fg transition-colors">
             JPG to JPEG Converter
           </a>
         </div>
       </section>
     </article>
-  </main>
+  </div>
 </BaseLayout>

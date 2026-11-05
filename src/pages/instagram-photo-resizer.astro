@@ -1,0 +1,205 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Social Presets', href: '/social-media-image-resizer/' },
+  { label: 'Instagram Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What is the best resolution for Instagram square photos and posts?',
+    a: 'The optimal resolution for standard Instagram square feed posts is 1080 × 1080 pixels (1:1 aspect ratio). Instagram displays photos at up to 1080 px wide; uploading photos wider than 1080 px triggers aggressive Instagram re-compression that can blur details. PixelKit scales your photo to crisp 1080 × 1080 px.',
+  },
+  {
+    q: 'What size should my Instagram profile picture (DP) be?',
+    a: 'Instagram profile pictures display at 110 × 110 pixels on mobile phones and 320 × 320 pixels on desktop browsers. For optimal sharpness on Retina screens, upload at 1080 × 1080 px (1:1 square). Keep important facial elements centered because Instagram crops the profile picture into a circle.',
+  },
+  {
+    q: 'Why does Instagram compress and ruin photo quality?',
+    a: 'Instagram automatically compresses photos over 1 MB or non-standard aspect ratios using aggressive compression algorithms. By pre-optimizing your photo with PixelKit to 1080 × 1080 px and strictly under 1,000 KB, you bypass Instagram severe re-compression and preserve vibrant colors.',
+  },
+  {
+    q: 'Can I resize portrait or landscape images to Instagram 1:1 without cropping out edges?',
+    a: 'Yes. In PixelKit Crop Studio, you can frame a 1:1 square crop or scale the image with white background letterboxing so the entire photo fits within the 1080 × 1080 square.',
+  },
+];
+
+const pageTitle = `Instagram Photo Resizer — 1080×1080 Post & DP | ${SITE.name}`;
+const pageDesc =
+  'Crop and resize photos for Instagram posts, feed, and profile pictures (DP) to 1080x1080 px square and under 1MB JPG with zero quality compression loss.';
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize photo for Instagram post and DP online',
+  description:
+    'Instructions to crop to 1:1 square, scale to 1080x1080 pixels, and compress under 1MB for Instagram.',
+  steps: [
+    {
+      name: 'Upload photo',
+      text: 'Drop any photo (JPG, PNG, WebP, or Apple HEIC) into PixelKit.',
+    },
+    {
+      name: 'Select Instagram 1:1 Square Preset',
+      text: 'PixelKit automatically locks the 1:1 square aspect ratio and targets 1080 × 1080 pixels.',
+    },
+    {
+      name: 'Optimize file size under 1MB',
+      text: 'PixelKit tunes JPEG compression under 1000 KB to prevent Instagram aggressive server-side compression.',
+    },
+    {
+      name: 'Download Instagram-ready image',
+      text: 'Download the high-definition picture ready for immediate publishing to your feed or profile.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Instagram Photo Resizer & Cropper',
+    description: pageDesc,
+    url: new URL('/instagram-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Instagram Feed · Square Post · Profile Picture (DP) · Meta</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Instagram Photo Resizer &amp; Cropper
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to 1:1 square (1080 × 1080 px), optimize colors, and compress under 1 MB JPG to stop Instagram from ruining your picture quality.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Instagram Photo Size & Aspect Guidelines (2026 Direct Answer)"
+      summaryText="Instagram standard square posts and profile pictures require a 1:1 aspect ratio with an optimal resolution of 1080 × 1080 pixels. Uploading images wider than 1080 px or heavier than 1 MB causes Instagram to downscale and heavily compress your picture. Keeping dimensions at exactly 1080 × 1080 px under 1000 KB ensures optimal clarity on high-density Retina displays."
+      portalName="Instagram Feed & Profile Guidelines (Meta)"
+      specs={[
+        { label: 'Standard Dimensions', value: '1080 × 1080 pixels', highlight: true },
+        { label: 'Aspect Ratio', value: '1:1 Square', highlight: true },
+        { label: 'Target File Size', value: 'Under 1.0 MB (1,000 KB)' },
+        { label: 'Accepted Formats', value: 'JPG / PNG' },
+        { label: 'Profile DP Display', value: 'Circular mask preview' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={1000}
+        initialTool="passport"
+        preset="social-instagram-post"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Instagram Image Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Official recommendations from Meta for Instagram feed, stories, and profile media:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Post Type</th>
+              <th class="py-3 px-4">Ideal Dimensions</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4">Recommended Size</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Square Feed Post</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1080 × 1080 px</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Square</td>
+              <td class="py-3.5 px-4 text-muted">Under 1.0 MB</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Profile Picture (DP)</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1080 × 1080 px (Display 320×320)</td>
+              <td class="py-3.5 px-4 text-muted">1:1 (Circular crop)</td>
+              <td class="py-3.5 px-4 text-muted">Under 500 KB</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Portrait Feed Post</td>
+              <td class="py-3.5 px-4 text-muted">1080 × 1350 px</td>
+              <td class="py-3.5 px-4 text-muted">4:5 Vertical</td>
+              <td class="py-3.5 px-4 text-muted">Under 1.5 MB</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Instagram Story / Reel</td>
+              <td class="py-3.5 px-4 text-muted">1080 × 1920 px</td>
+              <td class="py-3.5 px-4 text-muted">9:16 Fullscreen</td>
+              <td class="py-3.5 px-4 text-muted">Under 2.0 MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+
+    <!-- Related Social Media Resizers -->
+    <section class="mt-12 border-t border-border/80 pt-8">
+      <h2 class="text-base sm:text-lg font-bold text-fg mb-3">Related Social Media Image Tools</h2>
+      <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <a href="/social-media-image-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Social Media Image Resizer Hub</a>
+        <a href="/facebook-cover-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Facebook Cover Photo Resizer</a>
+        <a href="/twitter-header-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Twitter / X Header Resizer</a>
+        <a href="/linkedin-banner-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">LinkedIn Banner Resizer</a>
+        <a href="/youtube-thumbnail-compressor-under-2mb/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">YouTube Thumbnail Under 2MB</a>
+        <a href="/whatsapp-dp-cropper/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">WhatsApp DP Cropper</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

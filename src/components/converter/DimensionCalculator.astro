@@ -1,0 +1,556 @@
+---
+interface Props {
+  mode?: 'px-to-cm' | 'cm-to-px';
+  defaultUnit?: 'cm' | 'mm' | 'in';
+  defaultDpi?: number;
+}
+
+const { mode = 'px-to-cm', defaultUnit = 'cm', defaultDpi = 300 } = Astro.props;
+const isPxToPhys = mode === 'px-to-cm';
+
+const initialW = isPxToPhys
+  ? defaultUnit === 'in'
+    ? 600
+    : 413
+  : defaultUnit === 'mm'
+  ? 35
+  : defaultUnit === 'in'
+  ? 2
+  : 3.5;
+const initialH = isPxToPhys
+  ? defaultUnit === 'in'
+    ? 600
+    : 531
+  : defaultUnit === 'mm'
+  ? 45
+  : defaultUnit === 'in'
+  ? 2
+  : 4.5;
+const initialStep = isPxToPhys ? '1' : defaultUnit === 'mm' ? '0.1' : '0.01';
+const initialUnitLabel = isPxToPhys ? 'px' : defaultUnit;
+
+const dpiOptions = [72, 96, 150, 200, 300, 600];
+
+const presets = [
+  { label: 'Passport (3.5×4.5 cm)', cmW: 3.5, cmH: 4.5, pxW: 413, pxH: 531, dpi: 300, unit: 'cm' },
+  { label: 'US Visa (2×2 in)', cmW: 5.08, cmH: 5.08, pxW: 600, pxH: 600, dpi: 300, unit: 'in' },
+  { label: 'Schengen (35×45 mm)', cmW: 3.5, cmH: 4.5, pxW: 413, pxH: 531, dpi: 300, unit: 'mm' },
+  { label: 'Signature (4×2 cm)', cmW: 4.0, cmH: 2.0, pxW: 472, pxH: 236, dpi: 300, unit: 'cm' },
+  { label: 'PAN Card (200 DPI)', cmW: 2.5, cmH: 3.5, pxW: 197, pxH: 276, dpi: 200, unit: 'cm' },
+  { label: '4×6 Postcard', cmW: 10.16, cmH: 15.24, pxW: 1200, pxH: 1800, dpi: 300, unit: 'in' },
+  { label: 'A4 Print (21×29.7 cm)', cmW: 21.0, cmH: 29.7, pxW: 2480, pxH: 3508, dpi: 300, unit: 'cm' },
+];
+---
+
+<section
+  id="pk-dim-calculator"
+  data-initial-dir={isPxToPhys ? 'px-to-phys' : 'phys-to-px'}
+  data-initial-unit={defaultUnit}
+  data-initial-dpi={defaultDpi}
+  aria-label="Interactive Pixel and Centimeter Calculator"
+  class="rounded-2xl sm:rounded-3xl border border-border/80 bg-surface p-4 sm:p-6 shadow-sm mb-6"
+>
+  <!-- Top Controls: Direction Switcher + Physical Unit Switcher -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/60">
+    <div class="inline-flex rounded-xl border border-border bg-bg/60 p-1 text-xs font-semibold">
+      <button
+        type="button"
+        data-calc-dir="px-to-phys"
+        class={`pk-calc-dir-btn flex-1 sm:flex-initial rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
+          isPxToPhys ? 'bg-surface text-fg shadow-xs border border-border/60' : 'text-muted hover:text-fg'
+        }`}
+      >
+        Pixels → CM / MM / IN
+      </button>
+      <button
+        type="button"
+        data-calc-dir="phys-to-px"
+        class={`pk-calc-dir-btn flex-1 sm:flex-initial rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
+          !isPxToPhys ? 'bg-surface text-fg shadow-xs border border-border/60' : 'text-muted hover:text-fg'
+        }`}
+      >
+        CM / MM / IN → Pixels
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-[11px] font-medium text-muted">Physical unit:</span>
+      <div class="inline-flex rounded-lg border border-border bg-bg/60 p-0.5 text-[11px] font-semibold">
+        {(['cm', 'mm', 'in'] as const).map((u) => (
+          <button
+            type="button"
+            data-calc-unit={u}
+            class={`pk-calc-unit-btn rounded-md px-2.5 py-1 uppercase transition-all cursor-pointer ${
+              u === defaultUnit ? 'bg-accent text-accent-fg shadow-2xs' : 'text-muted hover:text-fg'
+            }`}
+          >
+            {u}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Inputs Grid: Width, Swap, Height, Print DPI -->
+  <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr_1.15fr] items-end">
+    <div>
+      <label for="pk-calc-w" class="block text-xs font-semibold text-fg mb-1">
+        Width (<span id="pk-calc-w-unit">{initialUnitLabel}</span>)
+      </label>
+      <input
+        id="pk-calc-w"
+        type="number"
+        min="0.01"
+        max="50000"
+        step={initialStep}
+        value={initialW}
+        class="w-full rounded-xl border border-border bg-bg/50 px-3.5 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+      />
+    </div>
+
+    <div class="flex justify-center sm:pb-1">
+      <button
+        id="pk-calc-swap"
+        type="button"
+        title="Swap Width and Height"
+        aria-label="Swap Width and Height"
+        class="inline-flex items-center justify-center rounded-xl border border-border bg-bg/60 p-2.5 text-muted hover:border-accent hover:text-accent transition-colors cursor-pointer"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="17 1 21 5 17 9"></polyline>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+          <polyline points="7 23 3 19 7 15"></polyline>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div>
+      <label for="pk-calc-h" class="block text-xs font-semibold text-fg mb-1">
+        Height (<span id="pk-calc-h-unit">{initialUnitLabel}</span>)
+      </label>
+      <input
+        id="pk-calc-h"
+        type="number"
+        min="0.01"
+        max="50000"
+        step={initialStep}
+        value={initialH}
+        class="w-full rounded-xl border border-border bg-bg/50 px-3.5 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <label for="pk-calc-dpi-input" class="text-xs font-semibold text-fg">
+          Resolution (DPI)
+        </label>
+        <span class="text-[10px] font-medium text-muted">Standard print = 300</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <input
+          id="pk-calc-dpi-input"
+          type="number"
+          min="10"
+          max="2400"
+          step="1"
+          value={defaultDpi}
+          class="w-24 shrink-0 rounded-xl border border-border bg-bg/50 px-3 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+        />
+        <div class="flex flex-wrap gap-1">
+          {dpiOptions.map((d) => (
+            <button
+              type="button"
+              data-calc-dpi={d}
+              class={`pk-calc-dpi-btn rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold transition-colors cursor-pointer ${
+                d === defaultDpi
+                  ? 'border-accent bg-accent/15 text-accent'
+                  : 'border-border bg-bg/50 text-muted hover:border-accent/40 hover:text-fg'
+              }`}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Official Presets -->
+  <div class="mt-3.5 flex flex-wrap items-center gap-1.5">
+    <span class="text-[11px] font-medium text-muted mr-1">Quick standards:</span>
+    {presets.map((p) => (
+      <button
+        type="button"
+        data-cm-w={p.cmW}
+        data-cm-h={p.cmH}
+        data-px-w={p.pxW}
+        data-px-h={p.pxH}
+        data-dpi={p.dpi}
+        data-unit={p.unit}
+        class="pk-calc-preset-btn rounded-lg border border-border/80 bg-bg/50 px-2.5 py-1 text-[11px] font-medium text-fg hover:border-accent hover:text-accent transition-colors cursor-pointer"
+      >
+        {p.label}
+      </button>
+    ))}
+  </div>
+
+  <!-- 4 Live Equivalent Result Readout Cards -->
+  <div class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+    <div id="pk-calc-card-px" class={`rounded-xl border p-3 transition-colors ${!isPxToPhys ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+      <div class="flex items-center justify-between gap-1">
+        <span class="text-[11px] font-semibold text-muted">Pixels (px)</span>
+        <button type="button" data-copy-target="px" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+      </div>
+      <p id="pk-calc-out-px" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">413 × 531 px</p>
+      <p id="pk-calc-sub-px" class="mt-0.5 text-[10px] text-muted">0.22 MP @ 300 DPI</p>
+    </div>
+
+    <div id="pk-calc-card-cm" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'cm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+      <div class="flex items-center justify-between gap-1">
+        <span class="text-[11px] font-semibold text-muted">Centimeters (cm)</span>
+        <button type="button" data-copy-target="cm" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+      </div>
+      <p id="pk-calc-out-cm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">3.5 × 4.5 cm</p>
+      <p id="pk-calc-sub-cm" class="mt-0.5 text-[10px] text-muted">1 cm = 118.11 px</p>
+    </div>
+
+    <div id="pk-calc-card-mm" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'mm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+      <div class="flex items-center justify-between gap-1">
+        <span class="text-[11px] font-semibold text-muted">Millimeters (mm)</span>
+        <button type="button" data-copy-target="mm" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+      </div>
+      <p id="pk-calc-out-mm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">35 × 45 mm</p>
+      <p id="pk-calc-sub-mm" class="mt-0.5 text-[10px] text-muted">1 mm = 11.81 px</p>
+    </div>
+
+    <div id="pk-calc-card-in" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'in' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+      <div class="flex items-center justify-between gap-1">
+        <span class="text-[11px] font-semibold text-muted">Inches (in)</span>
+        <button type="button" data-copy-target="in" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+      </div>
+      <p id="pk-calc-out-in" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">1.38 × 1.77 in</p>
+      <p id="pk-calc-sub-in" class="mt-0.5 text-[10px] text-muted">1 in = 300 px</p>
+    </div>
+  </div>
+
+  <!-- Live Formula Breakdown + 1-Click Send to Resizer CTA -->
+  <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-border/70 bg-bg/50 px-3.5 py-2.5">
+    <p id="pk-calc-formula" class="font-mono text-[11px] text-muted leading-relaxed">
+      {isPxToPhys
+        ? 'Formula: CM = (px × 2.54) ÷ 300 → 413 × 531 px = 3.5 × 4.5 cm'
+        : 'Formula: px = round((cm ÷ 2.54) × 300) → 3.5 × 4.5 cm = 413 × 531 px'}
+    </p>
+    <button
+      id="pk-calc-apply-btn"
+      type="button"
+      class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-fg shadow-xs hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
+    >
+      <span id="pk-calc-apply-label">Resize Photo to 413 × 531 px (3.5 × 4.5 cm @ 300 DPI) ↓</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  const calcRoot = document.getElementById('pk-dim-calculator');
+  if (calcRoot) {
+    type PhysUnit = 'cm' | 'mm' | 'in';
+    type CalcDir = 'px-to-phys' | 'phys-to-px';
+
+    let dir: CalcDir = (calcRoot.dataset.initialDir as CalcDir) || 'px-to-phys';
+    let physUnit: PhysUnit = (calcRoot.dataset.initialUnit as PhysUnit) || 'cm';
+    let dpi = Math.max(10, Math.min(2400, Number(calcRoot.dataset.initialDpi) || 300));
+
+    const wInput = document.getElementById('pk-calc-w') as HTMLInputElement | null;
+    const hInput = document.getElementById('pk-calc-h') as HTMLInputElement | null;
+    const wUnitEl = document.getElementById('pk-calc-w-unit');
+    const hUnitEl = document.getElementById('pk-calc-h-unit');
+    const swapBtn = document.getElementById('pk-calc-swap');
+    const dpiInput = document.getElementById('pk-calc-dpi-input') as HTMLInputElement | null;
+
+    const dirBtns = calcRoot.querySelectorAll<HTMLButtonElement>('.pk-calc-dir-btn');
+    const unitBtns = calcRoot.querySelectorAll<HTMLButtonElement>('.pk-calc-unit-btn');
+    const dpiBtns = calcRoot.querySelectorAll<HTMLButtonElement>('.pk-calc-dpi-btn');
+    const presetBtns = calcRoot.querySelectorAll<HTMLButtonElement>('.pk-calc-preset-btn');
+    const copyBtns = calcRoot.querySelectorAll<HTMLButtonElement>('.pk-calc-copy-btn');
+
+    const outPx = document.getElementById('pk-calc-out-px');
+    const outCm = document.getElementById('pk-calc-out-cm');
+    const outMm = document.getElementById('pk-calc-out-mm');
+    const outIn = document.getElementById('pk-calc-out-in');
+
+    const subPx = document.getElementById('pk-calc-sub-px');
+    const subCm = document.getElementById('pk-calc-sub-cm');
+    const subMm = document.getElementById('pk-calc-sub-mm');
+    const subIn = document.getElementById('pk-calc-sub-in');
+
+    const cardPx = document.getElementById('pk-calc-card-px');
+    const cardCm = document.getElementById('pk-calc-card-cm');
+    const cardMm = document.getElementById('pk-calc-card-mm');
+    const cardIn = document.getElementById('pk-calc-card-in');
+
+    const formulaEl = document.getElementById('pk-calc-formula');
+    const applyBtn = document.getElementById('pk-calc-apply-btn');
+    const applyLabel = document.getElementById('pk-calc-apply-label');
+
+    function fmtNum(val: number, decimals = 2): string {
+      if (!Number.isFinite(val)) return '0';
+      return Number(val.toFixed(decimals)).toString();
+    }
+
+    function physToCm(val: number, u: PhysUnit): number {
+      if (u === 'cm') return val;
+      if (u === 'mm') return val / 10;
+      return val * 2.54;
+    }
+
+    function cmToPhys(cm: number, u: PhysUnit): number {
+      if (u === 'cm') return cm;
+      if (u === 'mm') return cm * 10;
+      return cm / 2.54;
+    }
+
+    let lastComputed = { pxW: 413, pxH: 531, cmW: 3.5, cmH: 4.5, mmW: 35, mmH: 45, inW: 1.38, inH: 1.77 };
+
+    function updateUiStyles(): void {
+      dirBtns.forEach((btn) => {
+        const active = btn.dataset.calcDir === dir;
+        btn.className = `pk-calc-dir-btn flex-1 sm:flex-initial rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
+          active ? 'bg-surface text-fg shadow-xs border border-border/60' : 'text-muted hover:text-fg'
+        }`;
+      });
+
+      unitBtns.forEach((btn) => {
+        const active = btn.dataset.calcUnit === physUnit;
+        btn.className = `pk-calc-unit-btn rounded-md px-2.5 py-1 uppercase transition-all cursor-pointer ${
+          active ? 'bg-accent text-accent-fg shadow-2xs' : 'text-muted hover:text-fg'
+        }`;
+      });
+
+      dpiBtns.forEach((btn) => {
+        const active = Number(btn.dataset.calcDpi) === dpi;
+        btn.className = `pk-calc-dpi-btn rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold transition-colors cursor-pointer ${
+          active
+            ? 'border-accent bg-accent/15 text-accent'
+            : 'border-border bg-bg/50 text-muted hover:border-accent/40 hover:text-fg'
+        }`;
+      });
+
+      const inputUnit = dir === 'px-to-phys' ? 'px' : physUnit;
+      if (wUnitEl) wUnitEl.textContent = inputUnit;
+      if (hUnitEl) hUnitEl.textContent = inputUnit;
+      if (wInput) wInput.step = dir === 'px-to-phys' ? '1' : '0.01';
+      if (hInput) hInput.step = dir === 'px-to-phys' ? '1' : '0.01';
+
+      const highlightTarget = dir === 'phys-to-px' ? 'px' : physUnit;
+      const cards: Array<[HTMLElement | null, string]> = [
+        [cardPx, 'px'],
+        [cardCm, 'cm'],
+        [cardMm, 'mm'],
+        [cardIn, 'in'],
+      ];
+      cards.forEach(([card, key]) => {
+        if (!card) return;
+        card.className = `rounded-xl border p-3 transition-colors ${
+          key === highlightTarget ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'
+        }`;
+      });
+    }
+
+    function recalculate(): void {
+      const rawW = Math.max(0.01, Number(wInput?.value) || 0);
+      const rawH = Math.max(0.01, Number(hInput?.value) || 0);
+
+      let pxW = 1;
+      let pxH = 1;
+      let cmW = 0.01;
+      let cmH = 0.01;
+
+      if (dir === 'px-to-phys') {
+        pxW = Math.max(1, Math.round(rawW));
+        pxH = Math.max(1, Math.round(rawH));
+        cmW = (pxW * 2.54) / dpi;
+        cmH = (pxH * 2.54) / dpi;
+      } else {
+        cmW = physToCm(rawW, physUnit);
+        cmH = physToCm(rawH, physUnit);
+        pxW = Math.max(1, Math.round((cmW / 2.54) * dpi));
+        pxH = Math.max(1, Math.round((cmH / 2.54) * dpi));
+      }
+
+      const mmW = cmW * 10;
+      const mmH = cmH * 10;
+      const inW = cmW / 2.54;
+      const inH = cmH / 2.54;
+
+      lastComputed = { pxW, pxH, cmW, cmH, mmW, mmH, inW, inH };
+
+      if (outPx) outPx.textContent = `${pxW} × ${pxH} px`;
+      if (outCm) outCm.textContent = `${fmtNum(cmW, 2)} × ${fmtNum(cmH, 2)} cm`;
+      if (outMm) outMm.textContent = `${fmtNum(mmW, 1)} × ${fmtNum(mmH, 1)} mm`;
+      if (outIn) outIn.textContent = `${fmtNum(inW, 2)} × ${fmtNum(inH, 2)} in`;
+
+      const mp = ((pxW * pxH) / 1_000_000).toFixed(2);
+      if (subPx) subPx.textContent = `${mp} MP @ ${dpi} DPI`;
+      if (subCm) subCm.textContent = `1 cm = ${fmtNum(dpi / 2.54, 2)} px`;
+      if (subMm) subMm.textContent = `1 mm = ${fmtNum(dpi / 25.4, 2)} px`;
+      if (subIn) subIn.textContent = `1 in = ${dpi} px`;
+
+      if (formulaEl) {
+        if (dir === 'px-to-phys') {
+          const factor = physUnit === 'cm' ? '2.54' : physUnit === 'mm' ? '25.4' : '1';
+          const outW = fmtNum(cmToPhys(cmW, physUnit), physUnit === 'mm' ? 1 : 2);
+          const outH = fmtNum(cmToPhys(cmH, physUnit), physUnit === 'mm' ? 1 : 2);
+          formulaEl.textContent =
+            physUnit === 'in'
+              ? `Formula: IN = px ÷ ${dpi} → ${pxW} × ${pxH} px = ${outW} × ${outH} in`
+              : `Formula: ${physUnit.toUpperCase()} = (px × ${factor}) ÷ ${dpi} → ${pxW} × ${pxH} px = ${outW} × ${outH} ${physUnit}`;
+        } else {
+          const inValW = fmtNum(cmToPhys(cmW, physUnit), physUnit === 'mm' ? 1 : 2);
+          const inValH = fmtNum(cmToPhys(cmH, physUnit), physUnit === 'mm' ? 1 : 2);
+          const divStr = physUnit === 'cm' ? ' ÷ 2.54' : physUnit === 'mm' ? ' ÷ 25.4' : '';
+          formulaEl.textContent = `Formula: px = round((${physUnit}${divStr}) × ${dpi}) → ${inValW} × ${inValH} ${physUnit} = ${pxW} × ${pxH} px`;
+        }
+      }
+
+      if (applyLabel) {
+        const physWStr = fmtNum(cmToPhys(cmW, physUnit), physUnit === 'mm' ? 1 : 2);
+        const physHStr = fmtNum(cmToPhys(cmH, physUnit), physUnit === 'mm' ? 1 : 2);
+        applyLabel.textContent = `Resize Photo to ${pxW} × ${pxH} px (${physWStr} × ${physHStr} ${physUnit} @ ${dpi} DPI) ↓`;
+      }
+    }
+
+    dirBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nextDir = btn.dataset.calcDir as CalcDir;
+        if (!nextDir || nextDir === dir) return;
+        dir = nextDir;
+        if (wInput && hInput) {
+          if (dir === 'px-to-phys') {
+            wInput.value = String(lastComputed.pxW);
+            hInput.value = String(lastComputed.pxH);
+          } else {
+            const dec = physUnit === 'mm' ? 1 : 2;
+            wInput.value = fmtNum(cmToPhys(lastComputed.cmW, physUnit), dec);
+            hInput.value = fmtNum(cmToPhys(lastComputed.cmH, physUnit), dec);
+          }
+        }
+        updateUiStyles();
+        recalculate();
+      });
+    });
+
+    unitBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nextUnit = btn.dataset.calcUnit as PhysUnit;
+        if (!nextUnit || nextUnit === physUnit) return;
+        physUnit = nextUnit;
+        if (dir === 'phys-to-px' && wInput && hInput) {
+          const dec = physUnit === 'mm' ? 1 : 2;
+          wInput.value = fmtNum(cmToPhys(lastComputed.cmW, physUnit), dec);
+          hInput.value = fmtNum(cmToPhys(lastComputed.cmH, physUnit), dec);
+        }
+        updateUiStyles();
+        recalculate();
+      });
+    });
+
+    dpiBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nextDpi = Number(btn.dataset.calcDpi);
+        if (!nextDpi) return;
+        dpi = nextDpi;
+        if (dpiInput) dpiInput.value = String(dpi);
+        updateUiStyles();
+        recalculate();
+      });
+    });
+
+    dpiInput?.addEventListener('input', () => {
+      const val = Number(dpiInput.value);
+      if (val >= 10 && val <= 2400) {
+        dpi = Math.round(val);
+        updateUiStyles();
+        recalculate();
+      }
+    });
+
+    wInput?.addEventListener('input', recalculate);
+    hInput?.addEventListener('input', recalculate);
+
+    swapBtn?.addEventListener('click', () => {
+      if (!wInput || !hInput) return;
+      const tmp = wInput.value;
+      wInput.value = hInput.value;
+      hInput.value = tmp;
+      recalculate();
+    });
+
+    presetBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cmW = Number(btn.dataset.cmW) || 3.5;
+        const cmH = Number(btn.dataset.cmH) || 4.5;
+        const pxW = Number(btn.dataset.pxW) || 413;
+        const pxH = Number(btn.dataset.pxH) || 531;
+        const pDpi = Number(btn.dataset.dpi) || 300;
+        const pUnit = (btn.dataset.unit as PhysUnit) || 'cm';
+
+        dpi = pDpi;
+        physUnit = pUnit;
+        if (dpiInput) dpiInput.value = String(dpi);
+
+        if (wInput && hInput) {
+          if (dir === 'px-to-phys') {
+            wInput.value = String(pxW);
+            hInput.value = String(pxH);
+          } else {
+            const dec = physUnit === 'mm' ? 1 : 2;
+            wInput.value = fmtNum(cmToPhys(cmW, physUnit), dec);
+            hInput.value = fmtNum(cmToPhys(cmH, physUnit), dec);
+          }
+        }
+        updateUiStyles();
+        recalculate();
+      });
+    });
+
+    copyBtns.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const target = btn.dataset.copyTarget;
+        let text = '';
+        if (target === 'px') text = `${lastComputed.pxW} x ${lastComputed.pxH} px`;
+        else if (target === 'cm') text = `${fmtNum(lastComputed.cmW, 2)} x ${fmtNum(lastComputed.cmH, 2)} cm`;
+        else if (target === 'mm') text = `${fmtNum(lastComputed.mmW, 1)} x ${fmtNum(lastComputed.mmH, 1)} mm`;
+        else if (target === 'in') text = `${fmtNum(lastComputed.inW, 2)} x ${fmtNum(lastComputed.inH, 2)} in`;
+        if (!text || !navigator.clipboard) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          const prev = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => {
+            btn.textContent = prev || 'Copy';
+          }, 1500);
+        } catch {
+          // Ignore clipboard errors in restricted contexts
+        }
+      });
+    });
+
+    applyBtn?.addEventListener('click', () => {
+      const targetUnit = dir === 'px-to-phys' ? 'px' : physUnit;
+      const dec = physUnit === 'mm' ? 1 : 2;
+      const width =
+        targetUnit === 'px' ? lastComputed.pxW : Number(fmtNum(cmToPhys(lastComputed.cmW, physUnit), dec));
+      const height =
+        targetUnit === 'px' ? lastComputed.pxH : Number(fmtNum(cmToPhys(lastComputed.cmH, physUnit), dec));
+      const detail = { unit: targetUnit, width, height, dpi };
+      (window as unknown as Record<string, unknown>).__pkPendingResizeDims = detail;
+      window.dispatchEvent(new CustomEvent('pk:set-resize-dims', { detail }));
+      document.getElementById('pk-converter-root')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    updateUiStyles();
+    recalculate();
+  }
+</script>
+

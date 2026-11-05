@@ -1,0 +1,214 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'UAE Visa Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official UAE and Dubai Visa digital photo dimensions?',
+    a: 'The UAE Federal Authority for Identity, Citizenship, Customs and Port Security (ICP) and GDRFA Dubai require a 35 × 45 mm photograph at 300 DPI, which equals 413 × 531 pixels (minimum 300 × 369 pixels). The file must be in JPEG/JPG format with a file size strictly equal to or less than 100 KB on a pure white background.',
+  },
+  {
+    q: 'What is the head height and background requirement for UAE visas?',
+    a: 'The applicant head must occupy 70% to 80% of the photograph height (around 32–36 mm from top of hair to bottom of chin). The background must be completely plain white with no shadows, patterns, or objects. White attire blending into the background is discouraged.',
+  },
+  {
+    q: 'Does this preset work for Dubai Golden Visa and Green Visa?',
+    a: 'Yes! Both the Dubai Golden Visa and UAE Green Visa portals (via ICP and GDRFA Smart Services) enforce the standard 35 × 45 mm (413 × 531 px) biometric specification under 100 KB.',
+  },
+  {
+    q: 'Can I resize an iPhone or Android photo for UAE visa online?',
+    a: 'Yes. Simply drop your photo (JPG, PNG, or HEIC) into PixelKit. The tool locks the 3.5:4.5 aspect ratio, scales to 413 × 531 pixels, and compresses the JPEG strictly below 100 KB in 200ms.',
+  },
+  {
+    q: 'Is my biometric face photo stored on any server?',
+    a: 'No. PixelKit executes 100% in-browser via WebAssembly and HTML5 Canvas. Your photo never leaves your local computer or phone.',
+  },
+];
+
+const pageTitle = `UAE & Dubai Visa Photo Resizer (413×531 px) | ${SITE.name}`;
+const pageDesc =
+  'Resize and crop photos for UAE tourist visa, Dubai residence permit, and Golden Visa to 413×531 px (35×45 mm) under 100KB JPG privately in your browser.';
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to crop and resize photo for UAE and Dubai Visa online',
+  description:
+    'Step-by-step instructions to crop to 35x45 mm ratio, scale to 413x531 pixels, and compress under 100KB for UAE ICP and GDRFA portals.',
+  steps: [
+    {
+      name: 'Upload candidate portrait',
+      text: 'Drag and drop your front-facing portrait photo (JPG, PNG, or Apple HEIC) into PixelKit.',
+    },
+    {
+      name: 'Lock UAE 35×45 mm Preset',
+      text: 'PixelKit automatically applies the 3.5:4.5 aspect ratio and sets target dimensions to 413 × 531 pixels.',
+    },
+    {
+      name: 'Compress under 100KB',
+      text: 'PixelKit tunes JPEG compression to satisfy the strict ≤ 100 KB file limit while retaining crisp biometric facial clarity.',
+    },
+    {
+      name: 'Download ICP-Ready JPG',
+      text: 'Click Download to save your compliant photograph ready for immediate upload to ICP UAE or GDRFA Dubai.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit UAE & Dubai Visa Photo Resizer',
+    description: pageDesc,
+    url: new URL('/uae-visa-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>UAE ICP · GDRFA Dubai · Dubai Golden Visa · Residence &amp; Tourist</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        UAE &amp; Dubai Visa Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to 35 × 45 mm (413 × 531 px), align face to 70–80% height, and compress under 100 KB JPG. 100% private, instant client-side biometric framing.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official UAE & Dubai Visa Photo Rules (2026 Direct Answer)"
+      summaryText="The UAE Federal Authority for Identity and Citizenship (ICP) and GDRFA Dubai enforce a 35 × 45 mm photograph at 300 DPI (413 × 531 pixels; minimum 300 × 369 pixels). The file must be formatted in JPEG/JPG under 100 KB. The applicant's head must occupy 70% to 80% of the frame with a neutral expression on a plain white background. Colored eyewear, heavy reflections, or shadows are strictly rejected."
+      portalName="UAE ICP & GDRFA Dubai Smart Services"
+      specs={[
+        { label: 'File Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Ceiling', value: 'Strictly under 100 KB', highlight: true },
+        { label: 'Dimensions', value: '413 × 531 px (35 × 45 mm at 300 DPI)' },
+        { label: 'Head Coverage', value: '70% to 80% of frame height' },
+        { label: 'Background', value: 'Plain White (No shadows)' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={100}
+        initialTool="passport"
+        preset="ae-visa"
+        category="visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        UAE ICP &amp; Dubai Visa Photo Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory technical standards for online visa applications across Abu Dhabi, Dubai, Sharjah, and Northern Emirates:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Requirement</th>
+              <th class="py-3 px-4">UAE Portal Standard</th>
+              <th class="py-3 px-4">PixelKit Auto-Configuration</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Pixel Dimensions</td>
+              <td class="py-3.5 px-4 text-muted">413 × 531 pixels (300 DPI) or 300 × 369 pixels minimum</td>
+              <td class="py-3.5 px-4 font-mono text-accent">Auto-scaled to exact 413 × 531 px</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Print Size</td>
+              <td class="py-3.5 px-4 text-muted">35 mm width × 45 mm height</td>
+              <td class="py-3.5 px-4 text-muted">3.5 : 4.5 Standard aspect ratio</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">File Size Limit</td>
+              <td class="py-3.5 px-4 text-muted">Strictly equal to or under 100 KB</td>
+              <td class="py-3.5 px-4 font-mono text-accent">Auto-compressed ≤ 100 KB JPG</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Accepted Formats</td>
+              <td class="py-3.5 px-4 text-muted">JPEG / JPG format only</td>
+              <td class="py-3.5 px-4 text-muted">Universal converter to JPEG (.jpg)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Head Height</td>
+              <td class="py-3.5 px-4 text-muted">70% to 80% of vertical picture space</td>
+              <td class="py-3.5 px-4 text-muted">Top-anchor positioning guidance</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Background Color</td>
+              <td class="py-3.5 px-4 text-muted">Plain clean white without shadows or gradient</td>
+              <td class="py-3.5 px-4 text-muted">High contrast studio preview</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+
+    <!-- Related Visa & Passport Tools -->
+    <section class="mt-12 border-t border-border/80 pt-8">
+      <h2 class="text-base sm:text-lg font-bold text-fg mb-3">Related Visa &amp; Passport Photo Resizers</h2>
+      <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <a href="/passport-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Passport Photo Maker</a>
+        <a href="/saudi-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Saudi Visa &amp; Umrah Resizer</a>
+        <a href="/us-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">US Visa &amp; DS-160 Resizer</a>
+        <a href="/schengen-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Schengen Visa Resizer</a>
+        <a href="/uk-passport-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">UK Passport Photo Resizer</a>
+        <a href="/portal-photo-size-chart/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Official Size Chart</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

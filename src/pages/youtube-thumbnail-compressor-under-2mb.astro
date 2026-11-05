@@ -1,0 +1,182 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Social Tools",
+    "href": "/compress-image/"
+  },
+  {
+    "label": "YouTube Thumbnail Compressor"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does YouTube Studio say \"File is bigger than 2MB\"?",
+    "a": "PNG thumbnails exported from Photoshop, Canva, or Figma often exceed 2.5MB to 4MB due to lossless compression. PixelKit automatically converts and binary-search compresses the thumbnail to ~1.6MB–1.9MB JPG while preserving full HD clarity."
+  },
+  {
+    "q": "Will compressing my thumbnail under 2MB reduce my CTR (Click-Through Rate)?",
+    "a": "No. PixelKit uses advanced perceptual quantization that keeps vibrant colors, contrast, and text overlays pin-sharp. Viewers on mobile and desktop see identical high-resolution artwork."
+  }
+];
+
+const pageTitle = 'YouTube Thumbnail Compressor Under 2MB (1280x720 HD)';
+const pageDesc = 'Compress and resize YouTube thumbnails strictly under 2MB (1280x720 px, 16:9 ratio) without blur. Fast client-side tool with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit YouTube Thumbnail Compressor Under 2MB',
+    description: pageDesc,
+    url: new URL('/youtube-thumbnail-compressor-under-2mb/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>1280×720 px · 16:9 Ratio · Strictly Under 2MB JPG</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        YouTube Thumbnail Compressor Under 2MB
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize and compress custom YouTube video thumbnails strictly under 2.0 MB (1280 × 720 px HD) without loss of color vibrancy or visual sharpness.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="YouTube Custom Thumbnail Rules (2026 Direct Answer)"
+      summaryText="YouTube strictly limits custom video thumbnail uploads to a maximum file size of 2 MB (2,048 KB). The optimal resolution is 1280 × 720 pixels (minimum 640 px width) with a 16:9 widescreen aspect ratio in JPG, PNG, or GIF format. Any file exceeding 2.0 MB is immediately rejected by YouTube Studio."
+      portalName="YouTube Studio Specifications (Google)"
+      specs={[{"label":"Maximum File Size","value":"Strictly under 2.0 MB (2,048 KB)","highlight":true},{"label":"Optimal Resolution","value":"1280 × 720 pixels (HD)","highlight":true},{"label":"Aspect Ratio","value":"16:9 Widescreen"},{"label":"Accepted Formats","value":"JPG, PNG, GIF"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={2000}
+        initialTool="passport"
+        preset="social-yt-thumb"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        YouTube Video & Channel Image Specifications
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Official guidelines from YouTube Creator Studio:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Asset Type</th>
+              <th class="py-3 px-4">Ideal Dimensions</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4">Max File Size</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Custom Video Thumbnail</td>
+              <td class="py-3 px-4 text-muted">1280 × 720 pixels</td>
+              <td class="py-3 px-4 text-muted">16:9 Widescreen</td>
+              <td class="py-3 px-4 text-muted">Max 2.0 MB strictly</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">YouTube Channel Banner</td>
+              <td class="py-3 px-4 text-muted">2560 × 1440 pixels</td>
+              <td class="py-3 px-4 text-muted">16:9</td>
+              <td class="py-3 px-4 text-muted">Max 6.0 MB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Channel Profile Picture</td>
+              <td class="py-3 px-4 text-muted">800 × 800 pixels</td>
+              <td class="py-3 px-4 text-muted">1:1 Square</td>
+              <td class="py-3 px-4 text-muted">Max 4.0 MB</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">YouTube Shorts Thumbnail</td>
+              <td class="py-3 px-4 text-muted">1080 × 1920 pixels</td>
+              <td class="py-3 px-4 text-muted">9:16 Vertical</td>
+              <td class="py-3 px-4 text-muted">Max 2.0 MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

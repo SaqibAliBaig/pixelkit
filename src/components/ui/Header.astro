@@ -49,6 +49,36 @@ const isActive = (href: string) =>
       </nav>
 
       <div class="flex items-center gap-1">
+        <!-- Quick Search Trigger Button -->
+        <button
+          id="pk-search-trigger"
+          type="button"
+          class="inline-flex h-9 items-center gap-1.5 rounded-lg px-2 sm:px-2.5 text-xs text-muted hover:text-fg hover:bg-surface border border-transparent hover:border-border transition-colors cursor-pointer"
+          aria-label="Search tools and presets"
+          title="Search tools & presets (⌘K / Ctrl+K)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="shrink-0"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="hidden sm:inline font-medium text-xs">Search</span>
+          <kbd class="hidden sm:inline-block rounded border border-border bg-bg/80 px-1.5 py-0.5 text-[10px] font-mono text-muted">
+            ⌘K
+          </kbd>
+        </button>
+
         <ThemeToggle />
         <!-- Mobile menu button -->
         <button
@@ -95,24 +125,194 @@ const isActive = (href: string) =>
       </nav>
     </div>
   </Container>
+
+  <!-- Lightweight Search Modal Template (Inert in SSR DOM) -->
+  <template id="pk-search-modal-template">
+    <div id="pk-search-modal" class="fixed inset-0 z-50 flex items-start justify-center pt-12 sm:pt-20 px-3 bg-black/60 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-label="Search Tools & Presets">
+      <div id="pk-search-card" class="w-full max-w-xl rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="relative border-b border-border/80 p-3 sm:p-4">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-6 text-muted">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input
+            id="pk-search-modal-input"
+            type="search"
+            placeholder="Search tools, presets, dimensions (e.g. '100kb', '3.5x4.5 cm', '200 dpi', 'crop 16:9')..."
+            class="w-full rounded-xl border border-border bg-bg pl-10 pr-12 py-2.5 text-xs sm:text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none"
+            autocomplete="off"
+          />
+          <button
+            id="pk-search-modal-close"
+            type="button"
+            class="absolute inset-y-0 right-0 flex items-center pr-6 text-muted hover:text-fg cursor-pointer text-xs font-mono"
+            aria-label="Close search"
+          >
+            ESC
+          </button>
+        </div>
+
+        <div id="pk-search-results-list" class="overflow-y-auto p-2 sm:p-3 divide-y divide-border/40 space-y-1">
+          <!-- Dynamic results injected here -->
+        </div>
+
+        <div class="p-2.5 border-t border-border/60 bg-bg/50 px-4 flex items-center justify-between text-[11px] text-muted">
+          <span>Navigate with <kbd class="font-mono text-fg">↑</kbd> <kbd class="font-mono text-fg">↓</kbd> · Select with <kbd class="font-mono text-fg">↵</kbd></span>
+          <span>Zero cloud uploads · 100% private</span>
+        </div>
+      </div>
+    </div>
+  </template>
 </header>
 
 <script>
+  import { searchTools, type ToolSearchResult } from '../../lib/tool-search';
+
   (() => {
+    // 1. Mobile Menu Logic
     const btn = document.getElementById('mobile-menu-toggle');
     const menu = document.getElementById('mobile-menu');
-    if (!btn || !menu) return;
+    if (btn && menu) {
+      btn.addEventListener('click', () => {
+        const open = menu.classList.toggle('hidden') === false;
+        btn.setAttribute('aria-expanded', String(open));
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      });
 
-    btn.addEventListener('click', () => {
-      const open = menu.classList.toggle('hidden') === false;
-      btn.setAttribute('aria-expanded', String(open));
-      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.addEventListener('astro:after-swap', () => {
+        menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // 2. Global Quick Search Modal Logic
+    const triggerBtn = document.getElementById('pk-search-trigger');
+    const tpl = document.getElementById('pk-search-modal-template') as HTMLTemplateElement | null;
+    let modalEl: HTMLElement | null = null;
+    let activeIdx = 0;
+
+    function renderResults(results: ToolSearchResult[], container: HTMLElement) {
+      activeIdx = 0;
+      container.innerHTML = '';
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="py-8 text-center text-xs text-muted">
+            No matching tools or presets. Try <code class="text-accent">100kb</code>, <code class="text-accent">3.5x4.5 cm</code>, <code class="text-accent">300 dpi</code>, or <code class="text-accent">crop 16:9</code>.
+          </div>
+        `;
+        return;
+      }
+
+      results.forEach((item, idx) => {
+        const a = document.createElement('a');
+        a.href = item.href;
+        a.className = `pk-search-item flex items-center justify-between gap-3 p-2.5 rounded-xl border border-transparent transition-colors ${
+          idx === 0 ? 'bg-surface border-accent/40 text-fg' : 'text-fg/90 hover:bg-surface hover:border-border'
+        }`;
+        a.setAttribute('data-idx', String(idx));
+        a.innerHTML = `
+          <div class="min-w-0">
+            <div class="font-semibold text-xs sm:text-sm text-fg">${item.title}</div>
+            <div class="text-[11px] text-muted truncate mt-0.5">${item.subtitle}</div>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded-md font-mono text-[10px] font-bold bg-accent/10 border border-accent/20 text-accent uppercase">
+            ${item.badge}
+          </span>
+        `;
+        container.appendChild(a);
+      });
+    }
+
+    function openSearchModal() {
+      if (modalEl || !tpl) return;
+      const clone = tpl.content.cloneNode(true) as DocumentFragment;
+      document.body.appendChild(clone);
+      modalEl = document.getElementById('pk-search-modal');
+      if (!modalEl) return;
+
+      const input = modalEl.querySelector('#pk-search-modal-input') as HTMLInputElement | null;
+      const closeBtn = modalEl.querySelector('#pk-search-modal-close');
+      const listContainer = modalEl.querySelector('#pk-search-results-list') as HTMLElement | null;
+
+      if (!input || !listContainer) return;
+
+      // Initial suggestions
+      renderResults(searchTools(''), listContainer);
+
+      input.focus();
+
+      input.addEventListener('input', () => {
+        renderResults(searchTools(input.value), listContainer);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        const items = listContainer.querySelectorAll<HTMLAnchorElement>('.pk-search-item');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (items.length > 0) {
+            activeIdx = (activeIdx + 1) % items.length;
+            updateActiveItem(items);
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (items.length > 0) {
+            activeIdx = (activeIdx - 1 + items.length) % items.length;
+            updateActiveItem(items);
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const targetItem = items[activeIdx];
+          if (targetItem) {
+            targetItem.click();
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closeSearchModal();
+        }
+      });
+
+      function updateActiveItem(items: NodeListOf<HTMLAnchorElement>) {
+        items.forEach((it, idx) => {
+          if (idx === activeIdx) {
+            it.classList.add('bg-surface', 'border-accent/40');
+            it.scrollIntoView({ block: 'nearest' });
+          } else {
+            it.classList.remove('bg-surface', 'border-accent/40');
+          }
+        });
+      }
+
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) closeSearchModal();
+      });
+
+      closeBtn?.addEventListener('click', closeSearchModal);
+    }
+
+    function closeSearchModal() {
+      if (modalEl) {
+        modalEl.remove();
+        modalEl = null;
+      }
+    }
+
+    triggerBtn?.addEventListener('click', openSearchModal);
+
+    window.addEventListener('keydown', (e) => {
+      // ⌘K or Ctrl+K
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (modalEl) closeSearchModal();
+        else openSearchModal();
+      } else if (e.key === '/' && !modalEl && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        openSearchModal();
+      }
     });
 
-    // Close on navigation (client-side).
-    document.addEventListener('astro:after-swap', () => {
-      menu.classList.add('hidden');
-      btn.setAttribute('aria-expanded', 'false');
-    });
+    document.addEventListener('astro:after-swap', closeSearchModal);
   })();
 </script>

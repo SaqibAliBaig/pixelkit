@@ -1,0 +1,217 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "Signature Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "What are the exact photo and signature dimensions required for online exams?",
+    "a": "Most portals specify a 2:1 horizontal rectangle: 140 × 60 pixels or 280 × 140 pixels (equivalent to 3.5 × 1.5 cm or 4.0 × 2.0 cm at standard print resolutions). File size must strictly be between 10 KB and 20 KB in JPG format."
+  },
+  {
+    "q": "Why do exam portals reject signatures smaller than 10 KB?",
+    "a": "Portals enforce a minimum file size (typically 10 KB) to prevent candidates from uploading blank or corrupt placeholder files. PixelKit uses binary search quantization targeting 14 KB–18 KB, landing right in the sweet spot."
+  },
+  {
+    "q": "How do I keep my signature legible and crisp when compressed under 20KB?",
+    "a": "Crop all excess white paper margins tightly around the signature strokes before resizing. Removing large empty white borders allows the JPEG encoder to allocate all bits to the ink strokes rather than plain background."
+  },
+  {
+    "q": "Is my candidate signature kept secure and private?",
+    "a": "100% yes. Signatures are sensitive biometric assets. PixelKit operates entirely inside your local browser memory using Canvas and WebAssembly. No signature photos ever touch external servers."
+  }
+];
+
+const pageTitle = 'Signature Resizer Online (10–20KB & 2:1) | PixelKit';
+const pageDesc = 'Resize signature photo to 140x60 px or 280x140 px and compress to 10KB-20KB JPG online. 100% private in-browser tool with zero cloud uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Signature Resizer & Compressor Online',
+    description: pageDesc,
+    url: new URL('/signature-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>140×60 px · 280×140 px · 10KB–20KB JPG Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Signature Resizer & Compressor Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop unnecessary borders, rescale to official 2:1 signature dimensions, and compress strictly between 10KB and 20KB JPG with pin-sharp ink strokes.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Exam Signature Specification Summary (2026 Direct Answer)"
+      summaryText="Most government and recruitment examination portals (UPSC, SSC, IBPS, SBI, Railways, NTA) mandate candidate signatures in JPG/JPEG format weighing strictly between 10 KB and 20 KB. The standard dimension ratio is 2:1 (140 × 60 px, 280 × 140 px, or 3.5 × 1.5 cm), written with black or blue ink on smooth white paper."
+      portalName="National Examination & Recruitment Portals"
+      specs={[{"label":"File Size Bracket","value":"10 KB to 20 KB strictly","highlight":true},{"label":"Aspect Ratio","value":"2:1 Horizontal (140×60 px to 280×140 px)","highlight":true},{"label":"Format","value":"JPG / JPEG only"},{"label":"Ink & Background","value":"Dark Ink on Plain White Paper"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={20}
+        initialTool="passport"
+        preset="signature"
+        category="exam"
+        initialSizeMode="range"
+        minKb={10}
+        maxKb={20}
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Government & Banking Exam Signature Standards
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Compare signature dimension and file size requirements across major recruitment portals:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Portal / Exam</th>
+              <th class="py-3 px-4">Required Dimensions</th>
+              <th class="py-3 px-4">File Size Bracket</th>
+              <th class="py-3 px-4">Ink Color</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UPSC CSE & NDA</td>
+              <td class="py-3 px-4 text-muted">280 × 140 px (3.5 × 1.5 cm)</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">Black ink only</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC CGL, CHSL, MTS</td>
+              <td class="py-3 px-4 text-muted">140 × 60 px (4.0 × 2.0 cm)</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">Black / Blue ink</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">IBPS PO & Clerk</td>
+              <td class="py-3 px-4 text-muted">140 × 60 px (2:1 ratio)</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">Black ink on white</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SBI PO & Clerk</td>
+              <td class="py-3 px-4 text-muted">140 × 60 px</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">Black ink on white</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Railway RRB NTPC</td>
+              <td class="py-3 px-4 text-muted">80 × 35 mm (approx. 140×60 px)</td>
+              <td class="py-3 px-4 text-muted">10 KB – 40 KB</td>
+              <td class="py-3 px-4 text-muted">Blue or Black ink</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">NTA JEE & NEET</td>
+              <td class="py-3 px-4 text-muted">3.5 × 1.5 cm</td>
+              <td class="py-3 px-4 text-muted">4 KB – 30 KB</td>
+              <td class="py-3 px-4 text-muted">Black ink on white</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Signature & Biometric Upload Tools -->
+    <section class="mt-8 rounded-2xl border border-border bg-surface/60 p-5 sm:p-6 text-xs text-muted">
+      <h3 class="font-semibold text-fg text-sm">Related Signature &amp; Biometric Tools</h3>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <a href="/signature-resizer-10kb-to-20kb/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">10KB to 20KB Signature Resizer</a>
+        <a href="/crop-image-2-1-signature/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Crop Image 2:1 Signature Ratio</a>
+        <a href="/thumb-impression-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Thumb Impression Resizer</a>
+        <a href="/upsc-signature-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">UPSC Signature Resizer</a>
+        <a href="/portal-photo-size-chart/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Portal Photo &amp; Signature Chart</a>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

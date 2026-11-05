@@ -1,0 +1,185 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import DimensionCalculator from '@components/converter/DimensionCalculator.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+import { SEO_LANDING_PAGES, type SeoLandingPage } from '../data/seo-landing-pages';
+
+export function getStaticPaths() {
+  return SEO_LANDING_PAGES.map((page) => ({
+    params: { seoSlug: page.slug },
+    props: { page },
+  }));
+}
+
+interface Props {
+  page: SeoLandingPage;
+}
+
+const { page } = Astro.props;
+const canonicalUrl = new URL(`/${page.slug}/`, SITE.url).href;
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: page.breadcrumbParent.label, href: page.breadcrumbParent.href },
+  { label: page.breadcrumbLabel },
+];
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: `PixelKit ${page.h1}`,
+    description: page.description,
+    url: canonicalUrl,
+  }),
+  buildFaqJsonLd(page.faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  canonical={canonicalUrl}
+  keywords={page.keywords}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>{page.badge}</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        {page.h1}
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        {page.heroSubtitle}
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title={page.directAnswer.title}
+      portalName={page.directAnswer.portalName}
+      summaryText={page.directAnswer.summaryText}
+      specs={page.directAnswer.specs}
+    />
+
+    {page.calculatorProps && (
+      <div class="mt-6 sm:mt-8">
+        <DimensionCalculator
+          mode={page.calculatorProps.mode}
+          defaultUnit={page.calculatorProps.defaultUnit}
+          defaultDpi={page.calculatorProps.defaultDpi}
+        />
+      </div>
+    )}
+
+    <!-- Interactive Studio Pre-Configured with Exact Settings -->
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview {...page.toolProps} />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        {page.specTable.heading}
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        {page.specTable.subheading}
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              {page.specTable.columns.map((col) => (
+                <th class="py-3 px-4">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            {page.specTable.rows.map((row) => (
+              <tr>
+                <td class="py-3 px-4 font-medium text-fg">{row[0]}</td>
+                <td class="py-3 px-4 font-mono text-xs sm:text-sm text-accent">{row[1]}</td>
+                <td class="py-3 px-4 text-muted">{row[2]}</td>
+                <td class="py-3 px-4 text-muted">{row[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Guide & Key Advantages -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        {page.guideSection.heading}
+      </h2>
+      <div class="mt-4 space-y-4 text-xs sm:text-sm text-fg/85 leading-relaxed">
+        {page.guideSection.paragraphs.map((para) => (
+          <p>{para}</p>
+        ))}
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm">
+        {page.guideSection.cards.map((card) => (
+          <div class="rounded-xl border border-border/70 bg-bg/50 p-4">
+            <h3 class="font-semibold text-fg text-sm">{card.title}</h3>
+            <p class="mt-1.5 text-xs text-muted leading-relaxed">{card.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Related Companion Studios & Presets -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/60 p-5 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-bold tracking-tight text-fg">
+        Related Presets, Calculators &amp; Companion Studios
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Jump directly to a pre-configured studio with exact settings locked in:
+      </p>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-sm">
+        {page.relatedLinks.map((item) => (
+          <a
+            href={item.href}
+            class="group rounded-xl border border-border bg-bg/60 p-4 hover:border-accent hover:bg-surface transition-colors"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-semibold text-fg group-hover:text-accent transition-colors">{item.title}</span>
+              <span class="text-accent text-xs font-bold shrink-0">→</span>
+            </div>
+            <div class="font-mono text-[11px] text-accent mt-1">{item.meta}</div>
+            <p class="text-xs text-muted mt-1.5 leading-relaxed">{item.desc}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={page.faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

@@ -28,6 +28,9 @@
 /og-preview.png
   Cache-Control: public, max-age=86400
 
+/og/*
+  Cache-Control: public, max-age=86400
+
 /favicon.*
   Cache-Control: public, max-age=2592000
 

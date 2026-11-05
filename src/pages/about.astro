@@ -3,6 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import Button from '@components/ui/Button.astro';
 import { SITE } from '@lib/constants';
+import { buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -11,18 +12,15 @@ const breadcrumbs = [
 
 const jsonLd = [
   {
-    '@context': 'https://schema.org',
     '@type': 'AboutPage',
     name: `About ${SITE.name}`,
     description: 'PixelKit is a fast, private file converter and compressor running 100% in your browser.',
     url: new URL('/about/', SITE.url).href,
     mainEntity: {
-      '@type': 'Organization',
-      name: SITE.name,
-      url: SITE.url,
-      logo: `${SITE.url}/icon-512.png`,
+      '@id': 'https://pixelkit.app/#organization',
     },
   },
+  buildBreadcrumbJsonLd(breadcrumbs),
 ];
 ---
 
@@ -177,6 +175,39 @@ const jsonLd = [
           <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">UPNG.js</span>
           <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">jsPDF</span>
           <span class="inline-flex items-center rounded-lg border border-border bg-bg/70 px-2.5 py-1 text-[11px] font-medium text-fg">Cloudflare CDN</span>
+        </div>
+      </section>
+
+      <!-- Creator & Engineering -->
+      <section class="rounded-xl sm:rounded-2xl border border-border/80 bg-surface/90 p-4 sm:p-6 shadow-xs">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h2 class="text-base sm:text-lg font-bold text-fg">Creator &amp; Architecture</h2>
+        </div>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          PixelKit was engineered and founded by <strong class="text-fg">Saqib Ali Baig</strong> as an open, client-side alternative to opaque cloud conversion SaaS platforms. Every image transformation algorithm, WebAssembly pipeline, and binary-search compression routine runs locally in your device's memory with zero remote telemetry.
+        </p>
+        <div class="mt-3.5 flex flex-wrap items-center gap-2.5 text-xs">
+          <a
+            href="https://x.com/SaqibBaig1100"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg/80 px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+          >
+            <span>@SaqibBaig1100 on X</span>
+          </a>
+          <a
+            href="https://github.com/SaqibAliBaig"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg/80 px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors"
+          >
+            <span>GitHub @SaqibAliBaig</span>
+          </a>
         </div>
       </section>
 

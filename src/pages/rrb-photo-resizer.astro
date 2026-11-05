@@ -1,0 +1,169 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "RRB Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why was my photo rejected in the previous RRB application?",
+    "a": "The most common reasons for RRB photo rejections are selfies, wearing sunglasses or caps, patterned backgrounds, and file sizes outside the strict 20KB–50KB bracket."
+  }
+];
+
+const pageTitle = 'RRB Photo Resizer Online (320x400 px, 20-50KB)';
+const pageDesc = 'Crop and compress Railway RRB NTPC, ALP & Group D photo to 320x400 px (20-50KB) and signature (10-40KB) locally with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Railway RRB Photo & Signature Resizer',
+    description: pageDesc,
+    url: new URL('/rrb-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Indian Railways RRB NTPC · ALP · Group D Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Railway RRB Photo & Signature Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize candidate photo to 320 × 400 px (20–50 KB) and signature (10–40 KB) for Railway Recruitment Board online job applications.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official RRB Photo & Signature Specifications (2026 Direct Answer)"
+      summaryText="Railway Recruitment Board (RRB NTPC, ALP, Technician, JE, and Group D) mandates candidate photographs in JPG format between 20 KB and 50 KB with dimensions of 320 × 400 px (35 × 45 mm). Signatures must be in running handwriting, between 10 KB and 40 KB."
+      portalName="Railway Recruitment Boards (rrbapply.gov.in)"
+      specs={[{"label":"Photo Dimensions","value":"320 × 400 px (35 × 45 mm)","highlight":true},{"label":"Photo Size Bracket","value":"20 KB to 50 KB JPG","highlight":true},{"label":"Signature Size Bracket","value":"10 KB to 40 KB JPG","highlight":true},{"label":"Background","value":"Plain White or Light"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="passport"
+        preset="exam-rrb"
+        category="exam"
+        initialSizeMode="range"
+        minKb={20}
+        maxKb={50}
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        RRB Recruitment Photo Guidelines
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Official standards across Indian Railways recruitment zones:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Item</th>
+              <th class="py-3 px-4">Dimensions</th>
+              <th class="py-3 px-4">File Size Limit</th>
+              <th class="py-3 px-4">Format</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Passport Photo</td>
+              <td class="py-3 px-4 text-muted">320 × 400 px (3.5 × 4.5 cm)</td>
+              <td class="py-3 px-4 text-muted">20 KB – 50 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Signature</td>
+              <td class="py-3 px-4 text-muted">140 × 60 px or 80 × 35 mm</td>
+              <td class="py-3 px-4 text-muted">10 KB – 40 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

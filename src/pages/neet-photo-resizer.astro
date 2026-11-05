@@ -40,7 +40,7 @@ const faqs = [
 
 const pageTitle = `NEET Photo Resizer Online — 10KB to 200KB JPG | ${SITE.name}`;
 const pageDesc =
-  'Resize and compress passport & 4x6 postcard photos for NTA NEET-UG & JEE Main to exact specifications between 10KB and 200KB JPG directly in your browser.';
+  'Resize and compress passport & 4x6 postcard photos for NTA NEET and JEE to exact 10KB–200KB JPG specs directly in your browser with zero server uploads.';
 
 const howToJsonLd = buildCustomHowToJsonLd({
   name: 'How to resize and compress photos for NEET UG and JEE Main',
@@ -129,6 +129,10 @@ const jsonLd = [
         targetKb={50}
         initialTool="passport"
         preset="exam-neet"
+        category="exam"
+        initialSizeMode="range"
+        minKb={10}
+        maxKb={200}
       />
     </div>
 

@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
@@ -52,7 +51,7 @@ const directAnswer = {
     'To convert HEIC to JPG on Windows 10 or 11 for free: 1. Open PixelKit in Microsoft Edge or Google Chrome. 2. Drag and drop your .heic or .heif photos into the box. 3. PixelKit uses client-side WebAssembly to decode the Apple format in device memory. 4. Click Download to save universal, compatible JPG images without installing any paid Microsoft Store extensions or uploading files to third-party servers.',
 };
 
-const pageTitle = `How to Convert HEIC to JPG on Windows (Free, No Codecs) | ${SITE.name}`;
+const pageTitle = `Convert HEIC to JPG on Windows (No Codecs Needed) | ${SITE.name}`;
 const pageDesc =
   'Learn how to convert iPhone HEIC photos to JPG on Windows 11 & Windows 10 for free without paying for HEVC extensions. 100% private in-browser conversion.';
 const pageKeywords = [
@@ -98,7 +97,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit HEIC to JPG Converter for Windows',
     description: pageDesc,
-    path: '/how-to-convert-heic-to-jpg-on-windows/',
+    url: 'https://pixelkit.app/how-to-convert-heic-to-jpg-on-windows/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Windows 11, Windows 10, Any OS',
   }),
@@ -132,7 +131,7 @@ const windowsMethods = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/how-to-convert-heic-to-jpg-on-windows/"
+  canonical="https://pixelkit.app/how-to-convert-heic-to-jpg-on-windows/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -167,7 +166,7 @@ const windowsMethods = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for HEIC to JPG -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="heic"
         to="jpg"
@@ -175,7 +174,7 @@ const windowsMethods = [
         toMime="image/jpeg"
         initialTool="convert"
       />
-    </main>
+    </div>
 
     <!-- Three Methods Comparison Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

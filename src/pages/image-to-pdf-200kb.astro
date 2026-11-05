@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
@@ -49,9 +48,9 @@ const directAnswer = {
     'To convert an image to PDF under 200KB: 1. Drag and drop your JPG, PNG, or HEIC photo into PixelKit. 2. The tool automatically applies a 200KB target ceiling and high-precision document quantization. 3. Drag thumbnails to reorder pages or adjust margins if needed. 4. Click Download to save your compliant, crystal-clear PDF under 200KB with zero server uploads.',
 };
 
-const pageTitle = `Image to PDF 200KB Online — Convert Photo to PDF Under 200KB | ${SITE.name}`;
+const pageTitle = `Image to PDF 200KB Online (Convert Photo to PDF) | ${SITE.name}`;
 const pageDesc =
-  'Convert and compress image to PDF under 200KB online for free. Ideal for NTA NEET, JEE Main, Schengen visas, and government exam document uploads. 100% private in-browser tool.';
+  'Convert and compress images to PDF under 200KB online. Formatted for NEET, JEE Main, and visa portals. 100% private client-side tool with zero uploads.';
 const pageKeywords = [
   'image to pdf 200kb',
   'convert image to pdf under 200kb',
@@ -95,7 +94,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Image to PDF 200KB Converter',
     description: pageDesc,
-    path: '/image-to-pdf-200kb/',
+    url: 'https://pixelkit.app/image-to-pdf-200kb/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any (Web Browser)',
   }),
@@ -135,7 +134,7 @@ const portalsRequiring200kbPdf = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/image-to-pdf-200kb/"
+  canonical="https://pixelkit.app/image-to-pdf-200kb/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -170,7 +169,7 @@ const portalsRequiring200kbPdf = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for 200KB PDF -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
@@ -179,7 +178,7 @@ const portalsRequiring200kbPdf = [
         targetKb={200}
         initialTool="compress"
       />
-    </main>
+    </div>
 
     <!-- Portals Requiring 200KB PDF Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

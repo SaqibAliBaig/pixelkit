@@ -93,7 +93,7 @@ export const getStaticPaths: GetStaticPaths = () => {
       mime: 'image/webp',
       defaultKb: null,
       headline: 'Compress Image to WebP Online',
-      titleTag: 'Compress Image to WebP Online — Optimize Next-Gen WebP',
+      titleTag: 'Compress Image to WebP Online (Fast & Free)',
       metaDesc:
         'Free online tool to compress image to WebP. Optimize next-gen WebP images for green Core Web Vitals and instant page loads—100% in-browser, zero server uploads.',
       summary:
@@ -211,6 +211,8 @@ const jsonLd = [
         fromMime={spec.mime}
         toMime={spec.mime}
         targetKb={spec.defaultKb}
+        initialTool="compress"
+        initialSizeMode={spec.defaultKb === null ? 'quality' : 'max'}
       />
     </div>
 
@@ -259,7 +261,7 @@ const jsonLd = [
             <a href="/compress-jpg-to-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 100KB</a>
             <a href="/compress-jpg-to-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 200KB</a>
             <a href="/compress-jpg-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to PDF</a>
-            <a href="/photo-resizer-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Photo Resizer in KB</a>
+            <a href="/reduce-image-size-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 font-medium text-accent hover:bg-accent/15 transition-colors">Reduce Size in KB</a>
           </>
         )}
       </div>

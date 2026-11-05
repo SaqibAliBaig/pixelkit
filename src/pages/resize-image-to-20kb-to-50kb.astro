@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
@@ -49,9 +48,9 @@ const directAnswer = {
     'To resize an image between 20KB and 50KB, drop your JPG, PNG, or HEIC photo into PixelKit. Select 3.5 × 4.5 cm (350 × 450 px) passport framing. PixelKit automatically targets ~38 KB, landing right in the sweet spot between the 20 KB minimum and 50 KB maximum required by SSC, UPSC, and State PSC portals. Click Download for an instant, compliant JPEG with zero server uploads.',
 };
 
-const pageTitle = `Resize Image to 20KB to 50KB Online (SSC & UPSC Photo Preset) | ${SITE.name}`;
+const pageTitle = `Resize Image to 20KB–50KB Online (SSC & UPSC) | ${SITE.name}`;
 const pageDesc =
-  'Resize and compress images to 20KB to 50KB online. Calibrated for SSC CGL, CHSL, MTS, UPSC, and State PSC job application forms. 100% client-side privacy, zero server uploads.';
+  'Resize and compress images to 20KB–50KB online. Calibrated for SSC, UPSC, and State PSC job portals with 100% in-browser privacy and zero server uploads.';
 const pageKeywords = [
   'resize image to 20kb to 50kb',
   'resize photo to 20kb to 50kb',
@@ -95,7 +94,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Resize Image to 20KB to 50KB Tool',
     description: pageDesc,
-    path: '/resize-image-to-20kb-to-50kb/',
+    url: 'https://pixelkit.app/resize-image-to-20kb-to-50kb/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any (Web Browser)',
   }),
@@ -139,7 +138,7 @@ const portalsRequiringBracket = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/resize-image-to-20kb-to-50kb/"
+  canonical="https://pixelkit.app/resize-image-to-20kb-to-50kb/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -174,7 +173,7 @@ const portalsRequiringBracket = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for SSC/UPSC bracket -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -183,8 +182,12 @@ const portalsRequiringBracket = [
         targetKb={50}
         initialTool="passport"
         preset="exam-ssc"
+        category="exam"
+        initialSizeMode="range"
+        minKb={20}
+        maxKb={50}
       />
-    </main>
+    </div>
 
     <!-- Official Portal Bracket Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
@@ -225,8 +228,8 @@ const portalsRequiringBracket = [
         <span class="text-muted font-medium mr-1">Related Tools:</span>
         <a href="/ssc-photo-resizer/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">SSC Photo Resizer →</a>
         <a href="/upsc-signature-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">UPSC Signature Resizer (10KB–20KB)</a>
-        <a href="/resize-image-to-50kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize Image to 50KB</a>
-        <a href="/resize-image-to-20kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize Image to 20KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize Image to 50KB</a>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resize Image to 20KB</a>
         <a href="/increase-image-size-in-kb/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Increase Size in KB (If under 20KB)</a>
       </div>
     </section>

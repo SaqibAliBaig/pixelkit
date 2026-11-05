@@ -2,18 +2,72 @@
 interface Props {
   format?: string;
   sizeKb?: number | null;
+  filterKb?: number | null;
+  activePortal?: string;
 }
 
-const { format = 'JPG', sizeKb = null } = Astro.props;
+const {
+  format = 'JPG',
+  sizeKb = null,
+  filterKb = null,
+  activePortal = undefined,
+} = Astro.props;
+
+const targetKb = filterKb ?? sizeKb;
+
+const allPortals = [
+  { id: 'pan-sig', name: 'PAN Card & Aadhaar Signature', format: 'JPG', dims: '400 × 200 px', limit: '10 KB to 20 KB', minKb: 10, maxKb: 20 },
+  { id: 'ibps-sig', name: 'IBPS PO & Clerk Signature', format: 'JPG', dims: '140 × 60 px', limit: '10 KB to 20 KB', minKb: 10, maxKb: 20 },
+  { id: 'ssc-sig', name: 'SSC Signature (CGL / CHSL / MTS)', format: 'JPG', dims: '140 × 60 px (4 × 2 cm)', limit: '10 KB to 20 KB', minKb: 10, maxKb: 20 },
+  { id: 'ssc', name: 'SSC CGL, CHSL, GD Photo', format: 'JPG', dims: '350 × 450 px (3.5 × 4.5 cm)', limit: '20 KB to 50 KB', minKb: 20, maxKb: 50 },
+  { id: 'upsc', name: 'UPSC Civil Services (IAS/IPS)', format: 'JPG', dims: '350 × 350 to 1000 × 1000 px', limit: '20 KB to 300 KB', minKb: 20, maxKb: 300 },
+  { id: 'passport-in', name: 'Passport Seva (India) & PAN Card', format: 'JPG / JPEG', dims: '413 × 531 px (35 × 45 mm)', limit: '20 KB to 50 KB', minKb: 20, maxKb: 50 },
+  { id: 'neet', name: 'NEET-UG & JEE Main Photo', format: 'JPG', dims: '413 × 531 px (35 × 45 mm)', limit: '10 KB to 200 KB', minKb: 10, maxKb: 200 },
+  { id: 'us-visa', name: 'US Visa (DS-160) & DV Lottery', format: 'JPEG', dims: '600 × 600 px (2 × 2 inch square)', limit: 'Under 240 KB', minKb: 20, maxKb: 240 },
+  { id: 'schengen', name: 'Schengen Visa (France, Germany, Italy)', format: 'JPG', dims: '413 × 531 px (35 × 45 mm)', limit: 'Under 200 KB', minKb: 20, maxKb: 200 },
+  { id: 'uk-passport', name: 'UK Passport & UKVI Visa Portal', format: 'JPG', dims: '600 × 750 px (3:4 ratio)', limit: '50 KB to 10 MB', minKb: 50, maxKb: 10000 },
+  { id: 'canada', name: 'Canada Visa & Express Entry (IRCC)', format: 'JPG', dims: '420 × 540 px (35 × 45 mm)', limit: '60 KB to 240 KB', minKb: 60, maxKb: 240 },
+  { id: 'australia', name: 'Australia Visa (ImmiAccount)', format: 'JPG / PNG', dims: '413 × 531 px (35 × 45 mm)', limit: 'Under 500 KB', minKb: 50, maxKb: 500 },
+];
+
+let displayedPortals = allPortals;
+
+if (activePortal) {
+  const norm = activePortal.toLowerCase();
+  displayedPortals = allPortals.filter((p) => p.id.includes(norm) || p.name.toLowerCase().includes(norm));
+  if (displayedPortals.length < 3) {
+    displayedPortals = allPortals.slice(0, 4);
+  }
+} else if (targetKb) {
+  displayedPortals = allPortals.filter((p) => p.minKb <= targetKb && p.maxKb >= targetKb);
+  if (displayedPortals.length === 0) {
+    displayedPortals = allPortals.filter((p) => Math.abs(p.maxKb - targetKb) <= 50);
+  }
+  if (displayedPortals.length === 0) {
+    displayedPortals = allPortals.slice(0, 4);
+  }
+} else {
+  displayedPortals = allPortals.slice(0, 5);
+}
 ---
 
 <section class="mt-12 sm:mt-16 rounded-2xl border border-border bg-surface p-5 sm:p-8" aria-labelledby="portal-guide-heading">
-  <h2 id="portal-guide-heading" class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
-    Official Portal Upload Specifications &amp; Requirements Guide
-  </h2>
-  <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
-    Government, visa, and university recruitment portals enforce strict technical constraints to automate biometric validation. Here is how standard portals evaluate uploaded {format} files:
-  </p>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <div>
+      <h2 id="portal-guide-heading" class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Official Portal Upload Specifications &amp; Requirements Guide
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted leading-relaxed">
+        Government recruitment, visa, and exam portals enforce rigid biometric upload rules for {format} files:
+      </p>
+    </div>
+    <a
+      href="/portal-photo-size-chart/"
+      class="text-xs font-semibold text-accent hover:underline shrink-0"
+    >
+      Full 50+ Portal Chart →
+    </a>
+  </div>
 
   <div class="mt-6 overflow-x-auto">
     <table class="w-full text-left text-xs sm:text-sm">
@@ -26,112 +80,34 @@ const { format = 'JPG', sizeKb = null } = Astro.props;
         </tr>
       </thead>
       <tbody class="divide-y divide-border/60 text-fg/85">
-        <tr>
-          <td class="py-2.5 font-medium text-fg">Passport Seva (India) &amp; PAN Card</td>
-          <td class="py-2.5">JPG / JPEG</td>
-          <td class="py-2.5">413 × 531 px (35 × 45 mm at 300 DPI)</td>
-          <td class="py-2.5 font-medium text-accent">20 KB to 50 KB</td>
-        </tr>
-        <tr>
-          <td class="py-2.5 font-medium text-fg">US Visa (DS-160) &amp; DV Green Card Lottery</td>
-          <td class="py-2.5">JPEG</td>
-          <td class="py-2.5">600 × 600 px up to 1200 × 1200 px (1:1 Square)</td>
-          <td class="py-2.5 font-medium text-accent">Under 240 KB</td>
-        </tr>
-        <tr>
-          <td class="py-2.5 font-medium text-fg">Schengen Visa (France, Germany, Italy, Spain)</td>
-          <td class="py-2.5">JPG</td>
-          <td class="py-2.5">413 × 531 px (35 × 45 mm)</td>
-          <td class="py-2.5 font-medium text-accent">Under 200 KB</td>
-        </tr>
-        <tr>
-          <td class="py-2.5 font-medium text-fg">UK Passport &amp; Home Office Visa Portal</td>
-          <td class="py-2.5">JPG</td>
-          <td class="py-2.5">Minimum 600 × 750 px (3:4 ratio)</td>
-          <td class="py-2.5 font-medium text-accent">50 KB to 10 MB</td>
-        </tr>
-        <tr>
-          <td class="py-2.5 font-medium text-fg">UPSC, SSC, IBPS, State Civil Services Photos</td>
-          <td class="py-2.5">JPG</td>
-          <td class="py-2.5">350 × 450 px (Portrait)</td>
-          <td class="py-2.5 font-medium text-accent">20 KB to 50 KB</td>
-        </tr>
-        
-        <tr>
-          <td class="py-2.5 font-medium text-fg">Canada Visa, PR &amp; Express Entry (IRCC)</td>
-          <td class="py-2.5">JPEG / JPG</td>
-          <td class="py-2.5">420 × 540 px (50 × 70 mm, 5:7 aspect)</td>
-          <td class="py-2.5 font-medium text-accent">Under 240 KB</td>
-        </tr>
-        <tr>
-          <td class="py-2.5 font-medium text-fg">Official Digital Signature &amp; Thumbprint</td>
-          <td class="py-2.5">JPG / PNG</td>
-          <td class="py-2.5">140 × 60 px to 240 × 240 px</td>
-          <td class="py-2.5 font-medium text-accent">10 KB to 20 KB</td>
-        </tr>
+        {displayedPortals.map((p) => (
+          <tr>
+            <td class="py-2.5 font-medium text-fg">{p.name}</td>
+            <td class="py-2.5">{p.format}</td>
+            <td class="py-2.5">{p.dims}</td>
+            <td class="py-2.5 font-medium text-accent">{p.limit}</td>
+          </tr>
+        ))}
       </tbody>
     </table>
   </div>
 
-  <div class="mt-8 space-y-4 text-xs sm:text-sm text-fg/80 leading-relaxed border-t border-border/60 pt-6">
-    <h3 class="text-base font-semibold text-fg">
-      Avoiding Automated Portal Rejection: Core Technical Rules
-    </h3>
+  <div class="mt-6 border-t border-border/60 pt-5 space-y-3 text-xs sm:text-sm text-fg/80 leading-relaxed">
     <p>
-      <strong>Aspect Ratio and Margin Preservation:</strong> Automated facial biometric recognition systems expect the subject's face (from the crown of the head to the chin) to occupy between 70% and 80% of total image height. Cropping too closely into the forehead or leaving excessive empty sky above the head triggers automated disqualification. Always use PixelKit's 1:1 or 3:4 aspect ratio presets with balanced margins.
+      <strong>Biometric Facial Ratio (70%–80% Rule):</strong> Automated passport and exam gates require the subject's face (from the bottom of the chin to the top of the head) to measure strictly between 70% and 80% of total image height. Cropping too closely into the forehead or leaving excessive empty margins above the hair triggers automated rejection.
     </p>
     <p>
-      <strong>Preventing Loss of Detail in Small Budgets:</strong> When shrinking photos down to strict 20KB or 50KB limits, scaling original dimensions down (e.g. from 4000×3000 to 600×800 pixels) preserves far more perceived sharpness than applying high compression to full-resolution files. Rescaling reduces redundant pixel counts before compression begins, allowing quantization algorithms to retain clean facial contours and high-contrast signature lines.
+      <strong>Bicubic Downsampling Before Compression:</strong> When reducing large smartphone photos (e.g. 12MP–48MP) to small targets like 20KB or 50KB, always downsample pixel dimensions (e.g. to 350×450 px) first. Downscaling eliminates redundant pixel count before quantization begins, preserving crisp facial contours and high-contrast signature lines without blocky JPEG noise.
     </p>
-    <p>
-      <strong>Uniform Lighting &amp; Neutral Background Alignment:</strong> Biometric review engines measure pixel contrast differences between the subject's hair/ears and the background. Deep cast shadows on the wall behind the subject or uneven side-lighting frequently cause automated gates to reject submissions. If your original capture has minor background gradient variations, PixelKit's integrated canvas processor blends uniform backdrops cleanly before quantization passes.
-    </p>
-    <p>
-      <strong>Digital Signature &amp; Document Stamp Legibility:</strong> For candidate signatures and official stamp scans, low-pass blur filters must be avoided. Signatures rely on sharp edge transitions between blue/black ink strokes and white paper. PixelKit applies specialized high-contrast thresholding routines during binary search compression to keep delicate pen strokes legible even under strict 10KB to 20KB upload ceilings.
-    </p>
-    <p>
-      <strong>Orientation Normalization &amp; EXIF Header Handling:</strong> Smartphone cameras routinely record photos in landscape sensor orientation and append an EXIF rotation tag indicating how the photo should be rotated for display. Many legacy government portal scripts disregard EXIF tags, resulting in photos appearing sideways or upside down on official application forms. PixelKit physically bakes rotation into the raw bitmap data, guaranteeing upright display regardless of portal limitations.
-    </p>
-    <p>
-      <strong>Color Gamut Calibration (sRGB vs Display P3):</strong> Modern Apple iPhone and Android flagships photograph in the wide DCI-P3 color spectrum. However, web form upload validators and passport print systems expect standard sRGB color profiles. PixelKit converts chromatic coordinates to sRGB during client-side canvas processing, preventing washed-out skin tones or uncalibrated color shifts.
-    </p>
-    <p>
-      <strong>Multi-Core Web Worker Thread Concurrency:</strong> PixelKit executes compression in independent worker threads rather than blocking the browser's main UI loop. Even when processing multiple multi-megabyte raw photos simultaneously, your browser remains completely fluid, responsive, and stable without lag.
-    </p>
-    <p>
-      <strong>Zero Server Uploads &amp; Guaranteed Privacy:</strong> Personal ID cards, passports, signatures, and biometric photographs are high-value targets for data scraping and identity theft. PixelKit is built with a zero-knowledge architecture: all decoding, cropping, resizing, and binary-search compression executes 100% inside your local device memory using WebAssembly. Your files are never stored, transmitted, or logged on remote servers.
-    </p>
+  </div>
 
-    <h3 class="text-base font-semibold text-fg pt-4">
-      Biometric Passport Photo Technical Verification Standards
-    </h3>
-    <p>
-      <strong>Head Height and Eye Line Centering:</strong> The International Civil Aviation Organization (ICAO Doc 9303) and ISO/IEC 19794-5 dictate that in biometric passport images, the vertical distance between the bottom of the chin and the top of the head (excluding voluminous hair) must measure strictly between 70% and 80% of total image frame height (typically 31 mm to 36 mm on a 45 mm high print). Furthermore, the horizontal center line of the subject's eyes must sit between 50% and 70% of total image height from the bottom edge. PixelKit's 1-click portal presets automatically center the framing coordinates to fulfill these strict geometric ratios on upload.
-    </p>
-    <p>
-      <strong>DPI vs Resolution Translation:</strong> Official guidelines frequently specify dimensions in physical millimeters alongside a minimum DPI requirement (e.g., 35 × 45 mm at 300 DPI). To compute required digital pixels, divide millimeters by 25.4 to convert to inches, then multiply by DPI: (35 / 25.4) × 300 = 413.38 pixels wide, and (45 / 25.4) × 300 = 531.49 pixels high. Uploading files with non-integer subpixel scaling causes border blurring. PixelKit renders exact 413 × 531 integer pixel dimensions directly to ensure pin-sharp biometric validation.
-    </p>
-    <p>
-      <strong>Eliminating JPEG Compression Artifacts (Ringing and Blocking):</strong> When aggressive compression is applied to small file sizes like 20 KB or 50 KB, standard 8×8 Discrete Cosine Transform (DCT) block boundaries become visible around high-frequency edges such as eyelashes, eyebrows, and iris contours. Automated portal gates flag these DCT artifacts as biometric scanning interference. PixelKit's binary search engine utilizes adaptive quantization matrix tuning to preserve smooth facial skin gradients while constraining file sizes exactly below government upload limits.
-    </p>
-    <p>
-      <strong>White Background Uniformity and Shadow Elimination:</strong> Biometric photo gates employ automated edge detection filters that compute luminance gradients across the background perimeter. Any shadow, color tint, wallpaper pattern, or flash reflection behind the ears or neck causes the boundary test to fail. PixelKit's canvas rendering pipeline cleanly isolates facial borders and normalizes background pixels to pure neutral white (#FFFFFF) or light grey (#F2F2F2) as mandated by Schengen, UKVI, and US State Department DS-160 standards.
-    </p>
-
-    <h3 class="text-base font-semibold text-fg pt-4">
-      Universal Document &amp; Signature Optimization Guidelines
-    </h3>
-    <p>
-      <strong>High-Contrast Binarization for Official Signatures:</strong> Digital signature slots on banking, PSC, and university portals require stark differentiation between ink pigments and the paper background. When photograph scans suffer from shadows or ambient room warmth, low-contrast ink lines can be misidentified as blank uploads. PixelKit applies high-frequency adaptive thresholding during processing, amplifying blue and black ballpoint strokes to maximum contrast while ensuring the surrounding boundary clears to pristine white.
-    </p>
-    <p>
-      <strong>Resolution Normalization for Mobile Phone Scans:</strong> Modern smartphone camera sensors capture between 12 and 48 megapixels (4000×3000 to 8000×6000 pixels). Attempting to compress a 48-megapixel image directly down to 100 KB without downsizing dimensions forces extreme DCT quantization, destroying document readability. By combining PixelKit's integrated dimension resizer with its kilobyte compression ladder, images are resampled to balanced display resolutions (such as 1200×1600 px) before compression occurs, retaining crystal-clear alphanumeric legibility on certificates, marks cards, and government identity proofs.
-    </p>
-    <p>
-      <strong>Cross-Platform EXIF Orientation Correction:</strong> When taking photos with a smartphone held vertically or upside-down, the physical image sensor registers the photo in raw landscape orientation and merely writes an EXIF orientation flag into the header. Many institutional portal servers run legacy image parsing scripts that discard EXIF orientation tags, causing passport photos and signature uploads to appear rotated sideways on identity cards and exam hall tickets. PixelKit's engine automatically detects sensor orientation and physically bakes the rotation directly into the raw canvas pixel matrix before export, ensuring every submission displays upright on every legacy or modern system.
-    </p>
-    <p>
-      <strong>Multi-Image Batch Queue with Unlimited File Capacities:</strong> Preparing submissions for multi-member families, travel groups, or multiple government departments often demands processing dozens of photos and supporting documents. PixelKit imposes zero artificial caps on file counts or total megabyte throughput. Drag and drop unlimited images into the processing queue, customize crop and dimension parameters per job or globally, and download the entire batch instantly as individual files or combined archives with zero waiting queues.
-    </p>
+  <div class="mt-6 rounded-xl border border-accent/25 bg-accent/5 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+      <h3 class="font-semibold text-fg text-sm">Need specifications for another portal?</h3>
+      <p class="text-xs text-muted mt-0.5">Explore exact pixel dimensions, millimeter ratios, and kilobyte rules for 50+ global authorities in our master chart.</p>
+    </div>
+    <a href="/portal-photo-size-chart/" class="shrink-0 px-3.5 py-1.5 rounded-lg bg-accent text-accent-fg text-xs font-semibold hover:opacity-90 transition-opacity">
+      View 50+ Portal Size Chart →
+    </a>
   </div>
 </section>

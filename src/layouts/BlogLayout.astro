@@ -29,6 +29,9 @@ const {
 } = Astro.props;
 
 const url = new URL(Astro.url.pathname, Astro.site).href;
+const rawBlogSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
+const defaultBlogOgUrl = new URL(`/og/${rawBlogSlug}.png`, Astro.site).href;
+const fullCoverUrl = cover ? new URL(cover, Astro.site).href : defaultBlogOgUrl;
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -44,7 +47,7 @@ const jsonLd = [
     publishedAt,
     updatedAt,
     author,
-    image: cover,
+    image: fullCoverUrl,
   }),
   buildBreadcrumbJsonLd(
     breadcrumbs.map((b) => ({
@@ -56,7 +59,8 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={title.length > 58 ? title : `${title} — ${SITE.name}`}
+  title={title}
+  image={fullCoverUrl}
   description={description}
   type="article"
   publishedAt={publishedAt}

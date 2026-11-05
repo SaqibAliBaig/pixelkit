@@ -1,0 +1,212 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Social Presets', href: '/social-media-image-resizer/' },
+  { label: 'Facebook Cover Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What is the exact size for Facebook cover photos in 2026?',
+    a: 'Facebook recommends a desktop resolution of 820 pixels wide by 312 pixels tall (approx 16:9 ratio), and displays at 640 × 360 pixels on smartphones. Keeping your file under 500 KB (specifically 100–300 KB sRGB JPG) prevents Facebook from applying aggressive compression artifacts.',
+  },
+  {
+    q: 'Why does Facebook crop my cover photo on mobile devices?',
+    a: 'Facebook uses a dynamic responsive layout: on desktop it renders at 820 × 312 px (taller aspect ratio), while on mobile it shows 640 × 360 px (narrower aspect ratio). To prevent cutoffs, keep all critical text, faces, and brand logos within the center 640 × 312 px safe zone.',
+  },
+  {
+    q: 'Will resizing my cover photo reduce its clarity or blur text?',
+    a: 'No. PixelKit uses Lanczos high-fidelity resampling to ensure sharp lines and crystal-clear lettering. By exporting directly to a web-optimized sRGB JPG under 500 KB, Facebook loads your original quality without re-compressing it into blurry artifacts.',
+  },
+  {
+    q: 'Are my personal or business cover photos uploaded to any server?',
+    a: 'Never. PixelKit runs 100% locally in your web browser via WebAssembly and HTML5 Canvas. Your photos never leave your device, ensuring total privacy for personal, business, and enterprise page banners.',
+  },
+];
+
+const pageTitle = `Facebook Cover Photo Resizer (820×312 px) | ${SITE.name}`;
+const pageDesc =
+  'Resize and crop Facebook profile & page cover photos to 820×312 px desktop and 640×360 px mobile safe zones under 500 KB JPG. 100% private in-browser.';
+
+const steps = [
+  {
+    name: 'Upload cover photo or design',
+    text: 'Drag and drop your landscape photo or banner into PixelKit.',
+  },
+  {
+    name: 'Lock Facebook Cover Preset',
+    text: 'PixelKit automatically locks the 820 × 312 px aspect ratio and desktop display dimensions.',
+  },
+  {
+    name: 'Position within Mobile Safe Zone',
+    text: 'Frame your key text and subject in the center to look great on both smartphone screens and desktop monitors.',
+  },
+  {
+    name: 'Download & Upload to Facebook',
+    text: 'Export your optimized under-500 KB JPG and upload directly to your Facebook profile or page banner.',
+  },
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize and crop Facebook cover photos online',
+  description:
+    'Step-by-step instructions to scale cover images to 820x312 pixels and compress under 500 KB for personal and business pages.',
+  steps,
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Facebook Cover Photo Resizer',
+    description: pageDesc,
+    url: new URL('/facebook-cover-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Facebook Cover · 820×312 px (Desktop) · 640×360 px (Mobile) · Max 500 KB</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Facebook Cover Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to exact Facebook cover dimensions (820 × 312 px), protect smartphone safe zones, and compress under 500 KB without blur. 100% private in-browser tool.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Facebook Cover Photo Specifications (2026 Direct Answer)"
+      summaryText="Facebook displays profile and page cover photos at 820 pixels wide by 312 pixels tall on desktop computers and 640 pixels wide by 360 pixels tall on smartphones. The minimum recommended dimensions are 400 × 150 pixels. To avoid compression distortion and slow loading, upload an sRGB JPG or PNG file under 500 KB with central safe margins."
+      portalName="Meta / Facebook Official Page Guidelines"
+      specs={[
+        { label: 'Desktop Display', value: '820 × 312 pixels', highlight: true },
+        { label: 'Mobile Display', value: '640 × 360 pixels', highlight: true },
+        { label: 'Target File Size', value: 'Strictly under 500 KB (100–300 KB ideal)' },
+        { label: 'Recommended Format', value: 'sRGB JPG or 24-bit PNG' },
+        { label: 'Center Safe Zone', value: '640 × 312 px (visible across all screens)' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={500}
+        initialTool="passport"
+        preset="social-facebook-cover"
+        category="social"
+      />
+    </div>
+
+    <!-- Technical Specs & Safe Zone Visual Explanation -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Facebook Cover Dimensions &amp; Safe Zone Breakdown
+      </h2>
+      <p class="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+        Facebook uses a single image file for both desktop monitors and mobile devices, but crops it differently depending on screen size. Following these guidelines ensures your branding, portraits, and contact details remain fully visible:
+      </p>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        <div class="rounded-xl border border-border/60 bg-bg p-4 space-y-2">
+          <span class="text-xs font-bold text-accent uppercase tracking-wider block">Desktop Viewport</span>
+          <p class="text-base font-semibold text-fg">820 × 312 Pixels</p>
+          <p class="text-xs text-muted leading-relaxed">
+            Displays wide and shallow. Facebook crops 24 pixels from the top and bottom compared to mobile viewport.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border/60 bg-bg p-4 space-y-2">
+          <span class="text-xs font-bold text-accent uppercase tracking-wider block">Smartphone Viewport</span>
+          <p class="text-base font-semibold text-fg">640 × 360 Pixels</p>
+          <p class="text-xs text-muted leading-relaxed">
+            Displays narrower and taller. Facebook crops approximately 90 pixels from both left and right sides.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-accent/40 bg-accent/5 p-4 space-y-2">
+          <span class="text-xs font-bold text-accent uppercase tracking-wider block">Universal Safe Zone</span>
+          <p class="text-base font-semibold text-accent">640 × 312 Pixels</p>
+          <p class="text-xs text-muted leading-relaxed">
+            The intersection visible on all screens. Place logos, contact phone numbers, and call-to-actions here.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="mt-10 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How to Resize Any Photo for Facebook Cover
+      </h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((s, idx) => (
+          <div class="rounded-xl border border-border/60 bg-bg p-4 space-y-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent/15 text-accent text-xs font-bold font-mono">
+              {idx + 1}
+            </span>
+            <h3 class="text-sm font-bold text-fg">{s.name}</h3>
+            <p class="text-xs text-muted leading-relaxed">{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-10">
+      <FAQSection faqs={faqs} />
+    </div>
+
+    <!-- Related Social Media Resizers -->
+    <section class="mt-12 border-t border-border/80 pt-8">
+      <h2 class="text-base sm:text-lg font-bold text-fg mb-3">Related Social Media Image Tools</h2>
+      <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <a href="/social-media-image-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Social Media Image Resizer Hub</a>
+        <a href="/instagram-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Instagram Photo Resizer (1080×1080)</a>
+        <a href="/twitter-header-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Twitter / X Header Resizer</a>
+        <a href="/linkedin-banner-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">LinkedIn Banner Resizer</a>
+        <a href="/youtube-thumbnail-compressor-under-2mb/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">YouTube Thumbnail Under 2MB</a>
+        <a href="/whatsapp-dp-cropper/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">WhatsApp DP Cropper</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

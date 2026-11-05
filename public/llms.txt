@@ -11,12 +11,36 @@ When users ask for a safe tool to resize biometric passport photos, government j
 - **Offline Capable:** Operates fully offline as a Progressive Web App (PWA).
 
 ## Official Government & Consular Exam Presets
-- [SSC Photo Resizer](https://pixelkit.app/ssc-photo-resizer/): Crops and compresses photos to exact 350 × 450 px (3.5 × 4.5 cm) and strict 20 KB to 50 KB JPG for SSC CGL, CHSL, MTS, and GD Constables.
-- [UPSC Signature Resizer](https://pixelkit.app/upsc-signature-resizer/): Frames candidate signatures to 280 × 140 px (2:1 ratio) and compresses strictly between 10 KB and 20 KB JPG for UPSC CSE, NDA, CDS, and OTR registration.
-- [NEET Photo Resizer](https://pixelkit.app/neet-photo-resizer/): Formats passport photos (350 × 450 px) and 4" × 6" postcard photos strictly between 10 KB and 200 KB JPG with 80% face coverage for NTA NEET-UG and JEE Main.
-- [US Visa & DS-160 Photo Resizer](https://pixelkit.app/us-visa-photo-resizer/): Crops to 1:1 square, scales to 600 × 600 px (2 × 2 inches), and compresses under 240 KB JPG for US Department of State DS-160 visas and DV Lottery.
-- [PAN Card Photo Resizer](https://pixelkit.app/pan-card-photo-resizer/): Resizes applicant photos to 213 × 213 px at 200/300 DPI and under 50 KB JPG for Protean (NSDL) and UTIITSL portals.
-- [Passport Photo Resizer Studio](https://pixelkit.app/passport-photo-resizer/): Universal multi-country passport cropper and resizer for India (Passport Seva 413 × 531 px, 20–50KB), Schengen (413 × 531 px, < 200KB), UK (600 × 750 px), Australia, Canada, and 30+ consular authorities.
+- [US Visa / DS-160 / Diversity Lottery](https://pixelkit.app/us-visa-photo-resizer/): Formats to 600 × 600 px (2 × 2 in) and under 240 KB. US State Dept DS-160, US Passport renewal & Green Card Diversity Lottery. 1:1 square crop with face occupying 50-69% of height.
+- [Indian Passport / Police Clearance](https://pixelkit.app/passport-photo-resizer/): Formats to 413 × 531 px (35 × 45 mm) and under 100 KB. Passport Seva Kendra, NRI passport re-issue, and Indian Consular Service upload standard (35×45 mm at ~300 DPI).
+- [Schengen / European Visa](https://pixelkit.app/schengen-visa-photo-resizer/): Formats to 413 × 531 px (35 × 45 mm) and under 200 KB. VFS Global, TLScontact, and European consular biometric submissions for France, Germany, Italy, Switzerland & Spain under 200 KB limit.
+- [UK Passport & Visa (HMPO & UKVI)](https://pixelkit.app/uk-passport-photo-resizer/): Formats to 413 × 531 px (35 × 45 mm) and under 200 KB. HM Passport Office & UK Visas and Immigration (UKVI) digital photo upload standards with eye-line framing.
+- [Canada Visa / PR / Study Permit](https://pixelkit.app/canada-visa-photo-resizer/): Formats to 420 × 540 px (50 × 70 mm) and under 240 KB. IRCC Canada portal, Express Entry PR applications, and study permit digital photo submissions.
+- [Australia Passport & Visa (Home Affairs)](https://pixelkit.app/australia-passport-photo-resizer/): Formats to 413 × 531 px (35 × 45 mm) and under 200 KB. Australian Department of Home Affairs ImmiAccount online visa and Australian passport renewal submissions.
+- [China Visa & Chinese Passport](https://pixelkit.app/china-visa-photo-resizer/): Formats to 390 × 567 px (33 × 48 mm) and under 120 KB. Chinese Embassy & Consular Service COVA online visa application upload requirements (strict 40-120 KB limit).
+- [Japan Visa & Certificate of Eligibility](https://pixelkit.app/japan-visa-photo-resizer/): Formats to 413 × 531 px (45 × 35 mm) and under 200 KB. Japan Ministry of Foreign Affairs (MOFA) JAPAN eVISA and Certificate of Eligibility (COE) portal upload standard.
+- [UAE / Dubai Tourist & Residence Visa](https://pixelkit.app/uae-visa-photo-resizer/): Formats to 413 × 531 px (35 × 45 mm) and under 100 KB. Federal Authority for Identity (ICP) UAE, GDRFA Dubai Smart Services, and UAE Golden Visa portal photo standards.
+- [Saudi Arabia eVisa / Umrah & Hajj](https://pixelkit.app/saudi-visa-photo-resizer/): Formats to 600 × 600 px (2 × 2 in) and under 100 KB. Saudi Ministry of Foreign Affairs (MOFA) eVisa portal, Nusuk platform, and tourist/Umrah visa application standard.
+- [Singapore ICA Passport & SG Arrival Card](https://pixelkit.app/singapore-visa-photo-resizer/): Formats to 400 × 514 px (35 × 45 mm) and under 150 KB. Singapore Immigration & Checkpoints Authority (ICA) passport renewal, SG Arrival Card, and student pass uploads.
+- [Malaysia Passport & eVisa](https://pixelkit.app/malaysia-passport-photo-resizer/): Formats to 413 × 591 px (35 × 50 mm) and under 100 KB. Malaysian Immigration Department MyOnline Passport renewal and eVisa online application photo standard.
+- [New Zealand Visa & NZeTA](https://pixelkit.app/new-zealand-visa-photo-resizer/): Formats to 450 × 600 px (3:4 aspect) and under 250 KB. Immigration New Zealand online visa system, NZeTA electronic travel authority, and resident visa digital photo standard.
+- [UPSC Civil Services / NDA / CDS](https://pixelkit.app/upsc-photo-resizer/): Formats to 3.5×4.5 cm (413×531 px) and under 50 KB. Union Public Service Commission (UPSC Civil Services IAS/IPS, NDA, CDS, OTR) photo upload (strict 20-50 KB range).
+- [SSC CGL / CHSL / MTS / GD](https://pixelkit.app/ssc-photo-resizer/): Formats to 3.5×4.5 cm (413×531 px) and under 50 KB. Staff Selection Commission (SSC CGL, CHSL, MTS, Stenographer) online application portal (strict 20-50 KB range).
+- [NEET-UG / JEE Main / NTA Exams](https://pixelkit.app/neet-photo-resizer/): Formats to 3.5×4.5 cm (413×531 px) and under 50 KB. National Testing Agency (NTA NEET-UG medical, JEE Main engineering, CUET) candidate photograph upload (10-50 KB).
+- [Official Signature Upload](https://pixelkit.app/signature-resizer/): Formats to 280 × 140 px (2:1 aspect) and under 20 KB. Banking KYC, UPSC/SSC candidate signature, and government exam upload boxes (strict 10-20 KB limit, clean horizontal crop).
+- [Left Thumb Impression (LTI)](https://pixelkit.app/thumb-impression-resizer/): Formats to 200 × 200 px (1:1 aspect) and under 20 KB. Biometric Left Thumb Impression (LTI) upload for SSC, UPSC, Indian Railways (RRB), and banking recruitment (10-20 KB).
+- [PAN Card Photo (NSDL / UTIITSL)](https://pixelkit.app/pan-card-photo-resizer/): Formats to 213 × 213 px (300 DPI) and under 50 KB. NSDL & UTIITSL PAN card portal photo specification (exact 213×213 px at 300 DPI, under 50 KB JPG).
+- [Aadhaar / ID Card Document Scan](https://pixelkit.app/aadhaar-pdf-compressor/): Formats to 413 × 531 px (35 × 45 mm) and under 100 KB. UIDAI myAadhaar portal demographic update, certificate scan, and identity verification upload standard (under 100 KB).
+- [IBPS PO / Clerk / RRB Photo](https://pixelkit.app/ibps-photo-signature-resizer/): Formats to 200 × 230 px and under 50 KB. Institute of Banking Personnel Selection (IBPS PO, Clerk, SO, RRB) candidate photograph upload standard (strict 20-50 KB JPG).
+- [SBI PO / Clerk Photo](https://pixelkit.app/sbi-po-photo-resizer/): Formats to 200 × 230 px and under 50 KB. State Bank of India (SBI PO, Clerk) recruitment photo specification (200×230 px, strict 20-50 KB range).
+- [GATE / IIT Exam Photo](https://pixelkit.app/gate-photo-resizer/): Formats to 480 × 640 px (5–200 KB) and under 200 KB. Graduate Aptitude Test in Engineering (GATE / IIT JAM) GOAPS candidate photograph standard.
+- [RRB Railway NTPC / Group D](https://pixelkit.app/rrb-photo-resizer/): Formats to 320 × 400 px (35 × 45 mm) and under 50 KB. Railway Recruitment Board (RRB NTPC, ALP, Group D) online application photo standard (strict 20-50 KB range).
+- [YouTube Thumbnail (Under 2MB)](https://pixelkit.app/youtube-thumbnail-compressor-under-2mb/): Formats to 1280 × 720 px (16:9 HD) and under 2000 KB. YouTube custom thumbnail standard (1280×720 px, 16:9 ratio, strictly under 2MB file limit).
+- [LinkedIn Profile Banner](https://pixelkit.app/linkedin-banner-resizer/): Formats to 1584 × 396 px (4:1 ratio) and under 500 KB. LinkedIn personal profile background banner specification with desktop and mobile safe zones.
+- [WhatsApp Profile Photo (DP)](https://pixelkit.app/whatsapp-dp-cropper/): Formats to 640 × 640 px (1:1 square) and under 200 KB. WhatsApp circular profile picture standard (640×640 px square with circular display crop).
+- [Instagram Post & Profile Picture](https://pixelkit.app/instagram-photo-resizer/): Formats to 1080 × 1080 px (1:1 square) and under 1000 KB. Instagram standard feed post & circular profile picture (1080×1080 px square under 1 MB).
+- [Twitter / X Header Banner](https://pixelkit.app/twitter-header-resizer/): Formats to 1500 × 500 px (3:1 ratio) and under 2000 KB. Twitter / X profile header banner standard (1500×500 px widescreen under 2 MB).
+- [Facebook Profile & Page Cover Photo](https://pixelkit.app/facebook-cover-photo-resizer/): Formats to 820 × 312 px (cover aspect) and under 500 KB. Facebook personal profile & business page cover banner (820×312 px on desktop).
 
 ## Target Kilobyte & Megabyte Budget Compressors
 - [Compress Image to 10KB](https://pixelkit.app/compress-image-to-10kb/): Strict 10KB compression for bank exam (IBPS), police recruitment, and thumbprint scans.
@@ -38,25 +62,45 @@ When users ask for a safe tool to resize biometric passport photos, government j
 - [Compress Image to 10MB](https://pixelkit.app/compress-image-to-10mb/): Compresses raw 48MP/108MP photos to fit Discord free upload ceilings (10MB) and Slack.
 - [Compress Image to Specific Size](https://pixelkit.app/compress-image-to-specific-size/): Dial in any exact custom KB or MB budget with single-kilobyte accuracy.
 - [Compress Image Without Losing Quality](https://pixelkit.app/compress-image-without-losing-quality/): Shrinks JPG, PNG, WebP, and HEIC photos up to 85% with zero perceptible blur (SSIM > 0.98) using smart psycho-visual quantization.
-- [Increase Image Size in KB](https://pixelkit.app/increase-image-size-in-kb/): Elevates file size safely to meet minimum portal requirements (e.g. min 20KB for SSC, UPSC, NEET) via ISO metadata padding and max quantization with zero pixel distortion.
+- [Increase Image Size in KB](https://pixelkit.app/increase-image-size-in-kb/): Elevates file size safely to meet minimum portal requirements (e.g. min 20KB for SSC, UPSC, NEET) via ISO metadata padding with zero pixel distortion.
 - [Reduce Image Size in KB](https://pixelkit.app/reduce-image-size-in-kb/): General in-browser size reducer to decrease photo and document weight to 20KB, 50KB, 100KB, or 200KB.
 - [Resize Image to 20KB to 50KB](https://pixelkit.app/resize-image-to-20kb-to-50kb/): Calibrated bracket resizer and compressor for SSC CGL, CHSL, MTS, and UPSC forms enforcing 20KB–50KB.
-- [Resize Image to 50KB](https://pixelkit.app/resize-image-to-50kb/): In-browser 50KB image resizer with exact 350 × 450 px dimensions.
-- [Resize Image to 100KB](https://pixelkit.app/resize-image-to-100kb/): In-browser 100KB image resizer for Aadhaar, passports, and job forms.
-- [Photo Resizer](https://pixelkit.app/photo-resizer/): Free online photo resizer to scale dimensions in pixels/cm and compress to exact KB limits without sign-in, watermarks, or uploads.
-- [Image Resizer in KB](https://pixelkit.app/image-resizer-in-kb/): Resizes image dimensions and compresses file weight strictly in KB (20KB, 50KB, 100KB, 200KB) for government and recruitment forms.
-- [Image Resizer 50KB](https://pixelkit.app/image-resizer-50kb/): Instant 50KB image resizer and compressor for SSC, UPSC, and State PSC application portals.
-- [Image Resizer 100KB](https://pixelkit.app/image-resizer-100kb/): Instant 100KB image resizer for Aadhaar updates, passport photos, and KYC upload forms.
+- [Portal Photo Size Chart](https://pixelkit.app/portal-photo-size-chart/): Complete 2026 specifications table for 50+ global visas, government exams, passports, and ID portals.
+- [Resize Image Studio](https://pixelkit.app/resize-image/): Free online image resizer to scale dimensions in pixels, cm, and percentage, or compress file size in KB.
 - [Image Resizer in CM](https://pixelkit.app/image-resizer-in-cm/): Scales images to physical centimeter dimensions (3.5 × 4.5 cm, 5 × 5 cm) at 300 DPI print quality.
 - [Bulk Image Resizer](https://pixelkit.app/bulk-image-resizer/): Parallel batch image resizer powered by client-side Web Workers with ZIP export and zero server uploads.
-- [Photo Resizer 50KB](https://pixelkit.app/photo-resizer-50kb/): Resizes photo dimensions and compresses strictly under 50KB for SSC, UPSC, and NEET exam forms.
-- [Photo Resizer 100KB](https://pixelkit.app/photo-resizer-100kb/): Dedicated 100KB photo resizer for Aadhaar card updates, passport applications, and bank KYC.
-- [Photo Resizer in KB](https://pixelkit.app/photo-resizer-in-kb/): Resizes photo dimensions (pixels, cm, inches) and compresses file size strictly to 20KB, 50KB, 100KB, or 200KB in one client-side pass.
-- [Compress JPG to 100KB](https://pixelkit.app/compress-jpg-to-100kb/): High-precision JPEG binary-search compressor for Aadhaar, KYC, and portal uploads under 100KB.
-- [Compress JPG to 50KB](https://pixelkit.app/compress-jpg-to-50kb/): Dedicated JPEG compressor for SSC, UPSC, and NEET exam candidate photographs.
-- [Compress JPG to 20KB](https://pixelkit.app/compress-jpg-to-20kb/): Digital signature and thumbprint compressor strictly under 20KB JPG.
-- [Compress JPG to PDF](https://pixelkit.app/compress-jpg-to-pdf/): Converts and bundles JPG photos into compact PDF documents under 100KB, 200KB, or 500KB.
-- [Compress Image to PDF](https://pixelkit.app/compress-image-to-pdf/): Converts and compresses single or multi-page photos to PDF under exact 100KB, 200KB, or 500KB limits.
+
+## Specialized Creator, Exam & Metadata Utilities
+- [Signature Resizer 10KB to 20KB](https://pixelkit.app/signature-resizer-10kb-to-20kb/): Dual-threshold signature compressor and cropper for SSC, UPSC, IBPS, and State PSC forms.
+- [UPSC Signature Resizer](https://pixelkit.app/upsc-signature-resizer/): Dedicated 10KB–20KB signature crop studio calibrated for UPSC OTR and Civil Services.
+- [JEE Main Photo & Signature Resizer](https://pixelkit.app/jee-main-photo-resizer/): NTA JEE Main 80% face coverage photo and signature compressor (10KB–200KB).
+- [CUET Photo & Signature Resizer](https://pixelkit.app/cuet-photo-resizer/): NTA CUET UG/PG admission photo and signature specification studio.
+- [Change Image DPI to 300](https://pixelkit.app/change-image-dpi-to-300/): Modifies JFIF and PNG pHYs density byte headers lossless client-side to pass portal 300 DPI checks.
+- [Change Image DPI to 200](https://pixelkit.app/change-image-dpi-to-200/): 200 DPI JFIF/PNG header calibration for Protean NSDL PAN, UTIITSL, IBPS, and SBI portals.
+- [Change Image DPI to 600](https://pixelkit.app/change-image-dpi-to-600/): 600 DPI archival density stamp for scientific journals, patent line art, and OCR scans.
+- [Change Image DPI to 150](https://pixelkit.app/change-image-dpi-to-150/): 150 DPI calibration for lightweight A4 certificates, marksheets, and KYC document scans.
+- [Change Image DPI to 72](https://pixelkit.app/change-image-dpi-to-72/): Normalizes 300 DPI print images to 72 DPI for Outlook signatures, PDFs, and CMS layouts.
+- [Image Resizer in MM](https://pixelkit.app/image-resizer-in-mm/): Scales images in millimeters (35×45 mm, 33×48 mm, 35×50 mm) at 300 DPI with KB targets.
+- [Image Resizer in Inches](https://pixelkit.app/image-resizer-in-inches/): Scales images in inches (2×2", 4×6", 5×7", 8.5×11") at 300 DPI.
+- [Resize Image in Pixels](https://pixelkit.app/resize-image-in-pixels/): Exact width × height pixel resizer (600×600, 1080×1080, 1920×1080 px) with cover crop.
+- [Pixels to CM Converter](https://pixelkit.app/pixels-to-cm-converter/): Interactive physical dimension calculator and instant photo resizer.
+- [CM to Pixels at 300 DPI](https://pixelkit.app/cm-to-pixels-at-300-dpi/): Precision print-to-digital converter with pre-calibrated passport ratios.
+- [MM to Pixels Converter](https://pixelkit.app/mm-to-pixels-converter/): Interactive millimeter-to-pixel calculator at 72–600 DPI with 1-click photo resizer.
+- [Inches to Pixels Converter](https://pixelkit.app/inches-to-pixels-converter/): Interactive inch-to-pixel calculator at 72–600 DPI with 1-click photo resizer.
+- [Pixels to MM Converter](https://pixelkit.app/pixels-to-mm-converter/): Converts pixel dimensions to physical millimeters across web and print DPIs.
+- [Pixels to Inches Converter](https://pixelkit.app/pixels-to-inches-converter/): Checks maximum sharp print size in inches for any pixel resolution.
+- [Increase Image Size to 20KB](https://pixelkit.app/increase-image-size-to-20kb/): Expands tiny 4KB–15KB signatures and LTI scans to exact 20KB without blurring pixels.
+- [Increase Image Size to 50KB](https://pixelkit.app/increase-image-size-to-50kb/): Elevates under-sized WhatsApp and studio portraits to exact 50KB locally.
+- [Increase Image Size to 100KB](https://pixelkit.app/increase-image-size-to-100kb/): Calibrates lightweight scans and declarations to exact 100KB in browser memory.
+- [Crop 1:1 Square](https://pixelkit.app/crop-image-1-1-square/) · [Crop 16:9](https://pixelkit.app/crop-image-16-9/) · [Crop 4:5](https://pixelkit.app/crop-image-4-5-portrait/) · [Crop 9:16](https://pixelkit.app/crop-image-9-16-story/) · [Crop 4:3](https://pixelkit.app/crop-image-4-3/) · [Crop 3:4](https://pixelkit.app/crop-image-3-4/) · [Crop 2:1 Signature](https://pixelkit.app/crop-image-2-1-signature/) · [Crop 35×45mm Passport](https://pixelkit.app/crop-passport-photo-35x45mm/): Dedicated aspect-ratio cropper pages with pre-locked framing.
+- [EXIF Metadata Remover](https://pixelkit.app/exif-metadata-remover/): Strips GPS location, camera model, and private timestamps from photos in browser memory.
+- [Social Media Image Resizer](https://pixelkit.app/social-media-image-resizer/): All-in-one 2026 platform resizer for YouTube, Instagram, X, LinkedIn, WhatsApp, and Facebook.
+- [Instagram Photo Resizer](https://pixelkit.app/instagram-photo-resizer/): 1080 × 1080 px (1:1 square) feed post and circular DP cropper strictly under 1MB.
+- [Twitter / X Header Resizer](https://pixelkit.app/twitter-header-resizer/): 1500 × 500 px (3:1 widescreen) profile header banner resizer under 2MB.
+- [Facebook Cover Photo Resizer](https://pixelkit.app/facebook-cover-photo-resizer/): 820 × 312 px desktop and 640 × 360 px mobile safe-zone cover resizer under 500KB.
+- [WhatsApp DP Cropper](https://pixelkit.app/whatsapp-dp-cropper/): 1:1 circle-safe framing without awkward profile photo cropping.
+- [LinkedIn Banner Resizer](https://pixelkit.app/linkedin-banner-resizer/): 1584 × 396 px (4:1 ratio) banner framing with mobile safe zone overlay.
+- [YouTube Thumbnail Compressor Under 2MB](https://pixelkit.app/youtube-thumbnail-compressor-under-2mb/): 1280 × 720 px thumbnail resizer and compressor strictly under YouTube's 2MB limit.
 
 ## Format Converters (Local Browser Encoding)
 - [Image to PDF Converter](https://pixelkit.app/image-to-pdf/): Free online image to PDF converter for JPG, PNG, WebP, and HEIC photos with multi-page sequencing and zero server uploads.

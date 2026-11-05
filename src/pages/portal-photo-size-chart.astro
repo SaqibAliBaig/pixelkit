@@ -1,0 +1,333 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+  buildSoftwareApplicationJsonLd,
+} from '@lib/seo/jsonld';
+
+const canonicalUrl = 'https://pixelkit.app/portal-photo-size-chart/';
+const pageTitle = `Portal Photo & Size Chart (50+ Specs) | ${SITE.name}`;
+const pageDesc =
+  '2026 official photo & signature specs for 50+ visas, exams, and passports. Look up pixel dimensions, DPI, and KB limits with instant 1-click resize presets.';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Photo Size Chart' },
+];
+
+const portals = [
+  // India Exams
+  { name: 'SSC CGL, CHSL, MTS, GD', category: 'Indian Exams', format: 'JPEG / JPG', dims: '350 × 450 px (3.5 × 4.5 cm)', size: '20 KB to 50 KB', dpi: '100–300 DPI', bg: 'Light / White', link: '/ssc-photo-resizer/' },
+  { name: 'SSC Signature (All Exams)', category: 'Indian Exams', format: 'JPEG / JPG', dims: '140 × 60 px (4.0 × 2.0 cm)', size: '10 KB to 20 KB', dpi: '100–300 DPI', bg: 'White Paper', link: '/signature-resizer-10kb-to-20kb/' },
+  { name: 'UPSC Civil Services (IAS/IPS)', category: 'Indian Exams', format: 'JPG', dims: '350 × 450 px (3.5 × 4.5 cm)', size: '20 KB to 50 KB', dpi: '300 DPI', bg: 'White', link: '/upsc-photo-resizer/' },
+  { name: 'UPSC Signature Upload', category: 'Indian Exams', format: 'JPG', dims: '280 × 140 px (2:1 Ratio)', size: '10 KB to 20 KB', dpi: '300 DPI', bg: 'White Paper', link: '/upsc-signature-resizer/' },
+  { name: 'NEET-UG Passport Photo', category: 'Indian Exams', format: 'JPG', dims: '413 × 531 px (3.5 × 4.5 cm)', size: '10 KB to 200 KB', dpi: '200–300 DPI', bg: 'White with Name & Date', link: '/neet-photo-resizer/' },
+  { name: 'NEET-UG Postcard Photo (4×6")', category: 'Indian Exams', format: 'JPG', dims: '1200 × 1800 px (4 × 6 inch)', size: '10 KB to 200 KB', dpi: '300 DPI', bg: 'White', link: '/neet-photo-resizer/' },
+  { name: 'NEET-UG Signature & Left/Right Fingers', category: 'Indian Exams', format: 'JPG', dims: '140 × 60 px / Full Hand Palm', size: '4 KB to 30 KB', dpi: '200 DPI', bg: 'White Paper', link: '/thumb-impression-resizer/' },
+  { name: 'JEE Main & Advanced Photo', category: 'Indian Exams', format: 'JPEG / JPG', dims: '413 × 531 px (3.5 × 4.5 cm)', size: '10 KB to 200 KB', dpi: '200–300 DPI', bg: 'White (80% Face)', link: '/jee-main-photo-resizer/' },
+  { name: 'IBPS PO, Clerk, RRB Photo', category: 'Indian Exams', format: 'JPG', dims: '200 × 230 px (4.5 × 3.5 cm)', size: '20 KB to 50 KB', dpi: '200 DPI', bg: 'Light / White', link: '/ibps-photo-signature-resizer/' },
+  { name: 'IBPS Signature Upload', category: 'Indian Exams', format: 'JPG', dims: '140 × 60 px', size: '10 KB to 20 KB', dpi: '200 DPI', bg: 'White (Black Ink)', link: '/ibps-photo-signature-resizer/' },
+  { name: 'IBPS Left Thumb Impression (LTI)', category: 'Indian Exams', format: 'JPG', dims: '200 × 200 px (1:1 Ratio)', size: '10 KB to 20 KB', dpi: '200 DPI', bg: 'White Paper', link: '/thumb-impression-resizer/' },
+  { name: 'IBPS Handwritten Declaration', category: 'Indian Exams', format: 'JPG', dims: '800 × 400 px (10 × 5 cm)', size: '50 KB to 100 KB', dpi: '200 DPI', bg: 'White (Black Ink)', link: '/ibps-photo-signature-resizer/' },
+  { name: 'GATE (IIT) Candidate Photo', category: 'Indian Exams', format: 'JPEG', dims: '480 × 640 px (3.5 × 4.5 cm)', size: '20 KB to 200 KB', dpi: '200 DPI', bg: 'White', link: '/gate-photo-resizer/' },
+  { name: 'Railway Recruitment Board (RRB NTPC/Group D)', category: 'Indian Exams', format: 'JPG', dims: '350 × 450 px', size: '20 KB to 50 KB', dpi: '100 DPI', bg: 'Light / White', link: '/rrb-photo-resizer/' },
+  { name: 'SBI PO & Clerk Photo', category: 'Indian Exams', format: 'JPG', dims: '200 × 230 px', size: '20 KB to 50 KB', dpi: '200 DPI', bg: 'Light / White', link: '/sbi-po-photo-resizer/' },
+  { name: 'CUET UG & PG Photo', category: 'Indian Exams', format: 'JPG', dims: '413 × 531 px', size: '10 KB to 200 KB', dpi: '200 DPI', bg: 'White (80% Face)', link: '/cuet-photo-resizer/' },
+  { name: 'State PSC Exams (UPPSC, BPSC, MPSC, TNPSC)', category: 'Indian Exams', format: 'JPG', dims: '350 × 450 px (3.5 × 4.5 cm)', size: '20 KB to 50 KB', dpi: '150–300 DPI', bg: 'White / Light', link: '/resize-image-to-20kb-to-50kb/' },
+
+  // Passports & Government ID
+  { name: 'Passport Seva (India Online Portal)', category: 'Passports & IDs', format: 'JPG / JPEG', dims: '413 × 531 px (35 × 45 mm)', size: '20 KB to 50 KB', dpi: '300 DPI', bg: 'Pure White', link: '/passport-photo-resizer/' },
+  { name: 'PAN Card Photo (NSDL / UTIITSL)', category: 'Passports & IDs', format: 'JPEG', dims: '213 × 213 px (2.5 × 3.5 cm)', size: 'Under 50 KB', dpi: '300 DPI', bg: 'White', link: '/pan-card-photo-resizer/' },
+  { name: 'PAN Card Signature (NSDL / UTIITSL)', category: 'Passports & IDs', format: 'JPEG', dims: '400 × 200 px (2 × 4.5 cm)', size: 'Under 20 KB', dpi: '300 DPI', bg: 'White Paper', link: '/signature-resizer/' },
+  { name: 'Aadhaar Card Update Document (UIDAI)', category: 'Passports & IDs', format: 'PDF / JPEG', dims: 'A4 Document Scan', size: 'Under 2 MB', dpi: '150–300 DPI', bg: 'N/A', link: '/aadhaar-pdf-compressor/' },
+  { name: 'Indian Driving Licence (Sarathi Parivahan)', category: 'Passports & IDs', format: 'JPEG', dims: '413 × 531 px (35 × 45 mm)', size: '10 KB to 20 KB', dpi: '200 DPI', bg: 'White', link: '/compress-image-to-20kb/' },
+
+  // International Visas & Passports
+  { name: 'US Visa (DS-160, DS-260) & DV Lottery', category: 'Global Visas', format: 'JPEG', dims: '600 × 600 to 1200 × 1200 px (2 × 2")', size: 'Under 240 KB', dpi: '300 DPI', bg: 'Pure White / Off-White', link: '/us-visa-photo-resizer/' },
+  { name: 'US Passport Renewal Online', category: 'Global Visas', format: 'JPEG', dims: '600 × 600 to 1200 × 1200 px (1:1)', size: 'Under 240 KB', dpi: '300 DPI', bg: 'White', link: '/us-visa-photo-resizer/' },
+  { name: 'Schengen Visa (France, Germany, Italy, Spain)', category: 'Global Visas', format: 'JPG', dims: '413 × 531 px (35 × 45 mm)', size: 'Under 200 KB', dpi: '300 DPI', bg: 'Light Grey / White', link: '/schengen-visa-photo-resizer/' },
+  { name: 'UK Passport & UKVI Visa Portal', category: 'Global Visas', format: 'JPG', dims: 'Minimum 600 × 750 px (3:4 ratio)', size: '50 KB to 10 MB', dpi: '300 DPI', bg: 'Light Grey / Cream', link: '/uk-passport-photo-resizer/' },
+  { name: 'Canada Visa & Express Entry (IRCC)', category: 'Global Visas', format: 'JPEG', dims: '420 × 540 px (35 × 45 mm / 5:7)', size: '60 KB to 240 KB', dpi: '300 DPI', bg: 'Pure White', link: '/canada-visa-photo-resizer/' },
+  { name: 'Australia Visa (ImmiAccount)', category: 'Global Visas', format: 'JPG / PNG', dims: '413 × 531 px (35 × 45 mm)', size: 'Under 500 KB', dpi: '300 DPI', bg: 'Plain White', link: '/australia-passport-photo-resizer/' },
+  { name: 'Singapore Visa (ICA Portal)', category: 'Global Visas', format: 'JPEG', dims: '400 × 514 px (35 × 45 mm)', size: 'Under 150 KB', dpi: '300 DPI', bg: 'Pure White Matt', link: '/singapore-visa-photo-resizer/' },
+  { name: 'Malaysia Passport & eVisa (MyOnline)', category: 'Global Visas', format: 'JPEG', dims: '413 × 591 px (35 × 50 mm)', size: 'Under 100 KB', dpi: '300 DPI', bg: 'Plain White', link: '/malaysia-passport-photo-resizer/' },
+  { name: 'Dubai & UAE Tourist / Green Visa (ICP)', category: 'Global Visas', format: 'JPEG', dims: '413 × 531 px (35 × 45 mm)', size: 'Under 100 KB', dpi: '300 DPI', bg: 'White', link: '/uae-visa-photo-resizer/' },
+  { name: 'China Visa (COVA Portal)', category: 'Global Visas', format: 'JPEG', dims: '390 × 567 px (33 × 48 mm)', size: '40 KB to 120 KB', dpi: '300 DPI', bg: 'Pure White', link: '/china-visa-photo-resizer/' },
+  { name: 'Japan e-Visa & COE Photo', category: 'Global Visas', format: 'JPG', dims: '413 × 531 px (45 × 35 mm)', size: 'Under 200 KB', dpi: '300 DPI', bg: 'Plain White', link: '/japan-visa-photo-resizer/' },
+  { name: 'Saudi Arabia Umrah / Tourism Visa (Muqeem & Nusuk)', category: 'Global Visas', format: 'JPEG', dims: '600 × 600 px (2 × 2 inch square)', size: 'Under 100 KB', dpi: '300 DPI', bg: 'White', link: '/saudi-visa-photo-resizer/' },
+  { name: 'New Zealand Visa & NZeTA (Immigration Online)', category: 'Global Visas', format: 'JPG', dims: '450 × 600 px (3:4 ratio)', size: 'Under 250 KB', dpi: '300 DPI', bg: 'Light Colored Plain', link: '/new-zealand-visa-photo-resizer/' },
+
+  // Social & Web Platforms
+  { name: 'YouTube Custom Video Thumbnail', category: 'Social & Web', format: 'JPG / PNG', dims: '1280 × 720 px (16:9 HD)', size: 'Strictly Under 2 MB', dpi: '72–150 DPI', bg: 'Any Vibrant', link: '/youtube-thumbnail-compressor-under-2mb/' },
+  { name: 'LinkedIn Personal Profile Banner', category: 'Social & Web', format: 'JPG / PNG', dims: '1584 × 396 px (4:1 Aspect)', size: 'Under 500 KB', dpi: '72–150 DPI', bg: 'Any Brand', link: '/linkedin-banner-resizer/' },
+  { name: 'WhatsApp Profile Picture (DP)', category: 'Social & Web', format: 'JPG / PNG', dims: '640 × 640 px (1:1 Circular)', size: 'Under 200 KB', dpi: '72–150 DPI', bg: 'Any Clean', link: '/whatsapp-dp-cropper/' },
+  { name: 'Instagram Square Post & Avatar', category: 'Social & Web', format: 'JPG', dims: '1080 × 1080 px (1:1 Ratio)', size: 'Under 1 MB', dpi: '72–150 DPI', bg: 'Any Creative', link: '/instagram-photo-resizer/' },
+  { name: 'Twitter / X Profile Header Banner', category: 'Social & Web', format: 'JPG / PNG', dims: '1500 × 500 px (3:1 Widescreen)', size: 'Under 2 MB', dpi: '72–150 DPI', bg: 'Any Safe Zone', link: '/twitter-header-resizer/' },
+  { name: 'Facebook Profile & Page Cover Photo', category: 'Social & Web', format: 'JPG / PNG', dims: '820 × 312 px (Desktop Safe)', size: 'Under 500 KB', dpi: '72–150 DPI', bg: 'Any Safe Zone', link: '/facebook-cover-photo-resizer/' },
+];
+
+const faqs = [
+  {
+    q: 'Why do application portals reject uploaded photos despite matching pixel dimensions?',
+    a: 'Portals use automated server scripts that inspect three parameters simultaneously: (1) exact file size ceiling in kilobytes, (2) EXIF metadata orientation tags, and (3) color space encoding (sRGB). If your camera saved an image in Display P3 color space or if a phone recorded a sideways EXIF rotation tag, legacy portal servers reject the file immediately. PixelKit strips uncalibrated EXIF metadata, converts coordinates to sRGB, and quantizes bytes to guarantee acceptance.',
+  },
+  {
+    q: 'How do I convert mm to pixels at 300 DPI for passport photos?',
+    a: 'Use the official formula: Pixels = (Millimeters / 25.4) × DPI. For a standard 35 × 45 mm passport photo at 300 DPI: Width = (35 / 25.4) × 300 = 413.38 pixels (round to 413 px), and Height = (45 / 25.4) × 300 = 531.49 pixels (round to 531 px). PixelKit includes pre-calculated dimension presets so you never have to calculate subpixel fractions manually.',
+  },
+  {
+    q: 'What is the 70% to 80% biometric facial framing rule?',
+    a: 'ICAO Doc 9303 and international passport agencies mandate that the applicant face (measured vertically from the bottom of the chin to the crown of the head) must occupy between 70% and 80% of total image height. Cropping too closely into the forehead or zooming too far out leaves non-compliant margins that trigger biometric software disqualification.',
+  },
+  {
+    q: 'Can I resize photos for Indian competitive exams (SSC, UPSC, NEET) on a phone?',
+    a: 'Yes. PixelKit runs 100% inside your mobile browser (Mobile Safari, Chrome, Samsung Internet) without downloading any apps. You can crop, resize to 350 × 450 px, and compress strictly between 20KB and 50KB in under two seconds.',
+  },
+  {
+    q: 'Are candidate photos and identity documents uploaded to any remote server?',
+    a: 'Never. PixelKit is built on a zero-knowledge architecture. All image processing, canvas resampling, and binary search compression execute directly inside your device RAM using client-side WebAssembly. Zero bytes leave your phone or computer.',
+  },
+];
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Official Portal Photo Size Chart & Resizer',
+    description: pageDesc,
+    url: canonicalUrl,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem: 'All (Web Browser, Windows, macOS, iOS, Android)',
+  }),
+  buildBreadcrumbJsonLd(breadcrumbs),
+  buildFaqJsonLd(faqs),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  canonical={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <Breadcrumbs items={breadcrumbs} class="mb-6" />
+
+    <header class="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent mb-4">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+        Verified 2026 Official Guidelines
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-fg mb-4">
+        Official Portal Photo &amp; Signature Size Chart
+      </h1>
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
+        Comprehensive reference table of exact pixel dimensions, millimeter print sizes, DPI standards, and kilobyte caps across 50+ global visas, competitive exams, passports, and civil service portals.
+      </p>
+    </header>
+
+    <!-- Interactive 30-Preset Studio -->
+    <section aria-label="Official Portal Preset Studio" class="mb-10 sm:mb-12">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="passport"
+      />
+    </section>
+
+    <!-- Search & Filter Controls -->
+    <section class="mb-8 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-xs">
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div class="w-full sm:w-72 relative">
+          <input
+            type="search"
+            id="pk-chart-search"
+            placeholder="Search exam, visa, or portal (e.g. SSC, US Visa, NEET)..."
+            class="w-full rounded-xl border border-border bg-bg px-4 py-2.5 text-xs sm:text-sm text-fg placeholder:text-muted focus:border-accent focus:outline-none transition-colors"
+          />
+        </div>
+        <div class="flex flex-wrap gap-1.5 text-xs font-medium w-full sm:w-auto" id="pk-category-filters">
+          <button class="px-3 py-1.5 rounded-lg bg-accent text-accent-fg font-semibold cursor-pointer transition-colors" data-cat="all">All Portals</button>
+          <button class="px-3 py-1.5 rounded-lg bg-surface border border-border text-fg hover:border-accent cursor-pointer transition-colors" data-cat="Indian Exams">Indian Exams</button>
+          <button class="px-3 py-1.5 rounded-lg bg-surface border border-border text-fg hover:border-accent cursor-pointer transition-colors" data-cat="Global Visas">Global Visas</button>
+          <button class="px-3 py-1.5 rounded-lg bg-surface border border-border text-fg hover:border-accent cursor-pointer transition-colors" data-cat="Passports & IDs">Passports &amp; IDs</button>
+          <button class="px-3 py-1.5 rounded-lg bg-surface border border-border text-fg hover:border-accent cursor-pointer transition-colors" data-cat="Social & Web">Social &amp; Web</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Searchable Specifications Table -->
+    <section class="mb-14 rounded-2xl border border-border bg-surface p-5 sm:p-8 shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse" id="pk-spec-table">
+          <thead>
+            <tr class="border-b border-border text-muted font-semibold">
+              <th class="py-3 px-3">Portal / Authority</th>
+              <th class="py-3 px-3">Category</th>
+              <th class="py-3 px-3">Dimensions</th>
+              <th class="py-3 px-3 text-accent">File Size Limit</th>
+              <th class="py-3 px-3">DPI &amp; Format</th>
+              <th class="py-3 px-3">Background</th>
+              <th class="py-3 px-3 text-right">Quick Tool</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60 text-fg/85">
+            {portals.map((p) => (
+              <tr class="hover:bg-bg/40 transition-colors" data-category={p.category}>
+                <td class="py-3.5 px-3 font-semibold text-fg">{p.name}</td>
+                <td class="py-3.5 px-3 text-muted text-[11px] sm:text-xs">
+                  <span class="inline-block px-2 py-0.5 rounded-md bg-surface border border-border">{p.category}</span>
+                </td>
+                <td class="py-3.5 px-3 font-mono text-[11px] sm:text-xs">{p.dims}</td>
+                <td class="py-3.5 px-3 font-semibold text-accent">{p.size}</td>
+                <td class="py-3.5 px-3 text-muted text-[11px] sm:text-xs">{p.format} · {p.dpi}</td>
+                <td class="py-3.5 px-3 text-[11px] sm:text-xs">{p.bg}</td>
+                <td class="py-3.5 px-3 text-right">
+                  <a
+                    href={p.link}
+                    aria-label={`Resize ${p.name}`}
+                    class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors"
+                  >
+                    Resize <span class="sr-only">{p.name}</span> →
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p id="pk-no-results" class="hidden text-center py-8 text-sm text-muted">
+        No portals found matching your search. Try searching for "visa", "exam", "signature", or a specific country.
+      </p>
+
+      <div class="mt-6 pt-5 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-muted font-medium mr-1">Related Print &amp; Compliance Tools:</span>
+        <a href="/signature-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Signature Resizer</a>
+        <a href="/change-image-dpi-to-300/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Change Image DPI to 300</a>
+        <a href="/cm-to-pixels-at-300-dpi/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">CM to Pixels at 300 DPI</a>
+        <a href="/pixels-to-cm-converter/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to CM Converter</a>
+        <a href="/exif-metadata-remover/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">EXIF Metadata Remover</a>
+        <a href="/social-media-image-resizer/" class="rounded-lg border border-border bg-bg px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Social Media Image Resizer</a>
+      </div>
+    </section>
+
+    <!-- Deep In-Depth Technical Guide Section (The Full Canonical Reference) -->
+    <article class="prose prose-neutral dark:prose-invert max-w-none space-y-10 sm:space-y-12">
+      <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold text-fg mb-4">
+          Core Biometric Principles: How Portals Validate Uploaded Photos
+        </h2>
+        <div class="space-y-4 text-sm text-fg/85 leading-relaxed">
+          <p>
+            Government immigration departments, consular visa facilities, and public service commissions employ automated biometric verification algorithms to cross-reference submitted applicant photos against international standards (ICAO Doc 9303, ISO/IEC 19794-5). Submissions that fail automated checks are rejected before human officers ever review the application.
+          </p>
+          <div class="grid gap-4 sm:grid-cols-2 mt-4">
+            <div class="rounded-xl border border-border bg-bg/50 p-4">
+              <h3 class="font-semibold text-fg text-sm">70% to 80% Crown-to-Chin Ratio</h3>
+              <p class="text-xs text-muted mt-1 leading-relaxed">
+                Biometric scanners compute facial bounding boxes from the base of the chin to the vertex (top) of the head. This distance must encompass strictly between 70% and 80% of total vertical canvas height. Cropping too tightly or zooming excessively results in automated rejection.
+              </p>
+            </div>
+            <div class="rounded-xl border border-border bg-bg/50 p-4">
+              <h3 class="font-semibold text-fg text-sm">Physical Millimeters to Digital Pixels</h3>
+              <p class="text-xs text-muted mt-1 leading-relaxed">
+                Physical print specs must be converted to exact integer pixels: <code class="font-mono text-fg">Pixels = (mm / 25.4) × DPI</code>. A standard 35×45 mm passport photo reproduced at 300 DPI yields exactly 413.38 × 531.49 pixels (rounded to 413 × 531 px).
+              </p>
+            </div>
+            <div class="rounded-xl border border-border bg-bg/50 p-4">
+              <h3 class="font-semibold text-fg text-sm">Uniform Background Lighting (#FFFFFF / #F2F2F2)</h3>
+              <p class="text-xs text-muted mt-1 leading-relaxed">
+                Background perimeter luminance filters check for shadows behind the ears and neck. Uneven room lighting or wallpapers trigger boundary errors. Biometric photos mandate pure white (#FFFFFF) or light grey (#F2F2F2) backdrops.
+              </p>
+            </div>
+            <div class="rounded-xl border border-border bg-bg/50 p-4">
+              <h3 class="font-semibold text-fg text-sm">Adaptive Ink Binarization for Signatures</h3>
+              <p class="text-xs text-muted mt-1 leading-relaxed">
+                Candidate signature files require stark threshold transitions between ink lines and paper. Low-pass filters cause faint pen strokes to be rejected as blank files. PixelKit applies high-contrast adaptive thresholding to retain sharp ink strokes under strict 10–20KB limits.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXIF & Color Space Normalization -->
+      <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <h2 class="text-xl sm:text-2xl font-bold text-fg mb-4">
+          Technical Solutions to Common Portal Upload Errors
+        </h2>
+        <div class="space-y-4 text-sm text-fg/85 leading-relaxed">
+          <p>
+            <strong>Cross-Platform EXIF Orientation Correction:</strong> Smartphone cameras record photos in landscape sensor orientation and append an EXIF rotation tag. Many legacy government portal scripts disregard EXIF tags, displaying photos rotated sideways on admit cards. PixelKit physically bakes rotation into the raw bitmap data, guaranteeing upright display on all legacy and modern systems.
+          </p>
+          <p>
+            <strong>Color Gamut Calibration (sRGB vs Display P3):</strong> Modern Apple iPhone and Android flagships photograph in the wide DCI-P3 color spectrum. However, web form upload validators and passport print systems expect standard sRGB color profiles. PixelKit converts chromatic coordinates to sRGB during client-side canvas processing, preventing washed-out skin tones or uncalibrated color shifts.
+          </p>
+          <p>
+            <strong>Eliminating DCT Compression Artifacts:</strong> When aggressive compression is applied to small file sizes like 20 KB or 50 KB, standard 8×8 Discrete Cosine Transform (DCT) block boundaries become visible around eyes and iris contours. PixelKit's iterative binary-search quantization tuning preserves smooth facial skin gradients while keeping file size strictly below portal upload limits.
+          </p>
+        </div>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section>
+        <FAQSection faqs={faqs} heading="Frequently Asked Questions About Portal Specifications" />
+      </section>
+    </article>
+  </div>
+
+  <script is:inline>
+    (function () {
+      const searchInput = document.getElementById('pk-chart-search');
+      const table = document.getElementById('pk-spec-table');
+      const noResults = document.getElementById('pk-no-results');
+      const filterButtons = document.querySelectorAll('#pk-category-filters button');
+      if (!searchInput || !table) return;
+
+      const rows = Array.from(table.querySelectorAll('tbody tr'));
+      let activeCategory = 'all';
+
+      function filterRows() {
+        const query = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+          const text = row.textContent.toLowerCase();
+          const category = row.getAttribute('data-category');
+          const matchesQuery = !query || text.includes(query);
+          const matchesCat = activeCategory === 'all' || category === activeCategory;
+
+          if (matchesQuery && matchesCat) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      }
+
+      searchInput.addEventListener('input', filterRows);
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach((b) => {
+            b.classList.remove('bg-accent', 'text-accent-fg', 'font-semibold');
+            b.classList.add('bg-surface', 'border', 'border-border', 'text-fg');
+          });
+          btn.classList.remove('bg-surface', 'border', 'border-border', 'text-fg');
+          btn.classList.add('bg-accent', 'text-accent-fg', 'font-semibold');
+          activeCategory = btn.getAttribute('data-cat') || 'all';
+          filterRows();
+        });
+      });
+    })();
+  </script>
+</BaseLayout>

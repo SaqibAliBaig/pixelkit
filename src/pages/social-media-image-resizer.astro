@@ -1,0 +1,270 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Social Presets', href: '/portal-photo-size-chart/' },
+  { label: 'Social Media Image Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official image dimensions for social media in 2026?',
+    a: 'Key specifications include: YouTube Thumbnail: 1280 × 720 px (16:9 HD, strictly under 2.0 MB); Instagram Post / Avatar: 1080 × 1080 px (1:1 Square, under 1 MB); Twitter / X Header: 1500 × 500 px (3:1 Widescreen, under 2 MB); LinkedIn Banner: 1584 × 396 px (4:1 ratio, under 500 KB); WhatsApp Profile DP: 640 × 640 px (1:1 Circular, under 200 KB); Facebook Cover: 820 × 312 px desktop (under 500 KB).',
+  },
+  {
+    q: 'Why does social media compress my images and make them look blurry?',
+    a: 'Platforms like Instagram, Twitter, and Facebook use aggressive server-side compression algorithms when uploaded files are excessively heavy or incorrectly sized. By pre-resizing your graphics to exact platform dimensions and compressing them into web-optimized sRGB JPGs, you bypass the platform harsh re-compression filters and retain original sharpness.',
+  },
+  {
+    q: 'Can I resize photos for multiple platforms at once without distortion?',
+    a: 'Yes. PixelKit includes dedicated platform presets with auto-centering and aspect ratio locking (16:9, 1:1, 3:1, 4:1). You can also use the Interactive Crop Studio to frame your focal points inside desktop and mobile safe zones.',
+  },
+  {
+    q: 'Are my brand assets or personal photos uploaded to any third-party server?',
+    a: 'Never. PixelKit is built entirely on client-side WebAssembly and HTML5 Canvas. Your photos are processed 100% inside your device memory with zero server uploads, keeping client artwork and private photos completely confidential.',
+  },
+];
+
+const pageTitle = `Social Media Image Resizer — YT, IG, X & LI | ${SITE.name}`;
+const pageDesc =
+  'Resize and compress images for YouTube thumbnails, Instagram posts, X headers, LinkedIn banners, WhatsApp DP, and Facebook covers under exact KB limits.';
+
+const steps = [
+  {
+    name: 'Select Social Media Preset',
+    text: 'Choose YouTube, Instagram, LinkedIn, Twitter/X, WhatsApp, or Facebook from the presets panel.',
+  },
+  {
+    name: 'Drop Photo or Graphic',
+    text: 'Drag your image into PixelKit. The tool immediately locks the official aspect ratio and pixel dimensions.',
+  },
+  {
+    name: 'Position & Frame Safe Zones',
+    text: 'Use the interactive crop frame to ensure critical text, logos, and portraits remain visible across mobile and desktop displays.',
+  },
+  {
+    name: 'Download Platform-Ready JPG',
+    text: 'Export your optimized image strictly below the platform upload size limit for instant upload.',
+  },
+];
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to resize and compress photos for social media online',
+  description:
+    'Step-by-step guide to frame, crop, resize, and compress images for social media platforms without losing quality.',
+  steps,
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Social Media Image Resizer & Compressor',
+    description: pageDesc,
+    url: new URL('/social-media-image-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Verified 2026 Standards · YouTube · Instagram · X · LinkedIn · Facebook</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Social Media Image Resizer &amp; Compressor
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Frame, crop, and compress social graphics to verified aspect ratios and strict KB caps. 100% in-browser, zero server uploads.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Social Media Image Standards (2026 Direct Answer)"
+      summaryText="Major social media platforms mandate exact dimensions and file size ceilings to ensure fast mobile delivery. YouTube thumbnails must be 1280 × 720 px (16:9) strictly under 2.0 MB. Instagram posts require 1080 × 1080 px (1:1) under 1.0 MB. Twitter / X headers are 1500 × 500 px (3:1) under 2.0 MB. LinkedIn background banners need 1584 × 396 px (4:1) under 500 KB. Facebook cover photos render at 820 × 312 px under 500 KB."
+      portalName="Social Network Guidelines (YouTube, Meta, X, LinkedIn)"
+      specs={[
+        { label: 'YouTube Thumbnail', value: '1280 × 720 px (16:9 HD) · < 2.0 MB', highlight: true },
+        { label: 'Instagram Square / DP', value: '1080 × 1080 px (1:1) · < 1.0 MB', highlight: true },
+        { label: 'Twitter / X Header', value: '1500 × 500 px (3:1) · < 2.0 MB' },
+        { label: 'LinkedIn Banner', value: '1584 × 396 px (4:1) · < 500 KB' },
+        { label: 'WhatsApp Profile DP', value: '640 × 640 px (1:1) · < 200 KB' },
+        { label: 'Facebook Cover Photo', value: '820 × 312 px (Desktop Safe) · < 500 KB' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={2000}
+        initialTool="passport"
+        preset="social-yt-thumb"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Social Standards Comparison Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+            2026 Social Media Image Dimension Specifications
+          </h2>
+          <p class="mt-1 text-xs sm:text-sm text-muted">
+            Click any platform to jump directly to its dedicated single-purpose resizer:
+          </p>
+        </div>
+        <a href="/portal-photo-size-chart/" class="text-xs font-semibold text-accent hover:underline">
+          View full size chart →
+        </a>
+      </div>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Platform</th>
+              <th class="py-3 px-4">Asset Type</th>
+              <th class="py-3 px-4">Optimal Resolution</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4 text-accent">File Size Limit</th>
+              <th class="py-3 px-4 text-right">Quick Tool</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">YouTube</td>
+              <td class="py-3.5 px-4 text-muted">Custom Video Thumbnail</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1280 × 720 px</td>
+              <td class="py-3.5 px-4 text-muted">16:9 HD</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 2.0 MB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/youtube-thumbnail-compressor-under-2mb/" aria-label="Resize YouTube Thumbnail" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">YouTube Thumbnail</span> →
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">Instagram</td>
+              <td class="py-3.5 px-4 text-muted">Square Post &amp; Avatar</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1080 × 1080 px</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Square</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 1.0 MB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/instagram-photo-resizer/" aria-label="Resize Instagram Photo" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">Instagram Photo</span> →
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">Twitter / X</td>
+              <td class="py-3.5 px-4 text-muted">Profile Header Banner</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1500 × 500 px</td>
+              <td class="py-3.5 px-4 text-muted">3:1 Widescreen</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 2.0 MB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/twitter-header-resizer/" aria-label="Resize Twitter X Header" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">Twitter / X Header</span> →
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">LinkedIn</td>
+              <td class="py-3.5 px-4 text-muted">Personal Profile Banner</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1584 × 396 px</td>
+              <td class="py-3.5 px-4 text-muted">4:1 Ratio</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 500 KB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/linkedin-banner-resizer/" aria-label="Resize LinkedIn Banner" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">LinkedIn Banner</span> →
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">WhatsApp</td>
+              <td class="py-3.5 px-4 text-muted">Profile Picture (DP)</td>
+              <td class="py-3.5 px-4 font-mono text-accent">640 × 640 px</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Circular</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 200 KB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/whatsapp-dp-cropper/" aria-label="Crop WhatsApp Profile DP" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">WhatsApp DP</span> →
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-semibold text-fg">Facebook</td>
+              <td class="py-3.5 px-4 text-muted">Profile &amp; Page Cover</td>
+              <td class="py-3.5 px-4 font-mono text-accent">820 × 312 px</td>
+              <td class="py-3.5 px-4 text-muted">16:9 Desktop</td>
+              <td class="py-3.5 px-4 font-semibold text-accent">Max 500 KB</td>
+              <td class="py-3.5 px-4 text-right">
+                <a href="/facebook-cover-photo-resizer/" aria-label="Resize Facebook Cover Photo" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors">
+                  Resize <span class="sr-only">Facebook Cover Photo</span> →
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- How To Resize Section -->
+    <section class="mt-10 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        How to Resize Photos for Any Social Platform
+      </h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((s, idx) => (
+          <div class="rounded-xl border border-border/60 bg-bg p-4 space-y-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent/15 text-accent text-xs font-bold font-mono">
+              {idx + 1}
+            </span>
+            <h3 class="text-sm font-bold text-fg">{s.name}</h3>
+            <p class="text-xs text-muted leading-relaxed">{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-10">
+      <FAQSection faqs={faqs} />
+    </div>
+  </div>
+</BaseLayout>
+

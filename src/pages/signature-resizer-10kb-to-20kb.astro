@@ -1,0 +1,203 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "Signature Resizer 10KB to 20KB"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does my signature compress to 8KB and get rejected?",
+    "a": "Signatures on pure white backgrounds have very low visual complexity, so basic compressors overshoot and compress below 10 KB. PixelKit features automated padding and quantization tuning that keeps the file safely within the 10KB–20KB bracket."
+  },
+  {
+    "q": "Can I upload a smartphone photo of my signature?",
+    "a": "Yes. Take a photo of your signature under good lighting without shadows. Drop the picture into PixelKit, crop closely around the ink strokes, and the tool will scale and compress it between 10KB and 20KB automatically."
+  }
+];
+
+const pageTitle = 'Signature Resizer 10KB to 20KB Online — Free & Fast';
+const pageDesc = 'Compress signature image between 10KB and 20KB JPG for government exam applications. Fast client-side binary search with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Signature Resizer 10KB to 20KB Online',
+    description: pageDesc,
+    url: new URL('/signature-resizer-10kb-to-20kb/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>10 KB to 20 KB Exact Bracket Lock</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Signature Resizer 10KB to 20KB Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Strictly compress your candidate signature between 10 KB and 20 KB in JPG format. Guaranteed to satisfy both minimum and maximum portal limits in 1 click.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="The 10KB–20KB Signature Requirement Explained (2026 Direct Answer)"
+      summaryText="Portals such as SSC, UPSC, IBPS, and State PSCs enforce dual-threshold validation: signatures below 10 KB are rejected as low-resolution, and files above 20 KB are blocked as oversize. PixelKit targets ~15 KB, safely clearing both thresholds."
+      portalName="SSC, UPSC, IBPS, SBI & State PSC Portals"
+      specs={[{"label":"Lower Bound","value":"Minimum 10.0 KB strictly","highlight":true},{"label":"Upper Bound","value":"Maximum 20.0 KB strictly","highlight":true},{"label":"Ideal Target","value":"14.0 KB to 18.0 KB"},{"label":"Color Format","value":"24-bit RGB JPEG"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={20}
+        initialTool="passport"
+        preset="signature"
+        category="exam"
+        initialSizeMode="range"
+        minKb={10}
+        maxKb={20}
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Portals Enforcing the Strict 10KB–20KB Signature Rule
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Recruitment portals with strict two-sided signature file size filters:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Recruiting Agency</th>
+              <th class="py-3 px-4">Exams Covered</th>
+              <th class="py-3 px-4">Signature Bracket</th>
+              <th class="py-3 px-4">Accepted Formats</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Staff Selection Commission</td>
+              <td class="py-3 px-4 text-muted">CGL, CHSL, MTS, CPO, GD Constable</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Union Public Service Commission</td>
+              <td class="py-3 px-4 text-muted">Civil Services (IAS/IPS), NDA, CDS, CMS</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">IBPS</td>
+              <td class="py-3 px-4 text-muted">PO, Clerk, Specialist Officer, RRB</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">State Bank of India</td>
+              <td class="py-3 px-4 text-muted">SBI PO, SBI Clerk, Junior Associates</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">State PSCs</td>
+              <td class="py-3 px-4 text-muted">UPPSC, BPSC, MPSC, TNPSC, KPSC</td>
+              <td class="py-3 px-4 text-muted">10 KB – 20 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Signature & Biometric Upload Tools -->
+    <section class="mt-8 rounded-2xl border border-border bg-surface/60 p-5 sm:p-6 text-xs text-muted">
+      <h3 class="font-semibold text-fg text-sm">Related Signature &amp; Biometric Tools</h3>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <a href="/signature-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Signature Resizer Studio</a>
+        <a href="/crop-image-2-1-signature/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Crop Image 2:1 Signature Ratio</a>
+        <a href="/thumb-impression-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Thumb Impression Resizer</a>
+        <a href="/upsc-signature-resizer/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">UPSC Signature Resizer</a>
+        <a href="/portal-photo-size-chart/" class="rounded-lg border border-border bg-bg px-3 py-1.5 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Portal Photo &amp; Signature Chart</a>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

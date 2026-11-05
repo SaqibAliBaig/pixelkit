@@ -1,0 +1,199 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Social Presets', href: '/social-media-image-resizer/' },
+  { label: 'Twitter / X Header Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What is the official size for Twitter / X header banners?',
+    a: 'Twitter (now X) recommends an exact resolution of 1500 × 500 pixels with a 3:1 aspect ratio. The maximum allowed file size is 2.0 MB (2,048 KB) in JPG, PNG, or GIF format.',
+  },
+  {
+    q: 'Why does Twitter crop the top or bottom of my header banner?',
+    a: 'Twitter dynamically crops headers across desktop and mobile screens. Additionally, your round avatar profile picture overlaps the bottom-left corner of the header. Keep all critical logos, text, and artwork inside the central 1500 × 380 px safe zone with at least 60 px padding on top and bottom.',
+  },
+  {
+    q: 'Can I resize my photo to 1500 × 500 px without distortion?',
+    a: 'Yes. PixelKit provides an interactive 3:1 widescreen crop studio so you can position your photo exactly where you want it without stretching or distorting the image.',
+  },
+  {
+    q: 'Does PixelKit compress the header under the 2MB Twitter limit?',
+    a: 'Yes! PixelKit optimizes the image to remain strictly under the 2.0 MB file size limit while preserving crisp resolution on high-DPI displays.',
+  },
+];
+
+const pageTitle = `Twitter / X Header Resizer (1500×500 px) | ${SITE.name}`;
+const pageDesc =
+  'Resize and crop header banners for Twitter / X profiles to exact 1500x500 px (3:1 ratio) with mobile safe zone protection and under 2MB JPG compression.';
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to crop and resize Twitter / X header banner online',
+  description:
+    'Instructions to frame 3:1 ratio, scale to 1500x500 pixels, and compress under 2MB for Twitter / X profiles.',
+  steps: [
+    {
+      name: 'Upload banner graphic',
+      text: 'Drop your landscape photo or banner design into PixelKit.',
+    },
+    {
+      name: 'Lock Twitter 1500×500 Preset',
+      text: 'PixelKit locks the 3:1 aspect ratio and sets output resolution to 1500 × 500 pixels.',
+    },
+    {
+      name: 'Compress under 2MB',
+      text: 'PixelKit tunes JPEG compression to keep the file strictly below 2,000 KB for rapid profile loading.',
+    },
+    {
+      name: 'Download header banner',
+      text: 'Download the prepared banner ready for instant upload in Twitter / X Profile Edit settings.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Twitter / X Header Resizer',
+    description: pageDesc,
+    url: new URL('/twitter-header-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Twitter · X Profile Header · 1500×500 px · 3:1 Widescreen</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Twitter / X Header Banner Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to 3:1 widescreen (1500 × 500 px), protect mobile safe margins, and compress under 2.0 MB JPG. 100% in-browser, zero server uploads.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Twitter / X Header Banner Guidelines (2026 Direct Answer)"
+      summaryText="The recommended banner size for Twitter / X profiles is 1500 × 500 pixels (3:1 aspect ratio) with a maximum file size of 2 MB in JPG, PNG, or GIF format. Due to responsive profile cropping and avatar overlap in the bottom-left, place text and logos inside the 1500 × 380 px central safe zone with 60 px top and bottom margins."
+      portalName="Twitter / X Official Profile Guidelines"
+      specs={[
+        { label: 'Recommended Dimensions', value: '1500 × 500 pixels', highlight: true },
+        { label: 'Aspect Ratio', value: '3:1 Widescreen', highlight: true },
+        { label: 'Max File Weight', value: 'Strictly under 2.0 MB (2,048 KB)' },
+        { label: 'Safe Zone Margin', value: '60 px top/bottom, 400 px bottom-left' },
+        { label: 'Accepted Formats', value: 'JPG / PNG / non-animated GIF' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={2000}
+        initialTool="passport"
+        preset="social-twitter-header"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Twitter / X Profile Media Specifications Table
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Official dimensions and rules enforced by Twitter / X:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Asset Type</th>
+              <th class="py-3 px-4">Ideal Resolution</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4">File Size Ceiling</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Header Banner</td>
+              <td class="py-3.5 px-4 font-mono text-accent">1500 × 500 px</td>
+              <td class="py-3.5 px-4 text-muted">3:1 Widescreen</td>
+              <td class="py-3.5 px-4 text-muted">Max 2.0 MB strictly</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Profile Avatar (DP)</td>
+              <td class="py-3.5 px-4 font-mono text-accent">400 × 400 px</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Square (Circular display)</td>
+              <td class="py-3.5 px-4 text-muted">Max 2.0 MB</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">In-Stream Feed Image</td>
+              <td class="py-3.5 px-4 text-muted">1600 × 900 px (or 1200 × 675 px)</td>
+              <td class="py-3.5 px-4 text-muted">16:9 Landscape</td>
+              <td class="py-3.5 px-4 text-muted">Max 5.0 MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+
+    <!-- Related Social Media Resizers -->
+    <section class="mt-12 border-t border-border/80 pt-8">
+      <h2 class="text-base sm:text-lg font-bold text-fg mb-3">Related Social Media Image Tools</h2>
+      <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <a href="/social-media-image-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Social Media Image Resizer Hub</a>
+        <a href="/linkedin-banner-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">LinkedIn Banner Resizer</a>
+        <a href="/facebook-cover-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Facebook Cover Photo Resizer</a>
+        <a href="/instagram-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Instagram Photo Resizer (1080×1080)</a>
+        <a href="/youtube-thumbnail-compressor-under-2mb/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">YouTube Thumbnail Under 2MB</a>
+        <a href="/whatsapp-dp-cropper/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">WhatsApp DP Cropper</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

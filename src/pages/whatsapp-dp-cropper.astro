@@ -1,0 +1,172 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Social Tools",
+    "href": "/resize-image/"
+  },
+  {
+    "label": "WhatsApp DP Cropper"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does WhatsApp blur my profile photo when I set it?",
+    "a": "If you upload an extremely large photo (e.g. 15MB 48MP raw image), WhatsApp aggressive client-side compression reduces quality heavily. Pre-rescaling to 640 × 640 px in PixelKit produces a clean, sharp DP with zero compression blur."
+  }
+];
+
+const pageTitle = 'WhatsApp DP Cropper Online (1:1 Square) | PixelKit';
+const pageDesc = 'Crop and resize profile pictures for WhatsApp DP without losing photo quality. 1:1 square crop with circular preview and zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit WhatsApp DP Cropper & Resizer Online',
+    description: pageDesc,
+    url: new URL('/whatsapp-dp-cropper/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>1:1 Square & Circular Display Crop Studio</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        WhatsApp DP Cropper & Resizer Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop your photo to a 1:1 square (640 × 640 px or 500 × 500 px) with an instant circular mask preview so your profile picture never gets cut off.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="WhatsApp Profile Picture Size & Aspect (2026 Direct Answer)"
+      summaryText="WhatsApp profile pictures (DP) require a 1:1 square aspect ratio. The recommended resolution is 640 × 640 pixels (or 500 × 500 px minimum) in JPG or PNG format. Because WhatsApp masks your DP into a circle in chat lists, keep important facial features centered to prevent corners from being cropped out."
+      portalName="WhatsApp Profile Standard (Meta)"
+      specs={[{"label":"Aspect Ratio","value":"1:1 Square (Circular Display)","highlight":true},{"label":"Recommended Resolution","value":"640 × 640 pixels (HD)","highlight":true},{"label":"Minimum Resolution","value":"192 × 192 pixels"},{"label":"File Format","value":"JPG / PNG under 2 MB"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={200}
+        initialTool="passport"
+        preset="social-whatsapp-dp"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        WhatsApp Display Guidelines
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Optimal dimensions for WhatsApp profile photos and status images:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Format Type</th>
+              <th class="py-3 px-4">Recommended Dimensions</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4">Display Frame</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">WhatsApp Profile Photo (DP)</td>
+              <td class="py-3 px-4 text-muted">640 × 640 px (or 500 × 500 px)</td>
+              <td class="py-3 px-4 text-muted">1:1 Square</td>
+              <td class="py-3 px-4 text-muted">Circular mask in chats and calls</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">WhatsApp Status Image</td>
+              <td class="py-3 px-4 text-muted">1080 × 1920 px</td>
+              <td class="py-3 px-4 text-muted">9:16 Vertical</td>
+              <td class="py-3 px-4 text-muted">Full mobile screen</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">WhatsApp Channel Icon</td>
+              <td class="py-3 px-4 text-muted">500 × 500 px</td>
+              <td class="py-3 px-4 text-muted">1:1 Square</td>
+              <td class="py-3 px-4 text-muted">Circular icon</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

@@ -25,7 +25,7 @@ export const GET: APIRoute = async (context) => {
       <guid isPermaLink="true">${link}</guid>
       <description>${escapeXml(post.data.description)}</description>
       <pubDate>${pubDate}</pubDate>
-      <author>${escapeXml(SITE.twitterHandle)} (${escapeXml(post.data.author || SITE.name)})</author>
+      <author>${escapeXml(SITE.contactEmail)} (${escapeXml(post.data.author || SITE.name)})</author>
       ${categories}
     </item>`;
     })

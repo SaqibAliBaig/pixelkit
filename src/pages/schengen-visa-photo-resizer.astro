@@ -1,0 +1,173 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "Schengen Visa Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Can I use a smartphone selfie for my Schengen visa photo?",
+    "a": "Yes, provided someone else takes the photo from ~1.5 meters away (to avoid wide-angle nose distortion), with even natural lighting and a plain background. PixelKit will crop to 3.5:4.5 and compress under 200KB."
+  }
+];
+
+const pageTitle = 'Schengen Visa Photo Resizer (35x45 mm) — Under 200KB';
+const pageDesc = 'Resize and crop Schengen visa photo to 35x45 mm (413x531 px) with 70-80% face coverage and under 200KB JPG. 100% private in-browser tool.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Schengen Visa Photo Resizer Online',
+    description: pageDesc,
+    url: new URL('/schengen-visa-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>European Schengen Visa & Biometric Standard</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Schengen Visa Photo Resizer Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to exact 35 × 45 mm (3.5:4.5 aspect ratio), align 70–80% face height, and compress under 200KB JPG for France, Germany, Italy, Spain & Switzerland visas.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Schengen Visa Photo Guidelines (2026 Direct Answer)"
+      summaryText="European Schengen visa consulates (VFS Global, TLScontact, BLS) require a 35 × 45 mm photograph (413 × 531 pixels at 300 DPI). The applicant’s face must cover 70% to 80% of the photo height (32 mm to 36 mm from chin to crown) against a light gray or white background with neutral facial expression."
+      portalName="European Union Schengen Consular Services"
+      specs={[{"label":"Dimensions","value":"35 × 45 mm (413 × 531 px at 300 DPI)","highlight":true},{"label":"Face Height","value":"70% to 80% (32 to 36 mm)","highlight":true},{"label":"File Size Bracket","value":"Under 200 KB JPG"},{"label":"Background","value":"Uniform Light Gray or White"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={200}
+        initialTool="passport"
+        preset="schengen-visa"
+        category="visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Schengen Visa Photo Criteria Matrix
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory technical standards for all 29 Schengen member states:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Feature</th>
+              <th class="py-3 px-4">Official Requirement</th>
+              <th class="py-3 px-4">Common Mistakes to Avoid</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Dimensions</td>
+              <td class="py-3 px-4 text-muted">35 mm width × 45 mm height</td>
+              <td class="py-3 px-4 text-muted">Uploading 2×2 inch US visa photos instead</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Head Size</td>
+              <td class="py-3 px-4 text-muted">32 mm to 36 mm (crown to chin)</td>
+              <td class="py-3 px-4 text-muted">Face too small or cut off at forehead</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Background</td>
+              <td class="py-3 px-4 text-muted">Uniform plain light gray or light blue</td>
+              <td class="py-3 px-4 text-muted">Dark shadows, flash glare, patterned walls</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Expression</td>
+              <td class="py-3 px-4 text-muted">Neutral mouth closed, eyes open looking straight</td>
+              <td class="py-3 px-4 text-muted">Smiling with visible teeth or tilted head</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

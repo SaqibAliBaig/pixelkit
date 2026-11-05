@@ -1,0 +1,168 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "UK Passport Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Does HMPO accept photos taken with an iPhone or Android phone?",
+    "a": "Yes. GOV.UK allows taking your own photo on a mobile device, as long as it has no shadows, no filters, and meets head measurement rules. PixelKit frames and scales your photo for instant acceptance."
+  }
+];
+
+const pageTitle = 'UK Passport Photo Resizer (35x45 mm / HMPO & UKVI)';
+const pageDesc = 'Resize and crop photo for UK passport renewal and UKVI visa to 35x45 mm (413x531 px) under 200KB. 100% private client-side processing.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit UK Passport & Visa Photo Resizer',
+    description: pageDesc,
+    url: new URL('/uk-passport-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>HM Passport Office & UKVI Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        UK Passport & Visa Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Resize and crop digital photos to 35 × 45 mm (413 × 531 px) for His Majesty’s Passport Office (HMPO) online renewal and UK Visas and Immigration (UKVI).
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="HMPO UK Digital Passport Photo Rules (2026 Direct Answer)"
+      summaryText="HM Passport Office requires digital photos for online passport renewal to measure at least 600 × 750 pixels (or 413 × 531 px for visa uploads), between 50 KB and 10 MB (under 200 KB for consular forms). The head must be between 29 mm and 34 mm high against a plain light gray or cream background."
+      portalName="HM Passport Office & UKVI (gov.uk)"
+      specs={[{"label":"Standard Dimensions","value":"35 × 45 mm (413 × 531 px)","highlight":true},{"label":"Head Height","value":"29 mm to 34 mm"},{"label":"Background","value":"Plain cream or light grey","highlight":true},{"label":"File Size","value":"Under 200 KB (Visa) / Under 10 MB (HMPO)"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={200}
+        initialTool="passport"
+        preset="uk-visa"
+        category="visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        UK Passport & UKVI Photo Checklist
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Rules verified against official GOV.UK digital passport photo checker:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4">GOV.UK Standard</th>
+              <th class="py-3 px-4">PixelKit Implementation</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Aspect Ratio</td>
+              <td class="py-3 px-4 text-muted">35:45 (3.5 cm × 4.5 cm)</td>
+              <td class="py-3 px-4 text-muted">Auto-locked 3.5:4.5 portrait crop frame</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Background</td>
+              <td class="py-3 px-4 text-muted">Light gray or cream without shadows</td>
+              <td class="py-3 px-4 text-muted">Background contrast verification</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Eyeline Level</td>
+              <td class="py-3 px-4 text-muted">Between 20mm and 30mm from bottom</td>
+              <td class="py-3 px-4 text-muted">Center-top anchor framing</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

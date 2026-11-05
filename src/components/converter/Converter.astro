@@ -12,6 +12,7 @@ import PrivacyNote from '@components/converter/PrivacyNote.astro';
 import CompareModal from '@components/converter/CompareModal.astro';
 import CropModal from '@components/converter/CropModal.astro';
 import ResizeModal from '@components/converter/ResizeModal.astro';
+import type { CropAspectPreset } from '@lib/worker/types';
 
 interface Props {
   from: string;
@@ -19,11 +20,41 @@ interface Props {
   fromMime: string;
   toMime: string;
   targetKb: number | null;
-  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport' | 'dpi' | 'exif';
+  initialSizeMode?: 'max' | 'exact' | 'range' | 'quality';
+  minKb?: number | null;
+  maxKb?: number | null;
+  initialCropAspect?: CropAspectPreset;
+  initialUnit?: 'px' | 'cm' | 'mm' | 'in';
+  initialWidth?: number | null;
+  initialHeight?: number | null;
+  initialDpi?: number | null;
+  preserveMetadata?: boolean;
+  initialMergePdf?: boolean;
   preset?: string;
+  category?: 'all' | 'visa' | 'exam' | 'id' | 'social';
 }
 
-const { from, to, fromMime, toMime, targetKb, initialTool = 'all', preset } = Astro.props;
+const {
+  from,
+  to,
+  fromMime,
+  toMime,
+  targetKb,
+  initialTool = 'all',
+  initialSizeMode,
+  minKb,
+  maxKb,
+  initialCropAspect,
+  initialUnit,
+  initialWidth,
+  initialHeight,
+  initialDpi,
+  preserveMetadata,
+  initialMergePdf,
+  preset,
+  category,
+} = Astro.props;
 
 // Universal accept: all supported image formats + PDF
 const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tiff,.pdf';
@@ -38,21 +69,32 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
   data-to-mime={toMime}
   data-target-kb={targetKb ?? ''}
   data-initial-tool={initialTool}
+  data-size-mode={initialSizeMode ?? ''}
+  data-min-kb={minKb ?? ''}
+  data-max-kb={maxKb ?? ''}
+  data-crop-aspect={initialCropAspect ?? ''}
+  data-initial-unit={initialUnit ?? ''}
+  data-initial-width={initialWidth ?? ''}
+  data-initial-height={initialHeight ?? ''}
+  data-initial-dpi={initialDpi ?? ''}
+  data-preserve-metadata={preserveMetadata !== undefined ? String(preserveMetadata) : ''}
+  data-merge-pdf={initialMergePdf ? 'true' : ''}
   data-preset={preset ?? ''}
+  data-category={category ?? ''}
   aria-label="File converter"
 >
   <!-- Top Mode Segmented Switcher: All-in-One · Convert · Compress · Crop · Resize · Passport -->
   <div class="mb-4 sm:mb-5 flex items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5 overflow-hidden">
-    <div
+    <nav
       id="pk-top-mode-bar"
       class="flex items-center gap-1 p-1 rounded-xl bg-surface/80 border border-border text-xs font-semibold overflow-x-auto w-full sm:w-auto max-w-full scrollbar-none shadow-2xs touch-pan-x overscroll-contain"
       style="-webkit-overflow-scrolling: touch;"
-      role="tablist"
       aria-label="Processing Mode"
     >
       <a
         href="/"
         data-mode="all"
+        aria-current={initialTool === 'all' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'all' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
@@ -62,6 +104,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/convert/"
         data-mode="convert"
+        aria-current={initialTool === 'convert' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'convert' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
@@ -71,6 +114,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/compress-image/"
         data-mode="compress"
+        aria-current={initialTool === 'compress' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'compress' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
@@ -80,6 +124,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/crop-image/"
         data-mode="crop"
+        aria-current={initialTool === 'crop' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'crop' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
@@ -89,6 +134,7 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
       <a
         href="/resize-image/"
         data-mode="resize"
+        aria-current={initialTool === 'resize' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'resize' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
@@ -96,15 +142,36 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
         Resize
       </a>
       <a
-        href="/passport-photo-resizer/"
+        href="/portal-photo-size-chart/"
         data-mode="passport"
+        aria-current={initialTool === 'passport' ? 'page' : undefined}
         class={`pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium touch-manipulation ${
           initialTool === 'passport' ? 'bg-surface text-fg shadow-xs border border-border/50 font-semibold' : 'text-muted hover:text-fg'
         }`}
       >
-        Portal Presets
+        Presets
       </a>
-    </div>
+      {initialTool === 'dpi' && (
+        <a
+          href="/change-image-dpi-to-300/"
+          data-mode="dpi"
+          aria-current="page"
+          class="pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer touch-manipulation bg-surface text-fg shadow-xs border border-border/50 font-semibold"
+        >
+          {initialDpi || 300} DPI
+        </a>
+      )}
+      {initialTool === 'exif' && (
+        <a
+          href="/exif-metadata-remover/"
+          data-mode="exif"
+          aria-current="page"
+          class="pk-mode-tab shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer touch-manipulation bg-surface text-fg shadow-xs border border-border/50 font-semibold"
+        >
+          EXIF Privacy
+        </a>
+      )}
+    </nav>
 
     <div class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted shrink-0">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
@@ -114,7 +181,24 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
 
   <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] items-start min-w-0">
     <div class="space-y-4 min-w-0 w-full">
-      <DropZone accept={accept} from={from} to={to} initialTool={initialTool} />
+      <DropZone
+        accept={accept}
+        from={from}
+        to={to}
+        initialTool={initialTool}
+        initialSizeMode={initialSizeMode}
+        targetKb={targetKb}
+        minKb={minKb}
+        maxKb={maxKb}
+        initialCropAspect={initialCropAspect}
+        initialUnit={initialUnit}
+        initialWidth={initialWidth}
+        initialHeight={initialHeight}
+        initialDpi={initialDpi}
+        preserveMetadata={preserveMetadata}
+        initialMergePdf={initialMergePdf}
+        preset={preset}
+      />
       <ProgressBar />
       <FileList />
     </div>
@@ -125,6 +209,18 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
         to={to}
         targetKb={targetKb}
         initialTool={initialTool}
+        initialSizeMode={initialSizeMode}
+        minKb={minKb}
+        maxKb={maxKb}
+        initialCropAspect={initialCropAspect}
+        initialUnit={initialUnit}
+        initialWidth={initialWidth}
+        initialHeight={initialHeight}
+        initialDpi={initialDpi}
+        preserveMetadata={preserveMetadata}
+        initialMergePdf={initialMergePdf}
+        preset={preset}
+        category={category}
       />
       <PrivacyNote />
     </aside>
@@ -175,7 +271,9 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
     window.addEventListener(ev, onInteract, { capture: true, once: true, passive: true });
   });
 
-  if ('requestIdleCallback' in window) {
+  if (window.location.search.length > 1) {
+    requestAnimationFrame(bootConverter);
+  } else if ('requestIdleCallback' in window) {
     (window as any).requestIdleCallback(bootConverter, { timeout: 1500 });
   } else {
     setTimeout(bootConverter, 400);

@@ -17,6 +17,7 @@ export interface PdfOptions {
   widthPx: number;
   heightPx: number;
   title?: string;
+  dpi?: number;
 }
 
 const OVERHEAD_BYTES = 3 * 1024; // conservative PDF wrapper overhead
@@ -48,10 +49,10 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
 }
 
 export async function jpegToPdf(opts: PdfOptions): Promise<Blob> {
-  const { jpegBlob, widthPx, heightPx, title } = opts;
+  const { jpegBlob, widthPx, heightPx, title, dpi } = opts;
 
   // PDF page size in points (72 dpi). Keep aspect ratio.
-  const targetWidthPt = 595; // A4 width in points (approx)
+  const targetWidthPt = dpi && dpi > 0 ? Math.max(18, (widthPx / dpi) * 72) : 595;
   const ratio = heightPx / widthPx;
   const targetHeightPt = targetWidthPt * ratio;
 

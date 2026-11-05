@@ -1,5 +1,6 @@
 ---
 import Converter from '../converter/Converter.astro';
+import type { CropAspectPreset } from '@lib/worker/types';
 
 // Default page — HEIC to JPG at no target, so users on the homepage get a
 // useful tool immediately.
@@ -9,8 +10,19 @@ interface Props {
   fromMime?: string;
   toMime?: string;
   targetKb?: number | null;
-  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport' | 'dpi' | 'exif';
+  initialSizeMode?: 'max' | 'exact' | 'range' | 'quality';
+  minKb?: number | null;
+  maxKb?: number | null;
+  initialCropAspect?: CropAspectPreset;
+  initialUnit?: 'px' | 'cm' | 'mm' | 'in';
+  initialWidth?: number | null;
+  initialHeight?: number | null;
+  initialDpi?: number | null;
+  preserveMetadata?: boolean;
+  initialMergePdf?: boolean;
   preset?: string;
+  category?: 'all' | 'visa' | 'exam' | 'id' | 'social';
 }
 
 const {
@@ -20,7 +32,18 @@ const {
   toMime = 'image/jpeg',
   targetKb = null,
   initialTool = 'all',
+  initialSizeMode,
+  minKb,
+  maxKb,
+  initialCropAspect,
+  initialUnit,
+  initialWidth,
+  initialHeight,
+  initialDpi,
+  preserveMetadata,
+  initialMergePdf,
   preset,
+  category,
 } = Astro.props;
 ---
 
@@ -32,6 +55,17 @@ const {
     toMime={toMime}
     targetKb={targetKb}
     initialTool={initialTool}
+    initialSizeMode={initialSizeMode}
+    minKb={minKb}
+    maxKb={maxKb}
+    initialCropAspect={initialCropAspect}
+    initialUnit={initialUnit}
+    initialWidth={initialWidth}
+    initialHeight={initialHeight}
+    initialDpi={initialDpi}
+    preserveMetadata={preserveMetadata}
+    initialMergePdf={initialMergePdf}
     preset={preset}
+    category={category}
   />
 </div>

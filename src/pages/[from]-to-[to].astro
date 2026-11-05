@@ -34,13 +34,24 @@ const meta = buildMeta(combo);
 const intro = buildIntro(combo);
 const faqs = buildFaqs(combo);
 
+// Protect site quality: Low-search legacy sources (BMP, GIF, TIFF, AVIF inputs)
+// are marked noindex, follow to avoid doorway penalties while keeping full utility.
+const WEAK_SOURCES = new Set(['bmp', 'gif', 'tiff', 'avif']);
+const isWeak = WEAK_SOURCES.has(combo.from.toLowerCase());
+
 // Prioritize combos sharing the SAME source format (e.g., other TIFF or SVG conversions)
 const sameSource = allCombos
   .filter((c) => c.kind === 'convert' && c.from === combo.from && c.to !== combo.to);
 
-// Then combos sharing the SAME target format (e.g., other conversions to JPG or PNG)
+// Then combos sharing the SAME target format (exclude noindex weak sources on indexed pages)
 const sameTarget = allCombos
-  .filter((c) => c.kind === 'convert' && c.to === combo.to && c.from !== combo.from);
+  .filter(
+    (c) =>
+      c.kind === 'convert' &&
+      c.to === combo.to &&
+      c.from !== combo.from &&
+      (isWeak || !WEAK_SOURCES.has(c.from.toLowerCase()))
+  );
 
 const related = [...sameSource, ...sameTarget]
   .slice(0, 6)
@@ -57,7 +68,7 @@ const sizeTargets = allCombos
       c.from === combo.from &&
       c.to === combo.to
   )
-  .slice(0, 4)
+  .slice(0, 5)
   .map((c) => ({
     label: `${c.from.toUpperCase()} to ${c.to.toUpperCase()} under ${c.sizeKb}KB`,
     href: `/${c.from}-to-${c.to}-under-${c.sizeKb}kb/`,
@@ -75,11 +86,6 @@ const useCaseIds =
     : combo.to === 'webp'
     ? ['web-upload']
     : ['email'];
-
-// Protect site quality: Low-search legacy sources (BMP, GIF, TIFF, AVIF inputs)
-// are marked noindex, follow to avoid doorway penalties while keeping full utility.
-const WEAK_SOURCES = new Set(['bmp', 'gif', 'tiff', 'avif']);
-const isWeak = WEAK_SOURCES.has(combo.from.toLowerCase());
 ---
 
 <ToolLayout

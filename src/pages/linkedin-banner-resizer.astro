@@ -1,0 +1,178 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Social Tools",
+    "href": "/resize-image/"
+  },
+  {
+    "label": "LinkedIn Banner Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does my LinkedIn banner look cropped on mobile phones?",
+    "a": "On smartphones, the circular profile avatar moves towards the center-left and the sides of the banner are cropped to fit narrower screens. Placing text within the center-right safe zone ensures 100% visibility on both mobile and desktop."
+  }
+];
+
+const pageTitle = 'LinkedIn Banner Resizer (1584x396 px Safe Zones)';
+const pageDesc = 'Resize and crop LinkedIn profile cover banners to exact 1584x396 px (4:1 aspect ratio) with mobile avatar safe zone. Free & private in-browser.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit LinkedIn Banner Resizer Online',
+    description: pageDesc,
+    url: new URL('/linkedin-banner-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>1584×396 px · 4:1 Ratio · Mobile Safe Zone Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        LinkedIn Banner Resizer Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop and rescale your LinkedIn personal background cover to exact 1584 × 396 px (4:1 ratio) keeping key text and graphics outside mobile avatar crop zones.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official LinkedIn Banner Dimensions (2026 Direct Answer)"
+      summaryText="LinkedIn recommends a personal profile background banner of 1584 × 396 pixels (exact 4:1 aspect ratio) under 8 MB in JPG or PNG format. Crucially, the circular profile picture overlaps the bottom-left area of the banner on both desktop and mobile; keep important contact details and typography centered or right-aligned."
+      portalName="LinkedIn Profile Specifications"
+      specs={[{"label":"Recommended Dimensions","value":"1584 × 396 pixels","highlight":true},{"label":"Aspect Ratio","value":"4:1 Panoramic Ratio","highlight":true},{"label":"Max File Size","value":"Under 8 MB (JPG/PNG)"},{"label":"Safe Zone Area","value":"Center and Right-aligned"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={500}
+        initialTool="passport"
+        preset="social-linkedin-banner"
+        category="social"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        LinkedIn Visual Dimensions Reference
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Official image sizes across personal and company LinkedIn pages:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Image Type</th>
+              <th class="py-3 px-4">Dimensions</th>
+              <th class="py-3 px-4">Aspect Ratio</th>
+              <th class="py-3 px-4">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Personal Profile Banner</td>
+              <td class="py-3 px-4 text-muted">1584 × 396 pixels</td>
+              <td class="py-3 px-4 text-muted">4:1</td>
+              <td class="py-3 px-4 text-muted">Leave bottom-left clear for avatar</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Company Page Cover</td>
+              <td class="py-3 px-4 text-muted">1128 × 191 pixels</td>
+              <td class="py-3 px-4 text-muted">5.91:1</td>
+              <td class="py-3 px-4 text-muted">Horizontal corporate banner</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Profile Picture Avatar</td>
+              <td class="py-3 px-4 text-muted">400 × 400 pixels</td>
+              <td class="py-3 px-4 text-muted">1:1 Square</td>
+              <td class="py-3 px-4 text-muted">Circular display crop</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Feed Shared Post Image</td>
+              <td class="py-3 px-4 text-muted">1200 × 627 pixels</td>
+              <td class="py-3 px-4 text-muted">1.91:1</td>
+              <td class="py-3 px-4 text-muted">Optimal link and photo preview</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

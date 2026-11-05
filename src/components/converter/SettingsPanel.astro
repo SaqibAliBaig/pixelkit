@@ -1,26 +1,85 @@
 ---
+import PresetIcon from './PresetIcon.astro';
 import { PORTAL_PRESETS } from '@lib/portal-presets';
+
 interface Props {
   from: string;
   to: string;
   targetKb: number | null;
-  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport';
+  initialTool?: 'all' | 'compress' | 'convert' | 'resize' | 'crop' | 'passport' | 'dpi' | 'exif';
+  initialSizeMode?: 'max' | 'exact' | 'range' | 'quality';
+  minKb?: number | null;
+  maxKb?: number | null;
+  initialCropAspect?: string;
+  initialUnit?: 'px' | 'cm' | 'mm' | 'in';
+  initialWidth?: number | null;
+  initialHeight?: number | null;
+  initialDpi?: number | null;
+  preserveMetadata?: boolean;
+  initialMergePdf?: boolean;
+  preset?: string;
+  category?: 'all' | 'visa' | 'exam' | 'id' | 'social';
 }
 
-const { from, to, targetKb, initialTool = 'all' } = Astro.props;
+const {
+  from,
+  to,
+  targetKb,
+  initialTool = 'all',
+  initialSizeMode = 'max',
+  minKb = null,
+  maxKb = null,
+  initialCropAspect = 'original',
+  initialUnit = 'px',
+  initialWidth = null,
+  initialHeight = null,
+  initialDpi = null,
+  preserveMetadata,
+  initialMergePdf = false,
+  preset,
+  category,
+} = Astro.props;
+
+const allPresetsWithoutNone = PORTAL_PRESETS.filter((p) => p.id !== 'none');
+const visiblePresets = allPresetsWithoutNone;
+
+const visaCount = allPresetsWithoutNone.filter((p) => p.category === 'visa').length;
+const examCount = allPresetsWithoutNone.filter((p) => p.category === 'exam').length;
+const idCount = allPresetsWithoutNone.filter((p) => p.category === 'id').length;
+const socialCount = allPresetsWithoutNone.filter((p) => p.category === 'social').length;
+const totalCount = allPresetsWithoutNone.length;
+
+const activePresetObj = preset ? PORTAL_PRESETS.find((p) => p.id === preset) : null;
+const initialCat = (category && category !== 'all' ? category : null) || activePresetObj?.category || 'all';
+
+const panelTitle = 'Official Preset Profiles';
+const panelSubtitle = `${totalCount} verified standards: Passports, Visas, Exams, IDs & Social Media.`;
+
+
+
+
+
+
 
 // Crop Aspects
 const CROP_ASPECTS = [
   { value: 'original', label: 'Original', badge: 'AUTO', desc: 'Preserve natural aspect ratio' },
   { value: '1:1', label: '1:1 Square', badge: '1:1', desc: 'US Visa, WhatsApp, Instagram avatar' },
   { value: '3.5:4.5', label: '3.5 : 4.5 Passport', badge: '35×45', desc: 'Indian Passport, Schengen, UKVI' },
-  { value: '4:5', label: '4:5 Portrait', badge: '4:5', desc: 'Social mobile feeds' },
-  { value: '16:9', label: '16:9 Landscape', badge: '16:9', desc: 'Widescreen presentation & video' },
-  { value: '9:16', label: '9:16 Story / Reel', badge: '9:16', desc: 'Mobile full screen story' },
-  { value: '3:2', label: '3:2 Photo', badge: '3:2', desc: 'Classic 35mm photography' },
-  { value: '3:4', label: '3:4 Portrait', badge: '3:4', desc: 'Canada visa (50×70mm), official ID' },
+  { value: '4:5', label: '4:5 Portrait', badge: '4:5', desc: 'Social mobile feeds & Instagram' },
+  { value: '4:3', label: '4:3 Standard', badge: '4:3', desc: 'Classic digital & document frame' },
+  { value: '16:9', label: '16:9 Landscape', badge: '16:9', desc: 'Widescreen presentation & YouTube' },
+  { value: '9:16', label: '9:16 Story / Reel', badge: '9:16', desc: 'Mobile full screen story & shorts' },
+  { value: '3:2', label: '3:2 Photo', badge: '3:2', desc: 'Classic 35mm DSLR photography' },
+  { value: '3:4', label: '3:4 Portrait', badge: '3:4', desc: 'Official ID & portrait card' },
+  { value: '5:7', label: '5:7 Canada Visa', badge: '5:7', desc: 'Canada IRCC 50×70mm standard' },
   { value: '2:1', label: '2:1 Signature', badge: '2:1', desc: 'Govt signature upload slot' },
+  { value: '3:1', label: '3:1 X Header', badge: '3:1', desc: 'Twitter / X widescreen banner' },
+  { value: '4:1', label: '4:1 LinkedIn', badge: '4:1', desc: 'LinkedIn profile cover banner' },
 ];
+
+const activeCropOption = CROP_ASPECTS.find((c) => c.value === initialCropAspect) || CROP_ASPECTS[0]!;
+const initialCropHint = activeCropOption.value === 'original' ? 'Original' : activeCropOption.label;
 
 // Target Presets Ladder with KB and MB tiers
 const TARGET_PRESETS = [
@@ -44,16 +103,62 @@ const TARGET_PRESETS = [
   { value: 'custom', kb: null, badge: 'CUST', label: 'Custom Size…', desc: 'Enter any exact KB or MB value without limits', section: 'custom' },
 ];
 
-const activePreset = TARGET_PRESETS.find((p) => p.kb === targetKb) || (targetKb ? TARGET_PRESETS.find(p => p.value === 'custom')! : TARGET_PRESETS[0]!);
+const matchedTargetPreset = TARGET_PRESETS.find((p) => p.kb !== null && p.kb === targetKb);
+const isCustomTargetKb = Boolean(targetKb && !matchedTargetPreset);
+const activePreset = matchedTargetPreset || (targetKb ? TARGET_PRESETS.find((p) => p.value === 'custom')! : TARGET_PRESETS[0]!);
+const selectedTargetSelectVal = isCustomTargetKb ? 'custom' : (targetKb ? String(targetKb) : '');
+const formattedCustomKbBadge = targetKb
+  ? (targetKb >= 1024 && targetKb % 1024 === 0 ? `${targetKb / 1024} MB` : `${targetKb} KB`)
+  : 'CUST';
+const displayTargetBadge = isCustomTargetKb ? formattedCustomKbBadge : activePreset.badge;
+const displayTargetLabel = targetKb
+  ? `${initialSizeMode === 'exact' ? 'Exact ' : 'Under '}${isCustomTargetKb ? formattedCustomKbBadge : activePreset.label}`
+  : activePreset.label;
 
-function formatInitialTargetBadge(kb: number | null): string {
+function formatInitialTargetBadge(
+  kb: number | null,
+  mode: 'max' | 'exact' | 'range' | 'quality',
+  minVal: number | null,
+  maxVal: number | null
+): string {
+  if (mode === 'quality') return 'Quality 85%';
+  if (mode === 'range') {
+    const lo = minVal ?? 20;
+    const hi = maxVal ?? kb ?? 50;
+    return `Range: ${lo}–${hi} KB`;
+  }
   if (!kb) return 'Best quality (no limit)';
+  const prefix = mode === 'exact' ? 'Exact ' : 'Max ';
   if (kb >= 1024) {
     const mb = kb / 1024;
-    return mb % 1 === 0 ? `Max ${mb} MB` : `Max ${mb.toFixed(1)} MB`;
+    return mb % 1 === 0 ? `${prefix}${mb} MB` : `${prefix}${mb.toFixed(1)} MB`;
   }
-  return `Max ${kb} KB`;
+  return `${prefix}${kb} KB`;
 }
+
+function unitValToPx(val: number, u: 'px' | 'cm' | 'mm' | 'in', dpi: number): number {
+  if (u === 'cm') return Math.max(10, Math.round((val / 2.54) * dpi));
+  if (u === 'mm') return Math.max(10, Math.round((val / 25.4) * dpi));
+  if (u === 'in') return Math.max(10, Math.round(val * dpi));
+  return Math.max(10, Math.round(val));
+}
+
+const activeDimDpi = initialDpi || 300;
+const hasInitialCustomDims = Boolean(initialWidth || initialHeight || initialUnit !== 'px');
+const initialPxW = initialWidth ? unitValToPx(initialWidth, initialUnit, activeDimDpi) : null;
+const initialPxH = initialHeight ? unitValToPx(initialHeight, initialUnit, activeDimDpi) : null;
+const initialResizeHint = hasInitialCustomDims && initialWidth && initialHeight
+  ? (initialUnit === 'px'
+      ? `${initialWidth}×${initialHeight} px`
+      : `${initialWidth}×${initialHeight} ${initialUnit} (${initialPxW}×${initialPxH} px)`)
+  : '100% (Original)';
+
+const selectedDpiPill = !initialDpi
+  ? 'auto'
+  : (['72', '150', '200', '300', '600'].includes(String(initialDpi)) ? String(initialDpi) : 'custom');
+const initialDpiBadge = initialDpi ? `${initialDpi} DPI` : 'Auto (Original)';
+const isExifTool = initialTool === 'exif';
+const initialPreserveMetadata = preserveMetadata !== undefined ? preserveMetadata : !isExifTool;
 
 const OUTPUT_FORMATS = [
   { value: 'jpg', label: 'JPG / JPEG', badge: 'JPG', desc: 'Universal web & print photo', mime: 'image/jpeg' },
@@ -65,7 +170,23 @@ const OUTPUT_FORMATS = [
 ];
 
 const normalizedTo = to.toLowerCase() === 'jpeg' ? 'jpg' : to.toLowerCase();
-const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT_FORMATS[0]!;
+const isExplicitJpegExt = to.toLowerCase() === 'jpeg';
+const activeFmtBase = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT_FORMATS[0]!;
+const activeFmt = isExplicitJpegExt
+  ? { ...activeFmtBase, badge: 'JPEG', label: 'JPEG (.jpeg)', desc: 'Strict .jpeg portal extension' }
+  : activeFmtBase;
+const isFormatPairDifferent =
+  from.toLowerCase() !== to.toLowerCase() && !(from.toLowerCase() === 'jpeg' && to.toLowerCase() === 'jpg');
+const initialModeBadgeText =
+  initialTool === 'all'
+    ? 'All-in-One'
+    : initialTool === 'passport'
+      ? 'PRESETS'
+      : initialTool === 'dpi'
+        ? `${initialDpi || 300} DPI`
+        : initialTool === 'exif'
+          ? 'EXIF CLEAN'
+          : initialTool.toUpperCase();
 ---
 
 <div class="rounded-xl border border-border bg-bg/40 p-4">
@@ -76,7 +197,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         Settings
       </div>
       <span id="pk-settings-mode-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-border text-muted font-semibold">
-        {initialTool === 'all' ? 'All-in-One' : initialTool.toUpperCase()}
+        {initialModeBadgeText}
       </span>
     </div>
     <div class="flex items-center gap-1 shrink-0" role="tablist" aria-label="Settings Mode">
@@ -106,7 +227,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             : 'text-muted hover:text-fg'
         }`}
       >
-        <span>Portals</span>
+        <span>Presets</span>
         <span id="pk-portal-active-dot" class="hidden h-1.5 w-1.5 rounded-full bg-accent"></span>
       </button>
     </div>
@@ -208,10 +329,10 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
     <div
       id="pk-stage-format"
       class={`rounded-xl border transition-all p-3 space-y-2.5 ${
-        initialTool === 'convert'
+        initialTool === 'convert' || (initialTool === 'compress' && isFormatPairDifferent)
           ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
           : 'border-border bg-surface/40'
-      } ${['compress', 'crop', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+      } ${['crop', 'resize', 'dpi'].includes(initialTool) || (initialTool === 'compress' && !isFormatPairDifferent) ? 'hidden' : ''}`}
     >
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-fg flex items-center gap-2">
@@ -343,6 +464,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           <input
             id="pk-merge-pdf-toggle"
             type="checkbox"
+            checked={initialMergePdf}
             aria-label="Merge files into single multi-page PDF"
             class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
           />
@@ -383,7 +505,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         initialTool === 'compress'
           ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
           : 'border-border bg-surface/40'
-      } ${['convert', 'crop', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+      } ${['crop', 'resize', 'dpi', 'exif'].includes(initialTool) || (initialTool === 'convert' && !targetKb) ? 'hidden' : ''}`}
     >
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-fg flex items-center gap-2">
@@ -394,7 +516,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
           id="pk-target-value"
           class="text-[11px] text-muted tabular-nums font-medium"
         >
-          {formatInitialTargetBadge(targetKb)}
+          {formatInitialTargetBadge(targetKb, initialSizeMode, minKb, maxKb)}
         </span>
       </div>
 
@@ -403,7 +525,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-max"
-          class="flex-1 rounded-md py-1.5 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px] touch-manipulation"
+          class={`flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            initialSizeMode === 'max' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-mode="max"
         >
           Max Size
@@ -411,7 +535,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-exact"
-          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
+          class={`flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            initialSizeMode === 'exact' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-mode="exact"
         >
           Exact Size
@@ -419,7 +545,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-range"
-          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
+          class={`flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            initialSizeMode === 'range' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-mode="range"
         >
           Range
@@ -427,24 +555,33 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         <button
           type="button"
           id="pk-size-mode-quality"
-          class="flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
+          class={`flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            initialSizeMode === 'quality' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-mode="quality"
         >
           Quality %
         </button>
       </div>
 
+      <p
+        id="pk-size-mode-hint"
+        class={`text-[11px] text-accent font-medium leading-snug ${initialSizeMode === 'exact' ? '' : 'hidden'}`}
+      >
+        Increases smaller files losslessly or compresses larger files to hit exact KB.
+      </p>
+
       <!-- Hidden standard select for form / worker / test compatibility -->
       <select id="pk-target-kb" class="sr-only" tabindex="-1" aria-hidden="true">
         {TARGET_PRESETS.map((p) => (
-          <option value={p.value} selected={p.value === (targetKb ? String(targetKb) : '')}>
+          <option value={p.value} selected={p.value === selectedTargetSelectVal}>
             {p.label}
           </option>
         ))}
       </select>
 
       <!-- Custom High-End Trigger Button -->
-      <div id="pk-target-preset-container" class="relative" id="pk-target-kb-wrapper">
+      <div id="pk-target-preset-container" class={`relative ${['range', 'quality'].includes(initialSizeMode) ? 'hidden' : ''}`}>
         <button
           type="button"
           id="pk-custom-target-trigger"
@@ -457,11 +594,11 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               id="pk-selected-target-badge"
               class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
             >
-              {activePreset.badge}
+              {displayTargetBadge}
             </span>
             <div class="min-w-0 flex-1">
               <span id="pk-selected-target-title" class="block font-semibold text-fg text-xs truncate">
-                {activePreset.label}
+                {displayTargetLabel}
               </span>
               <span id="pk-selected-target-desc" class="block text-[10px] text-muted truncate">
                 {activePreset.desc}
@@ -675,7 +812,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </div>
 
       <!-- Custom Size Input Field (KB / MB Unit Toggle) -->
-      <div id="pk-custom-kb-container" class="mt-2 hidden">
+      <div id="pk-custom-kb-container" class={`mt-2 ${isCustomTargetKb && !['range', 'quality'].includes(initialSizeMode) ? '' : 'hidden'}`}>
         <div class="flex items-center gap-2">
           <input
             id="pk-custom-kb-input"
@@ -712,7 +849,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </div>
 
       <!-- Min-Max Range Input Fields with KB / MB Unit Toggle -->
-      <div id="pk-range-kb-container" class="mt-2 hidden space-y-2">
+      <div id="pk-range-kb-container" class={`mt-2 space-y-2 ${initialSizeMode === 'range' ? '' : 'hidden'}`}>
         <div class="flex items-center justify-between text-xs text-muted">
           <span>Target Size Bracket</span>
           <div class="flex rounded-lg border border-border bg-surface/80 p-0.5 text-[11px]">
@@ -743,6 +880,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               min="0.1"
               step="any"
               placeholder="20"
+              value={minKb ?? ''}
               aria-label="Minimum target size in KB or MB"
               class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
@@ -755,7 +893,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               min="0.1"
               step="any"
               placeholder="50"
-              value={targetKb ?? ''}
+              value={maxKb ?? targetKb ?? ''}
               aria-label="Maximum target size in KB or MB"
               class="mt-1 block w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
@@ -765,7 +903,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </div>
 
       <!-- Manual Quality Slider Container -->
-      <div id="pk-quality-container" class="mt-2.5 space-y-1.5 hidden">
+      <div id="pk-quality-container" class={`mt-2.5 space-y-1.5 ${initialSizeMode === 'quality' ? '' : 'hidden'}`}>
         <div class="flex items-center justify-between text-xs">
           <span class="font-medium text-fg">Manual Quality Factor</span>
           <span id="pk-quality-value" class="font-mono text-accent font-semibold">85%</span>
@@ -796,20 +934,20 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         initialTool === 'crop'
           ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
           : 'border-border bg-surface/40'
-      } ${['convert', 'compress', 'resize'].includes(initialTool) ? 'hidden' : ''}`}
+      } ${['convert', 'compress', 'resize', 'dpi', 'exif'].includes(initialTool) ? 'hidden' : ''}`}
     >
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-fg flex items-center gap-2">
-          <span id="pk-dot-crop" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'crop' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span id="pk-dot-crop" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'crop' || activeCropOption.value !== 'original' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
           <span>Crop &amp; Aspect Ratio</span>
         </span>
-        <span id="pk-crop-hint" class="text-[11px] text-muted font-medium">Original</span>
+        <span id="pk-crop-hint" class="text-[11px] text-muted font-medium">{initialCropHint}</span>
       </div>
 
       <!-- Hidden standard select for form / worker compatibility -->
       <select id="pk-crop-aspect" class="sr-only" tabindex="-1" aria-hidden="true">
         {CROP_ASPECTS.map((aspect) => (
-          <option value={aspect.value}>{aspect.label}</option>
+          <option value={aspect.value} selected={aspect.value === activeCropOption.value}>{aspect.label}</option>
         ))}
       </select>
 
@@ -827,14 +965,14 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               id="pk-selected-crop-badge"
               class="inline-flex items-center justify-center rounded-md font-mono text-[10px] font-bold px-1.5 py-0.5 bg-accent/15 text-accent border border-accent/25 shrink-0 uppercase"
             >
-              AUTO
+              {activeCropOption.badge}
             </span>
             <div class="min-w-0 flex-1">
               <span id="pk-selected-crop-title" class="block font-semibold text-fg truncate">
-                Original Aspect
+                {activeCropOption.value === 'original' ? 'Original Aspect' : activeCropOption.label}
               </span>
               <span id="pk-selected-crop-desc" class="block text-[10px] text-muted truncate">
-                Preserve natural image boundaries
+                {activeCropOption.desc}
               </span>
             </div>
           </div>
@@ -871,9 +1009,9 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
               data-badge={aspect.badge}
               data-title={aspect.label}
               data-desc={aspect.desc}
-              aria-selected={aspect.value === 'original'}
+              aria-selected={aspect.value === activeCropOption.value}
               class={`pk-custom-crop-option w-full flex items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition-all cursor-pointer group ${
-                aspect.value === 'original' ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
+                aspect.value === activeCropOption.value ? 'bg-accent/10 border border-accent/30' : 'hover:bg-bg/80 border border-transparent'
               }`}
             >
               <div class="flex items-center gap-2 min-w-0">
@@ -899,7 +1037,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class={`pk-crop-option-check text-accent shrink-0 ml-2 ${aspect.value === 'original' ? '' : 'hidden'}`}
+                class={`pk-crop-option-check text-accent shrink-0 ml-2 ${aspect.value === activeCropOption.value ? '' : 'hidden'}`}
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
@@ -909,7 +1047,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </div>
 
       <!-- Focal Anchor (Top, Center, Bottom) - shown when crop is active -->
-      <div id="pk-crop-anchor-container" class="hidden pt-1">
+      <div id="pk-crop-anchor-container" class={`${activeCropOption.value !== 'original' ? '' : 'hidden'} pt-1`}>
         <div class="flex items-center justify-between text-[11px] text-muted mb-1">
           <span id="pk-crop-anchor-label">Focal Anchor: Center</span>
         </div>
@@ -960,21 +1098,23 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         initialTool === 'resize'
           ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
           : 'border-border bg-surface/40'
-      } ${['convert', 'compress', 'crop'].includes(initialTool) ? 'hidden' : ''}`}
+      } ${['convert', 'compress', 'crop', 'dpi', 'exif'].includes(initialTool) ? 'hidden' : ''}`}
     >
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <span class="text-xs font-bold text-fg flex items-center gap-2">
-          <span id="pk-dot-resize" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'resize' ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span id="pk-dot-resize" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'resize' || hasInitialCustomDims ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
           <span>Resize Dimensions</span>
         </span>
-        <span id="pk-resize-hint" class="text-[11px] text-muted font-medium">100% (Original)</span>
+        <span id="pk-resize-hint" class="text-[11px] text-muted font-medium truncate">{initialResizeHint}</span>
       </div>
 
       <!-- Scale Pills -->
       <div class="flex rounded-lg border border-border bg-surface/50 p-0.5 text-xs">
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors bg-surface text-fg shadow-xs cursor-pointer text-[11px] touch-manipulation"
+          class={`pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            !hasInitialCustomDims ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-scale="100"
         >
           100%
@@ -1002,34 +1142,63 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         </button>
         <button
           type="button"
-          class="pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors text-muted hover:text-fg cursor-pointer text-[11px] touch-manipulation"
+          class={`pk-scale-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer text-[11px] touch-manipulation ${
+            hasInitialCustomDims ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'
+          }`}
           data-scale="custom"
         >
           Custom
         </button>
       </div>
 
-      <!-- Custom Dimension Inputs (Width x Height + Lock) -->
-      <div id="pk-custom-dims-container" class="hidden space-y-2 pt-0.5">
+      <!-- Custom Dimension Inputs (Unit: px/cm/mm/in + DPI + Width x Height + Lock) -->
+      <div id="pk-custom-dims-container" class={`${hasInitialCustomDims ? '' : 'hidden'} space-y-2 pt-0.5`}>
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex rounded-lg border border-border bg-surface/70 p-0.5 text-[11px]" role="group" aria-label="Dimension unit">
+            <button type="button" class={`pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer ${initialUnit === 'px' ? 'bg-accent/15 text-accent' : 'text-muted hover:text-fg'}`} data-unit="px">PX</button>
+            <button type="button" class={`pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer ${initialUnit === 'cm' ? 'bg-accent/15 text-accent' : 'text-muted hover:text-fg'}`} data-unit="cm">CM</button>
+            <button type="button" class={`pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer ${initialUnit === 'mm' ? 'bg-accent/15 text-accent' : 'text-muted hover:text-fg'}`} data-unit="mm">MM</button>
+            <button type="button" class={`pk-dim-unit-btn rounded-md px-2 py-0.5 font-semibold cursor-pointer ${initialUnit === 'in' ? 'bg-accent/15 text-accent' : 'text-muted hover:text-fg'}`} data-unit="in">IN</button>
+          </div>
+          <label id="pk-dim-dpi-wrap" class={`flex items-center gap-1 text-[11px] text-muted ${initialUnit === 'px' ? 'hidden' : ''}`}>
+            <span class="font-semibold">DPI:</span>
+            <select
+              id="pk-dim-dpi"
+              aria-label="Print DPI for physical unit conversion"
+              class="rounded-md border border-border bg-surface px-1.5 py-0.5 text-[11px] font-mono font-semibold text-fg focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+            >
+              <option value="72" selected={activeDimDpi === 72}>72</option>
+              <option value="96" selected={activeDimDpi === 96}>96</option>
+              <option value="150" selected={activeDimDpi === 150}>150</option>
+              <option value="200" selected={activeDimDpi === 200}>200</option>
+              <option value="300" selected={activeDimDpi === 300}>300</option>
+              <option value="600" selected={activeDimDpi === 600}>600</option>
+            </select>
+          </label>
+        </div>
+
         <div class="flex items-center gap-2">
           <div class="flex-1">
-            <span class="block text-[10px] text-muted mb-0.5">Width (px)</span>
+            <span id="pk-dim-width-label" class="block text-[10px] text-muted mb-0.5">Width ({initialUnit})</span>
             <input
               id="pk-dim-width"
               type="number"
-              min="10"
-              step="1"
-              placeholder="e.g. 1920"
-              aria-label="Width in pixels"
+              min="0.1"
+              step={initialUnit === 'px' ? '1' : 'any'}
+              value={initialWidth ?? ''}
+              placeholder={initialUnit === 'cm' ? 'e.g. 3.5' : 'e.g. 1920'}
+              aria-label="Target width"
               class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
           </div>
           <button
             type="button"
             id="pk-lock-aspect-btn"
-            data-locked="true"
-            class="self-end mb-1 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-surface text-accent hover:border-accent/50 transition-colors cursor-pointer"
-            title="Aspect ratio locked"
+            data-locked={hasInitialCustomDims && initialWidth && initialHeight ? 'false' : 'true'}
+            class={`self-end mb-1 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-surface hover:border-accent/50 transition-colors cursor-pointer ${
+              hasInitialCustomDims && initialWidth && initialHeight ? 'text-muted' : 'text-accent'
+            }`}
+            title={hasInitialCustomDims && initialWidth && initialHeight ? 'Aspect ratio unlocked' : 'Aspect ratio locked'}
           >
             <svg id="pk-lock-aspect-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -1037,17 +1206,34 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             </svg>
           </button>
           <div class="flex-1">
-            <span class="block text-[10px] text-muted mb-0.5">Height (px)</span>
+            <span id="pk-dim-height-label" class="block text-[10px] text-muted mb-0.5">Height ({initialUnit})</span>
             <input
               id="pk-dim-height"
               type="number"
-              min="10"
-              step="1"
-              placeholder="e.g. 1080"
-              aria-label="Height in pixels"
+              min="0.1"
+              step={initialUnit === 'px' ? '1' : 'any'}
+              value={initialHeight ?? ''}
+              placeholder={initialUnit === 'cm' ? 'e.g. 4.5' : 'e.g. 1080'}
+              aria-label="Target height"
               class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-mono"
             />
           </div>
+        </div>
+
+        <p
+          id="pk-dim-computed-px"
+          class={`text-[11px] font-mono text-accent font-medium ${initialUnit !== 'px' && initialPxW && initialPxH ? '' : 'hidden'}`}
+        >
+          {initialUnit !== 'px' && initialPxW && initialPxH
+            ? `${initialWidth} × ${initialHeight} ${initialUnit} @ ${activeDimDpi} DPI = ${initialPxW} × ${initialPxH} px`
+            : ''}
+        </p>
+
+        <div id="pk-cm-presets-row" class={`flex flex-wrap gap-1 ${initialUnit === 'px' ? 'hidden' : ''}`}>
+          <button type="button" class="pk-cm-preset-btn rounded-md border border-border bg-surface px-2 py-0.5 text-[10px] font-mono text-muted hover:text-accent hover:border-accent/40 cursor-pointer" data-unit="cm" data-w="3.5" data-h="4.5" data-dpi="300">3.5×4.5 cm</button>
+          <button type="button" class="pk-cm-preset-btn rounded-md border border-border bg-surface px-2 py-0.5 text-[10px] font-mono text-muted hover:text-accent hover:border-accent/40 cursor-pointer" data-unit="cm" data-w="5.08" data-h="5.08" data-dpi="300">2×2 in (5.08 cm)</button>
+          <button type="button" class="pk-cm-preset-btn rounded-md border border-border bg-surface px-2 py-0.5 text-[10px] font-mono text-muted hover:text-accent hover:border-accent/40 cursor-pointer" data-unit="cm" data-w="4" data-h="2" data-dpi="300">4×2 cm Sign</button>
+          <button type="button" class="pk-cm-preset-btn rounded-md border border-border bg-surface px-2 py-0.5 text-[10px] font-mono text-muted hover:text-accent hover:border-accent/40 cursor-pointer" data-unit="cm" data-w="2.5" data-h="2.5" data-dpi="200">2.5×2.5 cm PAN</button>
         </div>
       </div>
 
@@ -1067,6 +1253,53 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </button>
     </div>
 
+<!-- STAGE 5: 🖨️ Print Resolution (DPI) -->
+    <div
+      id="pk-stage-dpi"
+      class={`rounded-xl border transition-all p-3 space-y-2.5 ${
+        initialTool === 'dpi'
+          ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20'
+          : 'border-border bg-surface/40'
+      } ${['convert', 'compress', 'crop', 'resize', 'exif'].includes(initialTool) ? 'hidden' : ''}`}
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-fg flex items-center gap-2">
+          <span id="pk-dot-dpi" class={`pk-stage-dot inline-block h-2 w-2 rounded-full transition-all shrink-0 ${initialTool === 'dpi' || initialDpi ? 'bg-accent ring-2 ring-accent/25' : 'border-2 border-border/90 bg-surface'}`}></span>
+          <span>Print Resolution (DPI)</span>
+        </span>
+        <span id="pk-dpi-value" class="text-[11px] text-muted font-mono font-medium">{initialDpiBadge}</span>
+      </div>
+
+      <div class="flex rounded-lg border border-border bg-surface/50 p-0.5 text-[11px]">
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === 'auto' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="auto">Auto</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === '72' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="72">72</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === '150' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="150">150</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === '200' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="200">200</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === '300' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="300">300</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === '600' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="600">600</button>
+        <button type="button" class={`pk-dpi-btn flex-1 rounded-md py-1.5 font-medium transition-colors cursor-pointer touch-manipulation ${selectedDpiPill === 'custom' ? 'bg-surface text-fg shadow-xs' : 'text-muted hover:text-fg'}`} data-dpi="custom">Custom</button>
+      </div>
+
+      <div id="pk-custom-dpi-wrap" class={`flex items-center gap-2 ${selectedDpiPill === 'custom' ? '' : 'hidden'}`}>
+        <input
+          id="pk-custom-dpi-input"
+          type="number"
+          min="36"
+          max="2400"
+          step="1"
+          value={selectedDpiPill === 'custom' && initialDpi ? initialDpi : 300}
+          placeholder="e.g. 200"
+          aria-label="Custom DPI value"
+          class="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-mono text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+        />
+        <span class="text-[11px] font-mono text-muted shrink-0">DPI</span>
+      </div>
+
+      <p id="pk-dpi-hint" class={`text-[11px] text-muted leading-snug ${initialTool === 'dpi' || initialDpi ? '' : 'hidden'}`}>
+        Embeds official JFIF / EXIF / pHYs print density headers with zero quality loss.
+      </p>
+    </div>
+
     
     <!-- Toggle More Tools Button (Hidden on Home 'all', visible on dedicated tools) -->
     <div id="pk-more-tools-toggle-wrapper" class={initialTool === 'all' ? 'hidden' : 'pt-0.5'}>
@@ -1083,6 +1316,8 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
              initialTool === 'compress' ? 'Add Format, Crop, or Resize (Optional)' :
              initialTool === 'crop' ? 'Add Resize, Format, or Compression (Optional)' :
              initialTool === 'resize' ? 'Add Crop, Format, or Compression (Optional)' :
+             initialTool === 'dpi' ? 'Add Resize, Compression, or Format (Optional)' :
+             initialTool === 'exif' ? 'Add Compression, Resize, or Crop (Optional)' :
              'Additional Editing & Compression Tools'}
           </span>
           <span id="pk-more-tools-active-badge" class="hidden text-[10px] font-mono px-1.5 py-0.2 rounded bg-accent/20 text-accent font-bold">1 active</span>
@@ -1096,23 +1331,32 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
       </button>
     </div>
 
-<!-- STAGE 5: Advanced Options & Filters -->
-    <details class="group rounded-xl border border-border/80 bg-surface/40 p-3 text-xs" id="pk-stage-advanced">
+<!-- STAGE 6: Advanced Options & Filters -->
+    <details
+      open={isExifTool || !initialPreserveMetadata}
+      class={`group rounded-xl border p-3 text-xs ${
+        isExifTool ? 'border-accent bg-accent/5 shadow-xs ring-1 ring-accent/20' : 'border-border/80 bg-surface/40'
+      }`}
+      id="pk-stage-advanced"
+    >
       <summary class="flex items-center justify-between font-semibold text-fg cursor-pointer select-none">
         <div class="flex items-center gap-2">
-          <span>Advanced Options &amp; Filters</span>
-          <span id="pk-editing-active-badge" class="hidden h-2 w-2 rounded-full bg-accent animate-pulse" title="Edits active"></span>
+          <span>{isExifTool ? 'EXIF & Privacy Scrubbing' : 'Advanced Options & Filters'}</span>
+          <span id="pk-editing-active-badge" class={`${!initialPreserveMetadata ? '' : 'hidden'} h-2 w-2 rounded-full bg-accent animate-pulse`} title="Edits active"></span>
         </div>
         <svg class="h-4 w-4 text-muted group-open:rotate-180 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </summary>
       <div class="mt-3 pt-3 border-t border-border/60 space-y-2">
+        <p id="pk-exif-status-note" class={`text-[11px] font-medium text-accent leading-snug ${!initialPreserveMetadata ? '' : 'hidden'}`}>
+          Privacy mode active: All hidden EXIF, GPS location, camera serial &amp; timestamp tags will be stripped cleanly.
+        </p>
         <div class="flex items-center gap-2 text-xs text-fg cursor-pointer" onclick="document.getElementById('pk-preserve-metadata')?.click()">
           <input
             id="pk-preserve-metadata"
             type="checkbox"
-            checked
+            checked={initialPreserveMetadata}
             aria-label="Preserve EXIF metadata (Camera, GPS, date)"
             class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
           />
@@ -1172,7 +1416,7 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
             id="pk-btn-switch-to-portal"
             class="mt-2 text-xs font-bold text-accent hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
-            Browse 20 Official Portal Presets →
+            Browse {totalCount} Official Portal Presets →
           </button>
         </div>
       </div>
@@ -1184,10 +1428,10 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
     <div class="flex items-center justify-between">
       <div>
         <span class="text-xs font-bold text-fg uppercase tracking-wider block">
-          Official Portal &amp; Visa Profiles
+          {panelTitle}
         </span>
         <p class="text-[11px] text-muted mt-0.5">
-          20 global standards: auto-crop, scale dimensions &amp; target KB limit.
+          {panelSubtitle}
         </p>
       </div>
       <button
@@ -1217,88 +1461,164 @@ const activeFmt = OUTPUT_FORMATS.find((f) => f.value === normalizedTo) || OUTPUT
         />
       </div>
 
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] scrollbar-none" id="pk-portal-category-filters">
-        <button type="button" class="pk-cat-filter active rounded-md border border-accent bg-accent/15 px-2 py-0.5 font-semibold text-accent cursor-pointer transition-colors" data-cat="all">All (20)</button>
-        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="visa">🛂 Passports (13)</button>
-        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="exam">🎓 Exams &amp; Jobs (5)</button>
-        <button type="button" class="pk-cat-filter rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-muted hover:text-fg cursor-pointer transition-colors" data-cat="id">🪪 IDs &amp; Scans (2)</button>
+      <div class="flex flex-wrap gap-1.5 text-[11px]" id="pk-portal-category-filters">
+        <button
+          type="button"
+          class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
+            initialCat === 'all'
+              ? 'active border-accent bg-accent/15 font-semibold text-accent shadow-xs'
+              : 'border-border bg-surface text-muted hover:text-fg hover:border-accent/40'
+          }`}
+          data-cat="all"
+        >
+          All ({totalCount})
+        </button>
+        <button
+          type="button"
+          class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
+            initialCat === 'visa'
+              ? 'active border-accent bg-accent/15 font-semibold text-accent shadow-xs'
+              : 'border-border bg-surface text-muted hover:text-fg hover:border-accent/40'
+          }`}
+          data-cat="visa"
+        >
+          🛂 Passports ({visaCount})
+        </button>
+        <button
+          type="button"
+          class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
+            initialCat === 'exam'
+              ? 'active border-accent bg-accent/15 font-semibold text-accent shadow-xs'
+              : 'border-border bg-surface text-muted hover:text-fg hover:border-accent/40'
+          }`}
+          data-cat="exam"
+        >
+          🎓 Exams &amp; Jobs ({examCount})
+        </button>
+        <button
+          type="button"
+          class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
+            initialCat === 'id'
+              ? 'active border-accent bg-accent/15 font-semibold text-accent shadow-xs'
+              : 'border-border bg-surface text-muted hover:text-fg hover:border-accent/40'
+          }`}
+          data-cat="id"
+        >
+          🪪 IDs &amp; Docs ({idCount})
+        </button>
+        <button
+          type="button"
+          class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
+            initialCat === 'social'
+              ? 'active border-accent bg-accent/15 font-semibold text-accent shadow-xs'
+              : 'border-border bg-surface text-muted hover:text-fg hover:border-accent/40'
+          }`}
+          data-cat="social"
+        >
+          📱 Social &amp; Web ({socialCount})
+        </button>
       </div>
     </div>
 
     <!-- Hidden standard select for form / test compatibility -->
     <select id="pk-portal-preset-select" class="sr-only" tabindex="-1" aria-hidden="true">
       {PORTAL_PRESETS.map((p) => (
-        <option value={p.id}>{p.name}</option>
+        <option value={p.id} selected={p.id === preset}>{p.name}</option>
       ))}
     </select>
 
     <!-- Scrollable Preset Cards List: NO TRUNCATION -->
     <div id="pk-portal-cards-list" class="max-h-[460px] overflow-y-auto pr-1 space-y-2 scrollbar-thin" role="listbox" aria-label="Portal Presets">
-      {PORTAL_PRESETS.filter((p) => p.id !== 'none').map((preset) => (
-        <button
-          type="button"
-          role="option"
-          data-id={preset.id}
-          data-cat={preset.category}
-          data-flag={preset.flag}
-          data-code={preset.countryCode}
-          data-name={preset.name}
-          data-desc={preset.desc}
-          data-badge={preset.badge}
-          data-target-kb={preset.targetKb ?? ''}
-          data-crop-aspect={preset.cropAspect}
-          data-crop-anchor={preset.cropAnchor}
-          data-width={preset.width ?? ''}
-          data-height={preset.height ?? ''}
-          data-search={`${preset.name} ${preset.countryCode} ${preset.desc} ${preset.dimLabel} ${preset.portalSummary || ''}`.toLowerCase()}
-          class="pk-portal-preset-card group relative w-full rounded-xl border border-border bg-surface p-2.5 text-left transition-all cursor-pointer hover:border-accent/60 hover:bg-surface/90 shadow-2xs"
-        >
-          <div class="flex items-start justify-between gap-2">
-            <div class="flex items-start gap-2.5 min-w-0">
-              <span class="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-bg border border-border/80 font-bold text-xs uppercase shrink-0 shadow-2xs group-hover:border-accent/40 group-hover:text-accent transition-colors mt-0.5">
-                <span>{preset.countryCode || preset.flag}</span>
-              </span>
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="font-bold text-fg text-xs group-hover:text-accent transition-colors">
-                    {preset.name}
+      {(() => {
+        const cards = visiblePresets.map((p) => {
+          const isSelected = preset === p.id;
+          const searchKeywords = (p.keywords || []).join(' ');
+          const searchStr = `${p.name} ${p.countryCode} ${p.desc} ${p.dimLabel} ${searchKeywords} ${p.portalSummary || ''}`.toLowerCase();
+          const isMatchInitialCat = initialCat === 'all' || p.category === initialCat;
+          return (
+            <button
+              type="button"
+              role="option"
+              data-id={p.id}
+              data-cat={p.category}
+              data-flag={p.flag}
+              data-code={p.countryCode}
+              data-name={p.name}
+              data-desc={p.desc}
+              data-badge={p.badge}
+              data-target-kb={p.targetKb ?? ''}
+              data-crop-aspect={p.cropAspect}
+              data-crop-anchor={p.cropAnchor}
+              data-width={p.width ?? ''}
+              data-height={p.height ?? ''}
+              data-search={searchStr}
+              aria-selected={isSelected ? 'true' : 'false'}
+              class={`pk-portal-preset-card group relative w-full rounded-xl border p-2.5 text-left transition-all cursor-pointer shadow-2xs ${
+                !isMatchInitialCat ? 'hidden ' : ''
+              }${
+                isSelected
+                  ? 'border-accent bg-accent/10 shadow-xs'
+                  : 'border-border bg-surface hover:border-accent/60 hover:bg-surface/90'
+              }`}
+            >
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-start gap-2.5 min-w-0">
+                  <span class="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-bg border border-border/80 font-bold text-xs uppercase shrink-0 shadow-2xs group-hover:border-accent/40 group-hover:text-accent transition-colors mt-0.5 overflow-hidden">
+                    <PresetIcon
+                      presetId={p.id}
+                      category={p.category}
+                      countryCode={p.countryCode}
+                      class="w-5 h-5"
+                    />
                   </span>
-                  {preset.badge && (
-                    <span class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-bg border border-border text-muted font-bold shrink-0">
-                      {preset.badge}
-                    </span>
-                  )}
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-bold text-fg text-xs group-hover:text-accent transition-colors">
+                        {p.name}
+                      </span>
+                      {p.badge && (
+                        <span class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-bg border border-border text-muted font-bold shrink-0">
+                          {p.badge}
+                        </span>
+                      )}
+                    </div>
+
+                    <!-- Specs row: Dimensions + File limit -->
+                    <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[11px]">
+                      <span class="inline-flex items-center rounded-md bg-bg px-2 py-0.5 font-medium text-fg border border-border/70">
+                        {p.dimLabel}
+                      </span>
+                      <span class="inline-flex items-center rounded-md bg-accent/10 px-2 py-0.5 font-semibold text-accent border border-accent/25">
+                        Max {p.targetKb} KB JPG
+                      </span>
+                    </div>
+
+                    <!-- Description: full text, never truncated with ... -->
+                    <p class="mt-1 text-[11px] text-muted leading-relaxed">
+                      {p.portalSummary || p.desc}
+                    </p>
+                  </div>
                 </div>
 
-                <!-- Specs row: Dimensions + File limit -->
-                <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[11px]">
-                  <span class="inline-flex items-center rounded-md bg-bg px-2 py-0.5 font-medium text-fg border border-border/70">
-                    {preset.dimLabel}
-                  </span>
-                  <span class="inline-flex items-center rounded-md bg-accent/10 px-2 py-0.5 font-semibold text-accent border border-accent/25">
-                    Max {preset.targetKb} KB JPG
+                <!-- Active Check Badge -->
+                <div class={`pk-portal-card-check shrink-0 mt-0.5 ${isSelected ? '' : 'hidden'}`}>
+                  <span class="inline-flex items-center gap-1 rounded-full bg-accent text-accent-fg px-2 py-0.5 text-[10px] font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Active
                   </span>
                 </div>
-
-                <!-- Description: full text, never truncated with ... -->
-                <p class="mt-1 text-[11px] text-muted leading-relaxed">
-                  {preset.portalSummary || preset.desc}
-                </p>
               </div>
-            </div>
-
-            <!-- Active Check Badge -->
-            <div class="pk-portal-card-check shrink-0 hidden mt-0.5">
-              <span class="inline-flex items-center gap-1 rounded-full bg-accent text-accent-fg px-2 py-0.5 text-[10px] font-bold">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                Active
-              </span>
-            </div>
-          </div>
-        </button>
-      ))}
+            </button>
+          );
+        });
+        return initialTool === 'passport' ? (
+          cards
+        ) : (
+          <template id="pk-portal-cards-template">{cards}</template>
+        );
+      })()}
 
       <!-- Zero search results message -->
       <div id="pk-portal-no-matches" class="hidden rounded-xl border border-border/60 bg-bg/50 p-4 text-center">

@@ -69,42 +69,55 @@ const conversions = [
       ))}
     </ul>
 
-    <!-- Quick Jump to Exact KB Presets -->
-    <div class="mt-4 pt-4 border-t border-border/60 flex flex-wrap items-center gap-2 text-xs">
-      <span class="text-muted font-medium text-[11px] mr-1">Compress by exact size:</span>
-      <a href="/compress-image-to-10kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">10KB</a>
-      <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">20KB</a>
-      <a href="/compress-image-to-30kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">30KB</a>
-      <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">50KB</a>
-      <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">100KB</a>
-      <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">200KB</a>
-      <a href="/compress-image-to-1mb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">1MB</a>
-      <a href="/compress-image-without-losing-quality/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Without Losing Quality</a>
-      <a href="/increase-image-size-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Increase Size in KB</a>
-      <a href="/reduce-image-size-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Reduce Size in KB</a>
-      <a href="/photo-resizer-in-kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in KB</a>
-      <a href="/photo-resizer/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo Resizer</a>
-      <a href="/image-resizer-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image Resizer in KB</a>
-      <a href="/image-resizer-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image Resizer 50KB</a>
-      <a href="/resize-image-to-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Resize to 50KB</a>
-      <a href="/resize-image-to-20kb-to-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Resize to 20KB–50KB</a>
-      <a href="/image-resizer-in-cm/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Resizer in CM</a>
-      <a href="/bulk-image-resizer/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Bulk Resizer</a>
-      <a href="/photo-resizer-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo Resizer 50KB</a>
-      <a href="/compress-jpg-to-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 100KB</a>
-      <a href="/heic-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">HEIC to PDF</a>
-      <a href="/heic-to-png/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PNG</a>
-      <a href="/png-to-pdf/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">PNG to PDF</a>
-      <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Merge JPG to PDF</a>
-      <a href="/image-to-pdf-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF 200KB</a>
-      <a href="/how-to-convert-heic-to-jpg-on-windows/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">HEIC on Windows</a>
-      <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF on iPhone</a>
-      <a href="/photo-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF</a>
-      <a href="/photo-to-pdf-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF 200KB</a>
-      <a href="/photo-to-pdf-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF 100KB</a>
-      <a href="/jpg-to-jpeg/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">JPG to JPEG</a>
-      <a href="/how-to-convert-image-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">How to Convert Image to PDF</a>
-      <a href="/image-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF →</a>
+    <!-- Quick Jump Presets Organized by Tool Category -->
+    <div class="mt-4 pt-4 border-t border-border/60 space-y-2.5 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-muted font-medium text-[11px] mr-1">Compress & exact KB:</span>
+        <a href="/compress-image-to-10kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">10KB</a>
+        <a href="/compress-image-to-20kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">20KB</a>
+        <a href="/compress-image-to-30kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">30KB</a>
+        <a href="/compress-image-to-50kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">50KB</a>
+        <a href="/compress-image-to-100kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">100KB</a>
+        <a href="/compress-image-to-200kb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">200KB</a>
+        <a href="/compress-image-to-1mb/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">1MB</a>
+        <a href="/compress-jpg-to-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">JPG to 100KB</a>
+        <a href="/compress-image-without-losing-quality/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Without Losing Quality</a>
+        <a href="/reduce-image-size-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Reduce Size in KB</a>
+        <a href="/increase-image-size-in-kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Increase Size in KB</a>
+        <a href="/resize-image-to-20kb-to-50kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Resize to 20KB–50KB</a>
+        <a href="/aadhaar-pdf-compressor/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Aadhaar PDF 100KB</a>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-muted font-medium text-[11px] mr-1">Resize, CM & 300 DPI:</span>
+        <a href="/resize-image/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Resize Image</a>
+        <a href="/image-resizer-in-cm/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Resizer in CM</a>
+        <a href="/change-image-dpi-to-300/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">300 DPI Converter</a>
+        <a href="/pixels-to-cm-converter/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Pixels to CM</a>
+        <a href="/cm-to-pixels-at-300-dpi/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">CM to Pixels 300 DPI</a>
+        <a href="/portal-photo-size-chart/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Portal Photo Chart</a>
+        <a href="/signature-resizer/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Signature Resizer</a>
+        <a href="/social-media-image-resizer/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Social Media Resizer</a>
+        <a href="/bulk-image-resizer/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">Bulk Resizer</a>
+        <a href="/exif-metadata-remover/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">EXIF Remover</a>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-muted font-medium text-[11px] mr-1">PDF & format tools:</span>
+        <a href="/heic-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">HEIC to PDF</a>
+        <a href="/heic-to-png/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">HEIC to PNG</a>
+        <a href="/png-to-pdf/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">PNG to PDF</a>
+        <a href="/merge-jpg-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Merge JPG to PDF</a>
+        <a href="/image-to-pdf-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF 200KB</a>
+        <a href="/how-to-convert-heic-to-jpg-on-windows/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">HEIC on Windows</a>
+        <a href="/how-to-convert-photo-to-pdf-on-iphone/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF on iPhone</a>
+        <a href="/photo-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF</a>
+        <a href="/photo-to-pdf-200kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF 200KB</a>
+        <a href="/photo-to-pdf-100kb/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Photo to PDF 100KB</a>
+        <a href="/jpg-to-jpeg/" class="rounded-lg border border-border bg-surface px-2.5 py-1 font-medium text-fg hover:border-accent hover:text-accent transition-colors">JPG to JPEG</a>
+        <a href="/how-to-convert-image-to-pdf/" class="rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">How to Convert Image to PDF</a>
+        <a href="/image-to-pdf/" class="rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-1 font-medium text-accent hover:bg-accent/15 transition-colors">Image to PDF →</a>
+      </div>
     </div>
   </div>
 </section>

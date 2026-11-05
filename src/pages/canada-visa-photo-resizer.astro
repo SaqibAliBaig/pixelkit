@@ -1,0 +1,168 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "Canada Visa Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does IRCC reject photos with 35x45mm sizing?",
+    "a": "While many countries use 35×45 mm, Canadian permanent resident and visa applications strictly require 50×70 mm (420×540 px digital) aspect ratio. Uploading standard passport photos results in distorted proportions."
+  }
+];
+
+const pageTitle = 'Canada Visa & PR Photo Resizer (420x540 px) — Free';
+const pageDesc = 'Resize photo for IRCC Canada visa and Express Entry PR to 420x540 px and under 240KB JPG. Fast in-browser processing with zero server uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Canada Visa & PR Photo Resizer Online',
+    description: pageDesc,
+    url: new URL('/canada-visa-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>IRCC Canada · Express Entry · Study Permit Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Canada Visa & PR Photo Resizer Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to official IRCC digital dimensions (420 × 540 px, 5:7 ratio), align 31–36 mm face height, and compress under 240KB JPG for Canadian visa and PR applications.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official IRCC Canada Photo Specifications (2026 Direct Answer)"
+      summaryText="Immigration, Refugees and Citizenship Canada (IRCC) mandates digital photos for Express Entry PR, study permits, and visitor visas to measure minimum 420 × 540 pixels (5:7 ratio) and under 240 KB JPG. The face height from chin to crown must be between 31 mm and 36 mm against a pure white background."
+      portalName="Immigration, Refugees and Citizenship Canada (canada.ca)"
+      specs={[{"label":"Digital Dimensions","value":"420 × 540 pixels (5:7 ratio)","highlight":true},{"label":"File Size Limit","value":"Max 240 KB JPG strictly","highlight":true},{"label":"Face Height","value":"31 mm to 36 mm (50–70% of frame)"},{"label":"Background","value":"Plain White or Light-Coloured"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={240}
+        initialTool="passport"
+        preset="ca-visa"
+        category="visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        IRCC Canada Photo Criteria
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Technical digital standards from IRCC Appendix B:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Requirement</th>
+              <th class="py-3 px-4">IRCC Specification</th>
+              <th class="py-3 px-4">Details</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Minimum Resolution</td>
+              <td class="py-3 px-4 text-muted">420 × 540 pixels</td>
+              <td class="py-3 px-4 text-muted">5:7 aspect ratio (approx. 50 × 70 mm)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">File Weight</td>
+              <td class="py-3 px-4 text-muted">60 KB to 240 KB</td>
+              <td class="py-3 px-4 text-muted">Files over 240 KB fail portal upload</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Color Space</td>
+              <td class="py-3 px-4 text-muted">sRGB 24-bit color</td>
+              <td class="py-3 px-4 text-muted">Standard color space preserved</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

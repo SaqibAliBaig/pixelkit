@@ -3,6 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '@lib/constants';
+import { buildBreadcrumbJsonLd } from '@lib/seo/jsonld';
 
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
@@ -17,7 +18,6 @@ const breadcrumbs = [
 
 const jsonLd = [
   {
-    '@context': 'https://schema.org',
     '@type': 'Blog',
     name: `Blog — ${SITE.name}`,
     description: 'Practical guides on file formats, portals, compression, and getting your upload accepted on the first try.',
@@ -31,6 +31,7 @@ const jsonLd = [
       dateModified: (p.data.updatedAt ?? p.data.publishedAt).toISOString(),
     })),
   },
+  buildBreadcrumbJsonLd(breadcrumbs),
 ];
 ---
 

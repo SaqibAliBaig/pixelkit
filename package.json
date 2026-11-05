@@ -9,10 +9,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "npm run gen:data && astro build",
+    "build": "npm run gen:data && node scripts/generate-og-images.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "gen:data": "node scripts/generate-combinations.mjs",
+    "gen:data": "node scripts/generate-combinations.mjs && node scripts/generate-llms.mjs",
     "validate:content": "node scripts/validate-content.mjs",
     "check": "astro check",
     "lint": "eslint . --ext .js,.mjs,.ts,.astro",
@@ -36,6 +36,7 @@
     "utif": "^3.1.0"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.13",
     "@types/node": "^20.14.15",
     "@types/upng-js": "^2.1.0",
     "eslint": "^9.9.0",

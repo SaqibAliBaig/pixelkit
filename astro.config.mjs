@@ -76,7 +76,13 @@ export default defineConfig({
 
         // Accurate lastmod: accurate article date or source file git commit timestamp
         const blogMatch = item.url.match(/\/blog\/([^/]+)\/$/);
-        if (blogMatch && blogDates.has(blogMatch[1])) {
+        if (item.url.match(/\/blog\/$/)) {
+          if (blogDates.size > 0) {
+            item.lastmod = new Date(Math.max(...Array.from(blogDates.values()).map((d) => d.getTime())));
+          } else {
+            item.lastmod = getGitDate('src/pages/blog/index.astro');
+          }
+        } else if (blogMatch && blogDates.has(blogMatch[1])) {
           item.lastmod = blogDates.get(blogMatch[1]);
         } else if (item.url.match(/\/[a-z]+-to-[a-z]+-under-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/[from]-to-[to]-under-[size]kb.astro');
@@ -86,14 +92,8 @@ export default defineConfig({
           item.lastmod = getGitDate('src/pages/compress-image-to-[size]kb.astro');
         } else if (item.url.match(/\/compress-jpg-to-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/compress-jpg-to-[size]kb.astro');
-        } else if (item.url.match(/\/photo-resizer-\d+kb\/$/)) {
-          item.lastmod = getGitDate('src/pages/photo-resizer-[size]kb.astro');
         } else if (item.url.match(/\/photo-to-pdf-\d+kb\/$/)) {
           item.lastmod = getGitDate('src/pages/photo-to-pdf-[size]kb.astro');
-        } else if (item.url.match(/\/image-resizer-\d+kb\/$/)) {
-          item.lastmod = getGitDate('src/pages/image-resizer-[size]kb.astro');
-        } else if (item.url.match(/\/resize-image-to-\d+kb\/$/)) {
-          item.lastmod = getGitDate('src/pages/resize-image-to-[size]kb.astro');
         } else if (item.url.match(/\/compress-image-to-\d+mb\/$/)) {
           item.lastmod = getGitDate('src/pages/compress-image-to-[size]mb.astro');
         } else if (item.url.match(/\/compress-[a-z]+\/$/)) {
@@ -112,7 +112,7 @@ export default defineConfig({
               break;
             }
           }
-          item.lastmod = matchedDate || getGitDate('src/pages/index.astro');
+          item.lastmod = matchedDate || getGitDate('src/pages/[seoSlug].astro');
         }
 
         // Priority and changefreq are officially ignored by Google in 2024–2026.

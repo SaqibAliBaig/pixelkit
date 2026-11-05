@@ -4,8 +4,10 @@
  */
 
 export interface BreadcrumbItem {
-  name: string;
+  name?: string;
+  label?: string;
   url?: string;
+  href?: string;
 }
 
 export interface ComboJsonLdInput {
@@ -23,7 +25,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     '@type': 'Organization',
     '@id': 'https://pixelkit.app/#organization',
     name: 'PixelKit',
-    url: 'https://pixelkit.app',
+    url: 'https://pixelkit.app/',
     logo: {
       '@type': 'ImageObject',
       url: 'https://pixelkit.app/icon-512.png',
@@ -53,7 +55,7 @@ export function buildSiteSchemaGraph(): Record<string, unknown> {
         '@type': 'Organization',
         '@id': 'https://pixelkit.app/#organization',
         name: 'PixelKit',
-        url: 'https://pixelkit.app',
+        url: 'https://pixelkit.app/',
         logo: {
           '@type': 'ImageObject',
           url: 'https://pixelkit.app/icon-512.png',
@@ -77,7 +79,7 @@ export function buildSiteSchemaGraph(): Record<string, unknown> {
       {
         '@type': 'WebSite',
         '@id': 'https://pixelkit.app/#website',
-        url: 'https://pixelkit.app',
+        url: 'https://pixelkit.app/',
         name: 'PixelKit',
         publisher: { '@id': 'https://pixelkit.app/#organization' },
         potentialAction: {
@@ -93,7 +95,7 @@ export function buildSiteSchemaGraph(): Record<string, unknown> {
         '@type': 'WebApplication',
         '@id': 'https://pixelkit.app/#application',
         name: 'PixelKit Image Studio',
-        url: 'https://pixelkit.app',
+        url: 'https://pixelkit.app/',
         applicationCategory: 'MultimediaApplication',
         operatingSystem: 'Any (Web Browser)',
         browserRequirements: 'Requires JavaScript, WebAssembly, and Canvas API support',
@@ -113,7 +115,7 @@ export function buildWebSiteJsonLd(): Record<string, unknown> {
     '@type': 'WebSite',
     '@id': 'https://pixelkit.app/#website',
     name: 'PixelKit',
-    url: 'https://pixelkit.app',
+    url: 'https://pixelkit.app/',
     publisher: {
       '@id': 'https://pixelkit.app/#organization',
     },
@@ -129,12 +131,19 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): Record<string, u
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: items.map((it, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: it.name,
-      ...(it.url ? { item: it.url } : {}),
-    })),
+    itemListElement: items.map((it, i) => {
+      const name = it.name || it.label || '';
+      let itemUrl = it.url || it.href;
+      if (itemUrl && itemUrl.startsWith('/')) {
+        itemUrl = `https://pixelkit.app${itemUrl}`;
+      }
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(itemUrl ? { item: itemUrl } : {}),
+      };
+    }),
   };
 }
 
@@ -156,17 +165,25 @@ export function buildFaqJsonLd(faqs: { q: string; a: string }[]): Record<string,
 export function buildSoftwareApplicationJsonLd(input: {
   name: string;
   description: string;
-  url: string;
+  url?: string;
+  path?: string;
+  applicationCategory?: string;
+  operatingSystem?: string;
   rating?: { ratingValue: string; reviewCount: string };
 }): Record<string, unknown> {
+  let resolvedUrl = input.url || (input.path ? (input.path.startsWith('http') ? input.path : `https://pixelkit.app${input.path}`) : 'https://pixelkit.app/');
+  if (resolvedUrl.startsWith('/')) {
+    resolvedUrl = `https://pixelkit.app${resolvedUrl}`;
+  }
+
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': ['SoftwareApplication', 'WebApplication'],
     name: input.name,
     description: input.description,
-    url: input.url,
-    applicationCategory: 'MultimediaApplication',
-    operatingSystem: 'All (Web Browser, Windows, macOS, Linux, iOS, Android)',
+    url: resolvedUrl,
+    applicationCategory: input.applicationCategory || 'MultimediaApplication',
+    operatingSystem: input.operatingSystem || 'All (Web Browser, Windows, macOS, Linux, iOS, Android)',
     browserRequirements: 'Requires JavaScript, Canvas API, and WebAssembly support',
     offers: {
       '@type': 'Offer',
@@ -303,7 +320,6 @@ export function buildToolJsonLd(input: ComboJsonLdInput): Record<string, unknown
     }),
     buildFaqJsonLd(input.faqs),
     buildBreadcrumbJsonLd(input.breadcrumbs),
-    buildHowToJsonLd(input.combo),
   ];
 }
 
@@ -318,6 +334,8 @@ export interface BlogPostingInput {
 }
 
 export function buildBlogPostingJsonLd(input: BlogPostingInput): Record<string, unknown> {
+  const isOrgAuthor = !input.author || input.author === 'PixelKit' || input.author === 'PixelKit Team';
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -326,32 +344,159 @@ export function buildBlogPostingJsonLd(input: BlogPostingInput): Record<string, 
     url: input.url,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': input.url,
+      '@id': `${input.url}#webpage`,
     },
     datePublished: input.publishedAt.toISOString(),
     dateModified: (input.updatedAt ?? input.publishedAt).toISOString(),
-    author: {
+    author: isOrgAuthor
+      ? {
+          '@type': 'Organization',
+          '@id': 'https://pixelkit.app/#organization',
+          name: 'PixelKit',
+          url: 'https://pixelkit.app/',
+        }
+      : {
+          '@type': 'Person',
+          name: input.author,
+          url: 'https://pixelkit.app/about/',
+          sameAs: [
+            'https://x.com/SaqibBaig1100',
+            'https://github.com/SaqibAliBaig',
+          ],
+        },
+    publisher: {
+      '@id': 'https://pixelkit.app/#organization',
+    },
+    inLanguage: 'en-US',
+    image: input.image ? [input.image] : ['https://pixelkit.app/og-default.png'],
+  };
+}
+
+export function buildConnectedGraph(input: {
+  canonicalUrl: string;
+  title: string;
+  description: string;
+  items: (Record<string, unknown> | undefined | null)[];
+}): Record<string, unknown> {
+  const { canonicalUrl, title, description, items } = input;
+
+  const orgEntity: Record<string, unknown> = {
+    '@type': 'Organization',
+    '@id': 'https://pixelkit.app/#organization',
+    name: 'PixelKit',
+    url: 'https://pixelkit.app/',
+    logo: {
+      '@type': 'ImageObject',
+      '@id': 'https://pixelkit.app/#logo',
+      url: 'https://pixelkit.app/icon-512.png',
+      width: 512,
+      height: 512,
+    },
+    founder: {
       '@type': 'Person',
-      name: input.author || 'Saqib Ali Baig',
+      name: 'Saqib Ali Baig',
       url: 'https://pixelkit.app/about/',
       sameAs: [
         'https://x.com/SaqibBaig1100',
         'https://github.com/SaqibAliBaig',
       ],
     },
-    publisher: {
-      '@type': 'Organization',
-      '@id': 'https://pixelkit.app/#organization',
-      name: 'PixelKit',
-      url: 'https://pixelkit.app',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://pixelkit.app/icon-512.png',
-        width: 512,
-        height: 512,
+    sameAs: [
+      'https://x.com/SaqibBaig1100',
+      'https://github.com/SaqibAliBaig/pixelkit',
+    ],
+  };
+
+  const siteEntity: Record<string, unknown> = {
+    '@type': 'WebSite',
+    '@id': 'https://pixelkit.app/#website',
+    url: 'https://pixelkit.app/',
+    name: 'PixelKit',
+    publisher: { '@id': 'https://pixelkit.app/#organization' },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://pixelkit.app/convert/?q={search_term_string}',
       },
+      'query-input': 'required name=search_term_string',
     },
-    inLanguage: 'en-US',
-    image: input.image ? [input.image] : ['https://pixelkit.app/og-default.png'],
+  };
+
+  let breadcrumbId: string | undefined;
+  let mainEntityId: string | undefined;
+
+  const graphEntities: Record<string, unknown>[] = [orgEntity, siteEntity];
+
+  for (const rawItem of items) {
+    if (!rawItem) continue;
+    const rawList = Array.isArray(rawItem['@graph']) ? (rawItem['@graph'] as Record<string, unknown>[]) : [rawItem];
+
+    for (const item of rawList) {
+      if (!item) continue;
+      const type = item['@type'];
+      const typeStr = Array.isArray(type) ? type.join(',') : String(type || '');
+
+      // Drop deprecated HowTo schema as per Google's policy
+      if (typeStr.includes('HowTo')) {
+        continue;
+      }
+
+      const entity: Record<string, unknown> = { ...item };
+      delete entity['@context'];
+
+      if (typeStr.includes('BreadcrumbList')) {
+        entity['@id'] = `${canonicalUrl}#breadcrumb`;
+        breadcrumbId = `${canonicalUrl}#breadcrumb`;
+      } else if (typeStr.includes('SoftwareApplication') || typeStr.includes('WebApplication')) {
+        entity['@id'] = `${canonicalUrl}#app`;
+        if (!mainEntityId) mainEntityId = `${canonicalUrl}#app`;
+      } else if (typeStr.includes('BlogPosting')) {
+        entity['@id'] = `${canonicalUrl}#article`;
+        if (!mainEntityId) mainEntityId = `${canonicalUrl}#article`;
+      } else if (typeStr === 'Blog') {
+        entity['@id'] = `${canonicalUrl}#blog`;
+        if (!mainEntityId) mainEntityId = `${canonicalUrl}#blog`;
+      } else if (typeStr.includes('CollectionPage')) {
+        entity['@id'] = `${canonicalUrl}#collection`;
+        if (!mainEntityId) mainEntityId = `${canonicalUrl}#collection`;
+      } else if (typeStr.includes('FAQPage')) {
+        entity['@id'] = `${canonicalUrl}#faq`;
+      } else if (typeStr.includes('AboutPage')) {
+        entity['@id'] = `${canonicalUrl}#about`;
+        if (!mainEntityId) mainEntityId = `${canonicalUrl}#about`;
+      }
+
+      if (entity['@id'] === 'https://pixelkit.app/#organization' || entity['@id'] === 'https://pixelkit.app/#website') {
+        continue;
+      }
+
+      graphEntities.push(entity);
+    }
+  }
+
+  const pageEntity: Record<string, unknown> = {
+    '@type': 'WebPage',
+    '@id': `${canonicalUrl}#webpage`,
+    url: canonicalUrl,
+    name: title,
+    description: description,
+    isPartOf: { '@id': 'https://pixelkit.app/#website' },
+    publisher: { '@id': 'https://pixelkit.app/#organization' },
+  };
+
+  if (breadcrumbId) {
+    pageEntity.breadcrumb = { '@id': breadcrumbId };
+  }
+  if (mainEntityId) {
+    pageEntity.mainEntity = { '@id': mainEntityId };
+  }
+
+  // Insert WebPage entity right after WebSite
+  graphEntities.splice(2, 0, pageEntity);
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graphEntities,
   };
 }

@@ -29,8 +29,5 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-# Canonical Host
-Host: https://pixelkit.app
-
 # XML Sitemap Index
 Sitemap: https://pixelkit.app/sitemap-index.xml

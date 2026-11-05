@@ -1,0 +1,182 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Document Tools",
+    "href": "/image-to-pdf/"
+  },
+  {
+    "label": "Aadhaar PDF Compressor"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Why does UIDAI reject my e-Aadhaar PDF file?",
+    "a": "Official e-Aadhaar PDFs downloaded from UIDAI are password protected (first 4 letters of name + birth year). Portals cannot read password-protected files. PixelKit decodes and re-encodes the document into an unencrypted, lightweight PDF."
+  },
+  {
+    "q": "Is my Aadhaar number kept confidential?",
+    "a": "Yes, completely. PixelKit runs 100% locally in your browser sandbox using WebAssembly. Your identity documents never leave your computer or phone."
+  }
+];
+
+const pageTitle = 'Aadhaar PDF Compressor (< 100KB & 2MB) | PixelKit';
+const pageDesc = 'Compress Aadhaar card and identity document PDFs under 100KB or 2MB for UIDAI portal uploads. Safe in-browser compression with zero server upload.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Aadhaar PDF Compressor Online',
+    description: pageDesc,
+    url: new URL('/aadhaar-pdf-compressor/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>UIDAI myAadhaar · POA / POI Document Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Aadhaar PDF Compressor Online
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Compress your Aadhaar card copy, proof of identity, and proof of address PDFs under 100KB, 200KB, or 2MB without losing text sharpness.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="UIDAI myAadhaar PDF Upload Specifications (2026 Direct Answer)"
+      summaryText="UIDAI myAadhaar portal requires supporting Proof of Identity (POI) and Proof of Address (POA) documents in PDF or JPG format strictly under 2 MB (for portal updates) or under 100 KB / 200 KB (for banking, KYC, and government exams). Password-protected PDFs are rejected."
+      portalName="Unique Identification Authority of India (myaadhaar.uidai.gov.in)"
+      specs={[{"label":"Max File Size","value":"Under 2 MB (or 100 KB for KYC)","highlight":true},{"label":"Document Formats","value":"PDF, JPG, PNG","highlight":true},{"label":"Password Security","value":"Must be Password-Free"},{"label":"Legibility","value":"Clear 12-digit number & QR code"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="pdf"
+        to="pdf"
+        fromMime="application/pdf"
+        toMime="application/pdf"
+        targetKb={100}
+        initialTool="passport"
+        preset="aadhaar-doc"
+        category="id"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Aadhaar Document Size Limits by Portal
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        File size limits when submitting Aadhaar copies to various organizations:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Portal / Service</th>
+              <th class="py-3 px-4">Required Size Limit</th>
+              <th class="py-3 px-4">Accepted Format</th>
+              <th class="py-3 px-4">Password Allowed?</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">UIDAI myAadhaar Portal</td>
+              <td class="py-3 px-4 text-muted">Max 2 MB</td>
+              <td class="py-3 px-4 text-muted">PDF / JPG</td>
+              <td class="py-3 px-4 text-muted">No (Must remove password)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Banking KYC & Video KYC</td>
+              <td class="py-3 px-4 text-muted">Max 100 KB – 500 KB</td>
+              <td class="py-3 px-4 text-muted">PDF / JPG</td>
+              <td class="py-3 px-4 text-muted">No</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">SSC & UPSC OTR Verification</td>
+              <td class="py-3 px-4 text-muted">Max 300 KB – 500 KB</td>
+              <td class="py-3 px-4 text-muted">PDF format</td>
+              <td class="py-3 px-4 text-muted">No</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Passport Seva Portal</td>
+              <td class="py-3 px-4 text-muted">Max 1 MB</td>
+              <td class="py-3 px-4 text-muted">PDF format</td>
+              <td class="py-3 px-4 text-muted">No</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

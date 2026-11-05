@@ -1,0 +1,205 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+  buildCustomHowToJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Portal Presets', href: '/passport-photo-resizer/' },
+  { label: 'Saudi Visa Photo Resizer' },
+];
+
+const faqs = [
+  {
+    q: 'What are the official photo requirements for Saudi Arabia eVisa and Umrah?',
+    a: 'The Saudi Ministry of Foreign Affairs (MOFA) and Nusuk portal require a 1:1 square photograph of 600 × 600 pixels (or 2 × 2 inches at 300 DPI; minimum 200 × 200 pixels). The file must be in JPEG/JPG format with a file weight between 10 KB and 100 KB on a pure white background.',
+  },
+  {
+    q: 'Does Nusuk reject photos with eyeglasses or hats?',
+    a: 'Yes. Eyeglasses, tinted lenses, and non-religious headwear are prohibited. Traditional religious headwear (such as Hijab) is allowed provided the full face from forehead to chin and both cheek edges are clearly visible.',
+  },
+  {
+    q: 'Can I resize my photo for Saudi tourism and business visa?',
+    a: 'Yes! PixelKit locks the 1:1 square ratio, centers your facial features, scales to 600 × 600 px, and tunes the file size strictly under 100 KB JPG.',
+  },
+  {
+    q: 'Is my biometric face photo stored on any remote server?',
+    a: 'Never. All cropping, scaling, and JPEG compression take place 100% inside your local web browser. No files are uploaded to any server.',
+  },
+];
+
+const pageTitle = `Saudi Visa & Umrah Photo Resizer (600×600) | ${SITE.name}`;
+const pageDesc =
+  'Resize and crop photos for Saudi Arabia eVisa, Umrah, Hajj, and Nusuk platform to 600x600 px (2x2 inch) and under 100KB JPG directly in your browser.';
+
+const howToJsonLd = buildCustomHowToJsonLd({
+  name: 'How to crop and resize photo for Saudi eVisa and Umrah Nusuk online',
+  description:
+    'Instructions to frame 1:1 square ratio, scale to 600x600 pixels, and compress under 100KB for Saudi MOFA and Nusuk portals.',
+  steps: [
+    {
+      name: 'Upload candidate photo',
+      text: 'Drop your passport or portrait picture into PixelKit.',
+    },
+    {
+      name: 'Select Saudi 1:1 Square Preset',
+      text: 'PixelKit locks the 1:1 square ratio and 600 × 600 pixel target resolution.',
+    },
+    {
+      name: 'Compress under 100KB',
+      text: 'PixelKit automatically adjusts JPEG quality to meet the strict 10–100 KB MOFA upload requirement.',
+    },
+    {
+      name: 'Download Nusuk-ready image',
+      text: 'Download the prepared JPG ready for immediate submission on visa.mofa.gov.sa or the Nusuk app.',
+    },
+  ],
+});
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit Saudi Visa Photo Resizer',
+    description: pageDesc,
+    url: new URL('/saudi-visa-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  howToJsonLd,
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>Saudi MOFA · Nusuk Platform · Umrah &amp; Hajj · Tourist eVisa</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        Saudi Visa &amp; Umrah Photo Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop to 1:1 square (600 × 600 px or 2 × 2 inches), preserve facial detail, and compress under 100 KB JPG. 100% private, client-side execution.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Saudi Arabia eVisa Photo Requirements (2026 Direct Answer)"
+      summaryText="The Saudi Ministry of Foreign Affairs (MOFA) and Nusuk portal require a square digital photo of 600 × 600 pixels (or 2 × 2 inches at 300 DPI; minimum 200 × 200 pixels). The file must be formatted in JPEG/JPG between 10 KB and 100 KB. The applicant's face must occupy 70% to 80% of the image on a pure white background with a neutral expression. Eyeglasses are prohibited."
+      portalName="Saudi Ministry of Foreign Affairs (MOFA) & Nusuk"
+      specs={[
+        { label: 'File Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Ceiling', value: '10 KB to 100 KB strictly', highlight: true },
+        { label: 'Dimensions', value: '600 × 600 px (2 × 2 Inches / 1:1)' },
+        { label: 'Face Coverage', value: '70% to 80% of height' },
+        { label: 'Background', value: 'Clean white background' },
+      ]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={100}
+        initialTool="passport"
+        preset="sa-visa"
+        category="visa"
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Saudi MOFA &amp; Umrah Visa Photo Specifications
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory technical standards for online visa applications across Saudi Arabia:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Requirement</th>
+              <th class="py-3 px-4">Saudi Portal Standard</th>
+              <th class="py-3 px-4">PixelKit Auto-Configuration</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Dimensions</td>
+              <td class="py-3.5 px-4 text-muted">600 × 600 pixels (minimum 200 × 200 px)</td>
+              <td class="py-3.5 px-4 font-mono text-accent">Auto-scaled to exact 600 × 600 px</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Aspect Ratio</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Square (2 × 2 inches)</td>
+              <td class="py-3.5 px-4 text-muted">1:1 Square crop preset</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">File Size Limit</td>
+              <td class="py-3.5 px-4 text-muted">Strictly between 10 KB and 100 KB</td>
+              <td class="py-3.5 px-4 font-mono text-accent">Auto-compressed ≤ 100 KB JPG</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">File Format</td>
+              <td class="py-3.5 px-4 text-muted">JPEG / JPG format only</td>
+              <td class="py-3.5 px-4 text-muted">Universal converter to JPEG (.jpg)</td>
+            </tr>
+            <tr>
+              <td class="py-3.5 px-4 font-medium text-fg">Background</td>
+              <td class="py-3.5 px-4 text-muted">Solid white without patterns or shadows</td>
+              <td class="py-3.5 px-4 text-muted">High-contrast preview studio</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <div class="mt-12 sm:mt-16">
+      <FAQSection faqs={faqs} />
+    </div>
+
+    <!-- Related Visa & Passport Tools -->
+    <section class="mt-12 border-t border-border/80 pt-8">
+      <h2 class="text-base sm:text-lg font-bold text-fg mb-3">Related Visa &amp; Passport Photo Resizers</h2>
+      <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <a href="/passport-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Passport Photo Maker</a>
+        <a href="/uae-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">UAE &amp; Dubai Visa Resizer</a>
+        <a href="/us-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">US Visa &amp; DS-160 Resizer</a>
+        <a href="/schengen-visa-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Schengen Visa Resizer</a>
+        <a href="/uk-passport-photo-resizer/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">UK Passport Photo Resizer</a>
+        <a href="/portal-photo-size-chart/" class="px-3 py-1.5 rounded-lg bg-surface hover:border-accent border border-border text-fg transition-colors">Official Size Chart</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+

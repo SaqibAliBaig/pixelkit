@@ -1,0 +1,169 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
+import Badge from '@components/ui/Badge.astro';
+import ToolPreview from '@components/home/ToolPreview.astro';
+import FAQSection from '@components/seo/FAQSection.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
+import { SITE } from '@lib/constants';
+import {
+  buildSoftwareApplicationJsonLd,
+  buildFaqJsonLd,
+  buildBreadcrumbJsonLd,
+} from '@lib/seo/jsonld';
+
+const breadcrumbs = [
+  {
+    "label": "Home",
+    "href": "/"
+  },
+  {
+    "label": "Portal Presets",
+    "href": "/portal-photo-size-chart/"
+  },
+  {
+    "label": "CUET Resizer"
+  }
+];
+
+const faqs = [
+  {
+    "q": "Can I wear spectacles in my CUET photograph?",
+    "a": "If spectacles are normally worn, they must be clear with no glare or tinted lenses. Sunglasses or colored lenses are strictly prohibited."
+  }
+];
+
+const pageTitle = 'CUET Photo & Signature Resizer Online (NTA Compliant)';
+const pageDesc = 'Resize candidate photograph to 350x450 px and signature to 4-30KB for CUET UG application. Fast, 100% client-side with zero cloud uploads.';
+
+const jsonLd = [
+  buildSoftwareApplicationJsonLd({
+    name: 'PixelKit CUET Photo & Signature Resizer',
+    description: pageDesc,
+    url: new URL('/cuet-photo-resizer/', SITE.url).href,
+  }),
+  buildFaqJsonLd(faqs),
+  buildBreadcrumbJsonLd(
+    breadcrumbs.map((b) => ({
+      name: b.label,
+      url: b.href ? new URL(b.href, SITE.url).href : undefined,
+    }))
+  ),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDesc}
+  jsonLd={jsonLd}
+  width="wide"
+>
+  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="text-center mt-5 sm:mt-8">
+      <Badge variant="muted" class="mx-auto inline-flex items-center gap-1.5 py-1 px-3 text-xs shadow-sm">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+        <span>NTA CUET UG & PG Compliant</span>
+      </Badge>
+
+      <h1 class="mt-3.5 sm:mt-4 text-balance text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg">
+        CUET Photo & Signature Resizer
+      </h1>
+
+      <p class="mx-auto mt-3 sm:mt-4 max-w-2xl text-balance text-xs sm:text-base text-muted leading-relaxed">
+        Crop and compress candidate photo (10–200 KB, 350×450 px) and signature (4–30 KB) for Common University Entrance Test registration.
+      </p>
+    </header>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="NTA CUET Photo & Signature Requirements (2026 Direct Answer)"
+      summaryText="Common University Entrance Test (CUET UG/PG) candidates must upload a recent passport-size photograph (10 KB to 200 KB JPG) showing 80% face with both ears visible against a white background, and signature (4 KB to 30 KB JPG)."
+      portalName="NTA CUET Portal (exams.nta.ac.in/CUET-UG)"
+      specs={[{"label":"Photo Size","value":"10 KB to 200 KB JPG","highlight":true},{"label":"Signature Size","value":"4 KB to 30 KB JPG","highlight":true},{"label":"Background","value":"White Background"},{"label":"Ears Visibility","value":"Both ears clearly visible"}]}
+    />
+
+    <div class="mt-6 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="passport"
+        preset="exam-neet"
+        category="exam"
+        initialSizeMode="range"
+        minKb={10}
+        maxKb={200}
+      />
+    </div>
+
+    <!-- Official Specification Table -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        CUET Entrance Exam Upload Guidelines
+      </h2>
+      <p class="mt-1 text-xs sm:text-sm text-muted">
+        Mandatory parameters for CUET undergraduate and postgraduate admissions:
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="border-b border-border bg-surface text-fg font-semibold">
+              <th class="py-3 px-4">Upload Item</th>
+              <th class="py-3 px-4">Size Range</th>
+              <th class="py-3 px-4">Format</th>
+              <th class="py-3 px-4">Key Requirements</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/60">
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Candidate Photo</td>
+              <td class="py-3 px-4 text-muted">10 KB – 200 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+              <td class="py-3 px-4 text-muted">Clean white background, 80% face coverage</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-medium text-fg">Candidate Signature</td>
+              <td class="py-3 px-4 text-muted">4 KB – 30 KB</td>
+              <td class="py-3 px-4 text-muted">JPG / JPEG</td>
+              <td class="py-3 px-4 text-muted">Black ballpoint pen on plain white paper</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Technical Principles Section -->
+    <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
+      <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-fg">
+        Why In-Browser Processing is Essential for Sensitive Photos &amp; IDs
+      </h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs sm:text-sm text-muted leading-relaxed">
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🔒</span> Zero Cloud Uploads
+          </h3>
+          <p>Signatures, Aadhaar IDs, and passport photos are sensitive personal biometric assets. PixelKit processes all operations locally in browser RAM.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>⚡</span> Sub-Second Quantization
+          </h3>
+          <p>Powered by WebAssembly and Canvas binary-search encoding, resizing and compressing takes under 200ms with zero server latency.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-surface/50 border border-border/50">
+          <h3 class="font-semibold text-fg text-sm mb-1.5 flex items-center gap-1.5">
+            <span>🎯</span> Portal Pass Guarantee
+          </h3>
+          <p>Dimensions, aspect ratios, and KB file limits are locked directly to the official government guidelines for immediate intake clearance.</p>
+        </div>
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </div>
+</BaseLayout>

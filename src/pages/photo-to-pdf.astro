@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
-import Badge from '@components/ui/Badge.astro';
 import ToolPreview from '@components/home/ToolPreview.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import PortalRequirementsGuide from '@components/seo/PortalRequirementsGuide.astro';
@@ -53,9 +52,9 @@ const directAnswer = {
     'To convert photos to PDF online: 1. Drag and drop your camera photos (JPG, PNG, HEIC) into PixelKit. 2. Drag thumbnails to reorder pages, adjust margins, and select portrait or landscape layout. 3. Choose your desired file size limit (under 100KB, 200KB, or 300KB) for exam and visa compliance. 4. Click Download to save your sharp, watermark-free PDF document directly from device memory.',
 };
 
-const pageTitle = `Photo to PDF Converter — Convert Photos to PDF Online Free | ${SITE.name}`;
+const pageTitle = `Photo to PDF Converter Online (Free) | ${SITE.name}`;
 const pageDesc =
-  'Free online photo to PDF converter. Convert camera pictures, mobile snaps, and ID cards into PDF under 100KB, 200KB, or 300KB. 100% private in-browser tool with zero uploads.';
+  'Convert camera photos and ID cards into compact PDFs under 100KB, 200KB, or 300KB. 100% private in-browser conversion with zero server uploads or sign-up.';
 const pageKeywords = [
   'photo to pdf',
   'photo to pdf converter',
@@ -102,7 +101,7 @@ const jsonLd = [
   buildSoftwareApplicationJsonLd({
     name: 'PixelKit Photo to PDF Converter',
     description: pageDesc,
-    path: '/photo-to-pdf/',
+    url: 'https://pixelkit.app/photo-to-pdf/',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Any (Web Browser)',
   }),
@@ -136,7 +135,7 @@ const sizeBrackets = [
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  canonicalUrl="https://pixelkit.app/photo-to-pdf/"
+  canonical="https://pixelkit.app/photo-to-pdf/"
   keywords={pageKeywords}
   jsonLd={jsonLd}
 >
@@ -171,7 +170,7 @@ const sizeBrackets = [
     </div>
 
     <!-- Active Tool Studio Pre-configured for Photo to PDF -->
-    <main class="mt-6 sm:mt-8">
+    <div class="mt-6 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
@@ -179,7 +178,7 @@ const sizeBrackets = [
         toMime="application/pdf"
         initialTool="convert"
       />
-    </main>
+    </div>
 
     <!-- Popular Target File Size Brackets -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
