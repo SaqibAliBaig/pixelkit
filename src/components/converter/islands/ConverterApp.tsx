@@ -42,7 +42,10 @@ import type {
   CropAspectPreset,
   CropAnchor,
   CustomCropBox,
-} from '@lib/worker/types';
+  PdfOrientation,
+  PdfPageSize,
+  PdfMargin,
+  } from '@lib/worker/types';
 import { ASPECT_RATIOS } from '@lib/worker/adjustments';
 import { PORTAL_PRESETS } from '@lib/portal-presets';
 import { formatBytes } from '@lib/utils/filesize';
@@ -100,6 +103,9 @@ interface FileJob {
   pdfPageNumber?: number;
   pdfTotalPages?: number;
   renderedPageBlob?: Blob;
+  pdfOrientation?: PdfOrientation;
+  pdfPageSize?: PdfPageSize;
+  pdfMargin?: PdfMargin;
 }
 
 type SizeControlMode = TargetSizeMode | 'quality';
@@ -126,6 +132,9 @@ interface State {
   dimensions: DimensionOptions;
   grayscale: boolean;
   mergePdf: boolean;
+  pdfOrientation: PdfOrientation;
+  pdfPageSize: PdfPageSize;
+  pdfMargin: PdfMargin;
   svgScale: number;
   autoOrient: boolean;
   stripTransparency: boolean;
@@ -240,6 +249,9 @@ export function mountConverterApp(): void {
       : { mode: 'original' },
     grayscale: false,
     mergePdf: initialMergePdf,
+    pdfOrientation: 'auto',
+    pdfPageSize: 'a4',
+    pdfMargin: 'none',
     svgScale: 2,
     autoOrient: true,
     stripTransparency: true,
@@ -417,7 +429,8 @@ export function mountConverterApp(): void {
   const exifStatusNote = document.getElementById('pk-exif-status-note');
   const lockAspectBtn = document.getElementById('pk-lock-aspect-btn') as HTMLButtonElement | null;
   const grayscaleCheckbox = document.getElementById('pk-grayscale-filter') as HTMLInputElement | null;
-  const mergePdfContainer = document.getElementById('pk-merge-pdf-container');
+  const mergePdfContainer = document.getElementById('pk-pdf-options-container') || document.getElementById('pk-merge-pdf-container');
+  const pdfPageSizeSelect = document.getElementById('pk-pdf-pagesize-select') as HTMLSelectElement | null;
   const mergePdfToggle = document.getElementById('pk-merge-pdf-toggle') as HTMLInputElement | null;
   const svgScaleContainer = document.getElementById('pk-svg-scale-container');
   const svgScaleSelect = document.getElementById('pk-svg-scale') as HTMLSelectElement | null;
@@ -1936,6 +1949,38 @@ export function mountConverterApp(): void {
     updateLiveDimensionsAndCardPreviews();
   }
 
+  function syncPdfOptionsUi(): void {
+    document.querySelectorAll<HTMLButtonElement>('.pk-pdf-orientation-btn').forEach((btn) => {
+      const isSelected = btn.dataset.orientation === state.pdfOrientation;
+      if (isSelected) {
+        btn.classList.add('border-accent/40', 'bg-accent/15', 'text-accent');
+        btn.classList.remove('border-border', 'bg-surface', 'text-fg');
+      } else {
+        btn.classList.remove('border-accent/40', 'bg-accent/15', 'text-accent');
+        btn.classList.add('border-border', 'bg-surface', 'text-fg');
+      }
+    });
+
+    if (pdfPageSizeSelect && pdfPageSizeSelect.value !== state.pdfPageSize) {
+      pdfPageSizeSelect.value = state.pdfPageSize;
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('.pk-pdf-margin-btn').forEach((btn) => {
+      const isSelected = btn.dataset.margin === state.pdfMargin;
+      if (isSelected) {
+        btn.classList.add('border-accent/40', 'bg-accent/15', 'text-accent');
+        btn.classList.remove('border-border', 'bg-surface', 'text-fg');
+      } else {
+        btn.classList.remove('border-accent/40', 'bg-accent/15', 'text-accent');
+        btn.classList.add('border-border', 'bg-surface', 'text-fg');
+      }
+    });
+
+    if (mergePdfToggle && mergePdfToggle.checked !== state.mergePdf) {
+      mergePdfToggle.checked = state.mergePdf;
+    }
+  }
+
   function updateFormatUi(): void {
     syncCustomFormatUi(state.to);
     syncCustomCropUi(state.cropAspect);
@@ -2117,6 +2162,11 @@ export function mountConverterApp(): void {
       id: mergeId,
       pages,
       title: 'PixelKit Merged Document',
+      pdfOptions: {
+        orientation: state.pdfOrientation,
+        pageSize: state.pdfPageSize,
+        margin: state.pdfMargin,
+      },
     };
     worker.postMessage(req);
   }
@@ -2771,7 +2821,33 @@ export function mountConverterApp(): void {
     setStatus(`Target output set to ${val.toUpperCase()}`);
   });
 
-  // 1b. Merge Multiple Files into Single PDF
+  // 1b. PDF Options Suite
+  document.querySelectorAll<HTMLButtonElement>('.pk-pdf-orientation-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const orient = btn.dataset.orientation as PdfOrientation;
+      if (orient) {
+        state.pdfOrientation = orient;
+        syncPdfOptionsUi();
+      }
+    });
+  });
+
+  pdfPageSizeSelect?.addEventListener('change', () => {
+    state.pdfPageSize = (pdfPageSizeSelect.value as PdfPageSize) || 'a4';
+    syncPdfOptionsUi();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.pk-pdf-margin-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const margin = btn.dataset.margin as PdfMargin;
+      if (margin) {
+        state.pdfMargin = margin;
+        syncPdfOptionsUi();
+      }
+    });
+  });
+
+  // 1c. Merge Multiple Files into Single PDF
   mergePdfToggle?.addEventListener('change', () => {
     state.mergePdf = mergePdfToggle.checked;
     for (const j of state.jobs) {
@@ -5383,6 +5459,11 @@ export function mountConverterApp(): void {
         svgScale: state.svgScale,
         pdfPageNumber: job.pdfPageNumber,
         pdfTotalPages: job.pdfTotalPages,
+        pdfOptions: {
+          orientation: job.pdfOrientation ?? state.pdfOrientation,
+          pageSize: job.pdfPageSize ?? state.pdfPageSize,
+          margin: job.pdfMargin ?? state.pdfMargin,
+        },
         file: fileToSend,
       };
 

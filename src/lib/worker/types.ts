@@ -72,6 +72,16 @@ export interface TargetSizeOptions {
   maxKb?: number | null;
 }
 
+export type PdfOrientation = 'auto' | 'portrait' | 'landscape';
+export type PdfPageSize = 'a4' | 'letter' | 'fit';
+export type PdfMargin = 'none' | 'small' | 'big';
+
+export interface PdfOptionsConfig {
+  orientation?: PdfOrientation;
+  pageSize?: PdfPageSize;
+  margin?: PdfMargin;
+}
+
 export interface MergePdfPage {
   blob: Blob;
   width: number;
@@ -83,6 +93,7 @@ export interface MergePdfRequest {
   id: string;
   pages: MergePdfPage[];
   title?: string;
+  pdfOptions?: PdfOptionsConfig;
 }
 
 export interface ConvertRequest {
@@ -109,6 +120,7 @@ export interface ConvertRequest {
   dpi?: number;
   pdfPageNumber?: number;
   pdfTotalPages?: number;
+  pdfOptions?: PdfOptionsConfig;
   file: File;
 }
 

@@ -446,28 +446,150 @@ const initialModeBadgeText =
         </div>
       </div>
 
-      <!-- Merge Multiple Images into Single Multi-Page PDF -->
+      <!-- Image to PDF Options Suite -->
       <div
-        id="pk-merge-pdf-container"
-        class={`rounded-xl border border-accent/30 bg-accent/5 p-2.5 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
+        id="pk-pdf-options-container"
+        class={`rounded-xl border border-accent/30 bg-accent/[0.03] p-3 space-y-3 ${normalizedTo === 'pdf' ? '' : 'hidden'}`}
       >
-        <div class="flex items-center justify-between text-xs text-fg cursor-pointer select-none" onclick="document.getElementById('pk-merge-pdf-toggle')?.click()">
-          <span class="flex items-center gap-1.5 font-medium">
+        <div class="flex items-center justify-between border-b border-border/40 pb-2">
+          <span class="flex items-center gap-1.5 text-xs font-semibold text-fg">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="12" y1="18" x2="12" y2="12"></line>
               <line x1="9" y1="15" x2="15" y2="15"></line>
             </svg>
-            Merge Files into Single PDF
+            PDF Page Options
           </span>
-          <input
-            id="pk-merge-pdf-toggle"
-            type="checkbox"
-            checked={initialMergePdf}
-            aria-label="Merge files into single multi-page PDF"
-            class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
-          />
+          <span class="text-[10px] text-accent font-medium uppercase tracking-wider bg-accent/10 px-1.5 py-0.5 rounded border border-accent/20">Pro Controls</span>
+        </div>
+
+        <!-- Page orientation -->
+        <div>
+          <label class="block text-[11px] font-medium text-muted mb-1.5">Page orientation</label>
+          <div class="grid grid-cols-3 gap-1.5" role="group" aria-label="Page orientation">
+            <button
+              type="button"
+              class="pk-pdf-orientation-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-accent/40 bg-accent/15 text-accent text-xs font-medium transition-all hover:border-accent/60"
+              data-orientation="auto"
+              title="Auto-detect orientation to match each image aspect ratio"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 3v18"></path>
+                <path d="M3 12h18"></path>
+              </svg>
+              <span>Auto</span>
+            </button>
+            <button
+              type="button"
+              class="pk-pdf-orientation-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-border bg-surface text-fg text-xs font-medium transition-all hover:border-accent/40"
+              data-orientation="portrait"
+              title="Portrait: Standard vertical page"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="3" width="12" height="18" rx="2"></rect>
+              </svg>
+              <span>Portrait</span>
+            </button>
+            <button
+              type="button"
+              class="pk-pdf-orientation-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-border bg-surface text-fg text-xs font-medium transition-all hover:border-accent/40"
+              data-orientation="landscape"
+              title="Landscape: Standard horizontal page"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+              </svg>
+              <span>Landscape</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Page size -->
+        <div>
+          <label for="pk-pdf-pagesize-select" class="block text-[11px] font-medium text-muted mb-1.5">Page size</label>
+          <div class="relative">
+            <select
+              id="pk-pdf-pagesize-select"
+              aria-label="PDF page size"
+              class="block w-full appearance-none rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent cursor-pointer pr-8"
+            >
+              <option value="a4" selected>A4 (297 × 210 mm)</option>
+              <option value="letter">US Letter (216 × 279 mm)</option>
+              <option value="fit">Fit (Same page size as image)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Margin -->
+        <div>
+          <label class="block text-[11px] font-medium text-muted mb-1.5">Margin</label>
+          <div class="grid grid-cols-3 gap-1.5" role="group" aria-label="PDF margin">
+            <button
+              type="button"
+              class="pk-pdf-margin-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-accent/40 bg-accent/15 text-accent text-xs font-medium transition-all hover:border-accent/60"
+              data-margin="none"
+              title="No margin: Full bleed without white borders"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <path d="m21 15-5-5L5 21"></path>
+              </svg>
+              <span>No margin</span>
+            </button>
+            <button
+              type="button"
+              class="pk-pdf-margin-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-border bg-surface text-fg text-xs font-medium transition-all hover:border-accent/40"
+              data-margin="small"
+              title="Small margin: 5 mm (clean printing edge)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" stroke-dasharray="2 2"></rect>
+                <rect width="12" height="12" x="6" y="6" rx="1"></rect>
+              </svg>
+              <span>Small (5mm)</span>
+            </button>
+            <button
+              type="button"
+              class="pk-pdf-margin-btn flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border border-border bg-surface text-fg text-xs font-medium transition-all hover:border-accent/40"
+              data-margin="big"
+              title="Big margin: 12 mm (spacious border for certificates & documents)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" stroke-dasharray="2 2"></rect>
+                <rect width="8" height="8" x="8" y="8" rx="1"></rect>
+              </svg>
+              <span>Big (12mm)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Merge all images in one PDF file -->
+        <div class="pt-2 border-t border-border/40">
+          <label class="flex items-center justify-between text-xs text-fg cursor-pointer select-none">
+            <span class="flex items-center gap-1.5 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+              Merge all images in one PDF file
+            </span>
+            <input
+              id="pk-merge-pdf-toggle"
+              type="checkbox"
+              checked={initialMergePdf}
+              aria-label="Merge all images into one PDF file"
+              class="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+            />
+          </label>
         </div>
       </div>
 

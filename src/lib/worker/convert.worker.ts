@@ -15,6 +15,7 @@ import type {
   ConvertRequest,
   ConvertSuccess,
   MergePdfRequest,
+  PdfOptionsConfig,
   WorkerMessage,
 } from './types';
 import { mimeToOutputFormat, buildFilename, mimeForExtension } from '../engines';
@@ -46,7 +47,7 @@ ctx.addEventListener('message', async (event: MessageEvent<ConvertRequest | Merg
         widthPx: p.width,
         heightPx: p.height,
       }));
-      const blob = await mergeImagesToPdf(pages, req.title || 'PixelKit Merged Document');
+      const blob = await mergeImagesToPdf(pages, req.title || 'PixelKit Merged Document', req.pdfOptions);
       const filename = `PixelKit-merged-${Date.now()}.pdf`;
       const originalSize = req.pages.reduce((acc, p) => acc + p.blob.size, 0);
       const msg: ConvertSuccess = {
@@ -275,7 +276,8 @@ async function handleConvert(req: ConvertRequest): Promise<ConvertInternalResult
           targetBytes,
           req.file.name,
           effectiveDpi,
-          minBytesRequired ? padTargetBytes : null
+          minBytesRequired ? padTargetBytes : null,
+          req.pdfOptions
         );
         break;
       case 'webp':
@@ -510,7 +512,8 @@ async function encodePdfOutput(
   targetBytes: number | null,
   originalName: string,
   dpi: number | null = null,
-  padTargetBytes: number | null = null
+  padTargetBytes: number | null = null,
+  pdfOptions?: PdfOptionsConfig
 ): Promise<Blob> {
   const overhead = pdfOverheadBytes();
   const jpegTarget = targetBytes ? Math.max(1024, targetBytes - overhead) : null;
@@ -541,6 +544,9 @@ async function encodePdfOutput(
     heightPx: bitmap.height,
     title: originalName,
     dpi: dpi ?? undefined,
+    orientation: pdfOptions?.orientation,
+    pageSize: pdfOptions?.pageSize,
+    margin: pdfOptions?.margin,
   });
 
   if (padTargetBytes && pdfBlob.size < padTargetBytes) {
@@ -554,6 +560,9 @@ async function encodePdfOutput(
         heightPx: bitmap.height,
         title: originalName,
         dpi: dpi ?? undefined,
+        orientation: pdfOptions?.orientation,
+        pageSize: pdfOptions?.pageSize,
+        margin: pdfOptions?.margin,
       });
     }
   }

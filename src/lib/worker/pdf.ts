@@ -1,16 +1,15 @@
 /**
- * Wrap a JPEG image into a single-page PDF using jsPDF.
+ * Wrap JPEG images into single or multi-page PDFs using jsPDF.
  *
  * Strategy:
- *   1. The caller already compressed the image to `targetBytes - overhead`.
- *   2. We convert the JPEG Blob to a data URL.
- *   3. jsPDF embeds the JPEG in a PDF sized to the image's dimensions.
- *
- * Overhead is tiny (a few hundred bytes for a single-page PDF), so the
- * caller subtracts ~2 KB before compressing.
+ *   1. Images are compressed or scaled to JPEG.
+ *   2. Layout is computed according to orientation (auto/portrait/landscape),
+ *      page size (A4/Letter/Fit to image), and margins (none/small/big).
+ *   3. jsPDF embeds the images into compliant PDF documents client-side.
  */
 
 import { jsPDF } from 'jspdf';
+import type { PdfOrientation, PdfPageSize, PdfMargin, PdfOptionsConfig } from './types';
 
 export interface PdfOptions {
   jpegBlob: Blob;
@@ -18,9 +17,132 @@ export interface PdfOptions {
   heightPx: number;
   title?: string;
   dpi?: number;
+  orientation?: PdfOrientation;
+  pageSize?: PdfPageSize;
+  margin?: PdfMargin;
+}
+
+export interface PdfPageLayout {
+  pageW: number;
+  pageH: number;
+  drawX: number;
+  drawY: number;
+  drawW: number;
+  drawH: number;
+  orientation: 'portrait' | 'landscape';
 }
 
 const OVERHEAD_BYTES = 3 * 1024; // conservative PDF wrapper overhead
+
+/**
+ * Computes exact page geometry, image coordinates and scaling for PDF export.
+ */
+export function computePdfPageLayout(
+  widthPx: number,
+  heightPx: number,
+  options?: {
+    orientation?: PdfOrientation;
+    pageSize?: PdfPageSize;
+    margin?: PdfMargin;
+    dpi?: number;
+  }
+): PdfPageLayout {
+  const orientationSetting = options?.orientation ?? 'auto';
+  const pageSizeSetting = options?.pageSize ?? 'a4';
+  const marginSetting = options?.margin ?? 'none';
+  const dpi = options?.dpi;
+
+  // Margin in points (72 pt / inch)
+  // small = 5mm (~14.17 pt), big = 12mm (~34.02 pt), none = 0
+  let marginPt = 0;
+  if (marginSetting === 'small') {
+    marginPt = 14.17;
+  } else if (marginSetting === 'big') {
+    marginPt = 34.02;
+  }
+
+  // 1. Fit to Image (page matches photo dimensions + margin)
+  if (pageSizeSetting === 'fit') {
+    const effectiveDpi = dpi && dpi > 0 ? dpi : 96;
+    const imgWPt = Math.max(18, (widthPx / effectiveDpi) * 72);
+    const imgHPt = Math.max(18, (heightPx / effectiveDpi) * 72);
+    const pageW = imgWPt + 2 * marginPt;
+    const pageH = imgHPt + 2 * marginPt;
+    const orientation = pageW >= pageH ? 'landscape' : 'portrait';
+
+    return {
+      pageW,
+      pageH,
+      drawX: marginPt,
+      drawY: marginPt,
+      drawW: imgWPt,
+      drawH: imgHPt,
+      orientation,
+    };
+  }
+
+  // 2. Fixed Paper Sizes (A4 or US Letter)
+  // A4: 210 x 297 mm -> 595.28 x 841.89 pt
+  // US Letter: 8.5 x 11 in -> 612.00 x 792.00 pt
+  const [baseShort, baseLong] = pageSizeSetting === 'letter' ? [612.0, 792.0] : [595.28, 841.89];
+
+  let pageW: number;
+  let pageH: number;
+  let orientation: 'portrait' | 'landscape';
+
+  if (orientationSetting === 'portrait') {
+    pageW = baseShort;
+    pageH = baseLong;
+    orientation = 'portrait';
+  } else if (orientationSetting === 'landscape') {
+    pageW = baseLong;
+    pageH = baseShort;
+    orientation = 'landscape';
+  } else {
+    // 'auto': auto-detect based on image aspect ratio
+    if (widthPx >= heightPx) {
+      pageW = baseLong;
+      pageH = baseShort;
+      orientation = 'landscape';
+    } else {
+      pageW = baseShort;
+      pageH = baseLong;
+      orientation = 'portrait';
+    }
+  }
+
+  // Printable area inside margins
+  const availW = Math.max(1, pageW - 2 * marginPt);
+  const availH = Math.max(1, pageH - 2 * marginPt);
+
+  // Preserve image aspect ratio inside printable area
+  const imgRatio = widthPx / heightPx;
+  const availRatio = availW / availH;
+  let drawW: number;
+  let drawH: number;
+
+  if (imgRatio > availRatio) {
+    drawW = availW;
+    drawH = availW / imgRatio;
+  } else {
+    drawH = availH;
+    drawW = availH * imgRatio;
+  }
+
+  // Center image inside printable area
+  const drawX = marginPt + (availW - drawW) / 2;
+  const drawY = marginPt + (availH - drawH) / 2;
+
+  return {
+    pageW,
+    pageH,
+    drawX,
+    drawY,
+    drawW,
+    drawH,
+    orientation,
+  };
+}
 
 export async function blobToDataUrl(blob: Blob): Promise<string> {
   if (typeof FileReader !== 'undefined') {
@@ -49,29 +171,25 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
 }
 
 export async function jpegToPdf(opts: PdfOptions): Promise<Blob> {
-  const { jpegBlob, widthPx, heightPx, title, dpi } = opts;
-
-  // PDF page size in points (72 dpi). Keep aspect ratio.
-  const targetWidthPt = dpi && dpi > 0 ? Math.max(18, (widthPx / dpi) * 72) : 595;
-  const ratio = heightPx / widthPx;
-  const targetHeightPt = targetWidthPt * ratio;
+  const { jpegBlob, widthPx, heightPx, title, dpi, orientation, pageSize, margin } = opts;
+  const layout = computePdfPageLayout(widthPx, heightPx, { orientation, pageSize, margin, dpi });
 
   const dataUrl = await blobToDataUrl(jpegBlob);
 
   const pdf = new jsPDF({
-    orientation: targetWidthPt >= targetHeightPt ? 'landscape' : 'portrait',
+    orientation: layout.orientation,
     unit: 'pt',
-    format: [targetWidthPt, targetHeightPt],
+    format: [layout.pageW, layout.pageH],
     compress: false,
   });
 
   pdf.addImage(
     dataUrl,
     'JPEG',
-    0,
-    0,
-    targetWidthPt,
-    targetHeightPt,
+    layout.drawX,
+    layout.drawY,
+    layout.drawW,
+    layout.drawH,
     undefined,
     'FAST'
   );
@@ -80,8 +198,7 @@ export async function jpegToPdf(opts: PdfOptions): Promise<Blob> {
     pdf.setProperties({ title });
   }
 
-  const blob = pdf.output('blob');
-  return blob;
+  return pdf.output('blob');
 }
 
 export function pdfOverheadBytes(): number {
@@ -99,7 +216,8 @@ export interface MergedPdfPage {
  */
 export async function mergeImagesToPdf(
   pages: MergedPdfPage[],
-  title?: string
+  title?: string,
+  options?: PdfOptionsConfig
 ): Promise<Blob> {
   if (pages.length === 0) {
     throw new Error('No pages to merge');
@@ -109,31 +227,27 @@ export async function mergeImagesToPdf(
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i]!;
-    const targetWidthPt = 595; // Standard A4 width in points (72 DPI)
-    const ratio = page.heightPx / page.widthPx;
-    const targetHeightPt = targetWidthPt * ratio;
-    const orientation = targetWidthPt >= targetHeightPt ? 'landscape' : 'portrait';
-
+    const layout = computePdfPageLayout(page.widthPx, page.heightPx, options);
     const dataUrl = await blobToDataUrl(page.jpegBlob);
 
     if (i === 0) {
       pdf = new jsPDF({
-        orientation,
+        orientation: layout.orientation,
         unit: 'pt',
-        format: [targetWidthPt, targetHeightPt],
+        format: [layout.pageW, layout.pageH],
         compress: false,
       });
     } else {
-      pdf!.addPage([targetWidthPt, targetHeightPt], orientation);
+      pdf!.addPage([layout.pageW, layout.pageH], layout.orientation);
     }
 
     pdf!.addImage(
       dataUrl,
       'JPEG',
-      0,
-      0,
-      targetWidthPt,
-      targetHeightPt,
+      layout.drawX,
+      layout.drawY,
+      layout.drawW,
+      layout.drawH,
       undefined,
       'FAST'
     );
