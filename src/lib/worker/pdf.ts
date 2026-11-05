@@ -209,6 +209,9 @@ export interface MergedPdfPage {
   jpegBlob: Blob;
   widthPx: number;
   heightPx: number;
+  orientation?: PdfOrientation;
+  pageSize?: PdfPageSize;
+  margin?: PdfMargin;
 }
 
 /**
@@ -227,7 +230,12 @@ export async function mergeImagesToPdf(
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i]!;
-    const layout = computePdfPageLayout(page.widthPx, page.heightPx, options);
+    const pageOpts: PdfOptionsConfig = {
+      orientation: page.orientation ?? options?.orientation,
+      pageSize: page.pageSize ?? options?.pageSize,
+      margin: page.margin ?? options?.margin,
+    };
+    const layout = computePdfPageLayout(page.widthPx, page.heightPx, pageOpts);
     const dataUrl = await blobToDataUrl(page.jpegBlob);
 
     if (i === 0) {

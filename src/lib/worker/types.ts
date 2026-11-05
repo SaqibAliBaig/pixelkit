@@ -86,6 +86,9 @@ export interface MergePdfPage {
   blob: Blob;
   width: number;
   height: number;
+  orientation?: PdfOrientation;
+  pageSize?: PdfPageSize;
+  margin?: PdfMargin;
 }
 
 export interface MergePdfRequest {

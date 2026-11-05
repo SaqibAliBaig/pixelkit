@@ -1810,10 +1810,79 @@ export function mountConverterApp(): void {
       if (!job) return;
 
       const img = item.querySelector<HTMLImageElement>('.pk-file-img-preview');
+      const pageSheet = item.querySelector<HTMLElement>('.pk-pdf-page-sheet');
+      const pdfImg = item.querySelector<HTMLImageElement>('.pk-file-pdf-img');
+      const thumbBadge = item.querySelector<HTMLElement>('.pk-file-thumb-badge');
       const liveDimsEl = item.querySelector<HTMLElement>('.pk-file-live-dims');
+      const isPdfOutput = (job.to || state.to) === 'pdf';
 
-      // Update Card Thumbnail Live Framing
-      if (img) {
+      // Live PDF Sheet Preview Mode
+      if (isPdfOutput && pageSheet && pdfImg) {
+        pageSheet.classList.remove('hidden');
+        img?.classList.add('hidden');
+        thumbBadge?.classList.add('hidden');
+
+        const effOrientation = job.pdfOrientation ?? state.pdfOrientation;
+        const effPageSize = job.pdfPageSize ?? state.pdfPageSize;
+        const effMargin = job.pdfMargin ?? state.pdfMargin;
+
+        const imgW = job.originalWidth || 1;
+        const imgH = job.originalHeight || 1;
+        let isLandscape: boolean;
+        if (effOrientation === 'landscape') isLandscape = true;
+        else if (effOrientation === 'portrait') isLandscape = false;
+        else isLandscape = imgW >= imgH;
+
+        if (effPageSize === 'fit') {
+          const ratio = imgW / imgH;
+          if (ratio >= 1) {
+            pageSheet.style.width = '48px';
+            pageSheet.style.height = `${Math.max(22, Math.round(48 / ratio))}px`;
+          } else {
+            pageSheet.style.height = '48px';
+            pageSheet.style.width = `${Math.max(22, Math.round(48 * ratio))}px`;
+          }
+        } else {
+          // A4 (1:1.414 -> 48x34 / 34x48) vs Letter (1:1.294 -> 48x37 / 37x48)
+          const shortSide = effPageSize === 'letter' ? '37px' : '34px';
+          if (isLandscape) {
+            pageSheet.style.width = '48px';
+            pageSheet.style.height = shortSide;
+          } else {
+            pageSheet.style.height = '48px';
+            pageSheet.style.width = shortSide;
+          }
+        }
+
+        if (effMargin === 'none') {
+          pageSheet.style.padding = '0px';
+        } else if (effMargin === 'small') {
+          pageSheet.style.padding = '3px';
+        } else {
+          pageSheet.style.padding = '6px';
+        }
+
+        const currentSrc = job.thumbUrl || job.previewUrl || job.resultPreviewUrl;
+        if (currentSrc && pdfImg.getAttribute('data-src') !== currentSrc) {
+          pdfImg.setAttribute('data-src', currentSrc);
+          pdfImg.src = currentSrc;
+        }
+
+        const deg = job.rotate ?? 0;
+        const sx = job.flipH ? -1 : 1;
+        const isGray = job.grayscale ?? state.grayscale;
+        const trans: string[] = [];
+        if (deg !== 0) trans.push(`rotate(${deg}deg)`);
+        if (sx !== 1) trans.push(`scaleX(${sx})`);
+        pdfImg.style.transform = trans.join(' ');
+        pdfImg.style.filter = isGray ? 'grayscale(100%)' : '';
+      } else {
+        if (pageSheet) pageSheet.classList.add('hidden');
+        if (img) img.classList.remove('hidden');
+      }
+
+      // Update Card Thumbnail Live Framing (Standard Raster Mode)
+      if (img && !isPdfOutput) {
         const hasCustomBitmap = Boolean(job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl);
         if (hasCustomBitmap) {
           const targetSrc = (job.resultThumbUrl || job.resultPreviewUrl || job.adjustedPreviewUrl || job.croppedPreviewUrl)!;
@@ -1862,7 +1931,19 @@ export function mountConverterApp(): void {
 
       // Update Card Predicted Dimensions
       if (liveDimsEl) {
-        if (job.status === 'queued' && job.originalWidth && job.originalHeight) {
+        if (job.status === 'queued') {
+          if (isPdfOutput) {
+            const effOrientation = job.pdfOrientation ?? state.pdfOrientation;
+            const effPageSize = job.pdfPageSize ?? state.pdfPageSize;
+            const effMargin = job.pdfMargin ?? state.pdfMargin;
+            const orientLabel = effOrientation === 'auto' ? 'Auto (Smart)' : (effOrientation === 'portrait' ? 'Portrait' : 'Landscape');
+            const sizeLabel = effPageSize === 'fit' ? 'Fit to Image' : (effPageSize === 'letter' ? 'US Letter' : 'A4');
+            const marginLabel = effMargin === 'none' ? 'No Margin' : (effMargin === 'small' ? 'Small Margin (5mm)' : 'Big Margin (12mm)');
+            const kbNote = job.targetKb ? ` · Max ${formatSizeLabel(job.targetKb)}` : '';
+            const mergeNote = state.mergePdf && state.jobs.length > 1 ? ` · Page #${state.jobs.indexOf(job) + 1} of ${state.jobs.length}` : '';
+            liveDimsEl.textContent = `PDF Page: ${sizeLabel} · ${orientLabel} · ${marginLabel}${kbNote}${mergeNote}`;
+            liveDimsEl.classList.remove('hidden');
+          } else if (job.originalWidth && job.originalHeight) {
           const jobDims = job.dimensions ?? state.dimensions;
           const jobScale = jobDims.mode === 'original'
             ? null
@@ -1923,7 +2004,8 @@ export function mountConverterApp(): void {
           liveDimsEl.classList.add('hidden');
         }
       }
-    });
+    }
+  });
   }
 
   function setCropAnchor(anchor: CropAnchor): void {
@@ -1949,9 +2031,14 @@ export function mountConverterApp(): void {
     updateLiveDimensionsAndCardPreviews();
   }
 
-  function syncPdfOptionsUi(): void {
+  function syncPdfOptionsUi(jobOverride?: FileJob | null): void {
+    const targetJob = jobOverride !== undefined ? jobOverride : (selectedJobId ? state.jobs.find((j) => j.id === selectedJobId) : null);
+    const effOrientation = targetJob?.pdfOrientation ?? state.pdfOrientation;
+    const effPageSize = targetJob?.pdfPageSize ?? state.pdfPageSize;
+    const effMargin = targetJob?.pdfMargin ?? state.pdfMargin;
+
     document.querySelectorAll<HTMLButtonElement>('.pk-pdf-orientation-btn').forEach((btn) => {
-      const isSelected = btn.dataset.orientation === state.pdfOrientation;
+      const isSelected = btn.dataset.orientation === effOrientation;
       if (isSelected) {
         btn.classList.add('border-accent/40', 'bg-accent/15', 'text-accent');
         btn.classList.remove('border-border', 'bg-surface', 'text-fg');
@@ -1961,12 +2048,12 @@ export function mountConverterApp(): void {
       }
     });
 
-    if (pdfPageSizeSelect && pdfPageSizeSelect.value !== state.pdfPageSize) {
-      pdfPageSizeSelect.value = state.pdfPageSize;
+    if (pdfPageSizeSelect && pdfPageSizeSelect.value !== effPageSize) {
+      pdfPageSizeSelect.value = effPageSize;
     }
 
     document.querySelectorAll<HTMLButtonElement>('.pk-pdf-margin-btn').forEach((btn) => {
-      const isSelected = btn.dataset.margin === state.pdfMargin;
+      const isSelected = btn.dataset.margin === effMargin;
       if (isSelected) {
         btn.classList.add('border-accent/40', 'bg-accent/15', 'text-accent');
         btn.classList.remove('border-border', 'bg-surface', 'text-fg');
@@ -2107,6 +2194,9 @@ export function mountConverterApp(): void {
       blob: j.result!,
       width: j.resultWidth || 800,
       height: j.resultHeight || 1000,
+      orientation: j.pdfOrientation ?? state.pdfOrientation,
+      pageSize: j.pdfPageSize ?? state.pdfPageSize,
+      margin: j.pdfMargin ?? state.pdfMargin,
     }));
 
     const worker = idle.pop() || createWorker();
@@ -2825,25 +2915,72 @@ export function mountConverterApp(): void {
   document.querySelectorAll<HTMLButtonElement>('.pk-pdf-orientation-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const orient = btn.dataset.orientation as PdfOrientation;
-      if (orient) {
+      if (!orient) return;
+      if (selectedJobId) {
+        const activeJob = state.jobs.find((j) => j.id === selectedJobId);
+        if (activeJob) {
+          activeJob.pdfOrientation = orient;
+        }
+      } else {
         state.pdfOrientation = orient;
-        syncPdfOptionsUi();
+        for (const j of state.jobs) {
+          j.pdfOrientation = orient;
+        }
       }
+      syncPdfOptionsUi();
+      updateLiveDimensionsAndCardPreviews();
+      setStatus(
+        selectedJobId
+          ? `Set PDF orientation to ${orient.toUpperCase()} for selected photo`
+          : `Set PDF orientation to ${orient.toUpperCase()} for all photos`
+      );
     });
   });
 
   pdfPageSizeSelect?.addEventListener('change', () => {
-    state.pdfPageSize = (pdfPageSizeSelect.value as PdfPageSize) || 'a4';
+    const size = (pdfPageSizeSelect.value as PdfPageSize) || 'a4';
+    if (selectedJobId) {
+      const activeJob = state.jobs.find((j) => j.id === selectedJobId);
+      if (activeJob) {
+        activeJob.pdfPageSize = size;
+      }
+    } else {
+      state.pdfPageSize = size;
+      for (const j of state.jobs) {
+        j.pdfPageSize = size;
+      }
+    }
     syncPdfOptionsUi();
+    updateLiveDimensionsAndCardPreviews();
+    setStatus(
+      selectedJobId
+        ? `Set PDF page size to ${size.toUpperCase()} for selected photo`
+        : `Set PDF page size to ${size.toUpperCase()} for all photos`
+    );
   });
 
   document.querySelectorAll<HTMLButtonElement>('.pk-pdf-margin-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const margin = btn.dataset.margin as PdfMargin;
-      if (margin) {
+      if (!margin) return;
+      if (selectedJobId) {
+        const activeJob = state.jobs.find((j) => j.id === selectedJobId);
+        if (activeJob) {
+          activeJob.pdfMargin = margin;
+        }
+      } else {
         state.pdfMargin = margin;
-        syncPdfOptionsUi();
+        for (const j of state.jobs) {
+          j.pdfMargin = margin;
+        }
       }
+      syncPdfOptionsUi();
+      updateLiveDimensionsAndCardPreviews();
+      setStatus(
+        selectedJobId
+          ? `Set PDF margin to ${margin.toUpperCase()} for selected photo`
+          : `Set PDF margin to ${margin.toUpperCase()} for all photos`
+      );
     });
   });
 
@@ -5264,6 +5401,9 @@ export function mountConverterApp(): void {
       job.cropAspect = activeJob.cropAspect;
       job.cropAnchor = activeJob.cropAnchor;
       job.customCropBox = activeJob.customCropBox ? { ...activeJob.customCropBox } : undefined;
+      job.pdfOrientation = activeJob.pdfOrientation;
+      job.pdfPageSize = activeJob.pdfPageSize;
+      job.pdfMargin = activeJob.pdfMargin;
       job.dimensions = activeJob.dimensions ? { ...activeJob.dimensions } : undefined;
       job.scalePercent = activeJob.scalePercent;
       job.rotate = activeJob.rotate;
@@ -5286,7 +5426,10 @@ export function mountConverterApp(): void {
       applyToAllBtn.classList.remove('text-success');
     }, 1800);
 
-    setStatus(`Applied format, compression, crop & resize from ${activeJob.file.name} to all ${state.jobs.length} photos.`);
+    state.pdfOrientation = activeJob.pdfOrientation ?? state.pdfOrientation;
+    state.pdfPageSize = activeJob.pdfPageSize ?? state.pdfPageSize;
+    state.pdfMargin = activeJob.pdfMargin ?? state.pdfMargin;
+    setStatus(`Applied format, compression, crop, resize & PDF page options from ${activeJob.file.name} to all ${state.jobs.length} photos.`);
   });
 
   // Stepper inside Crop Modal

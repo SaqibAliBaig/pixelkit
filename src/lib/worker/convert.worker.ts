@@ -46,6 +46,9 @@ ctx.addEventListener('message', async (event: MessageEvent<ConvertRequest | Merg
         jpegBlob: p.blob,
         widthPx: p.width,
         heightPx: p.height,
+        orientation: p.orientation,
+        pageSize: p.pageSize,
+        margin: p.margin,
       }));
       const blob = await mergeImagesToPdf(pages, req.title || 'PixelKit Merged Document', req.pdfOptions);
       const filename = `PixelKit-merged-${Date.now()}.pdf`;

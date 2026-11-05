@@ -50,6 +50,14 @@
           class="pk-file-thumb-btn group/thumb relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-bg flex items-center justify-center cursor-pointer hover:border-accent transition-colors"
           title="Click to inspect in fullscreen / compare"
         >
+          <!-- Live PDF Page Sheet Preview -->
+          <div class="pk-pdf-page-sheet hidden relative flex items-center justify-center bg-white shadow-sm rounded-[2px] transition-all overflow-hidden pointer-events-none">
+            <img
+              class="pk-file-pdf-img h-full w-full object-contain transition-all"
+              alt=""
+              aria-hidden="true"
+            />
+          </div>
           <img
             class="pk-file-img-preview h-full w-full object-cover hidden transition-transform group-hover/thumb:scale-105"
             width="1"
