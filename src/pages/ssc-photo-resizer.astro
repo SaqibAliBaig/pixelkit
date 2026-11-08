@@ -89,7 +89,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -107,20 +107,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official SSC Photo Specification Summary (2026 Direct Answer)"
-      summaryText="Staff Selection Commission (SSC CGL, CHSL, MTS, GD, Stenographer) mandates a digital photograph in JPG/JPEG format with file size strictly between 20 KB and 50 KB, and dimensions of 350 × 450 pixels (3.5 cm × 4.5 cm). The photograph must feature a clean light or white background with both ears visible, without spectacles or headwear."
-      portalName="Staff Selection Commission (ssc.gov.in / OTR)"
-      specs={[
-        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
-        { label: 'File Size Bracket', value: '20 KB to 50 KB strictly', highlight: true },
-        { label: 'Dimensions', value: '350 × 450 px (3.5 × 4.5 cm)' },
-        { label: 'Background', value: 'Plain White or Light' },
-      ]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -135,6 +122,19 @@ const jsonLd = [
         maxKb={50}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official SSC Photo Specification Summary (2026 Direct Answer)"
+      summaryText="Staff Selection Commission (SSC CGL, CHSL, MTS, GD, Stenographer) mandates a digital photograph in JPG/JPEG format with file size strictly between 20 KB and 50 KB, and dimensions of 350 × 450 pixels (3.5 cm × 4.5 cm). The photograph must feature a clean light or white background with both ears visible, without spectacles or headwear."
+      portalName="Staff Selection Commission (ssc.gov.in / OTR)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Bracket', value: '20 KB to 50 KB strictly', highlight: true },
+        { label: 'Dimensions', value: '350 × 450 px (3.5 × 4.5 cm)' },
+        { label: 'Background', value: 'Plain White or Light' },
+      ]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

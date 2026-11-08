@@ -155,9 +155,18 @@ const sizeBrackets = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
         title="How to Convert Photos to PDF Online (Direct Answer)"
         summaryText={directAnswer.answer}
         specs={[
@@ -167,18 +176,6 @@ const sizeBrackets = [
           { label: 'Privacy & Security', value: '100% Local Browser Memory / Zero Cloud Uploads' },
         ]}
       />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for Photo to PDF -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="pdf"
-        fromMime="image/jpeg"
-        toMime="application/pdf"
-        initialTool="convert"
-      />
-    </div>
 
     <!-- Popular Target File Size Brackets -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

@@ -105,7 +105,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -124,7 +124,17 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        initialTool="resize"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title="How to Batch Resize Multiple Images Online for Free"
       summaryText="To resize multiple images at once, drop your photos into PixelKit. The tool queues all images and processes them simultaneously across multi-threaded Web Workers. You can set global pixel dimensions, scale by percentage, or enforce exact kilobyte ceilings across all images at once, then click 'Download All as ZIP' for immediate offline retrieval."
@@ -135,17 +145,6 @@ const jsonLd = [
         { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Cloud Uploads' },
       ]}
     />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="jpg"
-        fromMime="image/jpeg"
-        toMime="image/jpeg"
-        initialTool="resize"
-      />
-    </div>
 
     <!-- Practical Batch Use Cases -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

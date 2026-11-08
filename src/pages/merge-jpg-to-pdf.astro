@@ -144,22 +144,7 @@ const useCases = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
-        title="How to Merge Multiple JPG Photos into One PDF (Direct Answer)"
-        summaryText={directAnswer.answer}
-        specs={[
-          { label: 'Supported File Inputs', value: 'JPG, JPEG, PNG, WebP, HEIC (iPhone)', highlight: true },
-          { label: 'Page Sequencing', value: 'Interactive Drag-and-Drop Card Sorting' },
-          { label: 'Target Size Optimization', value: 'Presets for < 100KB, < 200KB, < 500KB', highlight: true },
-          { label: 'Confidentiality Guarantee', value: '100% Client-Side Memory / Zero Server Logs' },
-        ]}
-      />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for JPG to PDF -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
@@ -169,6 +154,18 @@ const useCases = [
         initialMergePdf={true}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+        title="How to Merge Multiple JPG Photos into One PDF (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Supported File Inputs', value: 'JPG, JPEG, PNG, WebP, HEIC (iPhone)', highlight: true },
+          { label: 'Page Sequencing', value: 'Interactive Drag-and-Drop Card Sorting' },
+          { label: 'Target Size Optimization', value: 'Presets for < 100KB, < 200KB, < 500KB', highlight: true },
+          { label: 'Confidentiality Guarantee', value: '100% Client-Side Memory / Zero Server Logs' },
+        ]}
+      />
 
     <!-- Multi-File PDF Use Cases Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

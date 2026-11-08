@@ -62,7 +62,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -80,15 +80,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="The 10KB–20KB Signature Requirement Explained (2026 Direct Answer)"
-      summaryText="Portals such as SSC, UPSC, IBPS, and State PSCs enforce dual-threshold validation: signatures below 10 KB are rejected as low-resolution, and files above 20 KB are blocked as oversize. PixelKit targets ~15 KB, safely clearing both thresholds."
-      portalName="SSC, UPSC, IBPS, SBI & State PSC Portals"
-      specs={[{"label":"Lower Bound","value":"Minimum 10.0 KB strictly","highlight":true},{"label":"Upper Bound","value":"Maximum 20.0 KB strictly","highlight":true},{"label":"Ideal Target","value":"14.0 KB to 18.0 KB"},{"label":"Color Format","value":"24-bit RGB JPEG"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -103,6 +95,14 @@ const jsonLd = [
         maxKb={20}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="The 10KB–20KB Signature Requirement Explained (2026 Direct Answer)"
+      summaryText="Portals such as SSC, UPSC, IBPS, and State PSCs enforce dual-threshold validation: signatures below 10 KB are rejected as low-resolution, and files above 20 KB are blocked as oversize. PixelKit targets ~15 KB, safely clearing both thresholds."
+      portalName="SSC, UPSC, IBPS, SBI & State PSC Portals"
+      specs={[{"label":"Lower Bound","value":"Minimum 10.0 KB strictly","highlight":true},{"label":"Upper Bound","value":"Maximum 20.0 KB strictly","highlight":true},{"label":"Ideal Target","value":"14.0 KB to 18.0 KB"},{"label":"Color Format","value":"24-bit RGB JPEG"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

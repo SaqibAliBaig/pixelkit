@@ -62,7 +62,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -80,15 +80,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="How 300 DPI Conversion Works Losslessly (2026 Direct Answer)"
-      summaryText="DPI (Dots Per Inch) is a metadata tag in the image header (JFIF APP0 in JPEG, pHYs chunk in PNG) that instructs printers how many pixels to print per physical inch. Changing DPI to 300 does not alter physical pixel dimensions; it updates the print density tag so official portals recognize your image as 300 DPI print-ready."
-      portalName="Print & Passport Portals (DPI Metadata Standard)"
-      specs={[{"label":"Standard Print DPI","value":"300 DPI (Universal Standard)","highlight":true},{"label":"Pixel Alteration","value":"Zero (Pixels remain 100% untouched)","highlight":true},{"label":"Header Modified","value":"JFIF APP0 (JPG) / pHYs (PNG)"},{"label":"Processing Speed","value":"< 10 milliseconds in browser"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -98,6 +90,14 @@ const jsonLd = [
         initialDpi={300}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="How 300 DPI Conversion Works Losslessly (2026 Direct Answer)"
+      summaryText="DPI (Dots Per Inch) is a metadata tag in the image header (JFIF APP0 in JPEG, pHYs chunk in PNG) that instructs printers how many pixels to print per physical inch. Changing DPI to 300 does not alter physical pixel dimensions; it updates the print density tag so official portals recognize your image as 300 DPI print-ready."
+      portalName="Print & Passport Portals (DPI Metadata Standard)"
+      specs={[{"label":"Standard Print DPI","value":"300 DPI (Universal Standard)","highlight":true},{"label":"Pixel Alteration","value":"Zero (Pixels remain 100% untouched)","highlight":true},{"label":"Header Modified","value":"JFIF APP0 (JPG) / pHYs (PNG)"},{"label":"Processing Speed","value":"< 10 milliseconds in browser"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

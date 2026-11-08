@@ -154,22 +154,7 @@ const portalsRequiring200kbPdf = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
-        title="How to Convert Image to PDF Under 200KB (Direct Answer)"
-        summaryText={directAnswer.answer}
-        specs={[
-          { label: 'Target File Ceiling', value: 'Strictly ≤ 200 KB (Typical 175–195 KB)', highlight: true },
-          { label: 'Document Presets', value: 'NEET, JEE, Schengen Visas, Marksheets' },
-          { label: 'Supported Inputs', value: 'JPG, JPEG, PNG, WebP, iPhone HEIC', highlight: true },
-          { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
-        ]}
-      />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for 200KB PDF -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="pdf"
@@ -179,6 +164,18 @@ const portalsRequiring200kbPdf = [
         initialTool="compress"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+        title="How to Convert Image to PDF Under 200KB (Direct Answer)"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Target File Ceiling', value: 'Strictly ≤ 200 KB (Typical 175–195 KB)', highlight: true },
+          { label: 'Document Presets', value: 'NEET, JEE, Schengen Visas, Marksheets' },
+          { label: 'Supported Inputs', value: 'JPG, JPEG, PNG, WebP, iPhone HEIC', highlight: true },
+          { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
+        ]}
+      />
 
     <!-- Portals Requiring 200KB PDF Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

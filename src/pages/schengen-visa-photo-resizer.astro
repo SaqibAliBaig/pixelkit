@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official Schengen Visa Photo Guidelines (2026 Direct Answer)"
-      summaryText="European Schengen visa consulates (VFS Global, TLScontact, BLS) require a 35 × 45 mm photograph (413 × 531 pixels at 300 DPI). The applicant’s face must cover 70% to 80% of the photo height (32 mm to 36 mm from chin to crown) against a light gray or white background with neutral facial expression."
-      portalName="European Union Schengen Consular Services"
-      specs={[{"label":"Dimensions","value":"35 × 45 mm (413 × 531 px at 300 DPI)","highlight":true},{"label":"Face Height","value":"70% to 80% (32 to 36 mm)","highlight":true},{"label":"File Size Bracket","value":"Under 200 KB JPG"},{"label":"Background","value":"Uniform Light Gray or White"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -96,6 +88,14 @@ const jsonLd = [
         category="visa"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Schengen Visa Photo Guidelines (2026 Direct Answer)"
+      summaryText="European Schengen visa consulates (VFS Global, TLScontact, BLS) require a 35 × 45 mm photograph (413 × 531 pixels at 300 DPI). The applicant’s face must cover 70% to 80% of the photo height (32 mm to 36 mm from chin to crown) against a light gray or white background with neutral facial expression."
+      portalName="European Union Schengen Consular Services"
+      specs={[{"label":"Dimensions","value":"35 × 45 mm (413 × 531 px at 300 DPI)","highlight":true},{"label":"Face Height","value":"70% to 80% (32 to 36 mm)","highlight":true},{"label":"File Size Bracket","value":"Under 200 KB JPG"},{"label":"Background","value":"Uniform Light Gray or White"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

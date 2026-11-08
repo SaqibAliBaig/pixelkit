@@ -157,9 +157,18 @@ const supportedInputs = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="pdf"
+        fromMime="image/jpeg"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
         title="How to Convert Image to PDF Online (Direct Answer)"
         summaryText={directAnswer.answer}
         specs={[
@@ -169,18 +178,6 @@ const supportedInputs = [
           { label: 'Privacy & Security', value: '100% Client-Side / Zero Cloud Storage' },
         ]}
       />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for Image to PDF -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="pdf"
-        fromMime="image/jpeg"
-        toMime="application/pdf"
-        initialTool="convert"
-      />
-    </div>
 
     <!-- Supported Inputs Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

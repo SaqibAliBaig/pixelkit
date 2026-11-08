@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="IIT GATE GOAPS Photo & Signature Guidelines (2026 Direct Answer)"
-      summaryText="Graduate Aptitude Test in Engineering (GATE) candidate photographs must have an aspect ratio of 3.5:4.5 (minimum 240 × 320 px, maximum 480 × 640 px), weighing between 5 KB and 200 KB. Signatures must have an aspect ratio of 1:3.5 (minimum 80 × 280 px, maximum 160 × 560 px), weighing between 5 KB and 200 KB."
-      portalName="IIT GATE Organizing Institute (GOAPS)"
-      specs={[{"label":"Photo Dimensions","value":"480 × 640 px max (3.5:4.5)","highlight":true},{"label":"Signature Dimensions","value":"160 × 560 px max (1:3.5)","highlight":true},{"label":"File Size Bracket","value":"5 KB to 200 KB strictly","highlight":true},{"label":"Face Coverage","value":"60% to 70% of photo area"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -96,6 +88,14 @@ const jsonLd = [
         category="exam"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="IIT GATE GOAPS Photo & Signature Guidelines (2026 Direct Answer)"
+      summaryText="Graduate Aptitude Test in Engineering (GATE) candidate photographs must have an aspect ratio of 3.5:4.5 (minimum 240 × 320 px, maximum 480 × 640 px), weighing between 5 KB and 200 KB. Signatures must have an aspect ratio of 1:3.5 (minimum 80 × 280 px, maximum 160 × 560 px), weighing between 5 KB and 200 KB."
+      portalName="IIT GATE Organizing Institute (GOAPS)"
+      specs={[{"label":"Photo Dimensions","value":"480 × 640 px max (3.5:4.5)","highlight":true},{"label":"Signature Dimensions","value":"160 × 560 px max (1:3.5)","highlight":true},{"label":"File Size Bracket","value":"5 KB to 200 KB strictly","highlight":true},{"label":"Face Coverage","value":"60% to 70% of photo area"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

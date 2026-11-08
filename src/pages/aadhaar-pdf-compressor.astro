@@ -62,7 +62,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -80,15 +80,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="UIDAI myAadhaar PDF Upload Specifications (2026 Direct Answer)"
-      summaryText="UIDAI myAadhaar portal requires supporting Proof of Identity (POI) and Proof of Address (POA) documents in PDF or JPG format strictly under 2 MB (for portal updates) or under 100 KB / 200 KB (for banking, KYC, and government exams). Password-protected PDFs are rejected."
-      portalName="Unique Identification Authority of India (myaadhaar.uidai.gov.in)"
-      specs={[{"label":"Max File Size","value":"Under 2 MB (or 100 KB for KYC)","highlight":true},{"label":"Document Formats","value":"PDF, JPG, PNG","highlight":true},{"label":"Password Security","value":"Must be Password-Free"},{"label":"Legibility","value":"Clear 12-digit number & QR code"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="pdf"
         to="pdf"
@@ -100,6 +92,14 @@ const jsonLd = [
         category="id"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="UIDAI myAadhaar PDF Upload Specifications (2026 Direct Answer)"
+      summaryText="UIDAI myAadhaar portal requires supporting Proof of Identity (POI) and Proof of Address (POA) documents in PDF or JPG format strictly under 2 MB (for portal updates) or under 100 KB / 200 KB (for banking, KYC, and government exams). Password-protected PDFs are rejected."
+      portalName="Unique Identification Authority of India (myaadhaar.uidai.gov.in)"
+      specs={[{"label":"Max File Size","value":"Under 2 MB (or 100 KB for KYC)","highlight":true},{"label":"Document Formats","value":"PDF, JPG, PNG","highlight":true},{"label":"Password Security","value":"Must be Password-Free"},{"label":"Legibility","value":"Clear 12-digit number & QR code"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official SBI PO Photo & Signature Specifications (2026 Direct Answer)"
-      summaryText="State Bank of India mandates passport photographs to be 200 × 230 pixels, between 20 KB and 50 KB JPG. Signatures must be 140 × 60 pixels, between 10 KB and 20 KB JPG in black ink. Left thumb impression must be 20 KB to 50 KB, and handwritten declaration 50 KB to 100 KB."
-      portalName="State Bank of India (sbi.co.in/careers)"
-      specs={[{"label":"Photo Size","value":"200 × 230 px (20 KB – 50 KB)","highlight":true},{"label":"Signature Size","value":"140 × 60 px (10 KB – 20 KB)","highlight":true},{"label":"Thumb Impression","value":"20 KB – 50 KB JPG"},{"label":"Declaration","value":"50 KB – 100 KB JPG"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -99,6 +91,14 @@ const jsonLd = [
         maxKb={50}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official SBI PO Photo & Signature Specifications (2026 Direct Answer)"
+      summaryText="State Bank of India mandates passport photographs to be 200 × 230 pixels, between 20 KB and 50 KB JPG. Signatures must be 140 × 60 pixels, between 10 KB and 20 KB JPG in black ink. Left thumb impression must be 20 KB to 50 KB, and handwritten declaration 50 KB to 100 KB."
+      portalName="State Bank of India (sbi.co.in/careers)"
+      specs={[{"label":"Photo Size","value":"200 × 230 px (20 KB – 50 KB)","highlight":true},{"label":"Signature Size","value":"140 × 60 px (10 KB – 20 KB)","highlight":true},{"label":"Thumb Impression","value":"20 KB – 50 KB JPG"},{"label":"Declaration","value":"50 KB – 100 KB JPG"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

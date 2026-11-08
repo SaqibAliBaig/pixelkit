@@ -48,15 +48,15 @@ const presets = [
   data-initial-unit={defaultUnit}
   data-initial-dpi={defaultDpi}
   aria-label="Interactive Pixel and Centimeter Calculator"
-  class="rounded-2xl sm:rounded-3xl border border-border/80 bg-surface p-4 sm:p-6 shadow-sm mb-6"
+  class="rounded-2xl sm:rounded-3xl border border-border/80 bg-surface p-3.5 sm:p-6 shadow-sm mb-5 sm:mb-6"
 >
   <!-- Top Controls: Direction Switcher + Physical Unit Switcher -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/60">
-    <div class="inline-flex rounded-xl border border-border bg-bg/60 p-1 text-xs font-semibold">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-border/60">
+    <div class="grid grid-cols-2 sm:inline-flex rounded-xl border border-border bg-bg/60 p-1 text-xs font-semibold gap-0.5">
       <button
         type="button"
         data-calc-dir="px-to-phys"
-        class={`pk-calc-dir-btn flex-1 sm:flex-initial rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
+        class={`pk-calc-dir-btn text-center rounded-lg px-2.5 py-1.5 transition-all cursor-pointer ${
           isPxToPhys ? 'bg-surface text-fg shadow-xs border border-border/60' : 'text-muted hover:text-fg'
         }`}
       >
@@ -65,7 +65,7 @@ const presets = [
       <button
         type="button"
         data-calc-dir="phys-to-px"
-        class={`pk-calc-dir-btn flex-1 sm:flex-initial rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
+        class={`pk-calc-dir-btn text-center rounded-lg px-2.5 py-1.5 transition-all cursor-pointer ${
           !isPxToPhys ? 'bg-surface text-fg shadow-xs border border-border/60' : 'text-muted hover:text-fg'
         }`}
       >
@@ -73,14 +73,14 @@ const presets = [
       </button>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center justify-between sm:justify-end gap-2">
       <span class="text-[11px] font-medium text-muted">Physical unit:</span>
       <div class="inline-flex rounded-lg border border-border bg-bg/60 p-0.5 text-[11px] font-semibold">
         {(['cm', 'mm', 'in'] as const).map((u) => (
           <button
             type="button"
             data-calc-unit={u}
-            class={`pk-calc-unit-btn rounded-md px-2.5 py-1 uppercase transition-all cursor-pointer ${
+            class={`pk-calc-unit-btn rounded-md px-3 py-1 uppercase transition-all cursor-pointer ${
               u === defaultUnit ? 'bg-accent text-accent-fg shadow-2xs' : 'text-muted hover:text-fg'
             }`}
           >
@@ -92,62 +92,66 @@ const presets = [
   </div>
 
   <!-- Inputs Grid: Width, Swap, Height, Print DPI -->
-  <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr_1.15fr] items-end">
-    <div>
-      <label for="pk-calc-w" class="block text-xs font-semibold text-fg mb-1">
-        Width (<span id="pk-calc-w-unit">{initialUnitLabel}</span>)
-      </label>
-      <input
-        id="pk-calc-w"
-        type="number"
-        min="0.01"
-        max="50000"
-        step={initialStep}
-        value={initialW}
-        class="w-full rounded-xl border border-border bg-bg/50 px-3.5 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-      />
+  <div class="mt-3.5 space-y-3 sm:space-y-0 sm:grid sm:grid-cols-[1fr_auto_1fr_1.25fr] sm:gap-3 sm:items-end">
+    <!-- Width, Swap, Height row (side-by-side on mobile to eliminate huge vertical stacking) -->
+    <div class="grid grid-cols-[1fr_auto_1fr] items-end gap-1.5 sm:contents">
+      <div class="min-w-0">
+        <label for="pk-calc-w" class="block text-xs font-semibold text-fg mb-1 truncate">
+          Width (<span id="pk-calc-w-unit">{initialUnitLabel}</span>)
+        </label>
+        <input
+          id="pk-calc-w"
+          type="number"
+          min="0.01"
+          max="50000"
+          step={initialStep}
+          value={initialW}
+          class="w-full rounded-xl border border-border bg-bg/50 px-3 py-2 sm:px-3.5 sm:py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+        />
+      </div>
+
+      <div class="flex items-center justify-center pb-0.5 sm:pb-1">
+        <button
+          id="pk-calc-swap"
+          type="button"
+          title="Swap Width and Height"
+          aria-label="Swap Width and Height"
+          class="inline-flex items-center justify-center rounded-xl border border-border bg-bg/60 p-2 sm:p-2.5 text-muted hover:border-accent hover:text-accent transition-colors cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="min-w-0">
+        <label for="pk-calc-h" class="block text-xs font-semibold text-fg mb-1 truncate">
+          Height (<span id="pk-calc-h-unit">{initialUnitLabel}</span>)
+        </label>
+        <input
+          id="pk-calc-h"
+          type="number"
+          min="0.01"
+          max="50000"
+          step={initialStep}
+          value={initialH}
+          class="w-full rounded-xl border border-border bg-bg/50 px-3 py-2 sm:px-3.5 sm:py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+        />
+      </div>
     </div>
 
-    <div class="flex justify-center sm:pb-1">
-      <button
-        id="pk-calc-swap"
-        type="button"
-        title="Swap Width and Height"
-        aria-label="Swap Width and Height"
-        class="inline-flex items-center justify-center rounded-xl border border-border bg-bg/60 p-2.5 text-muted hover:border-accent hover:text-accent transition-colors cursor-pointer"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="17 1 21 5 17 9"></polyline>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-          <polyline points="7 23 3 19 7 15"></polyline>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div>
-      <label for="pk-calc-h" class="block text-xs font-semibold text-fg mb-1">
-        Height (<span id="pk-calc-h-unit">{initialUnitLabel}</span>)
-      </label>
-      <input
-        id="pk-calc-h"
-        type="number"
-        min="0.01"
-        max="50000"
-        step={initialStep}
-        value={initialH}
-        class="w-full rounded-xl border border-border bg-bg/50 px-3.5 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-      />
-    </div>
-
-    <div>
+    <!-- DPI input and presets -->
+    <div class="min-w-0">
       <div class="flex items-center justify-between mb-1">
         <label for="pk-calc-dpi-input" class="text-xs font-semibold text-fg">
           Resolution (DPI)
         </label>
-        <span class="text-[10px] font-medium text-muted">Standard print = 300</span>
+        <span class="text-[10px] font-medium text-muted">Standard = 300</span>
       </div>
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 min-w-0">
         <input
           id="pk-calc-dpi-input"
           type="number"
@@ -155,14 +159,14 @@ const presets = [
           max="2400"
           step="1"
           value={defaultDpi}
-          class="w-24 shrink-0 rounded-xl border border-border bg-bg/50 px-3 py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+          class="w-20 sm:w-24 shrink-0 rounded-xl border border-border bg-bg/50 px-2.5 py-2 sm:px-3 sm:py-2.5 font-mono text-sm sm:text-base font-semibold text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
         />
-        <div class="flex flex-wrap gap-1">
+        <div class="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar py-0.5 sm:flex-wrap">
           {dpiOptions.map((d) => (
             <button
               type="button"
               data-calc-dpi={d}
-              class={`pk-calc-dpi-btn rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold transition-colors cursor-pointer ${
+              class={`pk-calc-dpi-btn shrink-0 rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold transition-colors cursor-pointer ${
                 d === defaultDpi
                   ? 'border-accent bg-accent/15 text-accent'
                   : 'border-border bg-bg/50 text-muted hover:border-accent/40 hover:text-fg'
@@ -176,9 +180,9 @@ const presets = [
     </div>
   </div>
 
-  <!-- Quick Official Presets -->
-  <div class="mt-3.5 flex flex-wrap items-center gap-1.5">
-    <span class="text-[11px] font-medium text-muted mr-1">Quick standards:</span>
+  <!-- Quick Official Presets (Horizontally swipeable on mobile, wrapping on desktop) -->
+  <div class="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar sm:flex-wrap">
+    <span class="text-[11px] font-medium text-muted shrink-0 mr-0.5">Quick standards:</span>
     {presets.map((p) => (
       <button
         type="button"
@@ -188,7 +192,7 @@ const presets = [
         data-px-h={p.pxH}
         data-dpi={p.dpi}
         data-unit={p.unit}
-        class="pk-calc-preset-btn rounded-lg border border-border/80 bg-bg/50 px-2.5 py-1 text-[11px] font-medium text-fg hover:border-accent hover:text-accent transition-colors cursor-pointer"
+        class="pk-calc-preset-btn shrink-0 whitespace-nowrap rounded-lg border border-border/80 bg-bg/50 px-2.5 py-1 text-[11px] font-medium text-fg hover:border-accent hover:text-accent transition-colors cursor-pointer"
       >
         {p.label}
       </button>
@@ -196,47 +200,47 @@ const presets = [
   </div>
 
   <!-- 4 Live Equivalent Result Readout Cards -->
-  <div class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-    <div id="pk-calc-card-px" class={`rounded-xl border p-3 transition-colors ${!isPxToPhys ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+  <div class="mt-3.5 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
+    <div id="pk-calc-card-px" class={`rounded-xl border p-2.5 sm:p-3 transition-colors ${!isPxToPhys ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
       <div class="flex items-center justify-between gap-1">
         <span class="text-[11px] font-semibold text-muted">Pixels (px)</span>
-        <button type="button" data-copy-target="px" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+        <button type="button" data-copy-target="px" class="pk-calc-copy-btn p-1 -m-1 text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
       </div>
-      <p id="pk-calc-out-px" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">413 × 531 px</p>
-      <p id="pk-calc-sub-px" class="mt-0.5 text-[10px] text-muted">0.22 MP @ 300 DPI</p>
+      <p id="pk-calc-out-px" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg truncate">413 × 531 px</p>
+      <p id="pk-calc-sub-px" class="mt-0.5 text-[10px] text-muted truncate">0.22 MP @ 300 DPI</p>
     </div>
 
-    <div id="pk-calc-card-cm" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'cm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+    <div id="pk-calc-card-cm" class={`rounded-xl border p-2.5 sm:p-3 transition-colors ${isPxToPhys && defaultUnit === 'cm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
       <div class="flex items-center justify-between gap-1">
         <span class="text-[11px] font-semibold text-muted">Centimeters (cm)</span>
-        <button type="button" data-copy-target="cm" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+        <button type="button" data-copy-target="cm" class="pk-calc-copy-btn p-1 -m-1 text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
       </div>
-      <p id="pk-calc-out-cm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">3.5 × 4.5 cm</p>
-      <p id="pk-calc-sub-cm" class="mt-0.5 text-[10px] text-muted">1 cm = 118.11 px</p>
+      <p id="pk-calc-out-cm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg truncate">3.5 × 4.5 cm</p>
+      <p id="pk-calc-sub-cm" class="mt-0.5 text-[10px] text-muted truncate">1 cm = 118.11 px</p>
     </div>
 
-    <div id="pk-calc-card-mm" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'mm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+    <div id="pk-calc-card-mm" class={`rounded-xl border p-2.5 sm:p-3 transition-colors ${isPxToPhys && defaultUnit === 'mm' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
       <div class="flex items-center justify-between gap-1">
         <span class="text-[11px] font-semibold text-muted">Millimeters (mm)</span>
-        <button type="button" data-copy-target="mm" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+        <button type="button" data-copy-target="mm" class="pk-calc-copy-btn p-1 -m-1 text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
       </div>
-      <p id="pk-calc-out-mm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">35 × 45 mm</p>
-      <p id="pk-calc-sub-mm" class="mt-0.5 text-[10px] text-muted">1 mm = 11.81 px</p>
+      <p id="pk-calc-out-mm" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg truncate">35 × 45 mm</p>
+      <p id="pk-calc-sub-mm" class="mt-0.5 text-[10px] text-muted truncate">1 mm = 11.81 px</p>
     </div>
 
-    <div id="pk-calc-card-in" class={`rounded-xl border p-3 transition-colors ${isPxToPhys && defaultUnit === 'in' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
+    <div id="pk-calc-card-in" class={`rounded-xl border p-2.5 sm:p-3 transition-colors ${isPxToPhys && defaultUnit === 'in' ? 'border-accent/60 bg-accent/5' : 'border-border bg-bg/40'}`}>
       <div class="flex items-center justify-between gap-1">
         <span class="text-[11px] font-semibold text-muted">Inches (in)</span>
-        <button type="button" data-copy-target="in" class="pk-calc-copy-btn text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
+        <button type="button" data-copy-target="in" class="pk-calc-copy-btn p-1 -m-1 text-[10px] font-semibold text-accent hover:underline cursor-pointer">Copy</button>
       </div>
-      <p id="pk-calc-out-in" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg">1.38 × 1.77 in</p>
-      <p id="pk-calc-sub-in" class="mt-0.5 text-[10px] text-muted">1 in = 300 px</p>
+      <p id="pk-calc-out-in" class="mt-1 font-mono text-sm sm:text-base font-bold text-fg truncate">1.38 × 1.77 in</p>
+      <p id="pk-calc-sub-in" class="mt-0.5 text-[10px] text-muted truncate">1 in = 300 px</p>
     </div>
   </div>
 
   <!-- Live Formula Breakdown + 1-Click Send to Resizer CTA -->
-  <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-border/70 bg-bg/50 px-3.5 py-2.5">
-    <p id="pk-calc-formula" class="font-mono text-[11px] text-muted leading-relaxed">
+  <div class="mt-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-border/70 bg-bg/50 p-2.5 sm:px-3.5 sm:py-2.5">
+    <p id="pk-calc-formula" class="font-mono text-[11px] text-muted leading-relaxed break-words">
       {isPxToPhys
         ? 'Formula: CM = (px × 2.54) ÷ 300 → 413 × 531 px = 3.5 × 4.5 cm'
         : 'Formula: px = round((cm ÷ 2.54) × 300) → 3.5 × 4.5 cm = 413 × 531 px'}
@@ -244,9 +248,9 @@ const presets = [
     <button
       id="pk-calc-apply-btn"
       type="button"
-      class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-fg shadow-xs hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
+      class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 sm:py-2 text-xs font-semibold text-accent-fg shadow-xs hover:opacity-90 active:scale-[0.98] transition-all shrink-0 cursor-pointer"
     >
-      <span id="pk-calc-apply-label">Resize Photo to 413 × 531 px (3.5 × 4.5 cm @ 300 DPI) ↓</span>
+      <span id="pk-calc-apply-label" class="text-center">Resize Photo to 413 × 531 px (3.5 × 4.5 cm @ 300 DPI) ↓</span>
     </button>
   </div>
 </section>

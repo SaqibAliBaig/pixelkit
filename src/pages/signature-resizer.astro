@@ -70,7 +70,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -88,15 +88,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official Exam Signature Specification Summary (2026 Direct Answer)"
-      summaryText="Most government and recruitment examination portals (UPSC, SSC, IBPS, SBI, Railways, NTA) mandate candidate signatures in JPG/JPEG format weighing strictly between 10 KB and 20 KB. The standard dimension ratio is 2:1 (140 × 60 px, 280 × 140 px, or 3.5 × 1.5 cm), written with black or blue ink on smooth white paper."
-      portalName="National Examination & Recruitment Portals"
-      specs={[{"label":"File Size Bracket","value":"10 KB to 20 KB strictly","highlight":true},{"label":"Aspect Ratio","value":"2:1 Horizontal (140×60 px to 280×140 px)","highlight":true},{"label":"Format","value":"JPG / JPEG only"},{"label":"Ink & Background","value":"Dark Ink on Plain White Paper"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -111,6 +103,14 @@ const jsonLd = [
         maxKb={20}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official Exam Signature Specification Summary (2026 Direct Answer)"
+      summaryText="Most government and recruitment examination portals (UPSC, SSC, IBPS, SBI, Railways, NTA) mandate candidate signatures in JPG/JPEG format weighing strictly between 10 KB and 20 KB. The standard dimension ratio is 2:1 (140 × 60 px, 280 × 140 px, or 3.5 × 1.5 cm), written with black or blue ink on smooth white paper."
+      portalName="National Examination & Recruitment Portals"
+      specs={[{"label":"File Size Bracket","value":"10 KB to 20 KB strictly","highlight":true},{"label":"Aspect Ratio","value":"2:1 Horizontal (140×60 px to 280×140 px)","highlight":true},{"label":"Format","value":"JPG / JPEG only"},{"label":"Ink & Background","value":"Dark Ink on Plain White Paper"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

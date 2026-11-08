@@ -113,7 +113,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -132,7 +132,18 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={50}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title="How to Reduce Image Size in KB Fast"
       summaryText="To reduce an image's size in KB, upload it to PixelKit, choose an exact kilobyte target (like 50 KB or 100 KB), and download the compressed file. PixelKit runs a fast client-side binary search across JPEG and WebP quantization tables, delivering up to 90% size reduction while retaining sharp text and facial clarity."
@@ -143,18 +154,6 @@ const jsonLd = [
         { label: 'Privacy & Security', value: '100% Client-Side / Zero Server Logging' },
       ]}
     />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="jpg"
-        fromMime="image/jpeg"
-        toMime="image/jpeg"
-        targetKb={50}
-        initialTool="compress"
-      />
-    </div>
 
     <!-- Quick Size Ladder Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

@@ -149,9 +149,18 @@ const comparisonMethods = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="heic"
+        to="pdf"
+        fromMime="image/heic"
+        toMime="application/pdf"
+        initialTool="convert"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
         title="How to Convert Photos to PDF on iPhone (Direct Answer)"
         summaryText={directAnswer.answer}
         specs={[
@@ -161,18 +170,6 @@ const comparisonMethods = [
           { label: 'Privacy & Security', value: '100% Client-Side Memory / Zero Cloud Uploads' },
         ]}
       />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for iPhone HEIC to PDF -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="heic"
-        to="pdf"
-        fromMime="image/heic"
-        toMime="application/pdf"
-        initialTool="convert"
-      />
-    </div>
 
     <!-- 3 Methods Comparison Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official IRCC Canada Photo Specifications (2026 Direct Answer)"
-      summaryText="Immigration, Refugees and Citizenship Canada (IRCC) mandates digital photos for Express Entry PR, study permits, and visitor visas to measure minimum 420 × 540 pixels (5:7 ratio) and under 240 KB JPG. The face height from chin to crown must be between 31 mm and 36 mm against a pure white background."
-      portalName="Immigration, Refugees and Citizenship Canada (canada.ca)"
-      specs={[{"label":"Digital Dimensions","value":"420 × 540 pixels (5:7 ratio)","highlight":true},{"label":"File Size Limit","value":"Max 240 KB JPG strictly","highlight":true},{"label":"Face Height","value":"31 mm to 36 mm (50–70% of frame)"},{"label":"Background","value":"Plain White or Light-Coloured"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -96,6 +88,14 @@ const jsonLd = [
         category="visa"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official IRCC Canada Photo Specifications (2026 Direct Answer)"
+      summaryText="Immigration, Refugees and Citizenship Canada (IRCC) mandates digital photos for Express Entry PR, study permits, and visitor visas to measure minimum 420 × 540 pixels (5:7 ratio) and under 240 KB JPG. The face height from chin to crown must be between 31 mm and 36 mm against a pure white background."
+      portalName="Immigration, Refugees and Citizenship Canada (canada.ca)"
+      specs={[{"label":"Digital Dimensions","value":"420 × 540 pixels (5:7 ratio)","highlight":true},{"label":"File Size Limit","value":"Max 240 KB JPG strictly","highlight":true},{"label":"Face Height","value":"31 mm to 36 mm (50–70% of frame)"},{"label":"Background","value":"Plain White or Light-Coloured"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

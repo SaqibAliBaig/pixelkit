@@ -151,9 +151,18 @@ const windowsMethods = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="heic"
+        to="jpg"
+        fromMime="image/heic"
+        toMime="image/jpeg"
+        initialTool="convert"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
         title="How to Convert HEIC to JPG on Windows (2026 Solution)"
         summaryText={directAnswer.answer}
         specs={[
@@ -163,18 +172,6 @@ const windowsMethods = [
           { label: 'Privacy & Security', value: 'Zero Server Uploads / Local Memory Only', highlight: true },
         ]}
       />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for HEIC to JPG -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="heic"
-        to="jpg"
-        fromMime="image/heic"
-        toMime="image/jpeg"
-        initialTool="convert"
-      />
-    </div>
 
     <!-- Three Methods Comparison Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

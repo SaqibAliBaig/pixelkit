@@ -102,7 +102,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero -->
@@ -121,7 +121,18 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer Box -->
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={100}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title="How Specific Size Compression Works"
       summaryText="Unlike traditional tools that force you to guess arbitrary quality percentages (e.g. 70% or 80%), PixelKit lets you enter the exact number required by your portal (e.g. 50 KB, 200 KB, 2 MB, or 5 MB). The browser engine automatically converges to that exact limit in milliseconds."
@@ -132,18 +143,6 @@ const jsonLd = [
         { label: 'Privacy', value: 'Zero Server Uploads' },
       ]}
     />
-
-    <!-- Tool Preview -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="jpg"
-        fromMime="image/jpeg"
-        toMime="image/jpeg"
-        targetKb={100}
-        initialTool="compress"
-      />
-    </div>
 
     <!-- Quick Target Jump Section -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

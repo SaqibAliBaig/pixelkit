@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="NTA CUET Photo & Signature Requirements (2026 Direct Answer)"
-      summaryText="Common University Entrance Test (CUET UG/PG) candidates must upload a recent passport-size photograph (10 KB to 200 KB JPG) showing 80% face with both ears visible against a white background, and signature (4 KB to 30 KB JPG)."
-      portalName="NTA CUET Portal (exams.nta.ac.in/CUET-UG)"
-      specs={[{"label":"Photo Size","value":"10 KB to 200 KB JPG","highlight":true},{"label":"Signature Size","value":"4 KB to 30 KB JPG","highlight":true},{"label":"Background","value":"White Background"},{"label":"Ears Visibility","value":"Both ears clearly visible"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -99,6 +91,14 @@ const jsonLd = [
         maxKb={200}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="NTA CUET Photo & Signature Requirements (2026 Direct Answer)"
+      summaryText="Common University Entrance Test (CUET UG/PG) candidates must upload a recent passport-size photograph (10 KB to 200 KB JPG) showing 80% face with both ears visible against a white background, and signature (4 KB to 30 KB JPG)."
+      portalName="NTA CUET Portal (exams.nta.ac.in/CUET-UG)"
+      specs={[{"label":"Photo Size","value":"10 KB to 200 KB JPG","highlight":true},{"label":"Signature Size","value":"4 KB to 30 KB JPG","highlight":true},{"label":"Background","value":"White Background"},{"label":"Ears Visibility","value":"Both ears clearly visible"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

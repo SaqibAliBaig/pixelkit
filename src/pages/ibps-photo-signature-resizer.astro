@@ -62,7 +62,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -80,15 +80,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official IBPS Upload Specifications (2026 Direct Answer)"
-      summaryText="IBPS applications require four separate digital files: (1) Passport Photo: 200 × 230 px, 20–50 KB; (2) Signature: 140 × 60 px, 10–20 KB (no capital/block letters); (3) Left Thumb Impression: 200 × 200 px or 140 × 60 px, 20–50 KB; (4) Handwritten Declaration: 800 × 400 px, 50–100 KB in English."
-      portalName="Institute of Banking Personnel Selection (ibps.in)"
-      specs={[{"label":"Passport Photo","value":"200 × 230 px (20–50 KB)","highlight":true},{"label":"Signature","value":"140 × 60 px (10–20 KB)","highlight":true},{"label":"Left Thumb (LTI)","value":"200 × 200 px (20–50 KB)","highlight":true},{"label":"Declaration","value":"800 × 400 px (50–100 KB)","highlight":true}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -103,6 +95,14 @@ const jsonLd = [
         maxKb={50}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official IBPS Upload Specifications (2026 Direct Answer)"
+      summaryText="IBPS applications require four separate digital files: (1) Passport Photo: 200 × 230 px, 20–50 KB; (2) Signature: 140 × 60 px, 10–20 KB (no capital/block letters); (3) Left Thumb Impression: 200 × 200 px or 140 × 60 px, 20–50 KB; (4) Handwritten Declaration: 800 × 400 px, 50–100 KB in English."
+      portalName="Institute of Banking Personnel Selection (ibps.in)"
+      specs={[{"label":"Passport Photo","value":"200 × 230 px (20–50 KB)","highlight":true},{"label":"Signature","value":"140 × 60 px (10–20 KB)","highlight":true},{"label":"Left Thumb (LTI)","value":"200 × 200 px (20–50 KB)","highlight":true},{"label":"Declaration","value":"800 × 400 px (50–100 KB)","highlight":true}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

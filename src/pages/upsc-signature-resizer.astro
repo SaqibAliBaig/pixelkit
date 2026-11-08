@@ -89,7 +89,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -107,20 +107,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official UPSC Signature Specification Summary (2026 Direct Answer)"
-      summaryText="Union Public Service Commission (UPSC Civil Services CSE, NDA, CDS, CMS, and OTR registration) requires candidate signatures in JPG/JPEG format weighing between 10 KB and 20 KB. Standard pixel dimensions are 280 × 140 pixels (or 350 × 350 px min to 1000 × 560 px max), signed with clear black ink on smooth white paper without shadows or smudges."
-      portalName="Union Public Service Commission (upsconline.nic.in)"
-      specs={[
-        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
-        { label: 'File Size Bracket', value: '10 KB to 20 KB strictly', highlight: true },
-        { label: 'Dimensions', value: '280 × 140 px (2:1 Ratio)' },
-        { label: 'Ink & Paper', value: 'Black Ink on White Paper' },
-      ]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -135,6 +122,19 @@ const jsonLd = [
         maxKb={20}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official UPSC Signature Specification Summary (2026 Direct Answer)"
+      summaryText="Union Public Service Commission (UPSC Civil Services CSE, NDA, CDS, CMS, and OTR registration) requires candidate signatures in JPG/JPEG format weighing between 10 KB and 20 KB. Standard pixel dimensions are 280 × 140 pixels (or 350 × 350 px min to 1000 × 560 px max), signed with clear black ink on smooth white paper without shadows or smudges."
+      portalName="Union Public Service Commission (upsconline.nic.in)"
+      specs={[
+        { label: 'Format', value: 'JPG / JPEG only', highlight: true },
+        { label: 'File Size Bracket', value: '10 KB to 20 KB strictly', highlight: true },
+        { label: 'Dimensions', value: '280 × 140 px (2:1 Ratio)' },
+        { label: 'Ink & Paper', value: 'Black Ink on White Paper' },
+      ]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

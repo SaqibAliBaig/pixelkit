@@ -113,7 +113,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -132,20 +132,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
-    <DirectAnswerBox
-      title="How to Compress an Image Without Losing Quality"
-      summaryText="To compress an image without losing quality, upload it to PixelKit. The in-browser Web Worker engine analyzes the image's frequency spectrum, applies 4:2:0 chroma subsampling, and fine-tunes quantization tables to remove redundant color samples that the human eye cannot detect. The result is a 70% to 85% smaller file with an SSIM score above 0.98, maintaining full photographic sharpness."
-      specs={[
-        { label: 'Perceptual Quality Score', value: 'SSIM > 0.98 (Visually Indistinguishable)', highlight: true },
-        { label: 'Supported Formats', value: 'JPG, PNG, WebP, AVIF, HEIC (iPhone), PDF' },
-        { label: 'File Size Reduction', value: '70% – 85% Average Byte Savings', highlight: true },
-        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
-      ]}
-    />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -156,6 +143,18 @@ const jsonLd = [
         initialSizeMode="quality"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="How to Compress an Image Without Losing Quality"
+      summaryText="To compress an image without losing quality, upload it to PixelKit. The in-browser Web Worker engine analyzes the image's frequency spectrum, applies 4:2:0 chroma subsampling, and fine-tunes quantization tables to remove redundant color samples that the human eye cannot detect. The result is a 70% to 85% smaller file with an SSIM score above 0.98, maintaining full photographic sharpness."
+      specs={[
+        { label: 'Perceptual Quality Score', value: 'SSIM > 0.98 (Visually Indistinguishable)', highlight: true },
+        { label: 'Supported Formats', value: 'JPG, PNG, WebP, AVIF, HEIC (iPhone), PDF' },
+        { label: 'File Size Reduction', value: '70% – 85% Average Byte Savings', highlight: true },
+        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
 
     <!-- Comparison: Lossless vs Perceptually Lossless -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

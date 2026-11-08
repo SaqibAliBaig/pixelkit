@@ -158,22 +158,7 @@ const portalsRequiringBracket = [
       </p>
     </header>
 
-    <!-- Direct Answer Box (GEO / AI Overview) -->
-    <div class="mt-6 sm:mt-8">
-      <DirectAnswerBox
-        title="How to Resize an Image to 20KB to 50KB for Online Forms"
-        summaryText={directAnswer.answer}
-        specs={[
-          { label: 'Allowable File Bracket', value: '20 KB Min to 50 KB Max', highlight: true },
-          { label: 'Target Sweet Spot', value: '~38 KB (18 KB floor / 12 KB ceiling margin)', highlight: true },
-          { label: 'Required Dimensions', value: '350 × 450 px (3.5 × 4.5 cm)' },
-          { label: 'Accepted File Format', value: 'JPEG / JPG with White Background' },
-        ]}
-      />
-    </div>
-
-    <!-- Active Tool Studio Pre-configured for SSC/UPSC bracket -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -188,6 +173,18 @@ const portalsRequiringBracket = [
         maxKb={50}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+        title="How to Resize an Image to 20KB to 50KB for Online Forms"
+        summaryText={directAnswer.answer}
+        specs={[
+          { label: 'Allowable File Bracket', value: '20 KB Min to 50 KB Max', highlight: true },
+          { label: 'Target Sweet Spot', value: '~38 KB (18 KB floor / 12 KB ceiling margin)', highlight: true },
+          { label: 'Required Dimensions', value: '350 × 450 px (3.5 × 4.5 cm)' },
+          { label: 'Accepted File Format', value: 'JPEG / JPG with White Background' },
+        ]}
+      />
 
     <!-- Official Portal Bracket Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

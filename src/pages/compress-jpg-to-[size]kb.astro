@@ -455,7 +455,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -474,7 +474,18 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={spec.size}
+        initialTool="compress"
+      />
+    </div>
+
+    <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title={`How to Compress JPG to ${spec.size}KB Fast`}
       summaryText={`To compress a JPG to ${spec.size}KB, drop your image into PixelKit. The browser executes an iterative binary-search quantization algorithm inside a Web Worker, converging on the highest possible visual clarity that stays strictly at or below ${spec.size}KB without uploading files to remote servers.`}
@@ -485,18 +496,6 @@ const jsonLd = [
         { label: 'Privacy Guarantee', value: '100% Client-Side / Zero Server Logging' },
       ]}
     />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="jpg"
-        fromMime="image/jpeg"
-        toMime="image/jpeg"
-        targetKb={spec.size}
-        initialTool="compress"
-      />
-    </div>
 
     <!-- Practical Use Cases Grid -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

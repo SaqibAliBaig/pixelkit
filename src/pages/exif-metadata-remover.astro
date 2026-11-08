@@ -62,7 +62,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -80,15 +80,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="What Hidden EXIF Data Does PixelKit Strip? (2026 Direct Answer)"
-      summaryText="Smartphone cameras and digital DSLRs embed extensive metadata into every photograph: precise GPS coordinates of your location, timestamp, camera make/model, unique lens serial numbers, exposure settings, and device owner info. PixelKit strips all APP1..APP15 and ancillary chunks in memory, returning clean, anonymous photos."
-      portalName="Digital Privacy & Metadata Protection Standard"
-      specs={[{"label":"GPS Location","value":"Completely removed (Lat/Long/Altitude)","highlight":true},{"label":"Device & Camera","value":"Removed (Make, Model, Lens Serial)","highlight":true},{"label":"Image Quality","value":"100% intact (No visual blur)"},{"label":"Server Upload","value":"Zero (Runs 100% in browser)"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -98,6 +90,14 @@ const jsonLd = [
         preserveMetadata={false}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="What Hidden EXIF Data Does PixelKit Strip? (2026 Direct Answer)"
+      summaryText="Smartphone cameras and digital DSLRs embed extensive metadata into every photograph: precise GPS coordinates of your location, timestamp, camera make/model, unique lens serial numbers, exposure settings, and device owner info. PixelKit strips all APP1..APP15 and ancillary chunks in memory, returning clean, anonymous photos."
+      portalName="Digital Privacy & Metadata Protection Standard"
+      specs={[{"label":"GPS Location","value":"Completely removed (Lat/Long/Altitude)","highlight":true},{"label":"Device & Camera","value":"Removed (Make, Model, Lens Serial)","highlight":true},{"label":"Image Quality","value":"100% intact (No visual blur)"},{"label":"Server Upload","value":"Zero (Runs 100% in browser)"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

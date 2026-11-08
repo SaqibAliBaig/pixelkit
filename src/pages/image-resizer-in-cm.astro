@@ -106,7 +106,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -125,20 +125,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
-    <DirectAnswerBox
-      title="How to Convert and Resize Images in CM to Pixels"
-      summaryText="To resize an image in cm, enter your required dimensions in PixelKit (e.g. 3.5 × 4.5 cm for passport photos). PixelKit calculates exact print pixel dimensions using the formula: Pixels = (Centimeters / 2.54) × DPI. At 300 DPI, 3.5 × 4.5 cm becomes 413 × 531 pixels (or 350 × 450 px on digital exam portals at 100 px/cm). Bicubic resampling ensures sharp, unblurred print reproduction."
-      specs={[
-        { label: 'Standard Passport CM', value: '3.5 cm (width) × 4.5 cm (height)', highlight: true },
-        { label: 'Pixel Conversion (300 DPI)', value: '413 × 531 px (Passport) / 600 × 600 px (Visa)' },
-        { label: 'DPI Presets', value: '200 DPI, 300 DPI, 600 DPI High-Res', highlight: true },
-        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
-      ]}
-    />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -152,6 +139,18 @@ const jsonLd = [
         initialDpi={300}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="How to Convert and Resize Images in CM to Pixels"
+      summaryText="To resize an image in cm, enter your required dimensions in PixelKit (e.g. 3.5 × 4.5 cm for passport photos). PixelKit calculates exact print pixel dimensions using the formula: Pixels = (Centimeters / 2.54) × DPI. At 300 DPI, 3.5 × 4.5 cm becomes 413 × 531 pixels (or 350 × 450 px on digital exam portals at 100 px/cm). Bicubic resampling ensures sharp, unblurred print reproduction."
+      specs={[
+        { label: 'Standard Passport CM', value: '3.5 cm (width) × 4.5 cm (height)', highlight: true },
+        { label: 'Pixel Conversion (300 DPI)', value: '413 × 531 px (Passport) / 600 × 600 px (Visa)' },
+        { label: 'DPI Presets', value: '200 DPI, 300 DPI, 600 DPI High-Res', highlight: true },
+        { label: 'Security & Privacy', value: '100% Client-Side / Zero Server Logging' },
+      ]}
+    />
 
     <!-- CM to Pixel Conversion Reference Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

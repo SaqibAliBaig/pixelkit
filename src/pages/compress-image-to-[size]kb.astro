@@ -463,7 +463,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -481,6 +481,17 @@ const jsonLd = [
       </p>
     </header>
 
+<div class="mt-5 sm:mt-8">
+      <ToolPreview
+        from="jpg"
+        to="jpg"
+        fromMime="image/jpeg"
+        toMime="image/jpeg"
+        targetKb={spec.size}
+        initialTool="compress"
+      />
+    </div>
+
     <!-- GEO Direct Answer Definition Block -->
     <DirectAnswerBox
       title={`Official ${spec.size}KB Compression Specification (2026 Direct Answer)`}
@@ -492,17 +503,6 @@ const jsonLd = [
         { label: 'Privacy', value: 'Zero Server Uploads' },
       ]}
     />
-
-    <div class="mt-6 sm:mt-8">
-      <ToolPreview
-        from="jpg"
-        to="jpg"
-        fromMime="image/jpeg"
-        toMime="image/jpeg"
-        targetKb={spec.size}
-        initialTool="compress"
-      />
-    </div>
 
     <!-- Use cases -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

@@ -63,7 +63,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -81,15 +81,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Pixels to CM Conversion Formula (2026 Direct Answer)"
-      summaryText="To convert pixels to centimeters: Centimeters = (Pixels × 2.54) ÷ DPI. At the standard print resolution of 300 DPI: 1 cm equals approximately 118.11 pixels, and 1 pixel equals 0.00846 cm. For example, a 413 × 531 pixel passport photo translates to exactly 3.5 × 4.5 cm at 300 DPI."
-      portalName="Print & Dimension Conversion Standard"
-      specs={[{"label":"Formula","value":"CM = (Pixels × 2.54) ÷ DPI","highlight":true},{"label":"At 300 DPI","value":"1 cm = 118.11 pixels","highlight":true},{"label":"At 72 DPI","value":"1 cm = 28.35 pixels"},{"label":"Passport (3.5×4.5cm)","value":"413 × 531 pixels @ 300 DPI"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+    <div class="mt-5 sm:mt-8">
       <DimensionCalculator mode="px-to-cm" defaultDpi={300} />
       <ToolPreview
         from="jpg"
@@ -103,6 +95,14 @@ const jsonLd = [
         initialDpi={300}
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Pixels to CM Conversion Formula (2026 Direct Answer)"
+      summaryText="To convert pixels to centimeters: Centimeters = (Pixels × 2.54) ÷ DPI. At the standard print resolution of 300 DPI: 1 cm equals approximately 118.11 pixels, and 1 pixel equals 0.00846 cm. For example, a 413 × 531 pixel passport photo translates to exactly 3.5 × 4.5 cm at 300 DPI."
+      portalName="Print & Dimension Conversion Standard"
+      specs={[{"label":"Formula","value":"CM = (Pixels × 2.54) ÷ DPI","highlight":true},{"label":"At 300 DPI","value":"1 cm = 118.11 pixels","highlight":true},{"label":"At 72 DPI","value":"1 cm = 28.35 pixels"},{"label":"Passport (3.5×4.5cm)","value":"413 × 531 pixels @ 300 DPI"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

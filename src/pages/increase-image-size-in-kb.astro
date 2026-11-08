@@ -112,7 +112,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Hero Header -->
@@ -131,20 +131,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- Direct Answer GEO Box -->
-    <DirectAnswerBox
-      title="How to Increase Image Size in KB for Online Application Forms"
-      summaryText="When government or university application portals reject your photo with errors like 'File size must be at least 20 KB', your image byte count is below their threshold. PixelKit increases image size in KB by raising quantization tables to full fidelity and injecting ISO-standard JPEG metadata padding, ensuring 100% portal acceptance without distorting your photo."
-      specs={[
-        { label: 'Common Targets', value: 'Increase to 20KB, 50KB, 100KB, 200KB', highlight: true },
-        { label: 'Supported Inputs', value: 'JPG, PNG, WebP, HEIC (iPhone), PDF' },
-        { label: 'Visual Quality', value: '100% Crisp / No Blurriness or Stretching', highlight: true },
-        { label: 'Portal Compliance', value: 'UPSC, SSC, NEET, JEE, IBPS, State PSCs' },
-      ]}
-    />
-
-    <!-- Interactive Tool -->
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -155,6 +142,18 @@ const jsonLd = [
         initialSizeMode="exact"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="How to Increase Image Size in KB for Online Application Forms"
+      summaryText="When government or university application portals reject your photo with errors like 'File size must be at least 20 KB', your image byte count is below their threshold. PixelKit increases image size in KB by raising quantization tables to full fidelity and injecting ISO-standard JPEG metadata padding, ensuring 100% portal acceptance without distorting your photo."
+      specs={[
+        { label: 'Common Targets', value: 'Increase to 20KB, 50KB, 100KB, 200KB', highlight: true },
+        { label: 'Supported Inputs', value: 'JPG, PNG, WebP, HEIC (iPhone), PDF' },
+        { label: 'Visual Quality', value: '100% Crisp / No Blurriness or Stretching', highlight: true },
+        { label: 'Portal Compliance', value: 'UPSC, SSC, NEET, JEE, IBPS, State PSCs' },
+      ]}
+    />
 
     <!-- Minimum Size Table & Use Cases -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">

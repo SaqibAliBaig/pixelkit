@@ -58,7 +58,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   width="wide"
 >
-  <div class="mx-auto max-w-5xl px-2 sm:px-0">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <Breadcrumbs items={breadcrumbs} />
 
     <header class="text-center mt-5 sm:mt-8">
@@ -76,15 +76,7 @@ const jsonLd = [
       </p>
     </header>
 
-    <!-- GEO Direct Answer Definition Block -->
-    <DirectAnswerBox
-      title="Official LinkedIn Banner Dimensions (2026 Direct Answer)"
-      summaryText="LinkedIn recommends a personal profile background banner of 1584 × 396 pixels (exact 4:1 aspect ratio) under 8 MB in JPG or PNG format. Crucially, the circular profile picture overlaps the bottom-left area of the banner on both desktop and mobile; keep important contact details and typography centered or right-aligned."
-      portalName="LinkedIn Profile Specifications"
-      specs={[{"label":"Recommended Dimensions","value":"1584 × 396 pixels","highlight":true},{"label":"Aspect Ratio","value":"4:1 Panoramic Ratio","highlight":true},{"label":"Max File Size","value":"Under 8 MB (JPG/PNG)"},{"label":"Safe Zone Area","value":"Center and Right-aligned"}]}
-    />
-
-    <div class="mt-6 sm:mt-8">
+<div class="mt-5 sm:mt-8">
       <ToolPreview
         from="jpg"
         to="jpg"
@@ -96,6 +88,14 @@ const jsonLd = [
         category="social"
       />
     </div>
+
+    <!-- GEO Direct Answer Definition Block -->
+    <DirectAnswerBox
+      title="Official LinkedIn Banner Dimensions (2026 Direct Answer)"
+      summaryText="LinkedIn recommends a personal profile background banner of 1584 × 396 pixels (exact 4:1 aspect ratio) under 8 MB in JPG or PNG format. Crucially, the circular profile picture overlaps the bottom-left area of the banner on both desktop and mobile; keep important contact details and typography centered or right-aligned."
+      portalName="LinkedIn Profile Specifications"
+      specs={[{"label":"Recommended Dimensions","value":"1584 × 396 pixels","highlight":true},{"label":"Aspect Ratio","value":"4:1 Panoramic Ratio","highlight":true},{"label":"Max File Size","value":"Under 8 MB (JPG/PNG)"},{"label":"Safe Zone Area","value":"Center and Right-aligned"}]}
+    />
 
     <!-- Official Specification Table -->
     <section class="mt-12 sm:mt-16 rounded-2xl border border-border/80 bg-surface/90 p-5 sm:p-8 shadow-xs">
