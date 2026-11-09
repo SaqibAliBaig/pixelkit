@@ -66,7 +66,7 @@ const connectedGraph = buildConnectedGraph({
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth overflow-x-hidden w-full">
+<html lang="en" class="scroll-smooth overflow-x-clip w-full max-w-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -109,7 +109,7 @@ const connectedGraph = buildConnectedGraph({
 
     <JsonLd data={connectedGraph} />
   </head>
-  <body class="min-h-screen bg-bg text-fg antialiased flex flex-col overflow-x-hidden w-full max-w-full">
+  <body class="min-h-screen bg-bg text-fg antialiased flex flex-col overflow-x-clip w-full max-w-full">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-fg"

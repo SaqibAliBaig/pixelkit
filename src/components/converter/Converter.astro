@@ -249,11 +249,13 @@ const accept = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,.bmp,.svg,.tif,.tif
 
 <!-- The island: deferred until browser idle or user interaction for lightning-fast LCP and zero main-thread blocking. -->
 <script>
-  // Center active tool tab in mobile scrollable bar
+  // Center active tool tab in mobile scrollable bar without scrolling window
   try {
-    const activeTab = document.querySelector<HTMLElement>('#pk-top-mode-bar [aria-current="page"]');
-    if (activeTab && window.innerWidth < 640) {
-      activeTab.scrollIntoView({ inline: 'center', block: 'nearest' });
+    const bar = document.getElementById('pk-top-mode-bar');
+    const activeTab = bar?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (bar && activeTab && window.innerWidth < 640) {
+      const targetScroll = activeTab.offsetLeft - (bar.clientWidth - activeTab.clientWidth) / 2;
+      bar.scrollLeft = Math.max(0, targetScroll);
     }
   } catch (_) {}
 

@@ -196,7 +196,7 @@ const initialModeBadgeText =
       <div class="text-xs uppercase tracking-wider text-muted font-bold" role="heading" aria-level="2">
         Settings
       </div>
-      <span id="pk-settings-mode-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-border text-muted font-semibold">
+      <span id="pk-settings-mode-badge" class="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface border border-border text-muted font-semibold whitespace-nowrap shrink-0">
         {initialModeBadgeText}
       </span>
     </div>
@@ -1547,19 +1547,19 @@ const initialModeBadgeText =
 
   <!-- PANEL 2: Portal Presets Mode (Dedicated, Spacious, Zero Truncation) -->
   <div id="pk-panel-portal" class={`mt-4 space-y-3 ${initialTool === 'passport' ? '' : 'hidden'}`}>
-    <div class="flex items-center justify-between">
-      <div>
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0 flex-1">
         <span class="text-xs font-bold text-fg uppercase tracking-wider block">
           {panelTitle}
         </span>
-        <p class="text-[11px] text-muted mt-0.5">
+        <p class="text-[11px] text-muted mt-0.5 leading-relaxed">
           {panelSubtitle}
         </p>
       </div>
       <button
         type="button"
         id="pk-portal-panel-reset"
-        class="text-[11px] text-muted hover:text-accent font-medium hidden cursor-pointer shrink-0"
+        class="text-[11px] text-muted hover:text-accent font-medium hidden cursor-pointer shrink-0 mt-0.5"
       >
         Reset to manual
       </button>
@@ -1577,13 +1577,13 @@ const initialModeBadgeText =
         <input
           type="search"
           id="pk-portal-search"
-          placeholder="Filter presets (e.g. US, UK, UPSC, China)..."
+          placeholder="Filter presets (e.g. US, UK, UPSC)..."
           class="w-full rounded-lg border border-border bg-surface pl-8 pr-3 py-1.5 text-xs text-fg placeholder:text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           autocomplete="off"
         />
       </div>
 
-      <div class="flex flex-wrap gap-1.5 text-[11px]" id="pk-portal-category-filters">
+      <div class="flex items-center gap-1.5 text-[11px] overflow-x-auto no-scrollbar pb-1 sm:flex-wrap" id="pk-portal-category-filters">
         <button
           type="button"
           class={`pk-cat-filter shrink-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium cursor-pointer transition-all shadow-2xs ${
@@ -1749,7 +1749,7 @@ const initialModeBadgeText =
     </div>
 
     <!-- Active Summary -->
-    <p id="pk-portal-applied-summary" class="text-[11px] text-accent font-medium hidden">
+    <p id="pk-portal-applied-summary" class="text-xs text-accent font-medium hidden p-2.5 rounded-xl bg-accent/10 border border-accent/25 flex items-center gap-2 leading-relaxed break-words">
     </p>
 
     <!-- Footer of portal panel -->

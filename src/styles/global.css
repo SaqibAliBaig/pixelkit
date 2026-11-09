@@ -52,8 +52,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: clip;
     background-color: rgb(var(--bg));
     color: rgb(var(--fg));
     font-family:
@@ -121,8 +121,8 @@
     line-height: 1.55;
     text-rendering: optimizeLegibility;
     width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: clip;
   }
 
   /* Enhanced mobile touch behavior & responsiveness */

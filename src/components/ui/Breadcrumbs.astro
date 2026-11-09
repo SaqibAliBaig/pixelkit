@@ -12,8 +12,8 @@ interface Props {
 const { items, class: className = '' } = Astro.props;
 ---
 
-<nav aria-label="Breadcrumb" class={['text-sm', className].join(' ')}>
-  <ol class="flex flex-wrap items-center gap-1.5 text-muted">
+<nav aria-label="Breadcrumb" class={['text-xs sm:text-sm max-w-full overflow-hidden', className].join(' ')}>
+  <ol class="flex flex-wrap items-center gap-1.5 text-muted break-words">
     {items.map((item, i) => {
       const isLast = i === items.length - 1;
       return (
