@@ -3,6 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/ui/Breadcrumbs.astro';
 import ToolHero from '@components/seo/ToolHero.astro';
 import ToolIntro from '@components/seo/ToolIntro.astro';
+import DirectAnswerBox from '@components/seo/DirectAnswerBox.astro';
 import FAQSection from '@components/seo/FAQSection.astro';
 import RelatedCombos from '@components/seo/RelatedCombos.astro';
 import UseCaseGrid from '@components/seo/UseCaseGrid.astro';
@@ -68,13 +69,38 @@ const fromLabel = combo.from.toUpperCase();
 const toLabel = combo.to.toUpperCase();
 const toolKeywords = [
   `${combo.from} to ${combo.to}`,
-  `convert ${fromLabel} to ${toLabel}`,
+  `${combo.from} to ${combo.to} converter`,
+  `convert ${combo.from} to ${combo.to}`,
+  `convert ${fromLabel} to ${toLabel} online free`,
+  `${fromLabel} to ${toLabel} converter online`,
   `${fromLabel} converter`,
   `${toLabel} converter`,
   combo.sizeKb ? `compress ${fromLabel} to ${combo.sizeKb}kb` : `compress ${fromLabel}`,
-  combo.sizeKb ? `${fromLabel} under ${combo.sizeKb}kb` : 'online file converter',
+  combo.sizeKb ? `${fromLabel} to ${toLabel} under ${combo.sizeKb}kb` : 'online file converter',
   'client-side converter',
   'no upload image converter',
+];
+
+const directAnswerTitle = combo.sizeKb
+  ? `Quick Answer: How to Convert ${fromLabel} to ${toLabel} Under ${combo.sizeKb}KB Online`
+  : `Quick Answer: How to Convert ${fromLabel} to ${toLabel} Online Free`;
+
+const directAnswerSummary = combo.sizeKb
+  ? `To convert ${fromLabel} to ${toLabel} under ${combo.sizeKb}KB: 1. Drag and drop your .${combo.from.toLowerCase()} file(s) into PixelKit above. 2. Output format (${toLabel}) and the ${combo.sizeKb}KB file size limit are pre-locked. 3. PixelKit runs a 12-step binary-search algorithm in browser memory to maximize clarity under ${combo.sizeKb}KB. 4. Click Download to save your compliant .${combo.to.toLowerCase()} file instantly with zero server uploads.`
+  : `To convert ${fromLabel} to ${toLabel} online for free: 1. Drag and drop one or more .${combo.from.toLowerCase()} files into the PixelKit converter above. 2. Optionally crop aspect ratio, resize dimensions, or set an exact KB size limit${combo.to.toLowerCase() === 'pdf' ? ' or merge multiple files into one PDF' : ''}. 3. Click Download (or Download All as ZIP) to save your converted .${combo.to.toLowerCase()} files instantly—100% locally in your browser with no watermarks or uploads.`;
+
+const directAnswerSpecs = [
+  { label: 'Conversion Pair', value: `.${combo.from.toLowerCase()} → .${combo.to.toLowerCase()} (${fromLabel} to ${toLabel})`, highlight: true },
+  {
+    label: combo.sizeKb ? 'Target Size Limit' : 'Quality & Size Control',
+    value: combo.sizeKb ? `Strictly ≤ ${combo.sizeKb} KB` : 'Lossless / Custom KB (20–500KB)',
+    highlight: Boolean(combo.sizeKb),
+  },
+  {
+    label: combo.to.toLowerCase() === 'pdf' ? 'Multi-Page & Batch' : 'Batch & Studio Tools',
+    value: combo.to.toLowerCase() === 'pdf' ? 'Merge to 1 PDF or Batch Export' : 'Bulk ZIP, Crop & Resize Included',
+  },
+  { label: 'Privacy & Cost', value: '100% Free · Zero Server Uploads' },
 ];
 ---
 
@@ -100,6 +126,12 @@ const toolKeywords = [
       initialTool={combo.sizeKb ? 'compress' : 'convert'}
     />
   </div>
+
+  <DirectAnswerBox
+    title={directAnswerTitle}
+    summaryText={directAnswerSummary}
+    specs={directAnswerSpecs}
+  />
 
   <ToolIntro combo={combo} intro={intro} />
 

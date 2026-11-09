@@ -80,6 +80,14 @@ const PAIR_INSIGHTS = {
   'pdf>png': 'Extracting PDF pages into lossless PNG preserves sharp document typography, handwritten signatures, and intricate stamps without JPEG compression blur, making it ideal for legal records and official archival.',
   'webp>jpg': 'While WebP dominates the modern web, legacy desktop applications, specialized print labs, and older passport portals still mandate traditional JPEG files. Converting WebP to JPG restores 100% universal compatibility across all legacy platforms.',
   'webp>png': 'Converting WebP images to PNG expands compressed lossy or lossless WebP streams into standard 32-bit RGBA bitmaps, enabling seamless editing in older graphic software that lacks WebP import filters.',
+  'webp>pdf': 'Converting WebP images to PDF allows you to package modern web graphics, downloaded screenshots, or scanned records into a universally printable document. PixelKit lets you merge multiple WebP files into a single multi-page PDF and optionally lock file size under 100KB or 200KB for portal uploads.',
+  'svg>pdf': 'Converting SVG vector files to PDF transforms XML path graphics into clean, printable document pages. PixelKit rasterizes vector curves at selectable DPI multipliers (up to 600 DPI print density) and packages them into standards-compliant single or multi-page PDF files.',
+  'png>avif': 'Converting PNG to AVIF leverages next-generation AV1 intra-frame compression to cut file sizes by 50% to 70% while preserving full 8-bit alpha channel transparency, sharp UI borders, and crisp typography for ultra-fast modern web performance.',
+  'jpg>avif': 'Converting JPG to AVIF upgrades standard photographs to the AV1 image container, delivering up to 50% byte savings over JPEG at identical perceptual quality with superior gradient rendering and minimal blocking artifacts.',
+  'webp>avif': 'Migrating WebP assets to AVIF achieves an additional 20% to 30% reduction in byte weight using advanced AV1 intra-frame coding, while retaining full alpha transparency and HDR color fidelity.',
+  'svg>webp': 'Rasterizing SVG vectors into WebP produces compact, transparent web bitmaps at 1x to 4x Retina DPI scales, combining sharp vector rendering with WebP’s lightweight byte footprint.',
+  'pdf>webp': 'Extracting PDF document pages into WebP images delivers lightweight, high-resolution page previews that load rapidly across modern web apps and digital archives.',
+  'heic>avif': 'Transcoding Apple iPhone HEIC captures into AVIF preserves wide color gamut fidelity while generating ultra-compact web-ready image files in local browser memory.',
 };
 
 const SIZE_PORTAL_DETAILS = {
@@ -111,17 +119,34 @@ const SIZE_PORTAL_DETAILS = {
 };
 
 function titleFor(c) {
+  const from = formatLabel(c.from);
+  const to = formatLabel(c.to);
   return c.sizeKb
-    ? `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} Under ${c.sizeKb}KB — Free, Private`
-    : `Convert ${formatLabel(c.from)} to ${formatLabel(c.to)} — Free & Instant`;
+    ? `Convert ${from} to ${to} Under ${c.sizeKb}KB Online (Free)`
+    : `${from} to ${to} Converter — Convert ${from} to ${to} Free`;
 }
 
 function descriptionFor(c) {
   const from = formatLabel(c.from);
   const to = formatLabel(c.to);
-  return c.sizeKb
-    ? `Convert ${from} to ${to} and hit exactly ${c.sizeKb}KB — no upload, no signup, 100% in your browser. Works for passport portals, exam forms and email limits.`
-    : `Convert ${from} to ${to} instantly in your browser. Private by design — your files never leave your device. Free, no signup.`;
+  const fromKey = c.from.toLowerCase();
+  const toKey = c.to.toLowerCase();
+
+  if (c.sizeKb) {
+    return `Convert and compress ${from} to ${to} strictly under ${c.sizeKb}KB online free. Auto-calibrates quality for passport, visa & exam portals—no blur, no upload.`;
+  } else if (toKey === 'pdf') {
+    return `Free online ${from} to PDF converter. Convert ${from} to PDF or merge multiple ${from} files into one compact PDF (100KB/200KB). Instant, no watermark, no upload.`;
+  } else if (fromKey === 'svg') {
+    return `Free online SVG to ${to} converter. Render vector SVG to crisp 300/600 DPI ${to} images with custom scaling. 100% lossless quality, batch ZIP & no upload.`;
+  } else if (fromKey === 'heic') {
+    return `Free online iPhone HEIC to ${to} converter. Convert Apple .heic/.heif photos to ${to} in 1 click—batch ZIP download, exact KB limits & zero server uploads.`;
+  } else if (fromKey === 'pdf') {
+    return `Free online PDF to ${to} converter. Extract multi-page PDF documents into high-res 300 DPI ${to} images in 1 click. Batch ZIP download, private & no upload.`;
+  } else if (toKey === 'avif' || toKey === 'webp') {
+    return `Free online ${from} to ${to} converter. Convert ${from} to ${to} with up to 50% smaller file size, full transparency, batch ZIP download & zero server uploads.`;
+  } else {
+    return `Free online ${from} to ${to} converter. Convert ${from} to ${to} in 1 click with lossless quality, optional crop/resize, batch ZIP & zero server uploads.`;
+  }
 }
 
 function introFor(c) {
